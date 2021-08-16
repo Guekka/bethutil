@@ -1,0 +1,130 @@
+name: Main CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/main_ci.yml'
+      - 'cmake/**'
+      - 'examples/**'
+      - 'include/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'CMakeLists.txt'
+      - 'CMakePresets.json'
+      - 'codecov.yml'
+      - 'vcpkg.json'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Debug
+  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        config: [ gcc ]
+        include:
+          - config: gcc
+            cc: gcc-10
+            cxx: g++-10
+            gcov: gcov-10
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: bethutil-common
+
+      - name: Setup Environment
+        run: |
+          echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
+          echo "GCOV=${{ matrix.gcov }}" >> $GITHUB_ENV
+
+          wget https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip
+          unzip ninja-linux.zip
+          sudo mv ninja /usr/local/bin
+
+          sudo apt install liblz4-dev zlib1g-dev -y
+          sudo pip install gcovr
+
+      - name: Download Catch2
+        uses: actions/checkout@v2
+        with:
+          ref: v2.13.6
+          repository: catchorg/Catch2
+          path: catch2
+
+      - name: Install Catch2
+        working-directory: ${{ github.workspace }}/catch2
+        run: |
+          cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCATCH_BUILD_TESTING=OFF -DCATCH_ENABLE_WERROR=OFF -DCATCH_INSTALL_DOCS=OFF
+          cmake --build build
+          sudo cmake --install build
+
+      - name: Configure CMake
+        working-directory: ${{ github.workspace }}/bethutil-common
+        run: cmake --preset ninja-linux-apt -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+      - name: Build
+        working-directory: ${{ github.workspace }}/bethutil-common
+        run: cmake --build build
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/bethutil-common/build
+        env:
+          gcovr: gcovr -r .. . --coveralls --exclude-unreachable-branches --exclude-function-lines --exclude-throw-branches
+        run: |
+          (cd tests && ./tests [src])
+          ${{ env.gcovr }} -f ".*/src/.*" -f ".*/include/btu/bethutil-common/.*" -o src.json
+
+          find -type f -name *.gcda | xargs rm
+
+          (cd tests && ./tests [examples])
+          ${{ env.gcovr }} -f ".*/examples/.*" -o examples.json
+
+      - name: Collect code coverage
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          files: bethutil-common/build/examples.json,bethutil-common/build/src.json
+          verbose: true
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: bethutil-common
+
+      - name: Setup vcpkg
+        run: |
+          mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          cd $env:VCPKG_INSTALLATION_ROOT
+          ./bootstrap-vcpkg.bat
+          ./vcpkg --version > ${{ github.workspace }}/vcpkg-version.txt
+
+      - name: Cache vcpkg
+        uses: actions/cache@v2
+        id: vcpkg-cache
+        env:
+          cache-name: vcpkg-cache
+        with:
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('bethutil-common/**/vcpkg.json', 'vcpkg-version.txt') }}
+
+      - name: Configure CMake
+        working-directory: ${{ github.workspace }}/bethutil-common
+        run: cmake --preset vs2019-windows-vcpkg
+
+      - name: Build
+        working-directory: ${{ github.workspace }}/bethutil-common
+        run: cmake --build build --config ${{ env.BUILD_TYPE }}
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/bethutil-common/build
+        run: ctest -C ${{ env.BUILD_TYPE }} -V

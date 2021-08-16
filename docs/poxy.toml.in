@@ -1,0 +1,33 @@
+author = 'Edgar B'
+cpp = 20
+description = 'Utilities for Bethesda games'
+github = 'Guekka/bethutil-common'
+license = [ 'MPL', 'https://github.com/Guekka/bethutil-common/blob/main/LICENSE' ]
+name = 'bethutil-common'
+navbar = [ 'classes', 'namespaces' ]
+
+[badges]
+'build' = [
+	'https://img.shields.io/github/workflow/status/Guekka/bethutil-common/Main%20CI?logo=github&style=flat-square',
+	'https://github.com/Guekka/bethutil-common/actions/workflows/main_ci.yml'
+]
+'codecov' = [
+	'https://img.shields.io/codecov/c/github/Guekka/bethutil-common?logo=codecov&logoColor=white&style=flat-square',
+	'https://app.codecov.io/gh/Guekka/bethutil-common'
+]
+
+[images]
+paths = [ '@DOCS_DIR@/images' ]
+
+[macros]
+'protected' = 'private'
+'BETHUTIL_VISIBLE' = ''
+
+[sources]
+extract_all = true
+paths = [ '@DOCS_DIR@/index.doxy' ]
+recursive_paths = [ '@INCLUDE_DIR@' ]
+strip_paths = [ '@INCLUDE_DIR@' ]
+
+[warnings]
+treat_as_errors = true

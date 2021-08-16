@@ -1,0 +1,7 @@
+{
+  "name": "bethutil-common",
+  "version-string": "1",
+  "dependencies": [
+    "catch2"
+  ]
+}
