@@ -13,4 +13,4 @@ namespace fs = std::filesystem;
 using fs::path;
 using string = path::string_type;
 using charT  = string::value_type;
-} // namespace BethUtil::BSA
+} // namespace btu::bsa

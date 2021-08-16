@@ -11,14 +11,14 @@
 
 using namespace btu::bsa;
 
-void processArgs(std::vector<std::string_view> args, path const& dir)
+void processArgs(std::vector<std::string_view> args, path const &dir)
 {
-    auto const& sets = GameSettings::get(Games::SSE);
-    auto const arg = args.at(0);
+    auto const &sets = GameSettings::get(Games::SSE);
+    auto const arg   = args.at(0);
     if (arg == "pack")
     {
         auto bsas = splitBSA(dir, true, sets);
-        for (auto const& bsa : bsas)
+        for (auto const &bsa : bsas)
         {
             std::cout << "Packing " << dir.string() << std::endl;
             create(dir, bsa, true, sets);
@@ -27,8 +27,8 @@ void processArgs(std::vector<std::string_view> args, path const& dir)
     else if (arg == "unpack")
     {
         std::vector files(fs::directory_iterator(dir), fs::directory_iterator{});
-        erase_if(files, [&sets](auto const& file) { return file.path().extension() != sets.extension; });
-        for (auto const& file : files)
+        erase_if(files, [&sets](auto const &file) { return file.path().extension() != sets.extension; });
+        for (auto const &file : files)
         {
             std::cout << "Unpacking " << file.path().string() << std::endl;
             extract(file.path());
@@ -36,7 +36,7 @@ void processArgs(std::vector<std::string_view> args, path const& dir)
     }
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
         auto const args = std::vector<std::string_view>(argv + 1, argv + argc);
         processArgs(args, fs::current_path());
     }
-    catch (std::exception const& e)
+    catch (std::exception const &e)
     {
         std::cerr << "An exception happened: " << e.what();
     }
