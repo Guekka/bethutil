@@ -1,0 +1,8 @@
+{
+  "name": "bethutil-bsa",
+  "version-string": "1",
+  "dependencies": [
+    "bsa",
+    "catch2"
+  ]
+}
