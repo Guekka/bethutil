@@ -2,29 +2,28 @@ set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 set(INCLUDE_DIR "${ROOT_DIR}/include")
 set(HEADER_FILES
-    "${INCLUDE_DIR}/btu/bsa.hpp"
-    "${INCLUDE_DIR}/btu/bsa/BSACreate.hpp"
-    "${INCLUDE_DIR}/btu/bsa/BSAExtract.hpp"
-    "${INCLUDE_DIR}/btu/bsa/BSATransform.hpp"
-    "${INCLUDE_DIR}/btu/bsa/Games.hpp"
-    "${INCLUDE_DIR}/btu/bsa/bethutil_bsa.hpp"
+    "${INCLUDE_DIR}/btu/bsa/pack.hpp"
+    "${INCLUDE_DIR}/btu/bsa/unpack.hpp"
+    "${INCLUDE_DIR}/btu/bsa/transform.hpp"
 
-    "${INCLUDE_DIR}/btu/bsa/detail/Algorithms.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/BSA.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/BSASplit.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/BSAType.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/FileTypes.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/Plugin.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/archive.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"
+
+    "${INCLUDE_DIR}/btu/bsa/detail/archive.hpp"
+    "${INCLUDE_DIR}/btu/bsa/detail/archive_data.hpp"
+    "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
+
+    "${INCLUDE_DIR}/btu/bsa/detail/plugin.hpp"
+
+    "${INCLUDE_DIR}/btu/bsa/detail/settings.hpp"
 )
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
-    "${SOURCE_DIR}/detail/BSA.cpp"
-    "${SOURCE_DIR}/detail/BSASplit.cpp"
-    "${SOURCE_DIR}/detail/Plugin.cpp"
+    "${SOURCE_DIR}/pack.cpp"
+
     "${SOURCE_DIR}/detail/archive.cpp"
+    "${SOURCE_DIR}/detail/archive_data.cpp"
+    "${SOURCE_DIR}/detail/plugin.cpp"
 )
 
 source_group(
@@ -46,6 +45,9 @@ add_library("btu::bsa" ALIAS "${PROJECT_NAME}")
 
 find_package(bsa CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PUBLIC bsa::bsa)
+
+find_package(bethutil-common CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PUBLIC btubethutil-common)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -74,11 +76,12 @@ endif()
 
 target_include_directories(
 	"${PROJECT_NAME}"
-	PUBLIC
+        SYSTEM PUBLIC
 		"$<BUILD_INTERFACE:${INCLUDE_DIR}>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
-	PRIVATE
-		"${SOURCE_DIR}"
+        PRIVATE
+                "$<BUILD_INTERFACE:${INCLUDE_DIR}>"
+                "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
 install(
@@ -107,13 +110,12 @@ install(
 	FILES
 		"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
 		"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-		"${ROOT_DIR}/cmake/FindLZ4.cmake"
 	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
 )
 
 install(
-	DIRECTORY "${INCLUDE_DIR}/btu/template"
-	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/bethutil"
+        DIRECTORY "${INCLUDE_DIR}/btu/bsa"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/btu"
 )
 
 install(

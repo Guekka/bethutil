@@ -1,6 +1,7 @@
 #pragma once
 
-#include <filesystem>
+#include "btu/common/games.hpp"
+#include "btu/common/path.hpp"
 
 #ifdef _MSC_VER // Only implementation that uses wchar for path::string_type
 #define bethutil_bsa_STR(x) L##x
@@ -10,7 +11,8 @@
 
 namespace btu::bsa {
 namespace fs = std::filesystem;
-using fs::path;
-using string = path::string_type;
-using charT  = string::value_type;
+using btu::common::Game;
+using btu::common::OsChar;
+using btu::common::OsString;
+using btu::common::Path;
 } // namespace btu::bsa
