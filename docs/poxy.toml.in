@@ -16,9 +16,6 @@ navbar = [ 'classes', 'namespaces' ]
 	'https://app.codecov.io/gh/Guekka/bethutil-common'
 ]
 
-[images]
-paths = [ '@DOCS_DIR@/images' ]
-
 [macros]
 'protected' = 'private'
 'BETHUTIL_VISIBLE' = ''

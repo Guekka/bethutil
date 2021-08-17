@@ -1,13 +1,18 @@
 set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
-set(INCLUDE_DIR "${ROOT_DIR}/include/btu")
+set(INCLUDE_DIR "${ROOT_DIR}/include")
 set(HEADER_FILES
-    "${INCLUDE_DIR}/common.hpp"
+    "${INCLUDE_DIR}/btu/common.hpp"
+
+    "${INCLUDE_DIR}/btu/common/algorithms.hpp"
+    "${INCLUDE_DIR}/btu/common/games.hpp"
+    "${INCLUDE_DIR}/btu/common/path.hpp"
+    "${INCLUDE_DIR}/btu/common/string.hpp"
 )
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
-	
+    "${SOURCE_DIR}/empty.cpp"
 )
 
 source_group(
@@ -54,11 +59,12 @@ endif()
 
 target_include_directories(
 	"${PROJECT_NAME}"
-	PUBLIC
+        SYSTEM PUBLIC
 		"$<BUILD_INTERFACE:${INCLUDE_DIR}>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
-	PRIVATE
-		"${SOURCE_DIR}"
+        PRIVATE
+                "$<BUILD_INTERFACE:${INCLUDE_DIR}>"
+                "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
 install(
@@ -68,7 +74,7 @@ install(
 
 install(
 	EXPORT "${PROJECT_NAME}-targets"
-	NAMESPACE "${PROJECT_NAME}::"
+        NAMESPACE "btu::"
 	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
 )
 
@@ -87,13 +93,12 @@ install(
 	FILES
 		"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
 		"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-		"${ROOT_DIR}/cmake/FindLZ4.cmake"
 	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
 )
 
 install(
-	DIRECTORY "${INCLUDE_DIR}/bethutil/template"
-	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/bethutil"
+        DIRECTORY "${INCLUDE_DIR}/btu/common"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/btu"
 )
 
 install(

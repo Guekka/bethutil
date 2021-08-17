@@ -23,6 +23,9 @@ add_executable(
 	${HEADER_FILES}
 	${SOURCE_FILES}
 )
+
+find_package(Catch2 CONFIG REQUIRED)
+include(Catch)
 catch_discover_tests(tests)
 
 target_compile_definitions(
