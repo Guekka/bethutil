@@ -12,7 +12,7 @@ int pack(const wchar_t* dir, unsigned long long max_size)
         auto sets    = Settings::get(Game::SSE);
         sets.maxSize = max_size;
         auto bsas    = splitBSA(dir, false, sets);
-        for (auto const& bsa : bsas)
+        for (const auto& bsa : bsas)
             create(dir, bsa, true, sets);
     }
     catch (std::exception const&)

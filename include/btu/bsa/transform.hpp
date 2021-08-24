@@ -14,12 +14,12 @@
 #include "transform_archive.hpp"
 
 namespace BethUtil::BSA {
-inline void transform(path const& file,
-                      path const& output,
+inline void transform(const Path& file,
+                      const Path& output,
                       libbsarch::transform_callback const& callback,
                       Settings const& sets)
 {
-    auto const path = FilePath::make(file, sets, FileTypes::BSA);
+    const auto path = FilePath::make(file, sets, FileTypes::BSA);
     auto format     = sets.format;
     if (path->suffix_ == sets.textureSuffix)
         format = *sets.textureFormat;

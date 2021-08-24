@@ -4,9 +4,9 @@
 #include "btu/common/path.hpp"
 
 #ifdef _MSC_VER // Only implementation that uses wchar for path::string_type
-#define bethutil_bsa_STR(x) L##x
+#define BETHUTIL_BSA_STR(x) L##x
 #else
-#define bethutil_bsa_STR(x) x
+#define BETHUTIL_BSA_STR(x) x
 #endif
 
 namespace btu::bsa {

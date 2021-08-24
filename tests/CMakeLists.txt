@@ -2,12 +2,16 @@ set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 set(INCLUDE_DIR "${ROOT_DIR}/tests")
 set(HEADER_FILES
-
+    "${INCLUDE_DIR}/utils.hpp"
 )
 
 set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
-	"${SOURCE_DIR}/main.cpp"
+        "${SOURCE_DIR}/main.cpp"
+
+        "${SOURCE_DIR}/archive_data.cpp"
+        "${SOURCE_DIR}/pack.cpp"
+        "${SOURCE_DIR}/plugin.cpp"
 )
 
 if("${BETHUTIL-BSA_BUILD_EXAMPLES}")

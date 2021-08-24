@@ -11,10 +11,10 @@
 
 using namespace btu::bsa;
 
-void processArgs(std::vector<std::string_view> args, Path const &dir)
+void processArgs(std::vector<std::string_view> args, const Path &dir)
 {
-    auto const &sets = Settings::get(Game::SSE);
-    auto const arg   = args.at(0);
+    const auto &sets = Settings::get(Game::SSE);
+    const auto arg   = args.at(0);
     if (arg == "pack")
     {
         create(CreationSettings{
@@ -27,8 +27,8 @@ void processArgs(std::vector<std::string_view> args, Path const &dir)
     else if (arg == "unpack")
     {
         std::vector files(fs::directory_iterator(dir), fs::directory_iterator{});
-        erase_if(files, [&sets](auto const &file) { return file.path().extension() != sets.extension; });
-        for (auto const &file : files)
+        erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
+        for (const auto &file : files)
         {
             std::cout << "Unpacking " << file.path().string() << std::endl;
             extract(file.path());
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     auto start = std::chrono::high_resolution_clock::now();
     try
     {
-        auto const args = std::vector<std::string_view>(argv + 1, argv + argc);
+        const auto args = std::vector<std::string_view>(argv + 1, argv + argc);
         processArgs(args, dir);
     }
     catch (std::exception const &e)

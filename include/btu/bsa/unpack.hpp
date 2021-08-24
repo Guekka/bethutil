@@ -18,7 +18,7 @@ namespace btu::bsa {
     return out;
 }
 
-inline void extract(Path const &filePath, bool removeBSA = false, bool overwriteExistingFiles = false)
+inline void extract(const Path &filePath, bool removeBSA = false, bool overwriteExistingFiles = false)
 {
     Archive arch(filePath);
     const auto root = filePath.parent_path();
@@ -37,10 +37,10 @@ inline void extract(Path const &filePath, bool removeBSA = false, bool overwrite
     }
 }
 
-inline void extractAll(Path const &dirPath, Settings const &sets)
+inline void extractAll(const Path &dirPath, const Settings &sets)
 {
     std::vector files(fs::directory_iterator(dirPath), fs::directory_iterator{});
-    erase_if(files, [&sets](auto const &file) { return file.path().extension() != sets.extension; });
-    std::for_each(files.begin(), files.end(), [](auto const &file) { btu::bsa::extract(file.path()); });
+    erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
+    std::for_each(files.begin(), files.end(), [](const auto &file) { btu::bsa::extract(file.path()); });
 }
 } // namespace btu::bsa

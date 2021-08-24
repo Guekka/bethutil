@@ -10,7 +10,7 @@
 namespace btu::bsa {
 using AllowFilePred = std::function<bool(const Path &dir, fs::directory_entry const &fileinfo)>;
 
-bool defaultIsAllowedPath(Path const &dir, fs::directory_entry const &fileinfo);
+bool defaultIsAllowedPath(const Path &dir, fs::directory_entry const &fileinfo);
 
 struct CreationSettings
 {
@@ -21,6 +21,14 @@ struct CreationSettings
     AllowFilePred allow_path_pred = defaultIsAllowedPath;
 };
 
+enum MergeSettings
+{
+    MergeTextures,
+    MergeIncompressible,
+    MergeBoth
+};
+
+void merge(std::vector<ArchiveData> &archives, MergeSettings sets = MergeBoth);
 void create(CreationSettings sets);
 
 } // namespace btu::bsa

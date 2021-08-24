@@ -16,7 +16,7 @@
 #include <ranges>
 
 namespace btu::bsa {
-bool defaultIsAllowedPath(Path const &dir, fs::directory_entry const &fileinfo)
+bool defaultIsAllowedPath(const Path &dir, fs::directory_entry const &fileinfo)
 {
     bool const isDir = fileinfo.is_directory();
 
@@ -50,7 +50,7 @@ void create(CreationSettings settings)
         if (!settings.allow_path_pred(dir, p))
             continue;
 
-        auto const ft = get_filetype(p.path(), dir, sets);
+        const auto ft = get_filetype(p.path(), dir, sets);
         if (ft != FileTypes::Standard && ft != FileTypes::Texture && ft != FileTypes::Incompressible)
             continue;
 
@@ -69,22 +69,45 @@ void create(CreationSettings settings)
         }
     }
 
+    auto cleaned = std::vector{std::move(standard), std::move(incompressible), std::move(textures)};
+    merge(cleaned);
+    for (auto bsa : cleaned)
+        write(settings.compress_archives, std::move(bsa), sets, dir);
+}
+
+void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
+{
     // Here, we have at most three BSAs, that are all under the maximum size
-    // Always merge textures into standard if possible
-    std::vector<ArchiveData *> cleaned{&standard, &incompressible, &textures};
-    if (textures.files_size() + standard.files_size() < standard.max_size())
+
+    auto standard       = archives.begin();
+    auto incompressible = archives.begin() + 1;
+    auto textures       = archives.begin() + 2;
+
+    // Preconditions
+    assert(archives.size() == 3);
+
+    assert(standard->get_type() == ArchiveType::Standard);
+    assert(incompressible->get_type() == ArchiveType::Incompressible);
+    assert(textures->get_type() == ArchiveType::Textures);
+
+    // Merge textures into standard if possible
+    if (sets == MergeTextures || sets == MergeBoth)
     {
-        standard += textures;
-        cleaned.erase(cleaned.begin() + 2);
-    }
-    if (incompressible.files_size() + standard.files_size() < standard.max_size())
-    {
-        standard += incompressible;
-        cleaned.erase(cleaned.begin() + 1);
+        if (textures->files_size() + standard->files_size() < standard->max_size())
+        {
+            *standard += *textures;
+            archives.erase(textures);
+        }
     }
 
-    for (auto *bsa : cleaned)
-        write(settings.compress_archives, std::move(*bsa), sets, dir);
+    if (sets == MergeIncompressible || sets == MergeBoth)
+    {
+        if (incompressible->files_size() + standard->files_size() < standard->max_size())
+        {
+            *standard += *incompressible;
+            archives.erase(incompressible);
+        }
+    }
 }
 
 } // namespace btu::bsa
