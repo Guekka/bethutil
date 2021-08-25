@@ -47,7 +47,7 @@ find_package(bsa CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PUBLIC bsa::bsa)
 
 find_package(bethutil-common CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PUBLIC btubethutil-common)
+target_link_libraries("${PROJECT_NAME}" PUBLIC btu::bethutil-common)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
