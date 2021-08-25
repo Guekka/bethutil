@@ -36,18 +36,17 @@ void write(bool compressed, ArchiveData &&data, const Settings &sets, const Path
     arch.write(data.find_name(root, sets));
 }
 
-void create(CreationSettings settings)
+std::vector<ArchiveData> split(const Path &dir, const Settings &sets, AllowFilePred allow_path_pred)
 {
-    const auto &dir  = settings.dir;
-    const auto &sets = settings.settings;
-
     auto standard       = ArchiveData(sets, ArchiveType::Standard);
     auto incompressible = ArchiveData(sets, ArchiveType::Incompressible);
     auto textures       = ArchiveData(sets, ArchiveType::Textures);
 
+    std::vector<ArchiveData> res;
+
     for (auto &p : fs::recursive_directory_iterator(dir))
     {
-        if (!settings.allow_path_pred(dir, p))
+        if (!allow_path_pred(dir, p))
             continue;
 
         const auto ft = get_filetype(p.path(), dir, sets);
@@ -61,7 +60,7 @@ void create(CreationSettings settings)
         if (!pBSA->add_file(p.path()))
         {
             // BSA full, write it
-            write(settings.compress_archives, std::move(*pBSA), sets, dir);
+            res.emplace_back(std::move(*pBSA));
 
             // Get a new one and add the file that did not make it
             *pBSA = ArchiveData(sets, pBSA->get_type());
@@ -69,10 +68,9 @@ void create(CreationSettings settings)
         }
     }
 
-    auto cleaned = std::vector{std::move(standard), std::move(incompressible), std::move(textures)};
-    merge(cleaned);
-    for (auto bsa : cleaned)
-        write(settings.compress_archives, std::move(bsa), sets, dir);
+    // Add BSAs that are not empty
+    res.insert(res.end(), {std::move(standard), std::move(incompressible), std::move(textures)});
+    return res;
 }
 
 void merge(std::vector<ArchiveData> &archives, MergeSettings sets)

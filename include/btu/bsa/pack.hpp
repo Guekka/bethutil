@@ -12,15 +12,6 @@ using AllowFilePred = std::function<bool(const Path &dir, fs::directory_entry co
 
 bool defaultIsAllowedPath(const Path &dir, fs::directory_entry const &fileinfo);
 
-struct CreationSettings
-{
-    const Path &dir;
-    bool compact_archives;
-    bool compress_archives;
-    const Settings &settings;
-    AllowFilePred allow_path_pred = defaultIsAllowedPath;
-};
-
 enum MergeSettings
 {
     MergeTextures,
@@ -28,7 +19,11 @@ enum MergeSettings
     MergeBoth
 };
 
+std::vector<ArchiveData> split(const Path &dir,
+                               const Settings &sets,
+                               AllowFilePred allow_path_pred = defaultIsAllowedPath);
+
 void merge(std::vector<ArchiveData> &archives, MergeSettings sets = MergeBoth);
-void create(CreationSettings sets);
+void write(bool compressed, ArchiveData &&data, const Settings &sets, const Path &root);
 
 } // namespace btu::bsa

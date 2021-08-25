@@ -17,12 +17,10 @@ void processArgs(std::vector<std::string_view> args, const Path &dir)
     const auto arg   = args.at(0);
     if (arg == "pack")
     {
-        create(CreationSettings{
-            .dir               = dir,
-            .compact_archives  = true,
-            .compress_archives = true,
-            .settings          = sets,
-        });
+        auto bsas = split(dir, sets);
+        merge(bsas);
+        for (auto bsa : std::move(bsas))
+            write(true, std::move(bsa), sets, dir);
     }
     else if (arg == "unpack")
     {
