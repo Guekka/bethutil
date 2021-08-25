@@ -93,7 +93,7 @@ void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
     // Merge textures into standard if possible
     if (sets == MergeTextures || sets == MergeBoth)
     {
-        if (textures->files_size() + standard->files_size() < standard->max_size())
+        if (textures->size().compressed + standard->size().compressed < standard->max_size())
         {
             *standard += *textures;
             archives.erase(textures);
@@ -102,7 +102,7 @@ void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
 
     if (sets == MergeIncompressible || sets == MergeBoth)
     {
-        if (incompressible->files_size() + standard->files_size() < standard->max_size())
+        if (incompressible->size().uncompressed + standard->size().uncompressed < standard->max_size())
         {
             *standard += *incompressible;
             archives.erase(incompressible);

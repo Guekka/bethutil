@@ -18,9 +18,9 @@ ArchiveData make_arch(uintmax_t max, uintmax_t size, ArchiveType type, uint32_t 
     sets.maxSize = max;
     auto arch    = ArchiveData(sets, type);
 
-    REQUIRE(arch.add_file("", size));
+    REQUIRE(arch.add_file("", ArchiveData::Size{size, size}));
     for (uint32_t i = 1; i < file_count; ++i)
-        REQUIRE(arch.add_file("", 0));
+        REQUIRE(arch.add_file("", ArchiveData::Size{0, 0}));
 
     return arch;
 }
