@@ -18,29 +18,30 @@ namespace btu::bsa {
     return out;
 }
 
-inline void extract(const Path &filePath, bool removeBSA = false, bool overwriteExistingFiles = false)
+inline void unpack(const Path &file_path, bool remove_arch = false, bool overwrite_existing_files = false)
 {
-    Archive arch(filePath);
-    const auto root = filePath.parent_path();
-    arch.iterate_files([&root, overwriteExistingFiles](const fs::path &rel, std::span<const std::byte> data) {
-        const auto path = root / rel;
-        if (fs::exists(path) && !overwriteExistingFiles)
-            return;
+    Archive arch(file_path);
+    const auto root = file_path.parent_path();
+    arch.iterate_files(
+        [&root, overwrite_existing_files](const fs::path &rel, std::span<const std::byte> data) {
+            const auto path = root / rel;
+            if (fs::exists(path) && !overwrite_existing_files)
+                return;
 
-        auto out = open_virtual_path(path);
-        out.write(reinterpret_cast<const char *>(data.data()), data.size());
-    });
+            auto out = open_virtual_path(path);
+            out.write(reinterpret_cast<const char *>(data.data()), data.size());
+        });
 
-    if (removeBSA && !fs::remove(filePath))
+    if (remove_arch && !fs::remove(file_path))
     {
         throw std::runtime_error("BSA Extract succeeded but failed to delete the extracted BSA");
     }
 }
 
-inline void extractAll(const Path &dirPath, const Settings &sets)
+inline void unpack_all(const Path &dir, const Settings &sets)
 {
-    std::vector files(fs::directory_iterator(dirPath), fs::directory_iterator{});
+    std::vector files(fs::directory_iterator(dir), fs::directory_iterator{});
     erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
-    std::for_each(files.begin(), files.end(), [](const auto &file) { btu::bsa::extract(file.path()); });
+    std::for_each(files.begin(), files.end(), [](const auto &file) { btu::bsa::unpack(file.path()); });
 }
 } // namespace btu::bsa
