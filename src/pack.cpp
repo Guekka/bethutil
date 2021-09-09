@@ -31,7 +31,7 @@ void write(bool compressed, ArchiveData &&data, const Settings &sets, const Path
     compressed &= data.get_type() != ArchiveType::Incompressible;
 
     auto arch = Archive(data.get_version(), compressed);
-    std::for_each(data.begin(), data.end(), [&](auto &&f) { arch.add_file(root, f); });
+    std::for_each(std::execution::par, data.begin(), data.end(), [&](auto &&f) { arch.add_file(root, f); });
 
     arch.write(data.find_name(root, sets));
 }
