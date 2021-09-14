@@ -78,7 +78,7 @@ void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
     // We have at most one underful BSA per type, so we only consider the last three BSAs
 
     auto standard       = archives.end() - 3;
-    auto incompressible = archives.end() + -2;
+    auto incompressible = archives.end() - 2;
     auto textures       = archives.end() - 1;
 
     // Preconditions

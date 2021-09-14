@@ -8,9 +8,11 @@
 #include "btu/bsa/detail/settings.hpp"
 
 #include <fstream>
+#include <iostream>
+#include <mutex>
 
 namespace btu::bsa {
-[[nodiscard]] auto open_virtual_path(const Path &path) -> std::ofstream
+[[nodiscard]] inline auto open_virtual_path(const Path &path) -> std::ofstream
 {
     std::filesystem::create_directories(path.parent_path());
     std::ofstream out{path, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc};
@@ -18,30 +20,49 @@ namespace btu::bsa {
     return out;
 }
 
-inline void unpack(const Path &file_path, bool remove_arch = false, bool overwrite_existing_files = false)
+struct UnpackSettings
 {
-    Archive arch(file_path);
-    const auto root = file_path.parent_path();
-    arch.iterate_files(
-        [&root, overwrite_existing_files](const fs::path &rel, std::span<const std::byte> data) {
+    const Path &file_path;
+    bool remove_arch              = false;
+    bool overwrite_existing_files = false;
+    const Path *root_opt          = nullptr;
+};
+
+inline void unpack(UnpackSettings sets)
+{
+    Archive arch(sets.file_path);
+
+    const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
+    arch.iterate_files([&](const fs::path &rel, std::span<const std::byte> data) {
+        auto raw_out = [&]() -> std::optional<std::ofstream> {
+            std::mutex mut;
+            std::scoped_lock lock(mut);
             const auto path = root / rel;
-            if (fs::exists(path) && !overwrite_existing_files)
-                return;
+            if (fs::exists(path) && !sets.overwrite_existing_files)
+                return std::nullopt;
 
-            auto out = open_virtual_path(path);
-            out.write(reinterpret_cast<const char *>(data.data()), data.size());
-        });
+            return open_virtual_path(path);
+        }();
 
-    if (remove_arch && !fs::remove(file_path))
+        if (!raw_out.has_value())
+            return;
+        auto &out = *raw_out;
+
+        out.write(reinterpret_cast<const char *>(data.data()), data.size());
+    });
+
+    if (sets.remove_arch && !fs::remove(sets.file_path))
     {
         throw std::runtime_error("BSA Extract succeeded but failed to delete the extracted BSA");
     }
 }
 
-inline void unpack_all(const Path &dir, const Settings &sets)
+inline void unpack_all(const Path &dir, const Path &out, const Settings &sets)
 {
     std::vector files(fs::directory_iterator(dir), fs::directory_iterator{});
     erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
-    std::for_each(files.begin(), files.end(), [](const auto &file) { btu::bsa::unpack(file.path()); });
+    std::for_each(files.begin(), files.end(), [&out](const auto &file) {
+        btu::bsa::unpack(UnpackSettings{.file_path = file.path(), .root_opt = &out});
+    });
 }
 } // namespace btu::bsa

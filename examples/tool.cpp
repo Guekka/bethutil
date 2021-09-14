@@ -29,7 +29,7 @@ void processArgs(std::vector<std::string_view> args, const Path &dir)
         for (const auto &file : files)
         {
             std::cout << "Unpacking " << file.path().string() << std::endl;
-            unpack(file.path());
+            unpack({.file_path = dir});
         }
     }
 }
