@@ -75,11 +75,11 @@ std::vector<ArchiveData> split(const Path &dir, const Settings &sets, AllowFileP
 
 void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
 {
-    // Here, we have at most three BSAs, that are all under the maximum size
+    // We have at most one underful BSA per type, so we only consider the last three BSAs
 
-    auto standard       = archives.begin();
-    auto incompressible = archives.begin() + 1;
-    auto textures       = archives.begin() + 2;
+    auto standard       = archives.end() - 3;
+    auto incompressible = archives.end() + -2;
+    auto textures       = archives.end() - 1;
 
     // Preconditions
     assert(archives.size() == 3);
