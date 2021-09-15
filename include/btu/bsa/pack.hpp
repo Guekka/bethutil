@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 #pragma once
 
-#include "btu/bsa/detail/archive_data.hpp"
+#include "btu/bsa/archive_data.hpp"
 #include "btu/bsa/detail/common.hpp"
 
 namespace btu::bsa {

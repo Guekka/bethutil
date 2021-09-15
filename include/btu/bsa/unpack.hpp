@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 #pragma once
 
-#include "btu/bsa/detail/archive.hpp"
-#include "btu/bsa/detail/settings.hpp"
+#include "btu/bsa/detail/backends/archive.hpp"
+#include "btu/bsa/settings.hpp"
 
 #include <fstream>
 #include <iostream>

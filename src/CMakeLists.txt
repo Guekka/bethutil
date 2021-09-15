@@ -6,24 +6,24 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/unpack.hpp"
     "${INCLUDE_DIR}/btu/bsa/transform.hpp"
 
-    "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"
+    "${INCLUDE_DIR}/btu/bsa/archive_data.hpp"
+    "${INCLUDE_DIR}/btu/bsa/settings.hpp"
+    "${INCLUDE_DIR}/btu/bsa/plugin.hpp"
 
-    "${INCLUDE_DIR}/btu/bsa/detail/archive.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/archive_data.hpp"
+    "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"  
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
 
-    "${INCLUDE_DIR}/btu/bsa/detail/plugin.hpp"
-
-    "${INCLUDE_DIR}/btu/bsa/detail/settings.hpp"
+    "${INCLUDE_DIR}/btu/bsa/detail/backends/archive.hpp"
 )
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
     "${SOURCE_DIR}/pack.cpp"
 
-    "${SOURCE_DIR}/detail/archive.cpp"
-    "${SOURCE_DIR}/detail/archive_data.cpp"
-    "${SOURCE_DIR}/detail/plugin.cpp"
+    "${SOURCE_DIR}/archive_data.cpp"
+    "${SOURCE_DIR}/plugin.cpp"
+
+    "${SOURCE_DIR}/detail/backends/archive.cpp"
 )
 
 source_group(

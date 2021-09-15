@@ -6,7 +6,7 @@
 #include "btu/bsa/pack.hpp"
 
 #include "btu/bsa/detail/common.hpp"
-#include "btu/bsa/detail/settings.hpp"
+#include "btu/bsa/settings.hpp"
 #include "btu/common/algorithms.hpp"
 
 #include <deque>
