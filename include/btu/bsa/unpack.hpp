@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 #pragma once
 
-#include "btu/bsa/detail/backends/archive.hpp"
+#include "btu/bsa/detail/backends/rsm_archive.hpp"
 #include "btu/bsa/settings.hpp"
 
 #include <fstream>
@@ -30,7 +30,7 @@ struct UnpackSettings
 
 inline void unpack(UnpackSettings sets)
 {
-    Archive arch(sets.file_path);
+    auto arch = detail::RsmArchive(sets.file_path);
 
     const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
     arch.iterate_files([&](const fs::path &rel, std::span<const std::byte> data) {

@@ -51,8 +51,6 @@ public:
     static constexpr bool separate_different_types = false;
 
 private:
-    static constexpr bool k_acurate_size_estimation = false;
-
     Size get_file_size(const common::Path &path, std::optional<Size> override) const;
 
     Size size_{};

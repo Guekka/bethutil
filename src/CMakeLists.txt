@@ -14,6 +14,7 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
 
     "${INCLUDE_DIR}/btu/bsa/detail/backends/archive.hpp"
+    "${INCLUDE_DIR}/btu/bsa/detail/backends/rsm_archive.hpp"
 )
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
@@ -23,7 +24,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/archive_data.cpp"
     "${SOURCE_DIR}/plugin.cpp"
 
-    "${SOURCE_DIR}/detail/backends/archive.cpp"
+    "${SOURCE_DIR}/detail/backends/rsm_archive.cpp"
 )
 
 source_group(

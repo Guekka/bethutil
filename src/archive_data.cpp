@@ -77,41 +77,7 @@ ArchiveData::Size ArchiveData::get_file_size(const common::Path &path, std::opti
         return override.value();
 
     Size ret;
-
-    // Incompressible archives have the same compressed and uncompressed size
-    if (k_acurate_size_estimation && type() != ArchiveType::Incompressible)
-    {
-        auto data        = detail::read_file(path);
-        ret.uncompressed = data.size();
-        ret.compressed   = [this, data = std::move(data)] {
-            switch (version_)
-            {
-                case ArchiveVersion::tes3: return data.size();
-                case ArchiveVersion::fo3:
-                case ArchiveVersion::tes4:
-                case ArchiveVersion::sse:
-                {
-                    libbsa::tes4::file f;
-                    f.set_data(std::move(data));
-                    return f.compress_bound(static_cast<libbsa::tes4::version>(version_));
-                }
-
-                case ArchiveVersion::fo4:
-                case ArchiveVersion::fo4dx:
-                {
-                    libbsa::fo4::chunk f;
-                    f.set_data(std::move(data));
-                    return f.compress_bound();
-                }
-                default: return data.size();
-            }
-        }();
-    }
-    else
-    {
-        ret.compressed = ret.uncompressed = fs::file_size(path);
-    }
-
+    ret.compressed = ret.uncompressed = fs::file_size(path);
     return ret;
 }
 

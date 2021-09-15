@@ -230,11 +230,10 @@ inline FileTypes get_filetype(const Path &filepath, const Path &root, const Sett
 {
     auto check = [ext = btu::common::to_lower(filepath.extension()), &filepath, &root](const auto &vec) {
         using std::cbegin, std::cend;
-        auto it = std::find_if(cbegin(vec), cend(vec), [&ext, &filepath, &root](auto &&val) {
-            auto visiter = detail::overload{[&](const AllowedPath &p) { return p.check(filepath, root); },
-                                            [&](const auto &p) { return p == ext; }};
-            return visiter(val);
-        });
+        auto it = std::find_if(cbegin(vec),
+                               cend(vec),
+                               detail::overload{[&](const AllowedPath &p) { return p.check(filepath, root); },
+                                                [&](const auto &p) { return p == ext; }});
         return it != cend(vec);
     };
 
