@@ -24,6 +24,11 @@ std::vector<ArchiveData> split(const Path &dir,
                                AllowFilePred allow_path_pred = defaultIsAllowedPath);
 
 void merge(std::vector<ArchiveData> &archives, MergeSettings sets = MergeBoth);
-void write(bool compressed, ArchiveData &&data, const Settings &sets, const Path &root);
+
+/// Returns the list of files which failed to pack
+std::vector<std::pair<Path, std::string>> write(bool compressed,
+                                                ArchiveData &&data,
+                                                const Settings &sets,
+                                                const Path &root);
 
 } // namespace btu::bsa

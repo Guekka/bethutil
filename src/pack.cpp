@@ -27,14 +27,29 @@ bool defaultIsAllowedPath(const Path &dir, fs::directory_entry const &fileinfo)
     return !isDir && !isRoot;
 }
 
-void write(bool compressed, ArchiveData &&data, const Settings &sets, const Path &root)
+std::vector<std::pair<Path, std::string>> write(bool compressed,
+                                                ArchiveData &&data,
+                                                const Settings &sets,
+                                                const Path &root)
 {
     compressed &= data.get_type() != ArchiveType::Incompressible;
 
     auto arch = detail::RsmArchive(data.get_version(), compressed);
-    std::for_each(std::execution::par, data.begin(), data.end(), [&](auto &&f) { arch.add_file(root, f); });
+    auto ret  = std::vector<std::pair<Path, std::string>>();
+
+    std::for_each(std::execution::par, data.begin(), data.end(), [&](auto &&f) {
+        try
+        {
+            arch.add_file(root, f);
+        }
+        catch (const std::exception &e)
+        {
+            ret.emplace_back(f, e.what());
+        }
+    });
 
     arch.write(data.find_name(root, sets));
+    return ret;
 }
 
 std::vector<ArchiveData> split(const Path &dir, const Settings &sets, AllowFilePred allow_path_pred)

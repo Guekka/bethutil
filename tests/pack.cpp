@@ -80,7 +80,12 @@ TEST_CASE("Create BSA")
             for (auto bsa : std::move(bsas))
             {
                 std::cout << time() << bsa.find_name(dir, sets) << std::endl;
-                write(true, std::move(bsa), sets, dir);
+                const auto errs = write(true, std::move(bsa), sets, dir);
+                for (auto &&err : errs)
+                {
+                    std::wcout << err.first;
+                    std::cout << " failed: " << err.second << std::endl;
+                }
             }
         },
         "create");
