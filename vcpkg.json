@@ -4,6 +4,7 @@
   "dependencies": [
     "bethutil-common",
     "bsa",
-    "catch2"
+    "catch2",
+    "libbsarch-cpp"
   ]
 }
