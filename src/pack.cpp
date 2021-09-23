@@ -98,8 +98,6 @@ void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
     auto textures       = archives.end() - 1;
 
     // Preconditions
-    assert(archives.size() == 3);
-
     assert(standard->get_type() == ArchiveType::Standard);
     assert(incompressible->get_type() == ArchiveType::Incompressible);
     assert(textures->get_type() == ArchiveType::Textures);
