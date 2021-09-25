@@ -21,4 +21,11 @@ constexpr auto to_underlying(E e) -> std::underlying_type_t<E>
 {
     return static_cast<std::underlying_type_t<E>>(e);
 }
+
+template<typename T, typename U>
+using is_equiv = std::is_same<std::remove_cvref<T>, std::remove_cvref<U>>;
+
+template<typename T, typename U>
+constexpr bool is_equiv_v = is_equiv<T, U>::value;
+
 } // namespace btu::common

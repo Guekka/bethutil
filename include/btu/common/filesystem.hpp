@@ -7,6 +7,7 @@
 
 #include "btu/common/path.hpp"
 
+#include <fstream>
 #include <vector>
 
 namespace btu::common {
