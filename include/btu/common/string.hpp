@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "btu/common/metaprogramming.hpp"
+
 #include <algorithm>
 #include <cctype>
 #include <iterator>
@@ -29,23 +31,30 @@ StrComparePred<CharT> str_compare_pred(bool case_sensitive = true)
     };
 }
 
-template<class CharT>
-bool str_compare(std::basic_string_view<CharT> string,
-                 std::basic_string_view<CharT> other,
-                 bool case_sensitive = true)
+template<class String1, typename String2>
+bool str_compare(String1 string, String2 other, bool case_sensitive = true)
 {
+    const auto lhs = std::basic_string_view(string);
+    const auto rhs = std::basic_string_view(other);
+
+    static_assert(is_equiv_v<decltype(lhs), decltype(rhs)>);
+    using CharT = typename decltype(lhs)::value_type;
+
     auto pred = str_compare_pred<CharT>(case_sensitive);
 
     using namespace std;
-    return string.size() == other.size() && equal(cbegin(other), cend(other), cbegin(string), pred);
+    return lhs.size() == rhs.size() && equal(cbegin(rhs), cend(rhs), cbegin(lhs), pred);
 }
 
-template<class CharT>
-std::basic_string<CharT> to_lower(std::basic_string_view<CharT> str)
+template<class StringView>
+auto to_lower(StringView str) ->
+    typename std::basic_string<typename decltype(std::basic_string_view(str))::value_type>
 {
+    const auto view = std::basic_string_view(str);
+    using CharT     = typename decltype(view)::value_type;
     std::basic_string<CharT> res;
-    res.reserve(str.size());
-    std::transform(str.begin(), str.end(), std::back_inserter(res), [](auto &&c) { return ::tolower(c); });
+    res.reserve(view.size());
+    std::transform(view.begin(), view.end(), std::back_inserter(res), [](auto &&c) { return ::tolower(c); });
     return res;
 }
 } // namespace btu::common
