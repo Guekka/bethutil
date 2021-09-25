@@ -23,7 +23,7 @@ constexpr auto to_underlying(E e) -> std::underlying_type_t<E>
 }
 
 template<typename T, typename U>
-using is_equiv = std::is_same<std::remove_cvref<T>, std::remove_cvref<U>>;
+using is_equiv = std::is_same<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
 
 template<typename T, typename U>
 constexpr bool is_equiv_v = is_equiv<T, U>::value;
