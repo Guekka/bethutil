@@ -5,7 +5,9 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/common.hpp"
 
     "${INCLUDE_DIR}/btu/common/algorithms.hpp"
+    "${INCLUDE_DIR}/btu/common/filesystem.hpp"
     "${INCLUDE_DIR}/btu/common/games.hpp"
+    "${INCLUDE_DIR}/btu/common/metaprogramming.hpp"
     "${INCLUDE_DIR}/btu/common/path.hpp"
     "${INCLUDE_DIR}/btu/common/string.hpp"
 )
