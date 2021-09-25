@@ -10,6 +10,7 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/main.cpp"
         "${SOURCE_DIR}/src/filesystem.cpp"
         "${SOURCE_DIR}/src/metaprogramming.cpp"
+        "${SOURCE_DIR}/src/string.cpp"
 )
 
 if("${BETHUTIL-COMMON_BUILD_EXAMPLES}")
