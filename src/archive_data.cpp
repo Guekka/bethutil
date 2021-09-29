@@ -12,7 +12,7 @@ namespace btu::bsa {
 ArchiveData::ArchiveData(const Settings &sets, ArchiveType type)
     : max_size_(sets.maxSize)
     , type_(type)
-    , version_(sets.format)
+    , version_(type == ArchiveType::Textures ? sets.textureFormat.value_or(sets.format) : sets.format)
 {
 }
 
@@ -47,9 +47,6 @@ bool ArchiveData::add_file(Path path, std::optional<Size> override)
 
 ArchiveData &ArchiveData::operator+=(const ArchiveData &other)
 {
-    if (other.version_ != version_)
-        throw std::runtime_error("Cannot merge ArchiveData of different format");
-
     if (size().compressed + other.size().compressed > max_size_)
         throw std::runtime_error("Cannot merge ArchiveData with file size over max size");
 
