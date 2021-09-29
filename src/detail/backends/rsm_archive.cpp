@@ -1,6 +1,7 @@
 #include "btu/bsa/detail/backends/rsm_archive.hpp"
 
 #include "btu/bsa/detail/common.hpp"
+#include "btu/common/filesystem.hpp"
 
 #include <execution>
 #include <fstream>
@@ -9,7 +10,7 @@ namespace btu::bsa::detail {
 
 [[nodiscard]] auto get_archive_identifier(const UnderlyingArchive &archive) -> std::string_view
 {
-    const auto visiter = detail::overload{
+    const auto visiter = btu::common::overload{
         [](libbsa::tes3::archive) { return "tes3"; },
         [](libbsa::tes4::archive) { return "tes4"; },
         [](libbsa::fo4::archive) { return "fo4"; },
@@ -124,7 +125,7 @@ auto RsmArchive::read(const std::filesystem::path &a_path) -> ArchiveVersion
 
 void RsmArchive::write(std::filesystem::path a_path)
 {
-    const auto writer = detail::overload{
+    const auto writer = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) { bsa.write(a_path); },
         [&](libbsa::tes4::archive &bsa) {
             const auto version = detail::archive_version<libbsa::tes4::version>(_archive, _version);
@@ -142,13 +143,13 @@ void RsmArchive::write(std::filesystem::path a_path)
 size_t RsmArchive::add_file(const std::filesystem::path &a_root, const std::filesystem::path &a_path)
 {
     const auto relative = a_path.lexically_relative(a_root).lexically_normal();
-    const auto data     = detail::read_file(a_path);
+    const auto data     = btu::common::read_file(a_path);
     return add_file(relative, data);
 }
 
 size_t RsmArchive::add_file(const std::filesystem::path &a_relative, std::vector<std::byte> a_data)
 {
-    const auto adder = detail::overload{
+    const auto adder = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) {
             libbsa::tes3::file f;
 
@@ -206,7 +207,7 @@ size_t RsmArchive::add_file(const std::filesystem::path &a_relative, std::vector
 
 void RsmArchive::iterate_files(const iteration_callback &a_callback, bool skip_compressed)
 {
-    auto visiter = detail::overload{
+    auto visiter = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) {
             std::for_each(std::execution::par, bsa.cbegin(), bsa.cend(), [&](auto &&pair) {
                 const auto [key, file] = pair;

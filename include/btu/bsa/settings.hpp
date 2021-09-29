@@ -3,7 +3,7 @@
 #include "btu/bsa/detail/backends/archive.hpp"
 #include "btu/bsa/detail/common.hpp"
 #include "btu/common/algorithms.hpp"
-#include "btu/common/template.hpp"
+#include "btu/common/metaprogramming.hpp"
 
 #include <optional>
 #include <variant>
@@ -211,7 +211,7 @@ inline const Settings &Settings::get(Game game)
 inline bool AllowedPath::check(const Path &filepath, const Path &root) const
 {
     const auto ext = filepath.extension().native();
-    if (!common::str_compare<OsChar>(extension.native(), ext, false))
+    if (!common::str_compare(extension.native(), ext, false))
         return false;
 
     const auto &relative = filepath.lexically_relative(root);
@@ -232,8 +232,10 @@ inline FileTypes get_filetype(const Path &filepath, const Path &root, const Sett
         using std::cbegin, std::cend;
         auto it = std::find_if(cbegin(vec),
                                cend(vec),
-                               detail::overload{[&](const AllowedPath &p) { return p.check(filepath, root); },
-                                                [&](const auto &p) { return p == ext; }});
+                               btu::common::overload{[&](const AllowedPath &p) {
+                                                         return p.check(filepath, root);
+                                                     },
+                                                     [&](const auto &p) { return p == ext; }});
         return it != cend(vec);
     };
 

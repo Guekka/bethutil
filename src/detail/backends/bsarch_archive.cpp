@@ -58,7 +58,7 @@ void BsarchArchive::write(std::filesystem::path a_path)
     for (auto &&file : std::move(files_))
     {
         const auto &relative = file.relative;
-        std::visit(detail::overload{
+        std::visit(btu::common::overload{
                        [&](std::filesystem::path &&path) {
                            auto blob = libbsarch::disk_blob(relative,
                                                             path,
