@@ -14,6 +14,14 @@
 
 namespace btu::common {
 
+constexpr auto to_string_view = overload{
+    [](const char *s) { return std::string_view(s); },
+    [](const std::string &s) { return std::string_view(s); },
+    [](const wchar_t *s) { return std::wstring_view(s); },
+    [](const std::wstring &s) { return std::wstring_view(s); },
+    [](const auto &s) { return std::basic_string_view(s); },
+};
+
 template<typename CharT>
 using StrComparePred = bool (*)(CharT, CharT);
 
@@ -31,30 +39,36 @@ StrComparePred<CharT> str_compare_pred(bool case_sensitive = true)
     };
 }
 
-template<class String1, typename String2>
-bool str_compare(String1 string, String2 other, bool case_sensitive = true)
+template<class CharT>
+bool str_compare(std::basic_string_view<CharT> lhs,
+                 std::basic_string_view<CharT> rhs,
+                 bool case_sensitive = true)
 {
-    const auto lhs = std::basic_string_view(string);
-    const auto rhs = std::basic_string_view(other);
-
-    static_assert(is_equiv_v<decltype(lhs), decltype(rhs)>);
-    using CharT = typename decltype(lhs)::value_type;
-
     auto pred = str_compare_pred<CharT>(case_sensitive);
 
     using namespace std;
     return lhs.size() == rhs.size() && equal(cbegin(rhs), cend(rhs), cbegin(lhs), pred);
 }
 
-template<class StringView>
-auto to_lower(StringView str) ->
-    typename std::basic_string<typename decltype(std::basic_string_view(str))::value_type>
+template<class String1, typename String2>
+bool str_compare(String1 lhs, String2 rhs, bool case_sensitive = true)
 {
-    const auto view = std::basic_string_view(str);
-    using CharT     = typename decltype(view)::value_type;
+    static_assert(is_equiv_v<decltype(lhs), decltype(rhs)>);
+    return str_compare(to_string_view(lhs), to_string_view(rhs), case_sensitive);
+}
+
+template<class CharT>
+std::basic_string_view<CharT> to_lower(std::basic_string_view<CharT> str)
+{
     std::basic_string<CharT> res;
-    res.reserve(view.size());
-    std::transform(view.begin(), view.end(), std::back_inserter(res), [](auto &&c) { return ::tolower(c); });
+    res.reserve(str.size());
+    std::transform(str.begin(), str.end(), std::back_inserter(res), [](auto &&c) { return ::tolower(c); });
     return res;
+}
+
+template<class String>
+auto to_lower(String str)
+{
+    return to_lower(to_string_view(str));
 }
 } // namespace btu::common
