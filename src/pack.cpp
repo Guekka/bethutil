@@ -84,7 +84,7 @@ std::vector<ArchiveData> split(const Path &dir, const Settings &sets, AllowFileP
         }
     }
 
-    // Add BSAs that are not empty
+    // Add BSAs that are not full
     res.insert(res.end(), {std::move(standard), std::move(incompressible), std::move(textures)});
     return res;
 }
