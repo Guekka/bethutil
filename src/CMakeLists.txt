@@ -27,6 +27,7 @@ set(SOURCE_FILES
 
     "${SOURCE_DIR}/detail/backends/bsarch_archive.cpp"
     "${SOURCE_DIR}/detail/backends/rsm_archive.cpp"
+    "${SOURCE_DIR}/detail/backends/rsm_archive_fo4.cpp"
 )
 
 source_group(
@@ -54,6 +55,11 @@ target_link_libraries("${PROJECT_NAME}" PUBLIC btu::bethutil-common)
 
 find_package(libbsarch-cpp CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PUBLIC libbsarch-cpp::libbsarch-cpp)
+
+find_package(directx-headers CONFIG REQUIRED)
+find_package(directxmath CONFIG REQUIRED)
+find_package(directxtex CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)

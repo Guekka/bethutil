@@ -33,9 +33,10 @@ using namespace btu::bsa;
 #ifdef BETHUTIL_BSA_INTERNAL_TEST
 const auto dir
     // = R"(E:\Programmes\Mod_Skyrim_SE\Cathedral Assets Optimizer\TESTS\TES5_TO_SSE\BSACreation\INPUT - Copy)";
-    //= R"(F:\Edgar\Downloads\mods\unglaubliche Reise EXTENDED Version SSE DV 2.0 BSA)";
-    // = R"(C:\Data\BSA)";
-    = R"(C:\Skyrim\Chanterelle\Data - Copy)";
+    // = R"(F:\Edgar\Downloads\mods\unglaubliche Reise EXTENDED Version SSE DV 2.0 BSA)";
+    // = R"(C:\Skyrim\Chanterelle\BSA)";
+    //    = R"(C:\Skyrim\Chanterelle\Data - Copy)";
+    = R"(C:\Skyrim\Chanterelle\TexTest\tmp)";
 
 template<typename Func>
 void run(Func const &f, std::string const &name)
@@ -68,15 +69,15 @@ std::string time()
 
 TEST_CASE("Create BSA")
 {
-    auto sets = Settings::get(Game::SSE);
-    run([&] { split(dir, sets); }, "Split");
+    auto sets = Settings::get(Game::FO4);
+    //run([&] { split(dir, sets); }, "Split");
     //cleanDummyPlugins(dir, sets);
     //makeDummyPlugins(dir, sets);
     run(
         [&sets] {
-            std::cout << time() << "start split";
+            std::cout << time() << "start split" << std::endl;
             auto bsas = split(dir, sets);
-            merge(bsas);
+            //merge(bsas);
             for (auto bsa : std::move(bsas))
             {
                 std::cout << time() << bsa.find_name(dir, sets) << std::endl;

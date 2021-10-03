@@ -5,6 +5,7 @@
     "bethutil-common",
     "bsa",
     "catch2",
+    "directxtex",
     "libbsarch-cpp"
   ]
 }

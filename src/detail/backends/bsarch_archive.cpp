@@ -71,17 +71,15 @@ void BsarchArchive::write(std::filesystem::path a_path)
     }
 }
 
-size_t BsarchArchive::add_file(const std::filesystem::path &a_root, const std::filesystem::path &a_path)
+void BsarchArchive::add_file(const std::filesystem::path &a_root, const std::filesystem::path &a_path)
 {
     const auto relative = a_path.lexically_relative(a_root).lexically_normal();
     files_.emplace_back(File{relative, a_path});
-    return std::filesystem::file_size(a_path);
 }
 
-size_t BsarchArchive::add_file(const std::filesystem::path &a_relative, std::vector<std::byte> a_data)
+void BsarchArchive::add_file(const std::filesystem::path &a_relative, std::vector<std::byte> a_data)
 {
     files_.emplace_back(File{a_relative, a_data});
-    return a_data.size();
 }
 
 void BsarchArchive::iterate_files(const iteration_callback &a_callback, bool)

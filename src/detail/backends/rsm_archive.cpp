@@ -8,6 +8,10 @@
 
 namespace btu::bsa::detail {
 
+// Defined in fo4 part
+libbsa::fo4::file pack_fo4dx_file(std::span<std::byte> data, bool compress);
+std::vector<std::byte> unpack_fo4dx_file(libbsa::fo4::file &file);
+
 [[nodiscard]] auto get_archive_identifier(const UnderlyingArchive &archive) -> std::string_view
 {
     const auto visiter = btu::common::overload{
@@ -116,10 +120,6 @@ auto RsmArchive::read(const std::filesystem::path &a_path) -> ArchiveVersion
             default: libbsa::detail::declare_unreachable();
         }
     }();
-    if (_version == ArchiveVersion::fo4dx)
-    {
-        throw std::runtime_error("unsupported fo4 archive format");
-    }
     return _version;
 }
 
@@ -140,26 +140,24 @@ void RsmArchive::write(std::filesystem::path a_path)
     std::visit(writer, _archive);
 }
 
-size_t RsmArchive::add_file(const std::filesystem::path &a_root, const std::filesystem::path &a_path)
+void RsmArchive::add_file(const std::filesystem::path &a_root, const std::filesystem::path &a_path)
 {
     const auto relative = a_path.lexically_relative(a_root).lexically_normal();
     const auto data     = btu::common::read_file(a_path);
     return add_file(relative, data);
 }
 
-size_t RsmArchive::add_file(const std::filesystem::path &a_relative, std::vector<std::byte> a_data)
+void RsmArchive::add_file(const std::filesystem::path &a_relative, std::vector<std::byte> a_data)
 {
     const auto adder = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) {
             libbsa::tes3::file f;
 
-            auto ret = a_data.size();
             f.set_data(std::move(a_data));
 
             std::scoped_lock lock(_mutex);
 
             bsa.insert(a_relative.lexically_normal().generic_string(), std::move(f));
-            return ret;
         },
         [&, this](libbsa::tes4::archive &bsa) {
             libbsa::tes4::file f;
@@ -179,30 +177,32 @@ size_t RsmArchive::add_file(const std::filesystem::path &a_relative, std::vector
                 return bsa[key];
             }();
 
-            auto ret = f.size();
             d->insert(a_relative.filename().lexically_normal().generic_string(), std::move(f));
-            return ret;
         },
         [&, this](libbsa::fo4::archive &ba2) {
-            assert(detail::archive_version<libbsa::fo4::format>(_archive, _version)
-                       == libbsa::fo4::format::general
-                   && "directx ba2 not supported");
-            libbsa::fo4::file f;
-            auto &chunk = f.emplace_back();
-            chunk.set_data(std::move(a_data));
+            const auto version = detail::archive_version<libbsa::fo4::format>(_archive, _version);
 
-            if (_compressed)
-                chunk.compress();
+            auto file = [&] {
+                if (version == libbsa::fo4::format::general)
+                {
+                    libbsa::fo4::file f;
+                    auto &chunk = f.emplace_back();
+                    chunk.set_data(std::move(a_data));
+
+                    if (_compressed)
+                        chunk.compress();
+                    return f;
+                }
+                return pack_fo4dx_file(a_data, _compressed);
+            }();
 
             std::scoped_lock lock(_mutex);
 
-            auto ret = chunk.size();
-            ba2.insert(a_relative.lexically_normal().generic_string(), std::move(f));
-            return ret;
+            ba2.insert(a_relative.lexically_normal().generic_string(), std::move(file));
         },
     };
 
-    return std::visit(adder, _archive);
+    std::visit(adder, _archive);
 }
 
 void RsmArchive::iterate_files(const iteration_callback &a_callback, bool skip_compressed)
@@ -240,23 +240,39 @@ void RsmArchive::iterate_files(const iteration_callback &a_callback, bool skip_c
                 auto &&[key, file]  = pair;
                 const auto relative = detail::virtual_to_local_path(key);
 
-                std::vector<std::byte> bytes;
-                for (auto &chunk : file)
+                if (_version == ArchiveVersion::fo4)
                 {
-                    if (chunk.compressed())
+                    // Fast path, one chunk
+                    if (file.size() == 1)
                     {
-                        if (skip_compressed)
-                        {
-                            return;
-                        }
-                        chunk.decompress();
+                        a_callback(relative, file[0].as_bytes());
                     }
+                    else
+                    {
+                        std::vector<std::byte> bytes;
+                        for (auto &chunk : file)
+                        {
+                            if (chunk.compressed())
+                            {
+                                if (skip_compressed)
+                                {
+                                    return;
+                                }
+                                chunk.decompress();
+                            }
 
-                    const auto chunk_bytes = chunk.as_bytes();
-                    bytes.reserve(bytes.size() + chunk_bytes.size());
-                    bytes.insert(bytes.end(), chunk_bytes.begin(), chunk_bytes.end());
+                            const auto chunk_bytes = chunk.as_bytes();
+                            bytes.reserve(bytes.size() + chunk_bytes.size());
+                            bytes.insert(bytes.end(), chunk_bytes.begin(), chunk_bytes.end());
+                        }
+                        a_callback(relative, bytes);
+                    }
                 }
-                a_callback(relative, bytes);
+                else
+                {
+                    const auto data = unpack_fo4dx_file(file);
+                    a_callback(relative, data);
+                }
             });
         },
     };
