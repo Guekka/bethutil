@@ -14,7 +14,6 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
 
     "${INCLUDE_DIR}/btu/bsa/detail/backends/archive.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/backends/bsarch_archive.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/backends/rsm_archive.hpp"
 )
 
@@ -25,7 +24,6 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/archive_data.cpp"
     "${SOURCE_DIR}/plugin.cpp"
 
-    "${SOURCE_DIR}/detail/backends/bsarch_archive.cpp"
     "${SOURCE_DIR}/detail/backends/rsm_archive.cpp"
     "${SOURCE_DIR}/detail/backends/rsm_archive_fo4.cpp"
 )
@@ -47,14 +45,11 @@ add_library(
 )
 add_library("btu::bsa" ALIAS "${PROJECT_NAME}")
 
-find_package(bsa CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PUBLIC bsa::bsa)
+find_package(rsm-bsa CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PUBLIC rsm-bsa::rsm-bsa)
 
 find_package(bethutil-common CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PUBLIC btu::bethutil-common)
-
-find_package(libbsarch-cpp CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PUBLIC libbsarch-cpp::libbsarch-cpp)
 
 find_package(directx-headers CONFIG REQUIRED)
 find_package(directxmath CONFIG REQUIRED)

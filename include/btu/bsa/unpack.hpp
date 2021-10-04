@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 #pragma once
 
-#include "btu/bsa/detail/backends/bsarch_archive.hpp"
 #include "btu/bsa/detail/backends/rsm_archive.hpp"
 #include "btu/bsa/settings.hpp"
 
@@ -29,9 +28,9 @@ struct UnpackSettings
     const Path *root_opt          = nullptr;
 };
 
-namespace detail {
-inline void unpack_impl(UnpackSettings sets, Archive &arch)
+inline void unpack(UnpackSettings sets)
 {
+    auto arch        = detail::RsmArchive(sets.file_path);
     const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
     arch.iterate_files([&](const fs::path &rel, std::span<const std::byte> data) {
         auto raw_out = [&]() -> std::optional<std::ofstream> {
@@ -54,21 +53,6 @@ inline void unpack_impl(UnpackSettings sets, Archive &arch)
     if (sets.remove_arch && !fs::remove(sets.file_path))
     {
         throw std::runtime_error("BSA Extract succeeded but failed to delete the extracted BSA");
-    }
-}
-} // namespace detail
-inline void unpack(UnpackSettings sets)
-{
-    try
-    {
-        auto arch = detail::RsmArchive(sets.file_path);
-        detail::unpack_impl(sets, arch);
-    }
-    catch (const std::exception &e)
-    {
-        // Try with other backend
-        auto arch = detail::BsarchArchive(sets.file_path);
-        detail::unpack_impl(sets, arch);
     }
 }
 

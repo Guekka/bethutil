@@ -3,9 +3,8 @@
   "version-string": "1",
   "dependencies": [
     "bethutil-common",
-    "bsa",
     "catch2",
     "directxtex",
-    "libbsarch-cpp"
+    "rsm-bsa"
   ]
 }
