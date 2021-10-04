@@ -32,6 +32,9 @@ std::vector<std::pair<Path, std::string>> write(bool compressed,
                                                 const Settings &sets,
                                                 const Path &root)
 {
+    if (std::distance(data.begin(), data.end()) == 0)
+        return {}; // Do not write empty archive
+
     compressed &= data.get_type() != ArchiveType::Incompressible;
 
     auto arch = detail::RsmArchive(data.get_version(), compressed);
