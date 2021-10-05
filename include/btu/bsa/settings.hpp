@@ -100,7 +100,8 @@ inline const Settings &Settings::get(Game game)
         sets.pluginExtensions = {".esl", ".esm", ".esp"};
         sets.sDummyPlugin     = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
         sets.standardFiles    = {
-
+            AllowedPath{".bgem", {"materials"}},
+            AllowedPath{".bgsm", {"materials"}},
             AllowedPath{".bto", {"meshes"}},
             AllowedPath{".btr", {"meshes"}},
             AllowedPath{".btt", {"meshes"}},
