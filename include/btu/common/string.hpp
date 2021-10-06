@@ -58,7 +58,7 @@ bool str_compare(String1 lhs, String2 rhs, bool case_sensitive = true)
 }
 
 template<class CharT>
-std::basic_string_view<CharT> to_lower(std::basic_string_view<CharT> str)
+std::basic_string<CharT> to_lower(std::basic_string_view<CharT> str)
 {
     std::basic_string<CharT> res;
     res.reserve(str.size());
