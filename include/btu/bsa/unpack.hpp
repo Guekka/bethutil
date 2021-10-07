@@ -30,26 +30,27 @@ struct UnpackSettings
 
 inline void unpack(UnpackSettings sets)
 {
-    auto arch        = detail::RsmArchive(sets.file_path);
-    const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
-    arch.iterate_files([&](const fs::path &rel, std::span<const std::byte> data) {
-        auto raw_out = [&]() -> std::optional<std::ofstream> {
-            std::mutex mut;
-            std::scoped_lock lock(mut);
-            const auto path = root / rel;
-            if (fs::exists(path) && !sets.overwrite_existing_files)
-                return std::nullopt;
+    {
+        auto arch        = detail::RsmArchive(sets.file_path);
+        const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
+        arch.iterate_files([&](const fs::path &rel, std::span<const std::byte> data) {
+            auto raw_out = [&]() -> std::optional<std::ofstream> {
+                std::mutex mut;
+                std::scoped_lock lock(mut);
+                const auto path = root / rel;
+                if (fs::exists(path) && !sets.overwrite_existing_files)
+                    return std::nullopt;
 
-            return open_virtual_path(path);
-        }();
+                return open_virtual_path(path);
+            }();
 
-        if (!raw_out.has_value())
-            return;
-        auto &out = *raw_out;
+            if (!raw_out.has_value())
+                return;
+            auto &out = *raw_out;
 
-        out.write(reinterpret_cast<const char *>(data.data()), data.size());
-    });
-
+            out.write(reinterpret_cast<const char *>(data.data()), data.size());
+        });
+    }
     if (sets.remove_arch && !fs::remove(sets.file_path))
     {
         throw std::runtime_error("BSA Extract succeeded but failed to delete the extracted BSA");
