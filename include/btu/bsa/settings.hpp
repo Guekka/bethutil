@@ -119,8 +119,7 @@ inline const Settings &Settings::get(Game game)
         sets.textureFiles = {
             AllowedPath{".dds", {"textures"}},
         };
-        sets.incompressibleFiles = {AllowedPath{".dds", {"interface"}},
-                                    AllowedPath{".dlstrings", {"strings"}},
+        sets.incompressibleFiles = {AllowedPath{".dlstrings", {"strings"}},
                                     AllowedPath{".fuz", {"sound"}},
                                     AllowedPath{".fxp", {"shadersfx"}},
                                     AllowedPath{".gid", {"grass"}},
