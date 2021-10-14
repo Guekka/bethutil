@@ -1,6 +1,6 @@
 #include <iostream>
 
-int main(int argc, char *argv[])
+auto main() -> int
 {
     std::cout << "hey";
     return 0;

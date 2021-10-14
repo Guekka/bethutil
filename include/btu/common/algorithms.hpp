@@ -16,7 +16,7 @@
 namespace btu::common {
 //Expects a range sorted in descending order
 template<class It, class Predicate, class Sum>
-[[nodiscard]] inline It merge_if(It first, It last, const Predicate &predicate, const Sum &sum)
+[[nodiscard]] inline auto merge_if(It first, It last, const Predicate &predicate, const Sum &sum) -> It
 {
     if (first == last)
         return last;
@@ -37,7 +37,7 @@ template<class It, class Predicate, class Sum>
 }
 
 template<class It, class Predicate>
-[[nodiscard]] inline It merge_if(It first, It last, Predicate &&predicate)
+[[nodiscard]] inline auto merge_if(It first, It last, Predicate &&predicate) -> It
 {
     using Type = typename std::iterator_traits<It>::value_type;
     auto plus  = [](const Type &first, const Type &second) { return first + second; };
@@ -47,35 +47,35 @@ template<class It, class Predicate>
 template<class Container, class Predicate>
 [[nodiscard]] inline auto merge_if(Container &cont, Predicate &&predicate)
 {
-    using namespace std;
-    return merge_if(begin(cont), end(cont), forward<Predicate>(predicate));
+    using std::begin, std::end;
+    return merge_if(begin(cont), end(cont), std::forward<Predicate>(predicate));
 }
 
 template<class Container, class Predicate, class Sum>
 [[nodiscard]] inline auto merge_if(Container &cont, Predicate &&pred, Sum &&sum)
 {
-    using namespace std;
+    using std::begin, std::end;
     return merge_if(begin(cont), end(cont), forward<Predicate>(pred), forward<Sum>(sum));
 }
 
 template<class Container, class ValueType>
 [[nodiscard]] inline auto contains(const Container &cont, const ValueType &val)
 {
-    using namespace std;
+    using std::begin, std::end;
     return find(begin(cont), end(cont), val) != end(cont);
 }
 
 template<class Container, class Predicate>
 [[nodiscard]] inline auto find_if(const Container &cont, const Predicate &pred)
 {
-    using namespace std;
+    using std::begin, std::end;
     return find_if(begin(cont), end(cont), pred);
 }
 
 template<typename Cont, typename Pred>
 void erase_if(Cont &cont, const Pred &pred)
 {
-    using namespace std;
+    using std::begin, std::end;
     cont.erase(remove_if(begin(cont), end(cont), pred), end(cont));
 }
 } // namespace btu::common

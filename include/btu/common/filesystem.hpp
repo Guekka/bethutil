@@ -20,7 +20,7 @@ namespace fs = std::filesystem;
 
     std::ifstream in{a_path, std::ios_base::in | std::ios_base::binary};
     in.exceptions(std::ios_base::failbit);
-    in.read(reinterpret_cast<char *>(data.data()), static_cast<std::streamsize>(data.size()));
+    in.read(reinterpret_cast<char *>(data.data()), static_cast<std::streamsize>(data.size())); // NOLINT
 
     return data;
 }

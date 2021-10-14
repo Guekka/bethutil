@@ -26,7 +26,7 @@ template<typename CharT>
 using StrComparePred = bool (*)(CharT, CharT);
 
 template<typename CharT>
-StrComparePred<CharT> str_compare_pred(bool case_sensitive = true)
+auto str_compare_pred(bool case_sensitive = true) -> StrComparePred<CharT>
 {
     if (case_sensitive)
         return [](CharT ch1, CharT ch2) { return ch1 == ch2; };
@@ -40,9 +40,9 @@ StrComparePred<CharT> str_compare_pred(bool case_sensitive = true)
 }
 
 template<class CharT>
-bool str_compare(std::basic_string_view<CharT> lhs,
+auto str_compare(std::basic_string_view<CharT> lhs,
                  std::basic_string_view<CharT> rhs,
-                 bool case_sensitive = true)
+                 bool case_sensitive = true) -> bool
 {
     auto pred = str_compare_pred<CharT>(case_sensitive);
 
@@ -51,14 +51,14 @@ bool str_compare(std::basic_string_view<CharT> lhs,
 }
 
 template<class String1, typename String2>
-bool str_compare(String1 lhs, String2 rhs, bool case_sensitive = true)
+auto str_compare(String1 lhs, String2 rhs, bool case_sensitive = true) -> bool
 {
     static_assert(is_equiv_v<decltype(lhs), decltype(rhs)>);
     return str_compare(to_string_view(lhs), to_string_view(rhs), case_sensitive);
 }
 
 template<class CharT>
-std::basic_string<CharT> to_lower(std::basic_string_view<CharT> str)
+auto to_lower(std::basic_string_view<CharT> str) -> std::basic_string<CharT>
 {
     std::basic_string<CharT> res;
     res.reserve(str.size());

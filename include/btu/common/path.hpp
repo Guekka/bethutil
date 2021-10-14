@@ -14,7 +14,7 @@ using Path     = std::filesystem::path;
 using OsString = Path::string_type;
 using OsChar   = OsString::value_type;
 
-inline Path to_lower(const Path &path)
+inline auto to_lower(const Path &path) -> Path
 {
     return to_lower(path.native());
 }
