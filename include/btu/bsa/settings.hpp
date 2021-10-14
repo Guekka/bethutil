@@ -112,12 +112,12 @@ inline const Settings &Settings::get(Game game)
             AllowedPath{".hkx", {"meshes"}},
             AllowedPath{".lst", {"meshes"}},
             AllowedPath{".nif", {"meshes"}},
-            AllowedPath{".png", {"textures"}},
             AllowedPath{".tga", {"textures"}},
             AllowedPath{".tri", {"meshes"}},
         };
         sets.textureFiles = {
             AllowedPath{".dds", {"textures"}},
+            AllowedPath{".png", {"textures"}},
         };
         sets.incompressibleFiles = {AllowedPath{".dlstrings", {"strings"}},
                                     AllowedPath{".fuz", {"sound"}},
@@ -199,6 +199,8 @@ inline const Settings &Settings::get(Game game)
                 s.textureFormat   = ArchiveVersion::fo4dx;
                 sets.extension    = ".ba2";
                 s.suffix          = "Main";
+                s.textureFiles    = {AllowedPath{".dds", {"textures"}}};
+                s.standardFiles.emplace_back(AllowedPath{".png", {"textures"}});
                 sets.sDummyPlugin = std::vector(std::begin(dummy::fo4), std::end(dummy::fo4));
                 return s;
             }();
