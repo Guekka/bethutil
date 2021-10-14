@@ -20,9 +20,12 @@ set(HEADER_FILES
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
     "${SOURCE_DIR}/pack.cpp"
+    "${SOURCE_DIR}/unpack.cpp"
 
     "${SOURCE_DIR}/archive_data.cpp"
     "${SOURCE_DIR}/plugin.cpp"
+
+    "${SOURCE_DIR}/detail/archive_type.cpp"
 
     "${SOURCE_DIR}/detail/backends/rsm_archive.cpp"
     "${SOURCE_DIR}/detail/backends/rsm_archive_fo4.cpp"
@@ -46,7 +49,7 @@ add_library(
 add_library("btu::bsa" ALIAS "${PROJECT_NAME}")
 
 find_package(rsm-bsa CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PUBLIC rsm-bsa::rsm-bsa)
+target_link_libraries("${PROJECT_NAME}" PRIVATE rsm-bsa::rsm-bsa)
 
 find_package(bethutil-common CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PUBLIC btu::bethutil-common)

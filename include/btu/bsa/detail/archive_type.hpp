@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <bsa/bsa.hpp>
+#include <cstdint>
 
 namespace btu::bsa {
 enum class ArchiveType
@@ -18,11 +18,11 @@ enum class ArchiveType
 enum class ArchiveVersion : std::uint32_t
 {
     tes3  = 1,
-    tes4  = ::bsa::detail::to_underlying(::bsa::tes4::version::tes4),
-    fo3   = ::bsa::detail::to_underlying(::bsa::tes4::version::fo3),
-    tes5  = ::bsa::detail::to_underlying(::bsa::tes4::version::tes5),
-    sse   = ::bsa::detail::to_underlying(::bsa::tes4::version::sse),
-    fo4   = ::bsa::detail::to_underlying(::bsa::fo4::format::general),
-    fo4dx = ::bsa::detail::to_underlying(::bsa::fo4::format::directx),
+    tes4  = 103,
+    fo3   = 104,
+    tes5  = 104,
+    sse   = 105,
+    fo4   = 1280462407,
+    fo4dx = 808540228,
 };
 } // namespace btu::bsa

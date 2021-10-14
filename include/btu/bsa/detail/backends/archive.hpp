@@ -2,7 +2,9 @@
 
 #include "btu/bsa/detail/archive_type.hpp"
 
+#include <filesystem>
 #include <functional>
+#include <span>
 
 namespace btu::bsa::detail {
 
