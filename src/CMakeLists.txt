@@ -1,4 +1,5 @@
 set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
+include("${ROOT_DIR}/cmake/CompilerWarnings.cmake")
 
 set(INCLUDE_DIR "${ROOT_DIR}/include")
 set(HEADER_FILES
@@ -47,6 +48,8 @@ add_library(
 	"${ROOT_DIR}/.clang-tidy"
 )
 add_library("btu::bsa" ALIAS "${PROJECT_NAME}")
+
+set_project_warnings("${PROJECT_NAME}")
 
 find_package(bsa CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE bsa::bsa)
