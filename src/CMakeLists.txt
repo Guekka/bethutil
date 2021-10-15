@@ -48,8 +48,8 @@ add_library(
 )
 add_library("btu::bsa" ALIAS "${PROJECT_NAME}")
 
-find_package(rsm-bsa CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE rsm-bsa::rsm-bsa)
+find_package(bsa CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE bsa::bsa)
 
 find_package(bethutil-common CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PUBLIC btu::bethutil-common)
