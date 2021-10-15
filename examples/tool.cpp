@@ -11,7 +11,7 @@
 
 using namespace btu::bsa;
 
-void processArgs(std::vector<std::string_view> args, const Path &dir)
+void process_args(std::vector<std::string_view> args, const Path &dir)
 {
     const auto &sets = Settings::get(Game::SSE);
     const auto arg   = args.at(0);
@@ -20,7 +20,7 @@ void processArgs(std::vector<std::string_view> args, const Path &dir)
         auto bsas = split(dir, sets);
         merge(bsas);
         for (auto bsa : std::move(bsas))
-            write(true, std::move(bsa), sets, dir);
+            write(/*compressed=*/true, std::move(bsa), sets, dir);
     }
     else if (arg == "unpack")
     {
@@ -34,7 +34,7 @@ void processArgs(std::vector<std::string_view> args, const Path &dir)
     }
 }
 
-int main(int argc, char *argv[])
+auto main(int argc, char *argv[]) -> int
 {
     Path dir = fs::current_path();
     if (argc == 3)
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     try
     {
         const auto args = std::vector<std::string_view>(argv + 1, argv + argc);
-        processArgs(args, dir);
+        process_args(args, dir);
     }
     catch (std::exception const &e)
     {

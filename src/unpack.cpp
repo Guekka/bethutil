@@ -14,7 +14,7 @@
 namespace btu::bsa {
 std::ofstream open_virtual_path(const common::Path &path)
 {
-    std::filesystem::create_directories(path.parent_path());
+    fs::create_directories(path.parent_path());
     std::ofstream out{path, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc};
     out.exceptions(std::ios_base::failbit);
     return out;
@@ -25,7 +25,7 @@ void unpack(UnpackSettings sets)
     {
         auto arch        = detail::RsmArchive(sets.file_path);
         const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
-        arch.iterate_files([&](const fs::path &rel, std::span<const std::byte> data) {
+        arch.iterate_files([&](const Path &rel, std::span<const std::byte> data) {
             auto raw_out = [&]() -> std::optional<std::ofstream> {
                 std::mutex mut;
                 std::scoped_lock lock(mut);

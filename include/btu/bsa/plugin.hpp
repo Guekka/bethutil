@@ -12,31 +12,33 @@
 namespace btu::bsa {
 class FilePath
 {
-    static inline const OsString suffixSeparator = BETHUTIL_BSA_STR(" - ");
+    static inline const OsString suffix_separator = BETHUTIL_BSA_STR(" - ");
 
 public:
     FilePath(Path dir, OsString name, OsString suffix, Path ext, FileTypes type);
-    static std::optional<FilePath> make(const Path &path, const Settings &sets, FileTypes type);
+    [[nodiscard]] static auto make(const Path &path, const Settings &sets, FileTypes type)
+        -> std::optional<FilePath>;
 
-    Path full_path() const;
-    Path full_name() const;
+    [[nodiscard]] auto full_path() const -> Path;
+    [[nodiscard]] auto full_name() const -> Path;
 
-    Path dir_;
-    OsString name_;
-    OsString suffix_;
-    Path ext_;
-    std::optional<uint8_t> counter_;
-    FileTypes type_{};
+    Path dir;
+    OsString name;
+    OsString suffix;
+    Path ext;
+    std::optional<uint8_t> counter;
+    FileTypes type{};
 
 private:
-    static std::optional<int> eat_digits(OsString &str);
-    static OsString eat_suffix(OsString &str, const Settings &sets);
+    static auto eat_digits(OsString &str) -> std::optional<int>;
+    static auto eat_suffix(OsString &str, const Settings &sets) -> OsString;
 
     explicit FilePath() = default;
 };
 
-FilePath find_archive_name(const Path &folderPath, const Settings &sets, ArchiveType type);
+[[nodiscard]] auto find_archive_name(const Path &folder_path, const Settings &sets, ArchiveType type)
+    -> FilePath;
 
-void clean_dummy_plugins(const Path &folderPath, const Settings &sets);
-void make_dummy_plugins(const Path &folderPath, const Settings &sets);
+void clean_dummy_plugins(const Path &folder_path, const Settings &sets);
+void make_dummy_plugins(const Path &folder_path, const Settings &sets);
 } // namespace btu::bsa

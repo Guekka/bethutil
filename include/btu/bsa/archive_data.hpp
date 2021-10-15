@@ -24,26 +24,26 @@ public:
         uintmax_t uncompressed;
 
         auto operator<=>(const Size &) const = default;
-        Size &operator+=(const Size &other);
+        auto operator+=(const Size &other) -> Size &;
     };
 
-    bool add_file(Path path, std::optional<Size> override = std::nullopt);
+    auto add_file(Path path, std::optional<Size> override = std::nullopt) -> bool;
 
-    ArchiveType get_type() const { return type_; }
-    ArchiveVersion get_version() const { return version_; }
-    bool empty() const;
+    [[nodiscard]] auto get_type() const -> ArchiveType { return type_; }
+    [[nodiscard]] auto get_version() const -> ArchiveVersion { return version_; }
+    [[nodiscard]] auto empty() const -> bool;
 
     auto begin() { return files_.begin(); }
     auto end() { return files_.end(); }
 
-    Path find_name(const Path &folder, const Settings &sets) const;
+    [[nodiscard]] auto find_name(const Path &folder, const Settings &sets) const -> Path;
 
-    Size size() const { return size_; }
-    uintmax_t max_size() const { return max_size_; }
-    ArchiveType type() const { return type_; }
+    [[nodiscard]] auto size() const -> Size { return size_; }
+    [[nodiscard]] auto max_size() const -> uintmax_t { return max_size_; }
+    [[nodiscard]] auto type() const -> ArchiveType { return type_; }
 
-    ArchiveData &operator+=(const ArchiveData &other);
-    ArchiveData operator+(ArchiveData const &other) const;
+    auto operator+=(const ArchiveData &other) -> ArchiveData &;
+    auto operator+(ArchiveData const &other) const -> ArchiveData;
 
     auto operator<=>(const ArchiveData &) const = default;
 
@@ -51,7 +51,7 @@ public:
     static constexpr bool separate_different_types = false;
 
 private:
-    Size get_file_size(const common::Path &path, std::optional<Size> override) const;
+    [[nodiscard]] static auto get_file_size(const common::Path &path, std::optional<Size> override) -> Size;
 
     Size size_{};
     uintmax_t max_size_ = -1;

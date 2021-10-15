@@ -11,152 +11,154 @@
 
 namespace btu::bsa {
 FilePath::FilePath(Path dir, OsString name, OsString suffix, Path ext, FileTypes type)
-    : dir_(std::move(dir))
-    , name_(std::move(name))
-    , suffix_(std::move(suffix))
-    , ext_(std::move(ext))
-    , type_(type)
+    : dir(std::move(dir))
+    , name(std::move(name))
+    , suffix(std::move(suffix))
+    , ext(std::move(ext))
+    , type(type)
 {
 }
 
-std::optional<FilePath> FilePath::make(const Path &path, const Settings &sets, FileTypes type)
+auto FilePath::make(const Path &path, const Settings &sets, FileTypes type) -> std::optional<FilePath>
 {
     if (fs::is_directory(path))
         return std::nullopt;
 
     FilePath file(path.parent_path(), path.stem().native(), {}, path.extension(), type);
 
-    if (type == FileTypes::Plugin && !common::contains(sets.pluginExtensions, file.ext_))
+    if (type == FileTypes::Plugin && !common::contains(sets.plugin_extensions, file.ext))
         return std::nullopt;
 
-    if (type == FileTypes::BSA && file.ext_ != sets.extension)
+    if (type == FileTypes::BSA && file.ext != sets.extension)
         return std::nullopt;
 
-    file.counter_ = eat_digits(file.name_);
-    file.suffix_  = eat_suffix(file.name_, sets);
+    file.counter = eat_digits(file.name);
+    file.suffix  = eat_suffix(file.name, sets);
 
-    if (!file.counter_.has_value())
-        file.counter_ = eat_digits(file.name_);
+    if (!file.counter.has_value())
+        file.counter = eat_digits(file.name);
 
     return file;
 }
 
-fs::path FilePath::full_path() const
+auto FilePath::full_path() const -> Path
 {
-    return (dir_ / full_name()).replace_extension(ext_);
+    return (dir / full_name()).replace_extension(ext);
 }
 
-btu::bsa::fs::path FilePath::full_name() const
+auto FilePath::full_name() const -> Path
 {
-    const auto counter = Path(counter_ ? std::to_string(*counter_) : "").native();
-    const auto suffix  = suffix_.empty() ? BETHUTIL_BSA_STR("") : suffixSeparator + suffix_;
-    return Path(name_ + counter + suffix);
+    const auto count = Path(counter ? std::to_string(*counter) : "").native();
+    const auto suf   = suffix.empty() ? BETHUTIL_BSA_STR("") : suffix_separator + suffix;
+    return {name + count + suf};
 }
 
-std::optional<int> FilePath::eat_digits(OsString &str)
+auto FilePath::eat_digits(OsString &str) -> std::optional<int>
 {
-    size_t firstDigit = str.length() - 1;
-    for (; isdigit(str[firstDigit]); --firstDigit)
+    size_t first_digit = str.length() - 1;
+    for (; isdigit(str[first_digit]) != 0; --first_digit)
         ;
-    ++firstDigit;
+    ++first_digit;
 
-    if (firstDigit != str.length())
+    if (first_digit != str.length())
     {
-        auto ret = std::stoi(str.substr(firstDigit));
-        str.erase(firstDigit);
+        auto ret = std::stoi(str.substr(first_digit));
+        str.erase(first_digit);
         return ret;
     }
     return std::nullopt;
 }
 
-OsString FilePath::eat_suffix(OsString &str, const Settings &sets)
+auto FilePath::eat_suffix(OsString &str, const Settings &sets) -> OsString
 {
-    auto suffixPos = str.rfind(suffixSeparator);
+    auto suffix_pos = str.rfind(suffix_separator);
 
-    if (suffixPos == OsString::npos)
+    if (suffix_pos == OsString::npos)
         return {};
 
-    auto suffix = str.substr(suffixPos + suffixSeparator.length());
-    if (suffix != sets.suffix && suffix != sets.textureSuffix)
+    auto suffix = str.substr(suffix_pos + suffix_separator.length());
+    if (suffix != sets.suffix && suffix != sets.texture_suffix)
         return {};
 
-    str.erase(suffixPos);
+    str.erase(suffix_pos);
     return suffix;
 }
 
-std::vector<FilePath> list_helper(const Path &folderPath, const Settings &sets, FileTypes type)
+auto list_helper(const Path &folder_path, const Settings &sets, FileTypes type) -> std::vector<FilePath>
 {
     std::vector<FilePath> res;
-    for (const auto &f : fs::directory_iterator(folderPath))
+    for (const auto &f : fs::directory_iterator(folder_path))
         if (auto file = FilePath::make(f.path(), sets, type))
             res.emplace_back(*file);
 
     return res;
 }
 
-bool is_loaded(const FilePath &archive, const Settings &sets)
+auto is_loaded(const FilePath &archive, const Settings &sets) -> bool
 {
-    return std::any_of(sets.pluginExtensions.cbegin(),
-                       sets.pluginExtensions.cend(),
+    return std::any_of(sets.plugin_extensions.cbegin(),
+                       sets.plugin_extensions.cend(),
                        [&archive](const auto &ext) {
                            auto b            = archive;
-                           b.ext_            = ext;
+                           b.ext             = ext;
                            bool const exact  = fs::exists(b.full_path());
-                           b.suffix_         = OsString{};
+                           b.suffix          = OsString{};
                            bool const approx = fs::exists(b.full_path());
                            return exact || approx;
                        });
 }
 
-std::vector<FilePath> list_plugins(const Path &folderPath, const Settings &sets)
+auto list_plugins(const Path &folder_path, const Settings &sets) -> std::vector<FilePath>
 {
-    return list_helper(folderPath, sets, FileTypes::Plugin);
+    return list_helper(folder_path, sets, FileTypes::Plugin);
 }
 
-std::vector<FilePath> list_archive(const Path &folderPath, const Settings &sets)
+auto list_archive(const Path &folder_path, const Settings &sets) -> std::vector<FilePath>
 {
-    return list_helper(folderPath, sets, FileTypes::BSA);
+    return list_helper(folder_path, sets, FileTypes::BSA);
 }
 
-FilePath find_archive_name(const Path &folderPath, const Settings &sets, ArchiveType type)
+auto find_archive_name(const Path &folder_path, const Settings &sets, ArchiveType type) -> FilePath
 {
-    std::vector<FilePath> plugins = list_plugins(folderPath, sets);
+    std::vector<FilePath> plugins = list_plugins(folder_path, sets);
 
     if (plugins.empty())
-        plugins.emplace_back(FilePath(folderPath, folderPath.filename(), {}, ".esp", FileTypes::Plugin));
+        plugins.emplace_back(FilePath(folder_path, folder_path.filename(), {}, ".esp", FileTypes::Plugin));
 
     const Path suffix = [type, &sets] {
         if (type == ArchiveType::Textures)
-            return sets.textureSuffix.value();
+        {
+            return sets.texture_suffix.value();
+        }
         return sets.suffix.value_or("");
     }();
 
-    auto checkPlugin = [&sets, &suffix](FilePath &file) {
-        file.ext_    = sets.extension;
-        file.suffix_ = suffix;
+    auto check_plugin = [&sets, &suffix](FilePath &file) {
+        file.ext    = sets.extension;
+        file.suffix = suffix;
         return !fs::exists(file.full_path());
     };
 
     for (auto &plugin : plugins)
-        if (checkPlugin(plugin))
+        if (check_plugin(plugin))
             return plugin;
 
     FilePath plug                   = plugins.front();
-    constexpr uint8_t maxIterations = UINT8_MAX;
-    for (plug.counter_ = 0; plug.counter_ < maxIterations; ++(*plug.counter_))
-        if (checkPlugin(plug))
+    constexpr uint8_t max_iterations = UINT8_MAX;
+    for (plug.counter = 0; plug.counter < max_iterations; ++(*plug.counter))
+        if (check_plugin(plug))
             return plug;
 
     throw std::runtime_error("No btu/bsa/plugin name found after 256 tries.");
 }
 
-void clean_dummy_plugins(const btu::bsa::fs::path &folderPath, const Settings &sets)
+void clean_dummy_plugins(const Path &folder_path, const Settings &sets)
 {
-    if (!sets.sDummyPlugin.has_value())
+    if (!sets.s_dummy_plugin.has_value())
         return;
-    const auto &dummy = *sets.sDummyPlugin;
+    const auto &dummy = *sets.s_dummy_plugin;
 
-    for (const auto &plug : list_plugins(folderPath, sets))
+    for (const auto &plug : list_plugins(folder_path, sets))
     {
         const auto path = plug.full_path();
         std::fstream file(path, std::ios::binary | std::ios::in | std::ios::ate);
@@ -170,22 +172,22 @@ void clean_dummy_plugins(const btu::bsa::fs::path &folderPath, const Settings &s
     }
 }
 
-void make_dummy_plugins(const fs::path &folderPath, const Settings &sets)
+void make_dummy_plugins(const Path &folder_path, const Settings &sets)
 {
-    if (!sets.sDummyPlugin.has_value())
+    if (!sets.s_dummy_plugin.has_value())
         return;
 
-    for (auto &&bsa : list_archive(folderPath, sets))
+    for (auto &&bsa : list_archive(folder_path, sets))
     {
         if (is_loaded(bsa, sets))
             continue;
 
-        bsa.ext_    = sets.pluginExtensions.back();
-        bsa.suffix_ = {};
+        bsa.ext    = sets.plugin_extensions.back();
+        bsa.suffix = {};
         std::ofstream dummy(bsa.full_path(), std::ios::out | std::ios::binary);
 
-        const auto dummyBytes = *sets.sDummyPlugin;
-        dummy.write(reinterpret_cast<const char *>(dummyBytes.data()), dummyBytes.size());
+        const auto dummy_bytes = *sets.s_dummy_plugin;
+        dummy.write(reinterpret_cast<const char *>(dummy_bytes.data()), dummy_bytes.size()); // NOLINT
     }
 }
 

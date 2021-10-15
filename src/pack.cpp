@@ -17,14 +17,14 @@
 #include <ranges>
 
 namespace btu::bsa {
-bool defaultIsAllowedPath(const Path &dir, fs::directory_entry const &fileinfo)
+bool default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinfo)
 {
-    bool const isDir = fileinfo.is_directory();
+    bool const is_dir = fileinfo.is_directory();
 
     //Removing files at the root directory, those cannot be packed
-    bool const isRoot = fileinfo.path().parent_path() == dir;
+    bool const is_root = fileinfo.path().parent_path() == dir;
 
-    return !isDir && !isRoot;
+    return !is_dir && !is_root;
 }
 
 std::vector<std::pair<Path, std::string>> write(bool compressed,
@@ -94,6 +94,9 @@ std::vector<ArchiveData> split(const Path &dir, const Settings &sets, AllowFileP
 
 void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
 {
+    const auto test_flag = [&](MergeSettings flag) {
+        return (btu::common::to_underlying(sets) & btu::common::to_underlying(flag)) != 0;
+    };
     // We have at most one underful BSA per type, so we only consider the last three BSAs
 
     auto standard       = archives.end() - 3;
@@ -106,7 +109,7 @@ void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
     assert(textures->get_type() == ArchiveType::Textures);
 
     // Merge textures into standard if possible
-    if (sets == MergeTextures || sets == MergeBoth)
+    if (test_flag(MergeSettings::MergeTextures))
     {
         if (textures->size().compressed + standard->size().compressed < standard->max_size())
         {
@@ -115,7 +118,7 @@ void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
         }
     }
 
-    if (sets == MergeIncompressible || sets == MergeBoth)
+    if (test_flag(MergeSettings::MergeIncompressible))
     {
         if (incompressible->size().uncompressed + standard->size().uncompressed < standard->max_size())
         {

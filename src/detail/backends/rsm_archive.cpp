@@ -63,7 +63,7 @@ template libbsa::tes4::version archive_version<libbsa::tes4::version>(const Unde
                                                                       ArchiveVersion);
 template libbsa::fo4::format archive_version<libbsa::fo4::format>(const UnderlyingArchive &, ArchiveVersion);
 
-RsmArchive::RsmArchive(const std::filesystem::path &a_path)
+RsmArchive::RsmArchive(const Path &a_path)
 {
     read(a_path);
 }
@@ -95,7 +95,7 @@ RsmArchive::RsmArchive(ArchiveVersion a_version, bool a_compressed)
     }
 }
 
-auto RsmArchive::read(const std::filesystem::path &a_path) -> ArchiveVersion
+auto RsmArchive::read(const Path &a_path) -> ArchiveVersion
 {
     const auto format = libbsa::guess_file_format(a_path).value();
 
@@ -123,7 +123,7 @@ auto RsmArchive::read(const std::filesystem::path &a_path) -> ArchiveVersion
     return _version;
 }
 
-void RsmArchive::write(std::filesystem::path a_path)
+void RsmArchive::write(Path a_path)
 {
     const auto writer = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) { bsa.write(a_path); },
@@ -140,14 +140,14 @@ void RsmArchive::write(std::filesystem::path a_path)
     std::visit(writer, _archive);
 }
 
-void RsmArchive::add_file(const std::filesystem::path &a_root, const std::filesystem::path &a_path)
+void RsmArchive::add_file(const Path &a_root, const Path &a_path)
 {
     const auto relative = a_path.lexically_relative(a_root).lexically_normal();
     const auto data     = btu::common::read_file(a_path);
     return add_file(relative, data);
 }
 
-void RsmArchive::add_file(const std::filesystem::path &a_relative, std::vector<std::byte> a_data)
+void RsmArchive::add_file(const Path &a_relative, std::vector<std::byte> a_data)
 {
     const auto adder = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) {

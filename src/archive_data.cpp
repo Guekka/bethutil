@@ -10,30 +10,30 @@
 
 namespace btu::bsa {
 ArchiveData::ArchiveData(const Settings &sets, ArchiveType type)
-    : max_size_(sets.maxSize)
+    : max_size_(sets.max_size)
     , type_(type)
-    , version_(type == ArchiveType::Textures ? sets.textureFormat.value_or(sets.format) : sets.format)
+    , version_(type == ArchiveType::Textures ? sets.texture_format.value_or(sets.format) : sets.format)
 {
 }
 
-ArchiveData::Size &ArchiveData::Size::operator+=(const Size &other)
+auto ArchiveData::Size::operator+=(const Size &other) -> ArchiveData::Size &
 {
     compressed += other.compressed;
     uncompressed += other.uncompressed;
     return *this;
 }
 
-Path ArchiveData::find_name(const Path &folder, const Settings &sets) const
+auto ArchiveData::find_name(const Path &folder, const Settings &sets) const -> Path
 {
     return find_archive_name(folder, sets, type_).full_path();
 }
 
-bool ArchiveData::empty() const
+auto ArchiveData::empty() const -> bool
 {
     return size().uncompressed == 0;
 }
 
-bool ArchiveData::add_file(Path path, std::optional<Size> override)
+auto ArchiveData::add_file(Path path, std::optional<Size> override) -> bool
 {
     const auto fsize = get_file_size(path, override);
     if (size_.compressed + fsize.compressed > max_size_)
@@ -45,7 +45,7 @@ bool ArchiveData::add_file(Path path, std::optional<Size> override)
     return true;
 }
 
-ArchiveData &ArchiveData::operator+=(const ArchiveData &other)
+auto ArchiveData::operator+=(const ArchiveData &other) -> ArchiveData &
 {
     if (size().compressed + other.size().compressed > max_size_)
         throw std::runtime_error("Cannot merge ArchiveData with file size over max size");
@@ -61,19 +61,20 @@ ArchiveData &ArchiveData::operator+=(const ArchiveData &other)
     return *this;
 }
 
-ArchiveData ArchiveData::operator+(ArchiveData const &other) const
+auto ArchiveData::operator+(ArchiveData const &other) const -> ArchiveData
 {
     ArchiveData copy = *this;
     copy += other;
     return copy;
 }
 
-ArchiveData::Size ArchiveData::get_file_size(const common::Path &path, std::optional<Size> override) const
+auto ArchiveData::get_file_size(const common::Path &path, std::optional<Size> override) 
+    -> ArchiveData::Size
 {
     if (override.has_value())
         return override.value();
 
-    Size ret;
+    Size ret{};
     ret.compressed = ret.uncompressed = fs::file_size(path);
     return ret;
 }

@@ -58,48 +58,48 @@ struct AllowedPath
     Path extension;
     std::vector<Path> directories;
 
-    bool check(const Path &filepath, const Path &root) const;
+    [[nodiscard]] auto check(const Path &filepath, const Path &root) const -> bool;
 };
 
 struct Settings
 {
-    Game game;
+    Game game{};
 
-    std::uintmax_t maxSize;
+    std::uintmax_t max_size{};
 
-    ArchiveVersion format;
-    std::optional<ArchiveVersion> textureFormat;
+    ArchiveVersion format{};
+    std::optional<ArchiveVersion> texture_format;
 
     std::optional<Path> suffix;
-    std::optional<Path> textureSuffix;
+    std::optional<Path> texture_suffix;
 
     Path extension;
 
-    std::vector<Path> pluginExtensions;
-    std::optional<std::vector<uint8_t>> sDummyPlugin;
+    std::vector<Path> plugin_extensions;
+    std::optional<std::vector<uint8_t>> s_dummy_plugin;
 
-    std::vector<AllowedPath> standardFiles;
-    std::vector<AllowedPath> textureFiles;
-    std::vector<AllowedPath> incompressibleFiles;
+    std::vector<AllowedPath> standard_files;
+    std::vector<AllowedPath> texture_files;
+    std::vector<AllowedPath> incompressible_files;
 
-    static const Settings &get(Game game);
+    [[nodiscard]] static auto get(Game game) -> const Settings &;
 };
 
-inline const Settings &Settings::get(Game game)
+[[nodiscard]] inline auto Settings::get(Game game) -> const Settings &
 {
-    constexpr std::uintmax_t gigabyte = 1024 * 1024 * 1024;
+    constexpr auto megabyte = 1024UL * 1024UL;
 
-    static Settings defaultSets = [=] {
+    static Settings default_sets = [=] {
         Settings sets;
-        sets.game             = Game::SSE;
-        sets.maxSize          = static_cast<std::uintmax_t>(gigabyte * 1.7); // Safe
-        sets.format           = ArchiveVersion::sse;
-        sets.textureFormat    = ArchiveVersion::sse;
-        sets.textureSuffix    = "Textures";
-        sets.extension        = ".bsa";
-        sets.pluginExtensions = {".esl", ".esm", ".esp"};
-        sets.sDummyPlugin     = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
-        sets.standardFiles    = {
+        sets.game              = Game::SSE;
+        sets.max_size          = 1700 * megabyte; // Safe
+        sets.format            = ArchiveVersion::sse;
+        sets.texture_format    = ArchiveVersion::sse;
+        sets.texture_suffix    = "Textures";
+        sets.extension         = ".bsa";
+        sets.plugin_extensions = {".esl", ".esm", ".esp"};
+        sets.s_dummy_plugin    = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
+        sets.standard_files    = {
             AllowedPath{".bgem", {"materials"}},
             AllowedPath{".bgsm", {"materials"}},
             AllowedPath{".bto", {"meshes"}},
@@ -115,32 +115,32 @@ inline const Settings &Settings::get(Game game)
             AllowedPath{".tga", {"textures"}},
             AllowedPath{".tri", {"meshes"}},
         };
-        sets.textureFiles = {
+        sets.texture_files = {
             AllowedPath{".dds", {"textures"}},
             AllowedPath{".png", {"textures"}},
         };
-        sets.incompressibleFiles = {AllowedPath{".dlstrings", {"strings"}},
-                                    AllowedPath{".fuz", {"sound"}},
-                                    AllowedPath{".fxp", {"shadersfx"}},
-                                    AllowedPath{".gid", {"grass"}},
-                                    AllowedPath{".gfx", {"interface"}},
-                                    AllowedPath{".hkc", {"meshes"}},
-                                    AllowedPath{".hkt", {"meshes"}},
-                                    AllowedPath{".ilstrings", {"strings"}},
-                                    AllowedPath{".ini", {"meshes"}},
-                                    AllowedPath{".lip", {"sound"}},
-                                    AllowedPath{".lnk", {"grass"}},
-                                    AllowedPath{".lod", {"lodsettings"}},
-                                    AllowedPath{".ogg", {"sound"}},
-                                    AllowedPath{".pex", {"scripts"}},
-                                    AllowedPath{".psc", {"scripts"}},
-                                    AllowedPath{".seq", {"seq"}},
-                                    AllowedPath{".strings", {"strings"}},
-                                    AllowedPath{".swf", {"interface"}},
-                                    AllowedPath{".txt", {"interface", "meshes", "scripts"}},
-                                    AllowedPath{".wav", {"sound"}},
-                                    AllowedPath{".xml", {"dialogueviews"}},
-                                    AllowedPath{".xwm", {"music", "sound", "music"}}};
+        sets.incompressible_files = {AllowedPath{".dlstrings", {"strings"}},
+                                     AllowedPath{".fuz", {"sound"}},
+                                     AllowedPath{".fxp", {"shadersfx"}},
+                                     AllowedPath{".gid", {"grass"}},
+                                     AllowedPath{".gfx", {"interface"}},
+                                     AllowedPath{".hkc", {"meshes"}},
+                                     AllowedPath{".hkt", {"meshes"}},
+                                     AllowedPath{".ilstrings", {"strings"}},
+                                     AllowedPath{".ini", {"meshes"}},
+                                     AllowedPath{".lip", {"sound"}},
+                                     AllowedPath{".lnk", {"grass"}},
+                                     AllowedPath{".lod", {"lodsettings"}},
+                                     AllowedPath{".ogg", {"sound"}},
+                                     AllowedPath{".pex", {"scripts"}},
+                                     AllowedPath{".psc", {"scripts"}},
+                                     AllowedPath{".seq", {"seq"}},
+                                     AllowedPath{".strings", {"strings"}},
+                                     AllowedPath{".swf", {"interface"}},
+                                     AllowedPath{".txt", {"interface", "meshes", "scripts"}},
+                                     AllowedPath{".wav", {"sound"}},
+                                     AllowedPath{".xml", {"dialogueviews"}},
+                                     AllowedPath{".xwm", {"music", "sound", "music"}}};
         return sets;
     }();
 
@@ -149,13 +149,13 @@ inline const Settings &Settings::get(Game game)
         case Game::TES4:
         {
             static Settings sets = [=] {
-                Settings s         = defaultSets;
-                s.game             = Game::TES4;
-                s.format           = ArchiveVersion::tes4;
-                s.textureFormat    = std::nullopt;
-                sets.textureSuffix = std::nullopt;
-                s.pluginExtensions = {".esm", ".esp"};
-                sets.sDummyPlugin  = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
+                Settings s          = default_sets;
+                s.game              = Game::TES4;
+                s.format            = ArchiveVersion::tes4;
+                s.texture_format    = std::nullopt;
+                sets.texture_suffix = std::nullopt;
+                s.plugin_extensions = {".esm", ".esp"};
+                sets.s_dummy_plugin = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
                 return s;
             }();
             return sets;
@@ -163,13 +163,13 @@ inline const Settings &Settings::get(Game game)
         case Game::FNV:
         {
             static Settings sets = [=] {
-                Settings s         = defaultSets;
-                s.game             = Game::FNV;
-                s.format           = ArchiveVersion::tes5;
-                s.textureFormat    = std::nullopt;
-                sets.textureSuffix = std::nullopt;
-                s.pluginExtensions = {".esm", ".esp"};
-                sets.sDummyPlugin  = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
+                Settings s          = default_sets;
+                s.game              = Game::FNV;
+                s.format            = ArchiveVersion::tes5;
+                s.texture_format    = std::nullopt;
+                s.texture_suffix    = std::nullopt;
+                s.plugin_extensions = {".esm", ".esp"};
+                sets.s_dummy_plugin = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
                 return s;
             }();
             return sets;
@@ -177,58 +177,59 @@ inline const Settings &Settings::get(Game game)
         case Game::SLE:
         {
             static Settings sets = [=] {
-                Settings s         = defaultSets;
-                s.game             = Game::SLE;
-                s.format           = ArchiveVersion::tes5;
-                s.textureFormat    = std::nullopt;
-                s.suffix           = Path{};
-                s.textureSuffix    = std::nullopt;
-                s.pluginExtensions = {".esm", ".esp"};
-                sets.sDummyPlugin  = std::vector(std::begin(dummy::tes5), std::end(dummy::tes5));
+                Settings s          = default_sets;
+                s.game              = Game::SLE;
+                s.format            = ArchiveVersion::tes5;
+                s.texture_format    = std::nullopt;
+                s.suffix            = Path{};
+                s.texture_suffix    = std::nullopt;
+                s.plugin_extensions = {".esm", ".esp"};
+                sets.s_dummy_plugin = std::vector(std::begin(dummy::tes5), std::end(dummy::tes5));
                 return s;
             }();
             return sets;
         }
-        case Game::SSE: return defaultSets;
+        case Game::SSE: return default_sets;
         case Game::FO4:
         {
             static Settings sets = [=] {
-                Settings s        = defaultSets;
-                s.game            = Game::FO4;
-                s.format          = ArchiveVersion::fo4;
-                s.textureFormat   = ArchiveVersion::fo4dx;
-                sets.extension    = ".ba2";
-                s.suffix          = "Main";
-                s.textureFiles    = {AllowedPath{".dds", {"textures"}}};
-                s.standardFiles.emplace_back(AllowedPath{".png", {"textures"}});
-                sets.sDummyPlugin = std::vector(std::begin(dummy::fo4), std::end(dummy::fo4));
+                Settings s       = default_sets;
+                s.game           = Game::FO4;
+                s.format         = ArchiveVersion::fo4;
+                s.texture_format = ArchiveVersion::fo4dx;
+                sets.extension   = ".ba2";
+                s.suffix         = "Main";
+                s.texture_files  = {AllowedPath{".dds", {"textures"}}};
+                s.standard_files.emplace_back(AllowedPath{".png", {"textures"}});
+                sets.s_dummy_plugin = std::vector(std::begin(dummy::fo4), std::end(dummy::fo4));
                 return s;
             }();
             return sets;
         }
-        default: return defaultSets;
+        default: return default_sets;
     }
 }
 
-inline bool AllowedPath::check(const Path &filepath, const Path &root) const
+[[nodiscard]] inline auto AllowedPath::check(const Path &filepath, const Path &root) const -> bool
 {
     const auto ext = filepath.extension().native();
-    if (!common::str_compare(extension.native(), ext, false))
+    if (!common::str_compare(extension.native(), ext, /*case_sensitive=*/false))
         return false;
 
     const auto &relative = filepath.lexically_relative(root);
     const auto dir       = [&relative] {
         if (relative.empty())
             return AllowedPath::root;
-        else
-            return common::to_lower(*relative.begin());
+
+        return common::to_lower(*relative.begin());
     }();
     return common::contains(directories, dir);
 
     return true;
 }
 
-inline FileTypes get_filetype(const Path &filepath, const Path &root, const Settings &sets)
+[[nodiscard]] inline auto get_filetype(const Path &filepath, const Path &root, const Settings &sets)
+    -> FileTypes
 {
     auto check = [ext = btu::common::to_lower(filepath.extension()), &filepath, &root](const auto &vec) {
         using std::cbegin, std::cend;
@@ -241,17 +242,17 @@ inline FileTypes get_filetype(const Path &filepath, const Path &root, const Sett
         return it != cend(vec);
     };
 
-    if (check(sets.standardFiles))
+    if (check(sets.standard_files))
         return FileTypes::Standard;
-    if (check(sets.textureFiles))
+    if (check(sets.texture_files))
         return FileTypes::Texture;
-    if (check(sets.incompressibleFiles))
+    if (check(sets.incompressible_files))
         return FileTypes::Incompressible;
-    if (check(sets.pluginExtensions))
+    if (check(sets.plugin_extensions))
         return FileTypes::Plugin;
 
-    Path plugExt[] = {sets.extension};
-    if (check(plugExt))
+    Path plug_ext = {sets.extension};
+    if (check(plug_ext))
         return FileTypes::BSA;
 
     return FileTypes::Blacklist;
