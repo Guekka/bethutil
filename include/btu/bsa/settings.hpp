@@ -92,7 +92,7 @@ struct Settings
     static Settings default_sets = [=] {
         Settings sets;
         sets.game              = Game::SSE;
-        sets.max_size          = 1700 * megabyte; // Safe
+        sets.max_size          = 2000 * megabyte;
         sets.format            = ArchiveVersion::sse;
         sets.texture_format    = ArchiveVersion::sse;
         sets.texture_suffix    = "Textures";
@@ -197,6 +197,7 @@ struct Settings
                 s.game           = Game::FO4;
                 s.format         = ArchiveVersion::fo4;
                 s.texture_format = ArchiveVersion::fo4dx;
+                s.max_size       = 4000 * megabyte;
                 sets.extension   = ".ba2";
                 s.suffix         = "Main";
                 s.texture_files  = {AllowedPath{".dds", {"textures"}}};
