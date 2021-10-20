@@ -10,17 +10,18 @@
 TEST_CASE("to_lower", "[string]")
 {
     using btu::common::to_lower;
-    auto check       = [](std::string_view upper, auto lower) { CHECK(to_lower(upper) == lower); };
-    auto check_false = [](std::string_view upper, auto lower) { CHECK_FALSE(to_lower(upper) == lower); };
+
+    using namespace std::literals;
 
     SECTION("Basic ASCII")
     {
-        check("A", "a");
-        check("ABCDEF", "abcdef");
-        check("abcdef", "abcdef");
-        check("!", "!");
+        CHECK(to_lower(u8"A"sv) == u8"a");
+        CHECK(to_lower(u8"ABCDEF"sv) == u8"abcdef");
+        CHECK(to_lower(u8"abcdef"sv) == u8"abcdef");
+        CHECK(to_lower(u8"!"sv) == u8"!");
     }
-    SECTION("More complicated characters are NOT supported") { check_false("À", "à"); }
+
+    SECTION("More complicated characters are supported") { CHECK(to_lower(u8"À"sv) == u8"à"); }
 }
 
 TEST_CASE("str_compare", "[string]")
@@ -29,10 +30,10 @@ TEST_CASE("str_compare", "[string]")
 
     SECTION("Basic ASCII")
     {
-        CHECK_FALSE(str_compare("A", "a"));
-        CHECK(str_compare("A", "a", false));
+        CHECK_FALSE(str_compare(u8"A", u8"a"));
+        CHECK(str_compare(u8"A", u8"a", false));
 
-        CHECK_FALSE(str_compare("somepath/c/x/d!", "somepath/C/X/D!"));
-        CHECK(str_compare("somepath/c/x/d!", "somepath/C/X/D!", false));
+        CHECK_FALSE(str_compare(u8"somepath/c/x/d!", u8"somepath/C/X/D!"));
+        CHECK(str_compare(u8"somepath/c/x/d!", u8"somepath/C/X/D!", false));
     }
 }

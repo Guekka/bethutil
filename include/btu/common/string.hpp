@@ -7,96 +7,31 @@
 
 #include "btu/common/metaprogramming.hpp"
 
-#include <algorithm>
 #include <cctype>
-#include <iterator>
 #include <string>
 
 namespace btu::common {
+using u8_unit = int32_t;
 
-constexpr auto to_string_view = overload{
-    [](const char *s) { return std::string_view(s); },
-    [](const std::string &s) { return std::string_view(s); },
-    [](const wchar_t *s) { return std::wstring_view(s); },
-    [](const std::wstring &s) { return std::wstring_view(s); },
-    [](const auto &s) { return std::basic_string_view(s); },
+class InvalidUTF8 : public std::exception
+{
+public:
+    InvalidUTF8(const void *location)
+        : location(location)
+    {
+    }
+
+    const void *location;
+    const char *what() const override { return "Invalid UTF8 string given in argument"; }
 };
 
-template<typename CharT>
-using StrComparePred = bool (*)(CharT, CharT);
+std::u8string_view as_utf8(std::string_view str);
 
-template<typename CharT>
-auto str_compare_pred(bool case_sensitive = true) -> StrComparePred<CharT>
-{
-    if (case_sensitive)
-        return [](CharT ch1, CharT ch2) { return ch1 == ch2; };
+auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive = true) -> bool;
+auto str_find(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true) -> size_t;
+auto str_contain(std::u8string_view string, std::u8string_view snippet, bool caseSensitive = true) -> bool;
 
-    return [](CharT ch1, CharT ch2) {
-        ch1 = ::tolower(ch1);
-        ch2 = ::tolower(ch2);
+auto to_lower(std::u8string_view str) -> std::u8string;
+auto to_lower(std::u8string &&str) -> std::u8string;
 
-        return ch1 == ch2;
-    };
-}
-
-template<class CharT>
-auto str_compare(std::basic_string_view<CharT> lhs,
-                 std::basic_string_view<CharT> rhs,
-                 bool case_sensitive = true) -> bool
-{
-    auto pred = str_compare_pred<CharT>(case_sensitive);
-
-    using namespace std;
-    return lhs.size() == rhs.size() && equal(cbegin(rhs), cend(rhs), cbegin(lhs), pred);
-}
-
-template<class String1, typename String2>
-auto str_compare(String1 lhs, String2 rhs, bool case_sensitive = true) -> bool
-{
-    static_assert(is_equiv_v<decltype(lhs), decltype(rhs)>);
-    return str_compare(to_string_view(lhs), to_string_view(rhs), case_sensitive);
-}
-
-template<class CharT>
-size_t str_find(std::basic_string_view<CharT> string,
-                std::basic_string_view<CharT> snippet,
-                bool caseSensitive = true,
-                size_t fromPos     = 0)
-{
-    auto pred = str_compare_pred<CharT>(caseSensitive);
-    using std::cbegin, std::cend;
-
-    if (cbegin(string) + fromPos > cend(string))
-        return std::string::npos;
-
-    auto it = std::search(cbegin(string) + fromPos, cend(string), cbegin(snippet), cend(snippet), pred);
-
-    if (it != cend(string))
-        return it - cbegin(string);
-    else
-        return std::string::npos; // not found
-}
-
-template<class CharT>
-bool str_contain(std::basic_string_view<CharT> string,
-                 std::basic_string_view<CharT> snippet,
-                 bool caseSensitive = true)
-{
-    return str_find(string, snippet, caseSensitive) != std::string::npos;
-}
-
-template<class CharT>
-auto to_lower(std::basic_string_view<CharT> str) -> std::basic_string<CharT>
-{
-    std::basic_string<CharT> res;
-    res.reserve(str.size());
-    std::transform(str.begin(), str.end(), std::back_inserter(res), [](auto &&c) { return ::tolower(c); });
-    return res;
-}
-
-template<class String>
-auto to_lower(String str)
-{
-    return to_lower(to_string_view(str));
-}
 } // namespace btu::common
