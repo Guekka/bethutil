@@ -14,7 +14,7 @@ set(HEADER_FILES
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
-    "${SOURCE_DIR}/empty.cpp"
+    "${SOURCE_DIR}/string.cpp"
 )
 
 source_group(
@@ -33,6 +33,9 @@ add_library(
 	"${ROOT_DIR}/.clang-tidy"
 )
 add_library("btu::common" ALIAS "${PROJECT_NAME}")
+
+find_path(UTF8H_INCLUDE_DIRS "utf8h/utf8.h")
+target_include_directories("${PROJECT_NAME}" PRIVATE ${UTF8H_INCLUDE_DIRS})
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
