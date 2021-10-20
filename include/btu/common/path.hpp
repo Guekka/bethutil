@@ -16,7 +16,7 @@ using OsChar   = OsString::value_type;
 
 inline auto to_lower(const Path &path) -> Path
 {
-    return to_lower(path.u8string());
+    return to_lower(std::u8string_view(path.u8string()));
 }
 
 } // namespace btu::common
