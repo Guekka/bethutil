@@ -54,13 +54,12 @@ target_compile_features(
 		cxx_std_20
 )
 
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang|GNU")
-	target_compile_options(
-		"${PROJECT_NAME}"
-		PRIVATE
-			"-fvisibility=hidden"
-	)
-endif()
+target_compile_options(
+        "${PROJECT_NAME}"
+        PRIVATE
+        "$<$<CXX_COMPILER_ID:AppleClang,Clang,GNU>:-fvisibility=hidden>"
+        "$<$<CXX_COMPILER_ID:MSVC>:/utf-8>"
+)
 
 target_include_directories(
 	"${PROJECT_NAME}"

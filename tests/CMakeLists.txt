@@ -28,6 +28,13 @@ add_executable(
 	${SOURCE_FILES}
 )
 
+target_compile_options(
+        tests
+        PRIVATE
+        "$<$<CXX_COMPILER_ID:AppleClang,Clang,GNU>:-fvisibility=hidden>"
+        "$<$<CXX_COMPILER_ID:MSVC>:/utf-8>"
+)
+
 find_package(Catch2 CONFIG REQUIRED)
 include(Catch)
 catch_discover_tests(tests)
