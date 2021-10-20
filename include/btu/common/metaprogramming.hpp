@@ -29,3 +29,29 @@ template<typename T, typename U>
 constexpr bool is_equiv_v = is_equiv<T, U>::value;
 
 } // namespace btu::common
+
+#define BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, a_op)                                           \
+    [[nodiscard]] constexpr auto operator a_op(a_type a_lhs, a_type a_rhs) noexcept->a_type      \
+    {                                                                                            \
+        return static_cast<a_type>(static_cast<std::underlying_type_t<a_type>>(a_lhs)            \
+                                       a_op static_cast<std::underlying_type_t<a_type>>(a_rhs)); \
+    }                                                                                            \
+                                                                                                 \
+    constexpr auto operator a_op##=(a_type &a_lhs, a_type a_rhs) noexcept->a_type &              \
+    {                                                                                            \
+        return a_lhs = a_lhs a_op a_rhs;                                                         \
+    }
+
+#define BETHUTIL_MAKE_ALL_ENUM_OPERATORS(a_type)                                         \
+    static_assert(std::is_enum_v<a_type>, "\'" #a_type "\' is not an enum");             \
+                                                                                         \
+    [[nodiscard]] constexpr auto operator~(a_type a_val) noexcept->a_type                \
+    {                                                                                    \
+        return static_cast<a_type>(~static_cast<std::underlying_type_t<a_type>>(a_val)); \
+    }                                                                                    \
+                                                                                         \
+    BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, ^)                                          \
+    BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, &)                                          \
+    BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, |)                                          \
+    BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, <<)                                         \
+    BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, >>)
