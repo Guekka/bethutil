@@ -58,6 +58,34 @@ auto str_compare(String1 lhs, String2 rhs, bool case_sensitive = true) -> bool
 }
 
 template<class CharT>
+size_t str_find(std::basic_string_view<CharT> string,
+                std::basic_string_view<CharT> snippet,
+                bool caseSensitive = true,
+                size_t fromPos     = 0)
+{
+    auto pred = str_compare_pred<CharT>(caseSensitive);
+    using std::cbegin, std::cend;
+
+    if (cbegin(string) + fromPos > cend(string))
+        return std::string::npos;
+
+    auto it = std::search(cbegin(string) + fromPos, cend(string), cbegin(snippet), cend(snippet), pred);
+
+    if (it != cend(string))
+        return it - cbegin(string);
+    else
+        return std::string::npos; // not found
+}
+
+template<class CharT>
+bool str_contain(std::basic_string_view<CharT> string,
+                 std::basic_string_view<CharT> snippet,
+                 bool caseSensitive = true)
+{
+    return str_find(string, snippet, caseSensitive) != std::string::npos;
+}
+
+template<class CharT>
 auto to_lower(std::basic_string_view<CharT> str) -> std::basic_string<CharT>
 {
     std::basic_string<CharT> res;
