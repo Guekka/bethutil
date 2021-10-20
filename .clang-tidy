@@ -3,7 +3,10 @@
 # misc-non-private-member-variables-in-classes: the options don't do anything
 Checks: "*,\
   -google-readability-todo,\
-  -altera-unroll-loops,\
+  -google-readability-braces-around-statements,\
+  -hicpp-braces-around-statements,\
+  -readability-braces-around-statements,\
+  -altera-*,\
   -fuchsia-*,\
   fuchsia-multiple-inheritance,\
   -llvm-header-guard,\
@@ -12,8 +15,6 @@ Checks: "*,\
   -misc-non-private-member-variables-in-classes"
 WarningsAsErrors: ''
 CheckOptions:
-  - key: 'bugprone-argument-comment.StrictMode'
-    value: 'true'
 # Prefer using enum classes with 2 values for parameters instead of bools
   - key: 'bugprone-argument-comment.CommentBoolLiterals'
     value: 'true'
@@ -135,7 +136,7 @@ CheckOptions:
   - key: 'readability-identifier-naming.StaticVariableCase'
     value: 'lower_case'
   - key: 'readability-identifier-naming.StructCase'
-    value: 'lower_case'
+    value: 'CamelCase'
   - key: 'readability-identifier-naming.TemplateParameterCase'
     value: 'CamelCase'
   - key: 'readability-identifier-naming.TemplateTemplateParameterCase'
