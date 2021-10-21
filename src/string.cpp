@@ -52,7 +52,8 @@ auto UTF8Iterator::operator++() -> UTF8Iterator &
 auto UTF8Iterator::operator++(int) -> UTF8Iterator
 {
     auto copy = *this;
-    return ++copy;
+    ++*this;
+    return copy;
 }
 
 auto as_utf8(std::string_view str) -> std::u8string_view
