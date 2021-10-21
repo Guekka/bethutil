@@ -23,10 +23,10 @@ public:
     using reference         = U8Unit;
 
     explicit UTF8Iterator(std::u8string_view string);
-    static auto end(std::u8string_view string) -> UTF8Iterator;
+    [[nodiscard]] static auto end(std::u8string_view string) -> UTF8Iterator;
 
-    auto operator*() const -> reference;
-    auto operator->() const -> pointer;
+    [[nodiscard]] auto operator*() const -> reference;
+    [[nodiscard]] auto operator->() const -> pointer;
 
     // Prefix increment
     auto operator++() -> UTF8Iterator &;
@@ -34,7 +34,8 @@ public:
     // Postfix increment
     auto operator++(int) -> UTF8Iterator;
 
-    auto operator<=>(const UTF8Iterator &) const = default;
+    [[nodiscard]] auto operator<=>(const UTF8Iterator &other) const -> std::strong_ordering;
+    [[nodiscard]] auto operator==(const UTF8Iterator &other) const -> bool;
 
 private:
     std::u8string_view string_;
