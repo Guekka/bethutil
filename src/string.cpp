@@ -49,6 +49,23 @@ auto UTF8Iterator::operator++() -> UTF8Iterator &
     utf8codepoint(string_.data() + idx_, &cur_);
     return *this;
 }
+
+bool UTF8Iterator::operator==(const UTF8Iterator &other) const
+{
+    return (*this <=> other) == 0;
+}
+
+auto UTF8Iterator::operator<=>(const UTF8Iterator &other) const -> std::strong_ordering
+{
+    if (idx_ != other.idx_)
+        return idx_ <=> other.idx_;
+
+    if (cur_ != other.cur_)
+        return cur_ <=> other.cur_;
+
+    return string_.data() <=> other.string_.data();
+}
+
 auto UTF8Iterator::operator++(int) -> UTF8Iterator
 {
     auto copy = *this;
