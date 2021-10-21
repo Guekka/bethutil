@@ -1,0 +1,9 @@
+{
+  "name": "bethutil-tex",
+  "version-string": "1",
+  "dependencies": [
+    "catch2",
+	"bethutil-common",
+	"directxtex"
+  ]
+}
