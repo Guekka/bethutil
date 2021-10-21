@@ -215,12 +215,7 @@ auto str_match(std::u8string_view string, std::u8string_view pattern, bool case_
                 ++pat_it;
             }
         }
-        else if (pat_it != pat_end && current_pat == current_str)
-        {
-            ++pat_it;
-            ++str_it;
-        }
-        else if (pat_it != pat_end && current_pat == cards.any)
+        else if (pat_it != pat_end && (current_pat == current_str || current_pat == cards.any))
         {
             ++pat_it;
             ++str_it;
