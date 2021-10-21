@@ -148,3 +148,54 @@ TEST_CASE("concat_codepoint", "[string]")
     for (auto &&cp : {291, 1222, 566415, 1832, 5396})
         add_codepoint(cp);
 }
+
+TEST_CASE("str_match", "[string]")
+{
+    using btu::common::str_match;
+
+    SECTION("Basic")
+    {
+        CHECK(str_match(u8"geeks", u8"g*ks"));
+        CHECK(str_match(u8"geeksforgeeks", u8"ge?ks*"));
+        CHECK(str_match(u8"abcdhghgbcd", u8"abc*bcd"));
+        CHECK(str_match(u8"abcd", u8"*c*d"));
+        CHECK(str_match(u8"abcd", u8"*?c*d"));
+        CHECK(str_match(u8"abcd", u8"*?*?c*d"));
+        CHECK(str_match(u8"", u8""));
+        CHECK(str_match(u8"", u8"*"));
+        CHECK(str_match(u8"a", u8"[abc]"));
+        CHECK(str_match(u8"abcd", u8"*?*?[dc]*d"));
+        CHECK(str_match(u8"aa*a", u8"aa[*]a"));
+
+        CHECK_FALSE(str_match(u8"pqrst", u8"*pqrs"));
+        CHECK_FALSE(str_match(u8"gee", u8"g*k"));
+        CHECK_FALSE(str_match(u8"abcd", u8"abc*c?d"));
+        CHECK_FALSE(str_match(u8"", u8"?"));
+        CHECK_FALSE(str_match(u8"s", u8"[abc]"));
+        CHECK_FALSE(str_match(u8"a_aa ", u8"[ab][ab]*"));
+    }
+    SECTION("Case sensitivity", "[string]")
+    {
+        CHECK(str_match(u8"geEksforgeeks", u8"ge?ks*"));
+        CHECK(str_match(u8"ABCD", u8"*c*d", false));
+
+        CHECK_FALSE(str_match(u8"geeks", u8"G*ks"));
+    }
+    SECTION("Set", "[string]")
+    {
+        CHECK(str_match(u8"c", u8"[abc]"));
+        CHECK_FALSE(str_match(u8"c", u8"[ab]"));
+    }
+    SECTION("paths", "[string]")
+    {
+        constexpr auto path = u8"E:/Documents/SomeData/SomeFolder/file.dds";
+        CHECK(str_match(path, u8"*.dds"));
+        CHECK(str_match(path, u8"e:/*", false));
+        CHECK(str_match(path, u8"E:/*/SomeFolder/*.*"));
+
+        CHECK_FALSE(str_match(path, u8"E:/*/SomeFolder/*.bsa"));
+
+        CHECK(str_match(u8"textures/hello.tga", u8"*[s]/*.[td][gd][as]"));
+        CHECK(str_match(u8"textures/my/world/is/purple/hello.dds", u8"*[s]/*.[td][gd][as]"));
+    }
+}
