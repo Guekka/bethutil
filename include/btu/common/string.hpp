@@ -59,6 +59,21 @@ auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensi
 auto str_find(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true) -> size_t;
 auto str_contain(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true) -> bool;
 
+struct Cards
+{
+    U8Unit any;
+    U8Unit any_repeat;
+    U8Unit set_begin;
+    U8Unit set_end;
+};
+
+constexpr Cards default_cards{u8'?', u8'*', u8'[', u8']'};
+
+auto str_match(std::u8string_view string,
+               std::u8string_view pattern,
+               bool case_sensitive = true,
+               Cards cards         = default_cards) -> bool;
+
 auto to_lower(std::u8string_view string) -> std::u8string;
 
 auto first_codepoint(std::u8string_view string) -> U8Unit;

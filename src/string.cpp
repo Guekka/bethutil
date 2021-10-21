@@ -50,7 +50,7 @@ auto UTF8Iterator::operator++() -> UTF8Iterator &
     return *this;
 }
 
-bool UTF8Iterator::operator==(const UTF8Iterator &other) const
+auto UTF8Iterator::operator==(const UTF8Iterator &other) const -> bool
 {
     return (*this <=> other) == 0;
 }
@@ -154,4 +154,102 @@ auto first_codepoint(std::u8string_view string) -> U8Unit
     return res;
 }
 
+auto str_match(std::u8string_view string, std::u8string_view pattern, bool case_sensitive, Cards cards)
+    -> bool
+{
+    // Empty pattern can only match with empty sting
+    if (pattern.empty())
+        return string.empty();
+
+    auto pat_it        = UTF8Iterator(pattern);
+    const auto pat_end = UTF8Iterator::end(pattern);
+
+    auto str_it        = UTF8Iterator(string);
+    const auto str_end = UTF8Iterator::end(string);
+
+    auto anyrep_pos_pat = pat_end;
+    auto anyrep_pos_str = str_end;
+
+    auto set_pos_pat = pat_end;
+
+    while (str_it != str_end)
+    {
+        U8Unit current_pat = 0;
+        U8Unit current_str = -1;
+        if (pat_it != pat_end)
+        {
+            current_pat = case_sensitive ? *pat_it : utf8lwrcodepoint(*pat_it);
+            current_str = case_sensitive ? *str_it : utf8lwrcodepoint(*str_it);
+        }
+        if (pat_it != pat_end && current_pat == cards.set_begin)
+        {
+            set_pos_pat = pat_it;
+            ++pat_it;
+        }
+        else if (pat_it != pat_end && current_pat == cards.set_end)
+        {
+            if (anyrep_pos_pat != pat_end)
+            {
+                set_pos_pat = pat_end;
+                pat_it++;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (set_pos_pat != pat_end)
+        {
+            if (current_pat == current_str)
+            {
+                set_pos_pat = pat_end;
+                pat_it      = std::next(std::find(pat_it, pat_end, cards.set_end));
+                ++str_it;
+            }
+            else
+            {
+                if (pat_it == pat_end)
+                {
+                    return false;
+                }
+                ++pat_it;
+            }
+        }
+        else if (pat_it != pat_end && current_pat == current_str)
+        {
+            ++pat_it;
+            ++str_it;
+        }
+        else if (pat_it != pat_end && current_pat == cards.any)
+        {
+            ++pat_it;
+            ++str_it;
+        }
+        else if (pat_it != pat_end && current_pat == cards.any_repeat)
+        {
+            anyrep_pos_pat = pat_it;
+            anyrep_pos_str = str_it;
+            ++pat_it;
+        }
+        else if (anyrep_pos_pat != pat_end)
+        {
+            pat_it = std::next(anyrep_pos_pat);
+            str_it = std::next(anyrep_pos_str);
+            ++anyrep_pos_str;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    while (pat_it != pat_end)
+    {
+        const U8Unit cur = case_sensitive ? *pat_it : utf8lwrcodepoint(*pat_it);
+        if (cur == cards.any_repeat)
+            ++pat_it;
+        else
+            break;
+    }
+    return pat_it == pat_end;
+}
 } // namespace btu::common
