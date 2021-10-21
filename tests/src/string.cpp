@@ -198,4 +198,11 @@ TEST_CASE("str_match", "[string]")
         CHECK(str_match(u8"textures/hello.tga", u8"*[s]/*.[td][gd][as]"));
         CHECK(str_match(u8"textures/my/world/is/purple/hello.dds", u8"*[s]/*.[td][gd][as]"));
     }
+    SECTION("malformed input", "[string]")
+    {
+        CHECK_FALSE(str_match(u8"abc", u8"["));
+        CHECK_FALSE(str_match(u8"abc", u8"]"));
+        CHECK_FALSE(str_match(u8"abc", u8"]"));
+        CHECK_FALSE(str_match(u8"abc", u8"[[[abc]]]"));
+    }
 }
