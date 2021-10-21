@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <codecvt>
 #include <iterator>
 
 namespace btu::common {
@@ -73,18 +74,42 @@ auto UTF8Iterator::operator++(int) -> UTF8Iterator
     return copy;
 }
 
+static_assert(sizeof(std::string_view::value_type) == sizeof(std::u8string_view::value_type)
+                  && sizeof(std::string::value_type) == sizeof(std::u8string::value_type),
+              "btu::common string assumption violated");
+
 auto as_utf8(std::string_view str) -> std::u8string_view
 {
-    static_assert(sizeof(std::string_view::value_type) == sizeof(std::u8string_view::value_type),
-                  "btu::common string assumption violated");
     return {reinterpret_cast<const char8_t *>(str.data()), str.size()};
 }
 
 auto as_ascii(std::u8string_view str) -> std::string_view
 {
-    static_assert(sizeof(std::string_view::value_type) == sizeof(std::u8string_view::value_type),
-                  "btu::common string assumption violated");
     return {reinterpret_cast<const char *>(str.data()), str.size()};
+}
+
+auto as_utf8_string(std::string str) -> std::u8string
+{
+    return {reinterpret_cast<const char8_t *>(str.data()), str.size()};
+}
+
+auto as_ascii_string(std::u8string str) -> std::string
+{
+    return {reinterpret_cast<const char *>(str.data()), str.size()};
+}
+
+namespace detail {
+static thread_local std::wstring_convert<std::codecvt_utf8<wchar_t>> converter{};
+} // namespace detail
+
+auto to_utf8(const std::wstring &str) -> std::u8string
+{
+    return as_utf8_string(detail::converter.to_bytes(str));
+}
+
+auto to_utf16(const std::u8string &str) -> std::wstring
+{
+    return detail::converter.from_bytes(as_ascii_string(str));
 }
 
 auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive) -> bool

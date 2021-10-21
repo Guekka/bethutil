@@ -54,6 +54,12 @@ target_compile_features(
 		cxx_std_20
 )
 
+target_compile_definitions(
+        "${PROJECT_NAME}"
+        PRIVATE
+                _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+)
+
 target_compile_options(
         "${PROJECT_NAME}"
         PRIVATE

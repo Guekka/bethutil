@@ -55,6 +55,12 @@ public:
 auto as_utf8(std::string_view str) -> std::u8string_view;
 auto as_ascii(std::u8string_view str) -> std::string_view;
 
+auto as_utf8_string(std::string str) -> std::u8string;
+auto as_ascii_string(std::u8string str) -> std::string;
+
+auto to_utf8(const std::wstring &str) -> std::u8string;
+auto to_utf16(const std::u8string &str) -> std::wstring;
+
 auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive = true) -> bool;
 auto str_find(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true) -> size_t;
 auto str_contain(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true) -> bool;
