@@ -13,14 +13,13 @@
 namespace btu::bsa {
 
 using btu::common::to_underlying;
-using enum ArchiveVersion;
 
 static_assert(to_underlying(ArchiveVersion::tes3) == 1);
-static_assert(to_underlying(tes4) == to_underlying(::bsa::tes4::version::tes4));
-static_assert(to_underlying(fo3) == to_underlying(::bsa::tes4::version::fo3));
-static_assert(to_underlying(tes5) == to_underlying(::bsa::tes4::version::tes5));
-static_assert(to_underlying(sse) == to_underlying(::bsa::tes4::version::sse));
-static_assert(to_underlying(fo4) == to_underlying(::bsa::fo4::format::general));
-static_assert(to_underlying(fo4dx) == to_underlying(::bsa::fo4::format::directx));
+static_assert(to_underlying(ArchiveVersion::tes4) == to_underlying(::bsa::tes4::version::tes4));
+static_assert(to_underlying(ArchiveVersion::fo3) == to_underlying(::bsa::tes4::version::fo3));
+static_assert(to_underlying(ArchiveVersion::tes5) == to_underlying(::bsa::tes4::version::tes5));
+static_assert(to_underlying(ArchiveVersion::sse) == to_underlying(::bsa::tes4::version::sse));
+static_assert(to_underlying(ArchiveVersion::fo4) == to_underlying(::bsa::fo4::format::general));
+static_assert(to_underlying(ArchiveVersion::fo4dx) == to_underlying(::bsa::fo4::format::directx));
 
 } // namespace btu::bsa
