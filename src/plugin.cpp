@@ -143,7 +143,7 @@ auto find_archive_name(const Path &folder_path, const Settings &sets, ArchiveTyp
         if (check_plugin(plugin))
             return plugin;
 
-    FilePath plug                   = plugins.front();
+    FilePath plug                    = plugins.front();
     constexpr uint8_t max_iterations = UINT8_MAX;
     for (plug.counter = 0; plug.counter < max_iterations; ++(*plug.counter))
         if (check_plugin(plug))

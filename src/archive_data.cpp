@@ -68,8 +68,7 @@ auto ArchiveData::operator+(ArchiveData const &other) const -> ArchiveData
     return copy;
 }
 
-auto ArchiveData::get_file_size(const common::Path &path, std::optional<Size> override) 
-    -> ArchiveData::Size
+auto ArchiveData::get_file_size(const common::Path &path, std::optional<Size> override) -> ArchiveData::Size
 {
     if (override.has_value())
         return override.value();
