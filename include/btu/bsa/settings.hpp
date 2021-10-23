@@ -53,10 +53,10 @@ enum class FileTypes
 
 struct AllowedPath
 {
-    static const auto inline root = Path("root");
+    static const inline auto root = std::u8string(u8"root");
 
-    Path extension;
-    std::vector<Path> directories;
+    std::u8string extension;
+    std::vector<std::u8string> directories;
 
     [[nodiscard]] auto check(const Path &filepath, const Path &root) const -> bool;
 };
@@ -100,47 +100,47 @@ struct Settings
         sets.plugin_extensions = {".esl", ".esm", ".esp"};
         sets.s_dummy_plugin    = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
         sets.standard_files    = {
-            AllowedPath{".bgem", {"materials"}},
-            AllowedPath{".bgsm", {"materials"}},
-            AllowedPath{".bto", {"meshes"}},
-            AllowedPath{".btr", {"meshes"}},
-            AllowedPath{".btt", {"meshes"}},
-            AllowedPath{".dlodsettings", {"lodsettings"}},
-            AllowedPath{".dtl", {"meshes"}}, // Unsure
-            AllowedPath{".egm", {"meshes"}}, // Unsure
-            AllowedPath{".jpg", {"root"}},
-            AllowedPath{".hkx", {"meshes"}},
-            AllowedPath{".lst", {"meshes"}},
-            AllowedPath{".nif", {"meshes"}},
-            AllowedPath{".tga", {"textures"}},
-            AllowedPath{".tri", {"meshes"}},
+            AllowedPath{u8".bgem", {u8"materials"}},
+            AllowedPath{u8".bgsm", {u8"materials"}},
+            AllowedPath{u8".bto", {u8"meshes"}},
+            AllowedPath{u8".btr", {u8"meshes"}},
+            AllowedPath{u8".btt", {u8"meshes"}},
+            AllowedPath{u8".dlodsettings", {u8"lodsettings"}},
+            AllowedPath{u8".dtl", {u8"meshes"}}, // Unsure
+            AllowedPath{u8".egm", {u8"meshes"}}, // Unsure
+            AllowedPath{u8".jpg", {u8"root"}},
+            AllowedPath{u8".hkx", {u8"meshes"}},
+            AllowedPath{u8".lst", {u8"meshes"}},
+            AllowedPath{u8".nif", {u8"meshes"}},
+            AllowedPath{u8".tga", {u8"textures"}},
+            AllowedPath{u8".tri", {u8"meshes"}},
         };
         sets.texture_files = {
-            AllowedPath{".dds", {"textures"}},
-            AllowedPath{".png", {"textures"}},
+            AllowedPath{u8".dds", {u8"textures"}},
+            AllowedPath{u8".png", {u8"textures"}},
         };
-        sets.incompressible_files = {AllowedPath{".dlstrings", {"strings"}},
-                                     AllowedPath{".fuz", {"sound"}},
-                                     AllowedPath{".fxp", {"shadersfx"}},
-                                     AllowedPath{".gid", {"grass"}},
-                                     AllowedPath{".gfx", {"interface"}},
-                                     AllowedPath{".hkc", {"meshes"}},
-                                     AllowedPath{".hkt", {"meshes"}},
-                                     AllowedPath{".ilstrings", {"strings"}},
-                                     AllowedPath{".ini", {"meshes"}},
-                                     AllowedPath{".lip", {"sound"}},
-                                     AllowedPath{".lnk", {"grass"}},
-                                     AllowedPath{".lod", {"lodsettings"}},
-                                     AllowedPath{".ogg", {"sound"}},
-                                     AllowedPath{".pex", {"scripts"}},
-                                     AllowedPath{".psc", {"scripts"}},
-                                     AllowedPath{".seq", {"seq"}},
-                                     AllowedPath{".strings", {"strings"}},
-                                     AllowedPath{".swf", {"interface"}},
-                                     AllowedPath{".txt", {"interface", "meshes", "scripts"}},
-                                     AllowedPath{".wav", {"sound"}},
-                                     AllowedPath{".xml", {"dialogueviews"}},
-                                     AllowedPath{".xwm", {"music", "sound", "music"}}};
+        sets.incompressible_files = {AllowedPath{u8".dlstrings", {u8"strings"}},
+                                     AllowedPath{u8".fuz", {u8"sound"}},
+                                     AllowedPath{u8".fxp", {u8"shadersfx"}},
+                                     AllowedPath{u8".gid", {u8"grass"}},
+                                     AllowedPath{u8".gfx", {u8"interface"}},
+                                     AllowedPath{u8".hkc", {u8"meshes"}},
+                                     AllowedPath{u8".hkt", {u8"meshes"}},
+                                     AllowedPath{u8".ilstrings", {u8"strings"}},
+                                     AllowedPath{u8".ini", {u8"meshes"}},
+                                     AllowedPath{u8".lip", {u8"sound"}},
+                                     AllowedPath{u8".lnk", {u8"grass"}},
+                                     AllowedPath{u8".lod", {u8"lodsettings"}},
+                                     AllowedPath{u8".ogg", {u8"sound"}},
+                                     AllowedPath{u8".pex", {u8"scripts"}},
+                                     AllowedPath{u8".psc", {u8"scripts"}},
+                                     AllowedPath{u8".seq", {u8"seq"}},
+                                     AllowedPath{u8".strings", {u8"strings"}},
+                                     AllowedPath{u8".swf", {u8"interface"}},
+                                     AllowedPath{u8".txt", {u8"interface", u8"meshes", u8"scripts"}},
+                                     AllowedPath{u8".wav", {u8"sound"}},
+                                     AllowedPath{u8".xml", {u8"dialogueviews"}},
+                                     AllowedPath{u8".xwm", {u8"music", u8"sound", u8"music"}}};
         return sets;
     }();
 
@@ -200,8 +200,8 @@ struct Settings
                 s.max_size       = 4000 * megabyte;
                 sets.extension   = ".ba2";
                 s.suffix         = "Main";
-                s.texture_files  = {AllowedPath{".dds", {"textures"}}};
-                s.standard_files.emplace_back(AllowedPath{".png", {"textures"}});
+                s.texture_files  = {AllowedPath{u8".dds", {u8"textures"}}};
+                s.standard_files.emplace_back(AllowedPath{u8".png", {u8"textures"}});
                 sets.s_dummy_plugin = std::vector(std::begin(dummy::fo4), std::end(dummy::fo4));
                 return s;
             }();
@@ -213,8 +213,8 @@ struct Settings
 
 [[nodiscard]] inline auto AllowedPath::check(const Path &filepath, const Path &root) const -> bool
 {
-    const auto ext = filepath.extension().native();
-    if (!common::str_compare(extension.native(), ext, /*case_sensitive=*/false))
+    const auto ext = filepath.extension().u8string();
+    if (!common::str_compare(extension, ext, /*case_sensitive=*/false))
         return false;
 
     const auto &relative = filepath.lexically_relative(root);
@@ -222,7 +222,7 @@ struct Settings
         if (relative.empty())
             return AllowedPath::root;
 
-        return common::to_lower(*relative.begin());
+        return common::to_lower(std::u8string_view(relative.begin()->u8string()));
     }();
     return common::contains(directories, dir);
 
