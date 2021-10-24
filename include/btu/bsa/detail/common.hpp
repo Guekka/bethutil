@@ -5,12 +5,6 @@
 
 #include <fstream>
 
-#ifdef _MSC_VER // Only implementation that uses wchar for path::string_type
-#define BETHUTIL_BSA_STR(x) L##x
-#else
-#define BETHUTIL_BSA_STR(x) x
-#endif
-
 namespace btu::bsa {
 namespace fs = std::filesystem; // NOLINT
 using btu::common::Game;        // NOLINT
