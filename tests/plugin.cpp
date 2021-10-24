@@ -14,10 +14,10 @@ TEST_CASE("Plugin names are correctly parsed")
         REQUIRE_FALSE(FilePath::make("", sets, FileTypes::Plugin).has_value());
         auto plug = FilePath::make("C:/SomeDir/Requiem.esp", sets, FileTypes::Plugin);
         REQUIRE(plug.has_value());
-        CHECK(plug->dir_ == "C:/SomeDir");
-        CHECK(plug->name_ == Path("Requiem"));
-        CHECK(plug->suffix_ == Path{});
-        CHECK(plug->ext_ == ".esp");
+        CHECK(plug->dir == "C:/SomeDir");
+        CHECK(plug->name == u8"Requiem");
+        CHECK(plug->suffix == u8"");
+        CHECK(plug->ext == u8".esp");
     }
     SECTION("Complex (SSE)")
     {
@@ -26,12 +26,12 @@ TEST_CASE("Plugin names are correctly parsed")
         auto plug  = FilePath::make("C:/SomeDir/Requiem - Textures01.bsa", sets, FileTypes::BSA);
         auto plug2 = FilePath::make("C:/SomeDir/Requiem01 - Textures.bsa", sets, FileTypes::BSA);
         REQUIRE(plug.has_value());
-        CHECK(plug->counter_ == plug2->counter_); // Digits can be after or before suffix
-        CHECK(plug->dir_ == "C:/SomeDir");
-        CHECK(plug->name_ == BETHUTIL_BSA_STR("Requiem"));
-        CHECK(plug->suffix_ == BETHUTIL_BSA_STR("Textures"));
-        CHECK(plug->counter_.value() == 1);
-        CHECK(plug->ext_ == ".bsa");
+        CHECK(plug->counter == plug2->counter); // Digits can be after or before suffix
+        CHECK(plug->dir == "C:/SomeDir");
+        CHECK(plug->name == u8"Requiem");
+        CHECK(plug->suffix == u8"Textures");
+        CHECK(plug->counter.value() == 1);
+        CHECK(plug->ext == u8".bsa");
     }
     SECTION("Complex 2 (SSE)")
     {
@@ -41,11 +41,11 @@ TEST_CASE("Plugin names are correctly parsed")
                                    FileTypes::BSA);
 
         REQUIRE(plug.has_value());
-        CHECK(plug->dir_ == "C:/AnotherSomeDir");
-        CHECK(plug->name_ == BETHUTIL_BSA_STR("Requiem01 - Enhancement"));
-        CHECK(plug->suffix_ == BETHUTIL_BSA_STR("Textures"));
-        CHECK(!plug->counter_.has_value());
-        CHECK(plug->ext_ == ".bsa");
+        CHECK(plug->dir == "C:/AnotherSomeDir");
+        CHECK(plug->name == u8"Requiem01 - Enhancement");
+        CHECK(plug->suffix == u8"Textures");
+        CHECK(!plug->counter.has_value());
+        CHECK(plug->ext == u8".bsa");
     }
     SECTION("Complex 3 (SSE)")
     {
@@ -53,10 +53,10 @@ TEST_CASE("Plugin names are correctly parsed")
         auto plug = FilePath::make("C:/AnotherSomeDir/Requiem - Enhancement01.bsa", sets, FileTypes::BSA);
 
         REQUIRE(plug.has_value());
-        CHECK(plug->dir_ == "C:/AnotherSomeDir");
-        CHECK(plug->name_ == BETHUTIL_BSA_STR("Requiem - Enhancement"));
-        CHECK(plug->suffix_ == BETHUTIL_BSA_STR(""));
-        CHECK(plug->counter_.value() == 1);
-        CHECK(plug->ext_ == ".bsa");
+        CHECK(plug->dir == "C:/AnotherSomeDir");
+        CHECK(plug->name == u8"Requiem - Enhancement");
+        CHECK(plug->suffix == u8"");
+        CHECK(plug->counter.value() == 1);
+        CHECK(plug->ext == u8".bsa");
     }
 }

@@ -54,7 +54,7 @@ private:
     [[nodiscard]] static auto get_file_size(const common::Path &path, std::optional<Size> override) -> Size;
 
     Size size_{};
-    uintmax_t max_size_ = -1;
+    uintmax_t max_size_ = UINT64_MAX;
     ArchiveType type_   = ArchiveType::Standard;
     ArchiveVersion version_{};
     std::vector<Path> files_;

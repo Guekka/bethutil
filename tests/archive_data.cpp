@@ -15,7 +15,7 @@ using namespace btu::bsa;
 ArchiveData make_arch(uintmax_t max, uintmax_t size, ArchiveType type, uint32_t file_count = 1)
 {
     auto sets    = Settings::get(Game::SSE);
-    sets.maxSize = max;
+    sets.max_size = max;
     auto arch    = ArchiveData(sets, type);
 
     REQUIRE(arch.add_file("", ArchiveData::Size{size, size}));
@@ -56,7 +56,7 @@ TEST_CASE("Testing merge settings")
     SECTION("MergeBoth")
     {
         const auto expected = std::vector{make_arch(1'000, 7, ArchiveType::Incompressible, 3)};
-        do_test(MergeSettings::MergeBoth, expected);
+        do_test(MergeSettings::MergeIncompressible | MergeSettings::MergeTextures, expected);
     }
     SECTION("MergeTextures")
     {

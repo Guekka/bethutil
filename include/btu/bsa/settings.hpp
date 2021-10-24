@@ -5,6 +5,8 @@
 #include "btu/common/algorithms.hpp"
 #include "btu/common/metaprogramming.hpp"
 
+#include <array>
+#include <iostream>
 #include <optional>
 #include <variant>
 
@@ -53,7 +55,7 @@ enum class FileTypes
 
 struct AllowedPath
 {
-    static const inline auto root = std::u8string(u8"root");
+    static const inline auto k_root = std::u8string(u8"root");
 
     std::u8string extension;
     std::vector<std::u8string> directories;
@@ -70,12 +72,12 @@ struct Settings
     ArchiveVersion format{};
     std::optional<ArchiveVersion> texture_format;
 
-    std::optional<Path> suffix;
-    std::optional<Path> texture_suffix;
+    std::optional<std::u8string> suffix;
+    std::optional<std::u8string> texture_suffix;
 
-    Path extension;
+    std::u8string extension;
 
-    std::vector<Path> plugin_extensions;
+    std::vector<std::u8string> plugin_extensions;
     std::optional<std::vector<uint8_t>> s_dummy_plugin;
 
     std::vector<AllowedPath> standard_files;
@@ -89,15 +91,15 @@ struct Settings
 {
     constexpr auto megabyte = 1024UL * 1024UL;
 
-    static Settings default_sets = [=] {
+    static const Settings default_sets = [=] {
         Settings sets;
         sets.game              = Game::SSE;
         sets.max_size          = 2000 * megabyte;
         sets.format            = ArchiveVersion::sse;
         sets.texture_format    = ArchiveVersion::sse;
-        sets.texture_suffix    = "Textures";
-        sets.extension         = ".bsa";
-        sets.plugin_extensions = {".esl", ".esm", ".esp"};
+        sets.texture_suffix    = u8"Textures";
+        sets.extension         = u8".bsa";
+        sets.plugin_extensions = {u8".esl", u8".esm", u8".esp"};
         sets.s_dummy_plugin    = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
         sets.standard_files    = {
             AllowedPath{u8".bgem", {u8"materials"}},
@@ -112,6 +114,7 @@ struct Settings
             AllowedPath{u8".hkx", {u8"meshes"}},
             AllowedPath{u8".lst", {u8"meshes"}},
             AllowedPath{u8".nif", {u8"meshes"}},
+            AllowedPath{u8".psc", {u8"scripts", u8"source"}},
             AllowedPath{u8".tga", {u8"textures"}},
             AllowedPath{u8".tri", {u8"meshes"}},
         };
@@ -133,14 +136,13 @@ struct Settings
                                      AllowedPath{u8".lod", {u8"lodsettings"}},
                                      AllowedPath{u8".ogg", {u8"sound"}},
                                      AllowedPath{u8".pex", {u8"scripts"}},
-                                     AllowedPath{u8".psc", {u8"scripts"}},
                                      AllowedPath{u8".seq", {u8"seq"}},
                                      AllowedPath{u8".strings", {u8"strings"}},
                                      AllowedPath{u8".swf", {u8"interface"}},
                                      AllowedPath{u8".txt", {u8"interface", u8"meshes", u8"scripts"}},
                                      AllowedPath{u8".wav", {u8"sound"}},
                                      AllowedPath{u8".xml", {u8"dialogueviews"}},
-                                     AllowedPath{u8".xwm", {u8"music", u8"sound", u8"music"}}};
+                                     AllowedPath{u8".xwm", {u8"music", u8"sound"}}};
         return sets;
     }();
 
@@ -148,64 +150,64 @@ struct Settings
     {
         case Game::TES4:
         {
-            static Settings sets = [=] {
+            static const Settings sets_tes4 = [=] {
                 Settings s          = default_sets;
                 s.game              = Game::TES4;
                 s.format            = ArchiveVersion::tes4;
                 s.texture_format    = std::nullopt;
-                sets.texture_suffix = std::nullopt;
-                s.plugin_extensions = {".esm", ".esp"};
-                sets.s_dummy_plugin = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
+                s.texture_suffix    = std::nullopt;
+                s.plugin_extensions = {u8".esm", u8".esp"};
+                s.s_dummy_plugin    = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
                 return s;
             }();
-            return sets;
+            return sets_tes4;
         }
         case Game::FNV:
         {
-            static Settings sets = [=] {
+            static const Settings sets_fnv = [=] {
                 Settings s          = default_sets;
                 s.game              = Game::FNV;
                 s.format            = ArchiveVersion::tes5;
                 s.texture_format    = std::nullopt;
                 s.texture_suffix    = std::nullopt;
-                s.plugin_extensions = {".esm", ".esp"};
-                sets.s_dummy_plugin = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
+                s.plugin_extensions = {u8".esm", u8".esp"};
+                s.s_dummy_plugin    = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
                 return s;
             }();
-            return sets;
+            return sets_fnv;
         }
         case Game::SLE:
         {
-            static Settings sets = [=] {
+            static const Settings sets_sle = [=] {
                 Settings s          = default_sets;
                 s.game              = Game::SLE;
                 s.format            = ArchiveVersion::tes5;
                 s.texture_format    = std::nullopt;
-                s.suffix            = Path{};
+                s.suffix            = {};
                 s.texture_suffix    = std::nullopt;
-                s.plugin_extensions = {".esm", ".esp"};
-                sets.s_dummy_plugin = std::vector(std::begin(dummy::tes5), std::end(dummy::tes5));
+                s.plugin_extensions = {u8".esm", u8".esp"};
+                s.s_dummy_plugin    = std::vector(std::begin(dummy::tes5), std::end(dummy::tes5));
                 return s;
             }();
-            return sets;
+            return sets_sle;
         }
         case Game::SSE: return default_sets;
         case Game::FO4:
         {
-            static Settings sets = [=] {
+            static const Settings sets_fo4 = [=] {
                 Settings s       = default_sets;
                 s.game           = Game::FO4;
                 s.format         = ArchiveVersion::fo4;
                 s.texture_format = ArchiveVersion::fo4dx;
                 s.max_size       = 4000 * megabyte;
-                sets.extension   = ".ba2";
-                s.suffix         = "Main";
+                s.extension      = u8".ba2";
+                s.suffix         = u8"Main";
                 s.texture_files  = {AllowedPath{u8".dds", {u8"textures"}}};
                 s.standard_files.emplace_back(AllowedPath{u8".png", {u8"textures"}});
-                sets.s_dummy_plugin = std::vector(std::begin(dummy::fo4), std::end(dummy::fo4));
+                s.s_dummy_plugin = std::vector(std::begin(dummy::fo4), std::end(dummy::fo4));
                 return s;
             }();
-            return sets;
+            return sets_fo4;
         }
         default: return default_sets;
     }
@@ -220,19 +222,19 @@ struct Settings
     const auto &relative = filepath.lexically_relative(root);
     const auto dir       = [&relative] {
         if (relative.empty())
-            return AllowedPath::root;
+            return AllowedPath::k_root;
 
-        return common::to_lower(std::u8string_view(relative.begin()->u8string()));
+        return common::to_lower(relative.begin()->u8string());
     }();
-    return common::contains(directories, dir);
 
-    return true;
+    return common::contains(directories, dir);
 }
 
 [[nodiscard]] inline auto get_filetype(const Path &filepath, const Path &root, const Settings &sets)
     -> FileTypes
 {
-    auto check = [ext = btu::common::to_lower(filepath.extension()), &filepath, &root](const auto &vec) {
+    const auto ext = btu::common::to_lower(filepath.extension().u8string());
+    auto check     = [ext, &filepath, &root](const auto &vec) {
         using std::cbegin, std::cend;
         auto it = std::find_if(cbegin(vec),
                                cend(vec),
@@ -252,7 +254,7 @@ struct Settings
     if (check(sets.plugin_extensions))
         return FileTypes::Plugin;
 
-    Path plug_ext = {sets.extension};
+    auto plug_ext = std::to_array({sets.extension});
     if (check(plug_ext))
         return FileTypes::BSA;
 

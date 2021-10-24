@@ -36,7 +36,7 @@ const auto dir
     // = R"(F:\Edgar\Downloads\mods\unglaubliche Reise EXTENDED Version SSE DV 2.0 BSA)";
     // = R"(C:\Skyrim\Chanterelle\BSA)";
     //    = R"(C:\Skyrim\Chanterelle\Data - Copy)";
-    = R"(C:\Skyrim\Chanterelle\TexTest\tmp)";
+    = R"(C:\Users\Edgar\Downloads\TSS)";
 
 template<typename Func>
 void run(Func const &f, std::string const &name)

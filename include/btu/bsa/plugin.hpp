@@ -12,10 +12,10 @@
 namespace btu::bsa {
 class FilePath
 {
-    static inline const OsString suffix_separator = BETHUTIL_BSA_STR(" - ");
+    static inline const std::u8string suffix_separator = u8" - ";
 
 public:
-    FilePath(Path dir, OsString name, OsString suffix, Path ext, FileTypes type);
+    FilePath(Path dir, std::u8string name, std::u8string suffix, std::u8string ext, FileTypes type);
     [[nodiscard]] static auto make(const Path &path, const Settings &sets, FileTypes type)
         -> std::optional<FilePath>;
 
@@ -23,15 +23,15 @@ public:
     [[nodiscard]] auto full_name() const -> Path;
 
     Path dir;
-    OsString name;
-    OsString suffix;
-    Path ext;
+    std::u8string name;
+    std::u8string suffix;
+    std::u8string ext;
     std::optional<uint8_t> counter;
     FileTypes type{};
 
 private:
-    static auto eat_digits(OsString &str) -> std::optional<int>;
-    static auto eat_suffix(OsString &str, const Settings &sets) -> OsString;
+    static auto eat_digits(std::u8string &str) -> std::optional<int>;
+    static auto eat_suffix(std::u8string &str, const Settings &sets) -> std::u8string;
 
     explicit FilePath() = default;
 };

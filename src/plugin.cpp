@@ -10,7 +10,7 @@
 #include <fstream>
 
 namespace btu::bsa {
-FilePath::FilePath(Path dir, OsString name, OsString suffix, Path ext, FileTypes type)
+FilePath::FilePath(Path dir, std::u8string name, std::u8string suffix, std::u8string ext, FileTypes type)
     : dir(std::move(dir))
     , name(std::move(name))
     , suffix(std::move(suffix))
@@ -24,7 +24,7 @@ auto FilePath::make(const Path &path, const Settings &sets, FileTypes type) -> s
     if (fs::is_directory(path))
         return std::nullopt;
 
-    FilePath file(path.parent_path(), path.stem().native(), {}, path.extension(), type);
+    FilePath file(path.parent_path(), path.stem().u8string(), {}, path.extension().u8string(), type);
 
     if (type == FileTypes::Plugin && !common::contains(sets.plugin_extensions, file.ext))
         return std::nullopt;
@@ -48,12 +48,12 @@ auto FilePath::full_path() const -> Path
 
 auto FilePath::full_name() const -> Path
 {
-    const auto count = Path(counter ? std::to_string(*counter) : "").native();
-    const auto suf   = suffix.empty() ? BETHUTIL_BSA_STR("") : suffix_separator + suffix;
+    const auto count = counter ? btu::common::as_utf8_string(std::to_string(*counter)) : u8"";
+    const auto suf   = suffix.empty() ? u8"" : suffix_separator + suffix;
     return {name + count + suf};
 }
 
-auto FilePath::eat_digits(OsString &str) -> std::optional<int>
+auto FilePath::eat_digits(std::u8string &str) -> std::optional<int>
 {
     size_t first_digit = str.length() - 1;
     for (; isdigit(str[first_digit]) != 0; --first_digit)
@@ -62,14 +62,14 @@ auto FilePath::eat_digits(OsString &str) -> std::optional<int>
 
     if (first_digit != str.length())
     {
-        auto ret = std::stoi(str.substr(first_digit));
+        auto ret = std::stoi(btu::common::as_ascii_string(str.substr(first_digit)));
         str.erase(first_digit);
         return ret;
     }
     return std::nullopt;
 }
 
-auto FilePath::eat_suffix(OsString &str, const Settings &sets) -> OsString
+auto FilePath::eat_suffix(std::u8string &str, const Settings &sets) -> std::u8string
 {
     auto suffix_pos = str.rfind(suffix_separator);
 
@@ -102,7 +102,7 @@ auto is_loaded(const FilePath &archive, const Settings &sets) -> bool
                            auto b            = archive;
                            b.ext             = ext;
                            bool const exact  = fs::exists(b.full_path());
-                           b.suffix          = OsString{};
+                           b.suffix          = {};
                            bool const approx = fs::exists(b.full_path());
                            return exact || approx;
                        });
@@ -123,14 +123,15 @@ auto find_archive_name(const Path &folder_path, const Settings &sets, ArchiveTyp
     std::vector<FilePath> plugins = list_plugins(folder_path, sets);
 
     if (plugins.empty())
-        plugins.emplace_back(FilePath(folder_path, folder_path.filename(), {}, ".esp", FileTypes::Plugin));
+        plugins.emplace_back(
+            FilePath(folder_path, folder_path.filename().u8string(), {}, u8".esp", FileTypes::Plugin));
 
-    const Path suffix = [type, &sets] {
+    const std::u8string suffix = [type, &sets] {
         if (type == ArchiveType::Textures)
         {
             return sets.texture_suffix.value();
         }
-        return sets.suffix.value_or("");
+        return sets.suffix.value_or(u8"");
     }();
 
     auto check_plugin = [&sets, &suffix](FilePath &file) {

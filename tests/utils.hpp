@@ -21,7 +21,7 @@ struct StringMaker<ArchiveData>
         return (std::stringstream() << "ArchiveData{"
                                     << "size:{" << in.size().compressed << ", " << in.size().uncompressed
                                     << "max_size: " << in.max_size()
-                                    << "type: " << bsa::detail::to_underlying(in.type()))
+                                    << "type: " << btu::common::to_underlying(in.type()))
             .str();
     }
 };
