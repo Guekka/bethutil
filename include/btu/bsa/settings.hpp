@@ -119,7 +119,7 @@ struct Settings
             AllowedPath{u8".tri", {u8"meshes"}},
         };
         sets.texture_files = {
-            AllowedPath{u8".dds", {u8"textures"}},
+            AllowedPath{u8".dds", {u8"textures", u8"interface"}},
             AllowedPath{u8".png", {u8"textures"}},
         };
         sets.incompressible_files = {AllowedPath{u8".dlstrings", {u8"strings"}},
@@ -202,7 +202,7 @@ struct Settings
                 s.max_size       = 4000 * megabyte;
                 s.extension      = u8".ba2";
                 s.suffix         = u8"Main";
-                s.texture_files  = {AllowedPath{u8".dds", {u8"textures"}}};
+                s.texture_files  = {AllowedPath{u8".dds", {u8"textures", u8"interface"}}};
                 s.standard_files.emplace_back(AllowedPath{u8".png", {u8"textures"}});
                 s.s_dummy_plugin = std::vector(std::begin(dummy::fo4), std::end(dummy::fo4));
                 return s;
