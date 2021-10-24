@@ -121,7 +121,7 @@ auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensi
     assert_valid_utf8(rhs);
 
     auto f = case_sensitive ? utf8ncasecmp : utf8ncmp;
-    return static_cast<bool>(f(lhs.data(), rhs.data(), lhs.size()));
+    return f(lhs.data(), rhs.data(), lhs.size()) == 0;
 }
 
 auto str_find(std::u8string_view string, std::u8string_view snippet, bool case_sensitive) -> size_t
