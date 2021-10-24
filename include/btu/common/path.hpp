@@ -13,10 +13,4 @@ namespace btu::common {
 using Path     = std::filesystem::path;
 using OsString = Path::string_type;
 using OsChar   = OsString::value_type;
-
-inline auto to_lower(const Path &path) -> Path
-{
-    return to_lower(std::u8string_view(path.u8string()));
-}
-
 } // namespace btu::common
