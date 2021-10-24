@@ -6,10 +6,3 @@
 #include "btu/common/path.hpp"
 
 #include <catch.hpp>
-
-TEST_CASE("to_lower path", "[path]")
-{
-    namespace c = btu::common;
-    auto p      = c::Path("somedir");
-    REQUIRE(c::to_lower(p) == p);
-}
