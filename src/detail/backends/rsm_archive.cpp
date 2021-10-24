@@ -9,8 +9,8 @@
 namespace btu::bsa::detail {
 
 // Defined in fo4 part
-libbsa::fo4::file pack_fo4dx_file(std::span<std::byte> data, bool compress);
-std::vector<std::byte> unpack_fo4dx_file(libbsa::fo4::file &file);
+auto pack_fo4dx_file(std::span<std::byte> data, bool compress) -> libbsa::fo4::file;
+auto unpack_fo4dx_file(libbsa::fo4::file &file) -> std::vector<std::byte>;
 
 [[nodiscard]] auto get_archive_identifier(const UnderlyingArchive &archive) -> std::string_view
 {
@@ -58,10 +58,11 @@ template<typename VersionType>
     return static_cast<VersionType>(libbsa::detail::to_underlying(a_version));
 }
 
-template std::uint32_t archive_version<std::uint32_t>(const UnderlyingArchive &, ArchiveVersion);
-template libbsa::tes4::version archive_version<libbsa::tes4::version>(const UnderlyingArchive &,
-                                                                      ArchiveVersion);
-template libbsa::fo4::format archive_version<libbsa::fo4::format>(const UnderlyingArchive &, ArchiveVersion);
+template auto archive_version<std::uint32_t>(const UnderlyingArchive &, ArchiveVersion) -> std::uint32_t;
+template auto archive_version<libbsa::tes4::version>(const UnderlyingArchive &, ArchiveVersion)
+    -> libbsa::tes4::version;
+template auto archive_version<libbsa::fo4::format>(const UnderlyingArchive &, ArchiveVersion)
+    -> libbsa::fo4::format;
 
 RsmArchive::RsmArchive(const Path &a_path)
 {
@@ -69,12 +70,12 @@ RsmArchive::RsmArchive(const Path &a_path)
 }
 
 RsmArchive::RsmArchive(ArchiveVersion a_version, bool a_compressed)
-    : _version(a_version)
-    , _compressed(a_compressed)
+    : version_(a_version)
+    , compressed_(a_compressed)
 {
-    switch (_version)
+    switch (version_)
     {
-        case ArchiveVersion::tes3: _archive = libbsa::tes3::archive{}; break;
+        case ArchiveVersion::tes3: archive_ = libbsa::tes3::archive{}; break;
         case ArchiveVersion::tes4:
         case ArchiveVersion::fo3:
         case ArchiveVersion::sse:
@@ -82,16 +83,16 @@ RsmArchive::RsmArchive(ArchiveVersion a_version, bool a_compressed)
             libbsa::tes4::archive bsa;
             auto flags = libbsa::tes4::archive_flag::directory_strings
                          | libbsa::tes4::archive_flag::file_strings;
-            if (_compressed)
+            if (compressed_)
             {
                 flags |= libbsa::tes4::archive_flag::compressed;
             }
             bsa.archive_flags(flags);
-            _archive = std::move(bsa);
+            archive_ = std::move(bsa);
             break;
         }
         case ArchiveVersion::fo4:
-        case ArchiveVersion::fo4dx: _archive = libbsa::fo4::archive{};
+        case ArchiveVersion::fo4dx: archive_ = libbsa::fo4::archive{};
     }
 }
 
@@ -101,11 +102,11 @@ auto RsmArchive::read(const Path &a_path) -> ArchiveVersion
 
     const auto read = [this, &a_path](auto archive) {
         auto format = archive.read(std::move(a_path));
-        _archive    = std::move(archive);
+        archive_    = std::move(archive);
         return static_cast<ArchiveVersion>(format);
     };
 
-    _version = [&] {
+    version_ = [&] {
         switch (format)
         {
             case libbsa::file_format::fo4: return read(libbsa::fo4::archive{});
@@ -113,41 +114,41 @@ auto RsmArchive::read(const Path &a_path) -> ArchiveVersion
             {
                 libbsa::tes3::archive archive;
                 archive.read(std::move(a_path));
-                _archive = std::move(archive);
+                archive_ = std::move(archive);
                 return ArchiveVersion::tes3;
             }
             case libbsa::file_format::tes4: return read(libbsa::tes4::archive{});
             default: libbsa::detail::declare_unreachable();
         }
     }();
-    return _version;
+    return version_;
 }
 
-void RsmArchive::write(Path a_path)
+auto RsmArchive::write(Path a_path) -> void
 {
     const auto writer = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) { bsa.write(a_path); },
         [&](libbsa::tes4::archive &bsa) {
-            const auto version = detail::archive_version<libbsa::tes4::version>(_archive, _version);
+            const auto version = detail::archive_version<libbsa::tes4::version>(archive_, version_);
             bsa.write(a_path, version);
         },
         [&](libbsa::fo4::archive &ba2) {
-            const auto version = detail::archive_version<libbsa::fo4::format>(_archive, _version);
+            const auto version = detail::archive_version<libbsa::fo4::format>(archive_, version_);
             ba2.write(a_path, version);
         },
     };
 
-    std::visit(writer, _archive);
+    std::visit(writer, archive_);
 }
 
-void RsmArchive::add_file(const Path &a_root, const Path &a_path)
+auto RsmArchive::add_file(const Path &a_root, const Path &a_path) -> void
 {
     const auto relative = a_path.lexically_relative(a_root).lexically_normal();
     const auto data     = btu::common::read_file(a_path);
     return add_file(relative, data);
 }
 
-void RsmArchive::add_file(const Path &a_relative, std::vector<std::byte> a_data)
+auto RsmArchive::add_file(const Path &a_relative, std::vector<std::byte> a_data) -> void
 {
     const auto adder = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) {
@@ -155,19 +156,19 @@ void RsmArchive::add_file(const Path &a_relative, std::vector<std::byte> a_data)
 
             f.set_data(std::move(a_data));
 
-            std::scoped_lock lock(_mutex);
+            std::scoped_lock lock(mutex_);
 
             bsa.insert(a_relative.lexically_normal().generic_string(), std::move(f));
         },
         [&, this](libbsa::tes4::archive &bsa) {
             libbsa::tes4::file f;
-            const auto version = detail::archive_version<libbsa::tes4::version>(_archive, _version);
+            const auto version = detail::archive_version<libbsa::tes4::version>(archive_, version_);
             f.set_data(std::move(a_data));
 
-            if (_compressed)
+            if (compressed_)
                 f.compress(version);
 
-            std::scoped_lock lock(_mutex);
+            std::scoped_lock lock(mutex_);
             const auto d = [&]() {
                 const auto key = a_relative.parent_path().lexically_normal().generic_string();
                 if (bsa.find(key) == bsa.end())
@@ -180,7 +181,7 @@ void RsmArchive::add_file(const Path &a_relative, std::vector<std::byte> a_data)
             d->insert(a_relative.filename().lexically_normal().generic_string(), std::move(f));
         },
         [&, this](libbsa::fo4::archive &ba2) {
-            const auto version = detail::archive_version<libbsa::fo4::format>(_archive, _version);
+            const auto version = detail::archive_version<libbsa::fo4::format>(archive_, version_);
 
             auto file = [&] {
                 if (version == libbsa::fo4::format::general)
@@ -189,23 +190,23 @@ void RsmArchive::add_file(const Path &a_relative, std::vector<std::byte> a_data)
                     auto &chunk = f.emplace_back();
                     chunk.set_data(std::move(a_data));
 
-                    if (_compressed)
+                    if (compressed_)
                         chunk.compress();
                     return f;
                 }
-                return pack_fo4dx_file(a_data, _compressed);
+                return pack_fo4dx_file(a_data, compressed_);
             }();
 
-            std::scoped_lock lock(_mutex);
+            std::scoped_lock lock(mutex_);
 
             ba2.insert(a_relative.lexically_normal().generic_string(), std::move(file));
         },
     };
 
-    std::visit(adder, _archive);
+    std::visit(adder, archive_);
 }
 
-void RsmArchive::iterate_files(const iteration_callback &a_callback, bool skip_compressed)
+auto RsmArchive::iterate_files(const iteration_callback &a_callback, bool skip_compressed) -> void
 {
     auto visiter = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) {
@@ -221,7 +222,7 @@ void RsmArchive::iterate_files(const iteration_callback &a_callback, bool skip_c
             {
                 std::for_each(std::execution::par, dir.second.begin(), dir.second.end(), [&](auto &&file) {
                     const auto relative = detail::virtual_to_local_path(dir.first, file.first);
-                    const auto ver      = detail::archive_version<libbsa::tes4::version>(_archive, _version);
+                    const auto ver      = detail::archive_version<libbsa::tes4::version>(archive_, version_);
 
                     if (file.second.compressed())
                     {
@@ -240,7 +241,7 @@ void RsmArchive::iterate_files(const iteration_callback &a_callback, bool skip_c
                 auto &&[key, file]  = pair;
                 const auto relative = detail::virtual_to_local_path(key);
 
-                if (_version == ArchiveVersion::fo4)
+                if (version_ == ArchiveVersion::fo4)
                 {
                     // Fast path, one chunk
                     if (file.size() == 1)
@@ -277,16 +278,16 @@ void RsmArchive::iterate_files(const iteration_callback &a_callback, bool skip_c
         },
     };
 
-    std::visit(visiter, _archive);
+    std::visit(visiter, archive_);
 }
 
-ArchiveVersion RsmArchive::get_version() const noexcept
+auto RsmArchive::get_version() const noexcept -> ArchiveVersion
 {
-    return _version;
+    return version_;
 }
 
-const UnderlyingArchive &RsmArchive::get_archive() const noexcept
+auto RsmArchive::get_archive() const noexcept -> const UnderlyingArchive &
 {
-    return _archive;
+    return archive_;
 }
 } // namespace btu::bsa::detail

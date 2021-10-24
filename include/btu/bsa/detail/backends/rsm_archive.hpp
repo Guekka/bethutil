@@ -39,27 +39,27 @@ template<typename Version>
 class RsmArchive : public Archive
 {
 public:
-    RsmArchive(const Path &a_path); // Read
+    explicit RsmArchive(const Path &a_path); // Read
     RsmArchive(ArchiveVersion a_version, bool a_compressed);
 
-    ArchiveVersion read(const Path &a_path) override;
-    void write(Path a_path) override;
+    auto read(const Path &a_path) -> ArchiveVersion override;
+    auto write(Path a_path) -> void override;
 
-    void add_file(const Path &a_root, const Path &a_path) override;
-    void add_file(const Path &a_relative, std::vector<std::byte> a_data) override;
+    auto add_file(const Path &a_root, const Path &a_path) -> void override;
+    auto add_file(const Path &a_relative, std::vector<std::byte> a_data) -> void override;
 
     using iteration_callback = std::function<void(const Path &, std::span<const std::byte>)>;
-    void iterate_files(const iteration_callback &a_callback, bool skip_compressed = false) override;
+    auto iterate_files(const iteration_callback &a_callback, bool skip_compressed = false) -> void override;
 
-    ArchiveVersion get_version() const noexcept override;
-    const UnderlyingArchive &get_archive() const noexcept;
+    [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion override;
+    [[nodiscard]] auto get_archive() const noexcept -> const UnderlyingArchive &;
 
 private:
-    UnderlyingArchive _archive;
-    std::mutex _mutex;
+    UnderlyingArchive archive_;
+    std::mutex mutex_;
 
-    ArchiveVersion _version;
-    bool _compressed;
+    ArchiveVersion version_;
+    bool compressed_;
 };
 
 } // namespace btu::bsa::detail
