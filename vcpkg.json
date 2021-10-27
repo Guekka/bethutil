@@ -3,7 +3,8 @@
   "version-string": "1",
   "dependencies": [
     "catch2",
-	"bethutil-common",
-	"directxtex"
+    "bethutil-common",
+    "directxtex",
+    "tl-expected"
   ]
 }

@@ -4,25 +4,20 @@ set(INCLUDE_DIR "${ROOT_DIR}/include")
 set(HEADER_FILES
     "${INCLUDE_DIR}/btu/tex.hpp"
 
-    "${INCLUDE_DIR}/btu/tex/detail/TextureCompressionDevice.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/TextureDecompress.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/TextureGenerateMipmaps.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/TextureAddAlpha.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/TextureConvert.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/TextureFile.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/TextureFormats.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/TextureResize.hpp"
+    "${INCLUDE_DIR}/btu/tex/error_code.hpp"
+    "${INCLUDE_DIR}/btu/tex/functions.hpp"
+
+    "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
+    "${INCLUDE_DIR}/btu/tex/detail/compression_device.hpp"
+    "${INCLUDE_DIR}/btu/tex/detail/formats.hpp"
     )
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
-    "${SOURCE_DIR}/detail/TextureConvert.cpp"
-    "${SOURCE_DIR}/detail/TextureGenerateMipmaps.cpp"
-    "${SOURCE_DIR}/detail/TextureAddAlpha.cpp"
-    "${SOURCE_DIR}/detail/TextureFile.cpp"
-    "${SOURCE_DIR}/detail/TextureResize.cpp"
-    "${SOURCE_DIR}/detail/TextureCompressionDevice.cpp"
-    "${SOURCE_DIR}/detail/TextureDecompress.cpp"
+    "${SOURCE_DIR}/error_code.cpp"
+    "${SOURCE_DIR}/functions.cpp"
+
+    "${SOURCE_DIR}/detail/compression_device.cpp"
     )
 
 source_group(
@@ -49,6 +44,10 @@ find_package(directx-headers CONFIG REQUIRED)
 find_package(directxmath CONFIG REQUIRED)
 find_package(directxtex CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)
+
+find_package(tl-expected CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
+
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
