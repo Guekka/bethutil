@@ -25,12 +25,12 @@ struct is_error_code_enum<btu::tex::TextureErr> : true_type
 namespace btu::tex {
 struct TextureErrCategory : std::error_category
 {
-    const char *name() const noexcept override;
-    std::string message(int ev) const override;
+    [[nodiscard]] auto name() const noexcept -> const char * override;
+    [[nodiscard]] auto message(int ev) const -> std::string override;
 };
 
 inline const TextureErrCategory k_texture_err_category{};
-std::error_code make_error_code(TextureErr e);
+auto make_error_code(TextureErr e) -> std::error_code;
 
 enum class FailureSource
 {
@@ -50,13 +50,13 @@ namespace btu::tex {
 class FailureSourceCategory : public std::error_category
 {
 public:
-    const char *name() const noexcept override;
-    std::string message(int ev) const override;
-    bool equivalent(const std::error_code &code, int condition) const noexcept override;
+    [[nodiscard]] auto name() const noexcept -> const char * override;
+    [[nodiscard]] auto message(int ev) const -> std::string override;
+    [[nodiscard]] auto equivalent(const std::error_code &ec, int cond) const noexcept -> bool override;
 };
 
-inline const FailureSourceCategory theFailureSourceCategory{};
-std::error_condition make_error_condition(FailureSource e);
+inline const FailureSourceCategory k_failure_source_category{};
+auto make_error_condition(FailureSource e) -> std::error_condition;
 
 auto error_from_hresult(int64_t hr, std::error_code default_err = TextureErr::Unknown) -> std::error_code;
 

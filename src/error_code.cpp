@@ -51,7 +51,7 @@ auto btu::tex::FailureSourceCategory::equivalent(const std::error_code &ec, int 
 
 auto make_error_condition(FailureSource e) -> std::error_condition
 {
-    return {static_cast<int>(e), theFailureSourceCategory};
+    return {static_cast<int>(e), k_failure_source_category};
 }
 
 auto error_from_hresult(int64_t hr, std::error_code default_err) -> std::error_code
