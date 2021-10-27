@@ -36,13 +36,13 @@ template<class... Keys>
 template<typename Version>
 [[nodiscard]] auto archive_version(const UnderlyingArchive &archive, Version a_version) -> Version;
 
-class RsmArchive : public Archive
+class RsmArchive final : public Archive
 {
 public:
     explicit RsmArchive(const Path &a_path); // Read
     RsmArchive(ArchiveVersion a_version, bool a_compressed);
 
-    auto read(const Path &a_path) -> ArchiveVersion override;
+    auto read(Path a_path) -> ArchiveVersion override;
     auto write(Path a_path) -> void override;
 
     auto add_file(const Path &a_root, const Path &a_path) -> void override;
@@ -58,8 +58,8 @@ private:
     UnderlyingArchive archive_;
     std::mutex mutex_;
 
-    ArchiveVersion version_;
-    bool compressed_;
+    ArchiveVersion version_{};
+    bool compressed_{false};
 };
 
 } // namespace btu::bsa::detail

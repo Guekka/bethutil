@@ -14,14 +14,15 @@ auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinf
 
 enum class MergeSettings : std::uint8_t
 {
-    MergeTextures       = 1,
-    MergeIncompressible = 1 << 1,
+    MergeTextures       = 1U,
+    MergeIncompressible = 1U << 1U,
 };
 
 BETHUTIL_MAKE_ALL_ENUM_OPERATORS(MergeSettings);
 
-auto split(const Path &dir, const Settings &sets, AllowFilePred allow_path_pred = default_is_allowed_path)
-    -> std::vector<ArchiveData>;
+auto split(const Path &dir,
+           const Settings &sets,
+           const AllowFilePred &allow_path_pred = default_is_allowed_path) -> std::vector<ArchiveData>;
 
 void merge(std::vector<ArchiveData> &archives,
            MergeSettings sets = MergeSettings::MergeIncompressible | MergeSettings::MergeTextures);

@@ -17,7 +17,7 @@
 #include <ranges>
 
 namespace btu::bsa {
-bool default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinfo)
+auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinfo) -> bool
 {
     bool const is_dir = fileinfo.is_directory();
 
@@ -27,10 +27,8 @@ bool default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinf
     return !is_dir && !is_root;
 }
 
-std::vector<std::pair<Path, std::string>> write(bool compressed,
-                                                ArchiveData &&data,
-                                                const Settings &sets,
-                                                const Path &root)
+auto write(bool compressed, ArchiveData &&data, const Settings &sets, const Path &root)
+    -> std::vector<std::pair<Path, std::string>>
 {
     if (std::distance(data.begin(), data.end()) == 0)
         return {}; // Do not write empty archive
@@ -55,7 +53,8 @@ std::vector<std::pair<Path, std::string>> write(bool compressed,
     return ret;
 }
 
-std::vector<ArchiveData> split(const Path &dir, const Settings &sets, AllowFilePred allow_path_pred)
+auto split(const Path &dir, const Settings &sets, const AllowFilePred &allow_path_pred)
+    -> std::vector<ArchiveData>
 {
     auto standard       = ArchiveData(sets, ArchiveType::Standard);
     auto incompressible = ArchiveData(sets, ArchiveType::Incompressible);
@@ -63,7 +62,7 @@ std::vector<ArchiveData> split(const Path &dir, const Settings &sets, AllowFileP
 
     std::vector<ArchiveData> res;
 
-    for (auto &p : fs::recursive_directory_iterator(dir))
+    for (const auto &p : fs::recursive_directory_iterator(dir))
     {
         if (!allow_path_pred(dir, p))
             continue;
@@ -72,18 +71,18 @@ std::vector<ArchiveData> split(const Path &dir, const Settings &sets, AllowFileP
         if (ft != FileTypes::Standard && ft != FileTypes::Texture && ft != FileTypes::Incompressible)
             continue;
 
-        auto *pBSA = ft == FileTypes::Texture ? &textures : &standard;
-        pBSA       = ft == FileTypes::Incompressible ? &incompressible : pBSA;
+        auto *p_bsa = ft == FileTypes::Texture ? &textures : &standard;
+        p_bsa       = ft == FileTypes::Incompressible ? &incompressible : p_bsa;
 
         //adding files and sizes to list
-        if (!pBSA->add_file(p.path()))
+        if (!p_bsa->add_file(p.path()))
         {
             // BSA full, write it
-            res.emplace_back(std::move(*pBSA));
+            res.emplace_back(std::move(*p_bsa));
 
             // Get a new one and add the file that did not make it
-            *pBSA = ArchiveData(sets, pBSA->get_type());
-            pBSA->add_file(p.path());
+            *p_bsa = ArchiveData(sets, p_bsa->get_type());
+            p_bsa->add_file(p.path());
         }
     }
 
@@ -92,7 +91,7 @@ std::vector<ArchiveData> split(const Path &dir, const Settings &sets, AllowFileP
     return res;
 }
 
-void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
+auto merge(std::vector<ArchiveData> &archives, MergeSettings sets) -> void
 {
     const auto test_flag = [&](MergeSettings flag) {
         return (btu::common::to_underlying(sets) & btu::common::to_underlying(flag)) != 0;

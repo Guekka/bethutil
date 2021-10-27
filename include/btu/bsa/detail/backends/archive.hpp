@@ -12,7 +12,7 @@ namespace btu::bsa::detail {
 class Archive
 {
 public:
-    virtual auto read(const Path &a_path) -> ArchiveVersion = 0;
+    virtual auto read(Path a_path) -> ArchiveVersion        = 0;
     virtual void write(Path a_path)                         = 0;
 
     virtual void add_file(const Path &a_root, const Path &a_path)                = 0;

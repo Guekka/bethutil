@@ -15,9 +15,9 @@ auto unpack_fo4dx_file(libbsa::fo4::file &file) -> std::vector<std::byte>;
 [[nodiscard]] auto get_archive_identifier(const UnderlyingArchive &archive) -> std::string_view
 {
     const auto visiter = btu::common::overload{
-        [](libbsa::tes3::archive) { return "tes3"; },
-        [](libbsa::tes4::archive) { return "tes4"; },
-        [](libbsa::fo4::archive) { return "fo4"; },
+        [](const libbsa::tes3::archive &) { return "tes3"; },
+        [](const libbsa::tes4::archive &) { return "tes4"; },
+        [](const libbsa::fo4::archive &) { return "fo4"; },
     };
     return std::visit(visiter, archive);
 }
@@ -96,7 +96,7 @@ RsmArchive::RsmArchive(ArchiveVersion a_version, bool a_compressed)
     }
 }
 
-auto RsmArchive::read(const Path &a_path) -> ArchiveVersion
+auto RsmArchive::read(Path a_path) -> ArchiveVersion
 {
     const auto format = libbsa::guess_file_format(a_path).value();
 
