@@ -1,6 +1,9 @@
 #include "btu/tex/functions.hpp"
 
 #include <DirectXTex.h>
+
+#define CATCH_CONFIG_MAIN
+
 #include <catch2/catch.hpp>
 
 #include <filesystem>
@@ -8,7 +11,7 @@
 auto load_tex(const std::filesystem::path &path)
 {
     DirectX::ScratchImage in;
-    DirectX::TexMetadata info;
+    DirectX::TexMetadata info{};
     const auto res = DirectX::LoadFromDDSFile(path.wstring().c_str(), DirectX::DDS_FLAGS_NONE, &info, in);
     REQUIRE(SUCCEEDED(res));
     return in;
