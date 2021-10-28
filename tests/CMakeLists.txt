@@ -7,7 +7,7 @@ set(HEADER_FILES
 
 set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
-	"${SOURCE_DIR}/main.cpp"
+        "${SOURCE_DIR}/src/functions.cpp"
 )
 
 if("${BETHUTIL-TEX_BUILD_EXAMPLES}")
