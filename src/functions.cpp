@@ -241,4 +241,29 @@ auto compute_resize_dimension(const TexMetadata &info, const TextureResizeArg &a
                       args.data);
 }
 
+auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool
+{
+    auto cmp = [&](auto... ptrs) { return ((std::invoke(ptrs, lhs) == std::invoke(ptrs, rhs)) && ...); };
+    return cmp(&TexMetadata::arraySize,
+               &TexMetadata::depth,
+               &TexMetadata::format,
+               &TexMetadata::height,
+               &TexMetadata::mipLevels,
+               &TexMetadata::miscFlags,
+               &TexMetadata::miscFlags2,
+               &TexMetadata::width);
+}
+auto operator==(const ScratchImage &lhs, const ScratchImage &rhs) noexcept -> bool
+{
+    auto cmp = [&](auto... ptrs) { return ((std::invoke(ptrs, lhs) == std::invoke(ptrs, rhs)) && ...); };
+    const bool first = cmp(&ScratchImage::GetMetadata,
+                           &ScratchImage::GetImageCount,
+                           &ScratchImage::GetPixelsSize);
+    if (!first)
+        return false;
+
+    const auto end = lhs.GetPixels() + lhs.GetPixelsSize(); // NOLINT
+    return std::equal(lhs.GetPixels(), end, rhs.GetPixels());
+}
+
 } // namespace btu::tex

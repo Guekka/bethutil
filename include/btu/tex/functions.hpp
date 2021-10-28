@@ -34,8 +34,11 @@ struct TextureResizeArg
     std::variant<Ratio, Absolute> data;
 };
 
-auto compute_resize_dimension(const DirectX::TexMetadata &info, const TextureResizeArg &args)
+[[nodiscard]] auto compute_resize_dimension(const DirectX::TexMetadata &info, const TextureResizeArg &args)
     -> std::pair<size_t, size_t>;
 
 [[nodiscard]] auto resize(const ScratchImage &tex, size_t x, size_t y) -> Result;
+
+auto operator==(const ScratchImage &lhs, const ScratchImage &rhs) noexcept -> bool;
+auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool;
 } // namespace btu::tex
