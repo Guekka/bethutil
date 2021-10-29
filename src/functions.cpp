@@ -241,8 +241,7 @@ auto resize(const ScratchImage &tex, size_t x, size_t y) -> Result
     return timage;
 }
 
-auto compute_resize_dimension(const TexMetadata &info, const TextureResizeArg &args)
-    -> std::pair<size_t, size_t>
+auto compute_resize_dimension(const TexMetadata &info, const ResizeArg &args) -> std::pair<size_t, size_t>
 {
     const auto calculate = [&](auto ratio, auto min_w, auto min_h) -> std::pair<size_t, size_t> {
         size_t w = info.width;
@@ -259,11 +258,11 @@ auto compute_resize_dimension(const TexMetadata &info, const TextureResizeArg &a
         return {w, h};
     };
 
-    return std::visit(btu::common::overload{[&](TextureResizeArg::Absolute s) -> std::pair<size_t, size_t> {
+    return std::visit(btu::common::overload{[&](ResizeArg::Absolute s) -> std::pair<size_t, size_t> {
                                                 constexpr auto infinite_ratio = 4096;
                                                 return calculate(infinite_ratio, s.width, s.height);
                                             },
-                                            [&](TextureResizeArg::Ratio s) -> std::pair<size_t, size_t> {
+                                            [&](ResizeArg::Ratio s) -> std::pair<size_t, size_t> {
                                                 return calculate(s.ratio, s.min_width, s.min_height);
                                             }},
                       args.data);
