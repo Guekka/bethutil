@@ -120,7 +120,7 @@ auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensi
     assert_valid_utf8(lhs);
     assert_valid_utf8(rhs);
 
-    auto f = case_sensitive ? utf8ncasecmp : utf8ncmp;
+    auto f = case_sensitive ? utf8ncmp : utf8ncasecmp;
     return f(lhs.data(), rhs.data(), lhs.size()) == 0;
 }
 
