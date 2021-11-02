@@ -6,6 +6,7 @@ set(HEADER_FILES
 
     "${INCLUDE_DIR}/btu/tex/error_code.hpp"
     "${INCLUDE_DIR}/btu/tex/functions.hpp"
+    "${INCLUDE_DIR}/btu/tex/dimension.hpp"
 
     "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
     "${INCLUDE_DIR}/btu/tex/detail/compression_device.hpp"

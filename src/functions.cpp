@@ -8,6 +8,9 @@
 
 #include <algorithm>
 
+#undef max // Windows...
+#undef min
+
 namespace DirectX {
 auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool
 {
@@ -159,22 +162,6 @@ auto convert(const ScratchImage &tex, DXGI_FORMAT format, CompressionDevice &dev
     return timage;
 }
 
-auto optimal_mip_count(size_t width, size_t height) noexcept -> size_t
-{
-    size_t mips = 1;
-
-    while (height > 1 || width > 1)
-    {
-        if (height > 1)
-            height /= 2;
-
-        if (width > 1)
-            width /= 2;
-
-        ++mips;
-    }
-    return mips;
-}
 
 auto prepare_generate_mipmaps(const ScratchImage &tex) -> Result
 {
@@ -204,7 +191,7 @@ auto prepare_generate_mipmaps(const ScratchImage &tex) -> Result
 auto generate_mipmaps_impl(ScratchImage tex) -> Result
 {
     const auto &info  = tex.GetMetadata();
-    const size_t mips = optimal_mip_count(info.width, info.height);
+    const size_t mips = optimal_mip_count({info.width, info.height});
 
     DirectX::ScratchImage timage;
     const auto hr = GenerateMipMaps(tex.GetImages(),
@@ -241,30 +228,4 @@ auto resize(const ScratchImage &tex, size_t x, size_t y) -> Result
     return timage;
 }
 
-auto compute_resize_dimension(const TexMetadata &info, const ResizeArg &args) -> std::pair<size_t, size_t>
-{
-    const auto calculate = [&](auto ratio, auto min_w, auto min_h) -> std::pair<size_t, size_t> {
-        size_t w = info.width;
-        size_t h = info.height;
-        while (ratio)
-        {
-            if (w <= min_w || h <= min_h)
-                break;
-
-            ratio /= 2;
-            w /= 2;
-            h /= 2;
-        }
-        return {w, h};
-    };
-
-    return std::visit(btu::common::overload{[&](ResizeArg::Absolute s) -> std::pair<size_t, size_t> {
-                                                constexpr auto infinite_ratio = 4096;
-                                                return calculate(infinite_ratio, s.width, s.height);
-                                            },
-                                            [&](ResizeArg::Ratio s) -> std::pair<size_t, size_t> {
-                                                return calculate(s.ratio, s.min_width, s.min_height);
-                                            }},
-                      args.data);
-}
 } // namespace btu::tex

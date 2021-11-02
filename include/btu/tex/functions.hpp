@@ -2,8 +2,7 @@
 
 #include "btu/tex/detail/common.hpp"
 #include "btu/tex/detail/formats.hpp"
-
-#include <variant>
+#include "btu/tex/dimension.hpp"
 
 namespace DirectX { // NOLINT
 auto operator==(const ScratchImage &lhs, const ScratchImage &rhs) noexcept -> bool;
@@ -17,30 +16,19 @@ class CompressionDevice;
 [[nodiscard]] auto make_opaque_alpha(const ScratchImage &tex) -> Result;
 [[nodiscard]] auto convert(const ScratchImage &tex, DXGI_FORMAT format, CompressionDevice &dev) -> Result;
 
-[[nodiscard]] auto optimal_mip_count(size_t width, size_t height) noexcept -> size_t;
-[[nodiscard]] auto generate_mipmaps(const ScratchImage &tex) -> Result;
-
-struct ResizeArg
+[[nodiscard]] constexpr auto optimal_mip_count(Dimension dim) noexcept -> size_t
 {
-    struct Ratio
+    size_t mips = 1;
+    auto size   = std::max(dim.w, dim.h);
+
+    while (size > 1)
     {
-        uint8_t ratio;
+        size /= 2;
+        ++mips;
+    }
+    return mips;
+}
 
-        size_t min_width;
-        size_t min_height;
-    };
-
-    struct Absolute
-    {
-        size_t width;
-        size_t height;
-    };
-
-    std::variant<Ratio, Absolute> data;
-};
-
-[[nodiscard]] auto compute_resize_dimension(const TexMetadata &info, const ResizeArg &args)
-    -> std::pair<size_t, size_t>;
-
-[[nodiscard]] auto resize(const ScratchImage &tex, size_t x, size_t y) -> Result;
+[[nodiscard]] auto generate_mipmaps(const ScratchImage &tex) -> Result;
+[[nodiscard]] auto resize(const ScratchImage &tex, Dimension dim) -> Result;
 } // namespace btu::tex
