@@ -7,7 +7,7 @@
 
 #include "btu/tex/functions.hpp"
 
-#include "btu/tex/detail/compression_device.hpp"
+#include "btu/tex/compression_device.hpp"
 #include "btu/tex/error_code.hpp"
 
 #include <DirectXTex.h>

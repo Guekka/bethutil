@@ -5,20 +5,21 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/tex.hpp"
 
     "${INCLUDE_DIR}/btu/tex/error_code.hpp"
-    "${INCLUDE_DIR}/btu/tex/functions.hpp"
+
+    "${INCLUDE_DIR}/btu/tex/compression_device.hpp"
     "${INCLUDE_DIR}/btu/tex/dimension.hpp"
+    "${INCLUDE_DIR}/btu/tex/functions.hpp"
 
     "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/compression_device.hpp"
     "${INCLUDE_DIR}/btu/tex/detail/formats.hpp"
     )
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
     "${SOURCE_DIR}/error_code.cpp"
-    "${SOURCE_DIR}/functions.cpp"
 
-    "${SOURCE_DIR}/detail/compression_device.cpp"
+    "${SOURCE_DIR}/compression_device.cpp"
+    "${SOURCE_DIR}/functions.cpp"
     )
 
 source_group(
