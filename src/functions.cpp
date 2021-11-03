@@ -1,3 +1,10 @@
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#define NODRAWTEXT
+#define NOMCX
+#define NOSERVICE
+#define NOHELP
+
 #include "btu/tex/functions.hpp"
 
 #include "btu/tex/detail/compression_device.hpp"
@@ -7,9 +14,6 @@
 #include <btu/common/metaprogramming.hpp>
 
 #include <algorithm>
-
-#undef max // Windows...
-#undef min
 
 namespace DirectX {
 auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool
