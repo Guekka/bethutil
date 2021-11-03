@@ -63,7 +63,7 @@ auto load_file(const std::filesystem::path &path) noexcept -> Result
 }
 
 auto save_file(const ScratchImage &tex, const std::filesystem::path &path) noexcept
-    -> tl::expected<std::monostate, std::error_code>
+    -> tl::expected<std::monostate, Error>
 {
     const auto res = DirectX::SaveToDDSFile(tex.GetImages(),
                                             tex.GetImageCount(),
@@ -84,7 +84,7 @@ auto decompress(const ScratchImage &tex) -> Result
     DirectX::ScratchImage timage;
     const auto hr = DirectX::Decompress(img, nimg, info, DXGI_FORMAT_UNKNOWN /* picks good default */, timage);
     if (FAILED(hr))
-        return tl::make_unexpected(TextureErr::Unknown);
+        return tl::make_unexpected(Error(TextureErr::Unknown));
 
     return timage;
 }
@@ -92,7 +92,7 @@ auto decompress(const ScratchImage &tex) -> Result
 auto make_opaque_alpha(const ScratchImage &tex) -> Result
 {
     if (!DirectX::HasAlpha(tex.GetMetadata().format))
-        return tl::make_unexpected(TextureErr::BadInput);
+        return tl::make_unexpected(Error(TextureErr::BadInput));
 
     constexpr auto transform = [](DirectX::XMVECTOR *out_pixels,
                                   const DirectX::XMVECTOR *in_pixels,
@@ -185,7 +185,7 @@ auto convert(const ScratchImage &tex, DXGI_FORMAT format, CompressionDevice &dev
     const bool uncompressed_required = info.width < 4 || info.height < 4;
     //Textures smaller than that cannot be compressed
     if (uncompressed_required && DirectX::IsCompressed(info.format))
-        return tl::make_unexpected(TextureErr::BadInput);
+        return tl::make_unexpected(Error(TextureErr::BadInput));
 
     DirectX::ScratchImage timage;
 
@@ -252,7 +252,7 @@ auto resize(const ScratchImage &tex, Dimension dim) -> Result
     DirectX::ScratchImage timage;
     const auto &img = tex.GetImages();
     if (img == nullptr)
-        return tl::make_unexpected(TextureErr::BadInput);
+        return tl::make_unexpected(Error(TextureErr::BadInput));
 
     constexpr auto filter = DirectX::TEX_FILTER_SEPARATE_ALPHA;
     const HRESULT hr      = DirectX::Resize(img, tex.GetImageCount(), info, dim.w, dim.h, filter, timage);

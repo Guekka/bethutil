@@ -1,5 +1,6 @@
 #include "btu/tex/error_code.hpp"
 
+#include <iostream>
 #include <optional>
 
 namespace btu::tex {
@@ -54,7 +55,7 @@ auto make_error_condition(FailureSource e) -> std::error_condition
     return {static_cast<int>(e), k_failure_source_category};
 }
 
-auto error_from_hresult(int64_t hr, std::error_code default_err) -> std::error_code
+auto error_from_hresult(int64_t hr, std::error_code default_err, SourceLocation loc) -> Error
 {
     // MAKE_HRESULT(SEVERITY_ERROR, FACILITY_WIN32, 0)
     constexpr auto win32_valid = 0x80070000L;
@@ -63,14 +64,37 @@ auto error_from_hresult(int64_t hr, std::error_code default_err) -> std::error_c
     {
         // Could have come from many values, but we choose this one
         const auto converted_code = static_cast<int32_t>(static_cast<uint64_t>(hr) & 0xFFFFU);
-        return std::system_error(converted_code, std::system_category(), "DirectXTex error").code();
+        const auto ec = std::system_error(converted_code, std::system_category(), "DirectXTex error").code();
+        return Error(ec, loc);
     }
     if (hr == 0) // S_OK
     {
-        return std::system_error(0, std::system_category(), "DirectXTex success").code();
+        const auto ec = std::system_error(0, std::system_category(), "DirectXTex success").code();
+        return Error(ec, loc);
     }
     // otherwise, we got an impossible value
-    return default_err;
+    return Error(default_err, loc);
+}
+
+auto operator<<(std::ostream &os, [[maybe_unused]] SourceLocation loc) -> std::ostream &
+{
+#ifdef __clang__
+    return os << std::string_view("source location unsupported with clang");
+#else
+    return os << "file: " << loc.file_name() << "(" << loc.line() << ":" << loc.column() << ") `"
+              << loc.function_name() << "`";
+#endif
+}
+
+Error::Error(std::error_code ec, SourceLocation l)
+    : loc(l)
+    , ec(ec)
+{
+}
+
+Error::Error(TextureErr ec, SourceLocation l)
+    : Error(make_error_code(ec), l)
+{
 }
 
 } // namespace btu::tex

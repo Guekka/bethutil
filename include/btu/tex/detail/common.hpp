@@ -1,8 +1,8 @@
 #pragma once
 
-#include <tl/expected.hpp>
+#include "btu/tex/error_code.hpp"
 
-#include <system_error>
+#include <tl/expected.hpp>
 
 namespace DirectX { // NOLINT
 class ScratchImage;
@@ -13,7 +13,7 @@ namespace btu::tex {
 using DirectX::ScratchImage;
 using DirectX::TexMetadata; // NOLINT Not actually unused
 
-using Result = tl::expected<ScratchImage, std::error_code>;
+using Result = tl::expected<ScratchImage, Error>;
 
 enum class CommandState
 {

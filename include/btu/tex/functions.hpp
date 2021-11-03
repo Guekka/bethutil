@@ -16,7 +16,7 @@ class CompressionDevice;
 
 [[nodiscard]] auto load_file(const std::filesystem::path &path) noexcept -> Result;
 [[nodiscard]] auto save_file(const ScratchImage &tex, const std::filesystem::path &path) noexcept
-    -> tl::expected<std::monostate, std::error_code>;
+    -> tl::expected<std::monostate, Error>;
 
 [[nodiscard]] auto decompress(const ScratchImage &tex) -> Result;
 [[nodiscard]] auto make_opaque_alpha(const ScratchImage &tex) -> Result;
