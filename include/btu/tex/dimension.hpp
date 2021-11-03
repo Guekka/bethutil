@@ -44,7 +44,7 @@ struct ResizeRatio
 
 [[nodiscard]] constexpr auto sanitize_dimensions(Dimension dim,
                                                  uint8_t ratio_threshold = 3,
-                                                 uint8_t pow2_threshold  = 5) noexcept -> Dimension
+                                                 uint8_t pow2_threshold  = 3) noexcept -> Dimension
 {
     // Prevent 0s
     dim.w = std::max<size_t>(dim.w, 1);
@@ -76,6 +76,14 @@ struct ResizeRatio
     return dim;
 }
 
+// Makes number equal to target, and scale number2 accordingly
+constexpr auto scale_fit(size_t &number, size_t target, size_t &number2) -> void
+{
+    const auto ratio = target / static_cast<double>(number);
+    number2 *= ratio;
+    number = target;
+}
+
 [[nodiscard]] constexpr auto compute_resize_dimension(Dimension dim, Dimension target) noexcept -> Dimension
 {
     dim = sanitize_dimensions(dim); // We start from a sanitized base
@@ -84,40 +92,47 @@ struct ResizeRatio
     if (target > dim)
         return dim;
 
+    // Good case. We already got a power of 2. We wanna preserve it, so we only divide by 2
+    if (is_pow2(dim.w) || is_pow2(dim.h))
+    {
+        target.w *= 2;
+        target.h *= 2; // Otherwise last calculation would end below target
+        while (dim.w >= target.w && dim.h >= target.h)
+        {
+            dim.w /= 2;
+            dim.h /= 2;
+        }
+        return dim;
+    }
+    // Bad case. No power of 2. Which means we can afford less precise calculations
+
     // If target and current have same ratio
-    const auto cur_ratio    = dim.h / dim.w; // NOLINT
-    const auto target_ratio = target.h / target.w;
+    const auto cur_ratio    = (dim.h * 1000) / dim.w; // NOLINT
+    const auto target_ratio = (target.h * 1000) / target.w;
     if (cur_ratio == target_ratio)
-        return target; // Then we can directly return target
+        return target; // We can directly return target
 
     // Here we know that target and source have different ratios
     const auto max_ratio = std::max(target.w / static_cast<double>(dim.w),
                                     target.h / static_cast<double>(dim.h));
     // We return the closest multiple
-    return {static_cast<size_t>(dim.w * max_ratio), static_cast<size_t>(dim.h * max_ratio)};
+    return sanitize_dimensions(
+        {static_cast<size_t>(dim.w * max_ratio), static_cast<size_t>(dim.h * max_ratio)});
 }
 
 [[nodiscard]] constexpr auto compute_resize_dimension(Dimension dim, ResizeRatio args) noexcept -> Dimension
 {
-    auto target = sanitize_dimensions({dim.w / args.ratio, dim.h / args.ratio});
+    const auto ratio = static_cast<double>(args.ratio);
+    auto target      = sanitize_dimensions(
+        {static_cast<size_t>(std::round(dim.w / ratio)), static_cast<size_t>(std::round(dim.h / ratio))});
 
     if (target.w < args.min.w)
-    {
-        const auto delta = static_cast<double>(args.min.w) / target.w;
-        target.w *= delta;
-        target.h *= delta;
-    }
+        scale_fit(target.w, args.min.w, target.h);
     if (target.h < args.min.h)
-    {
-        const auto delta = static_cast<double>(args.min.h) / target.h;
-        target.w *= delta;
-        target.h *= delta;
-    }
+        scale_fit(target.h, args.min.h, target.w);
 
-    // If we have a square, extend it to pow2
-    if (target.w == target.h)
-        if (auto up = upper_pow2(target.w); up < dim.w)
-            target.w = target.h = up;
+    //  Maybe those calculations changed ratio by a tiny amount, allowing to make the tex a square
+    target = sanitize_dimensions(target);
 
     return compute_resize_dimension(dim, target);
 }

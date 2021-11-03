@@ -124,6 +124,15 @@ TEST_CASE("nearest_pow2")
     STATIC_REQUIRE(nearest_pow2((512 + 1024) / 2) == 1024);
 }
 
+TEST_CASE("scale_fit")
+{
+    using btu::tex::util::scale_fit;
+    size_t x = 10, y = 20, tx = 2;
+    scale_fit(x, tx, y);
+    CHECK(x == 2);
+    CHECK(y == 4);
+}
+
 TEST_CASE("sanitize_dimensions")
 {
     using btu::tex::util::sanitize_dimensions;
@@ -142,6 +151,9 @@ TEST_CASE("sanitize_dimensions")
 
     // Or can be, with high threshold
     STATIC_REQUIRE(sanitize_dimensions({144, 200}, 50) == Dimension{128, 128});
+
+    // Cannot be simplified
+    STATIC_REQUIRE(sanitize_dimensions({1066, 576}) == Dimension{1066, 576});
 }
 
 TEST_CASE("compute_resize_dimension")
@@ -160,19 +172,22 @@ TEST_CASE("compute_resize_dimension")
         CHECK(compute_resize_dimension({700, 900}, args) == Dimension{512, 658});
 
         // More esoteric
-        CHECK(compute_resize_dimension({1066, 576}, args) == Dimension{910, 512});
+        CHECK(compute_resize_dimension({1066, 576}, args) == Dimension{947, 512});
 
         constexpr auto args2 = ResizeRatio{5, {25, 25}};
         CHECK(compute_resize_dimension({1024, 1024}, args2) == Dimension{256, 256});
         CHECK(compute_resize_dimension({512, 512}, args2) == Dimension{128, 128});
         CHECK(compute_resize_dimension({100, 100}, args2) == Dimension{32, 32});
-        CHECK(compute_resize_dimension({64, 66}, args2) == Dimension{25, 27});
+        CHECK(compute_resize_dimension({64, 66}, args2) == Dimension{32, 33});
 
         constexpr auto args3 = ResizeRatio{1, {0, 0}};
         CHECK(compute_resize_dimension({1024, 1024}, args3) == Dimension{1024, 1024});
         // (Almost) square textures are rounded to a power of two
         CHECK(compute_resize_dimension({100, 100}, args3) == Dimension{128, 128});
-        CHECK(compute_resize_dimension({64, 66}, args3) == Dimension{64, 64});
+        CHECK(compute_resize_dimension({64, 65}, args3) == Dimension{64, 64});
+
+        const auto args4 = btu::tex::util::ResizeRatio{3, {200, 200}};
+        CHECK(compute_resize_dimension({256, 256}, args4) == Dimension{256, 256});
     }
     SECTION("Absolute")
     {
