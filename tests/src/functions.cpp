@@ -1,6 +1,6 @@
 #include "btu/tex/functions.hpp"
 
-#define CATCH_CONFIG_MAIN
+#include "btu/tex/compression_device.hpp"
 
 #include <DirectXTex.h>
 
@@ -9,7 +9,6 @@
 #include <catch2/catch.hpp>
 
 #include <filesystem>
-
 namespace Catch {
 template<>
 struct StringMaker<btu::tex::Dimension>
@@ -24,8 +23,10 @@ struct StringMaker<btu::tex::Dimension>
 
 using btu::tex::Dimension;
 
-auto load_tex(const std::filesystem::path &path)
+auto load_tex(const std::filesystem::path &path) -> DirectX::ScratchImage
 {
+    CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
     DirectX::ScratchImage in;
     DirectX::TexMetadata info{};
     const auto res = DirectX::LoadFromDDSFile(path.wstring().c_str(), DirectX::DDS_FLAGS_NONE, &info, in);
@@ -34,41 +35,71 @@ auto load_tex(const std::filesystem::path &path)
 }
 
 template<typename Func>
-auto test_expected(const std::filesystem::path &root, const Func &f) -> void
+auto test_expected(const std::filesystem::path &root,
+                   const std::filesystem::path &filename,
+                   Func f,
+                   bool approve = false)
 {
-    return;
-    auto it = std::filesystem::directory_iterator(root / "in");
-    for (const auto &file : it)
+    const auto in              = load_tex(root / "in" / filename);
+    const btu::tex::Result out = f(in);
+    if (!out.has_value())
+        UNSCOPED_INFO(out.error().message());
+    REQUIRE(out.has_value());
+
+    const auto expected_path = root / "expected" / filename;
+    if (!std::filesystem::exists(expected_path) && approve)
     {
-        const auto in  = load_tex(file.path());
-        const auto out = f(in);
-        REQUIRE(out.has_value());
-        const auto expected = load_tex(root / "expected" / file.path().filename());
+        const auto res = DirectX::SaveToDDSFile(out->GetImages(),
+                                                out->GetImageCount(),
+                                                out->GetMetadata(),
+                                                DirectX::DDS_FLAGS_NONE,
+                                                expected_path.wstring().c_str());
+        CHECK(SUCCEEDED(res));
+        FAIL("Expected file not found:" + expected_path.string());
+    }
+    else
+    {
+        const auto expected = load_tex(expected_path);
         CHECK(*out == expected);
     }
 }
 
-// TODO add test files
+template<typename Func>
+auto test_expected_dir(const std::filesystem::path &root, const Func &f) -> void
+{
+    for (const auto &file : std::filesystem::directory_iterator(root / "in"))
+        test_expected(root, file.path().filename(), f);
+}
 
 TEST_CASE("decompress")
 {
-    test_expected(u8"decompress", btu::tex::decompress);
+    test_expected_dir(u8"decompress", btu::tex::decompress);
 }
+
 TEST_CASE("make_opaque_alpha")
 {
-    test_expected(u8"decompress", btu::tex::decompress);
+    test_expected_dir(u8"make_opaque_alpha", btu::tex::make_opaque_alpha);
 }
 TEST_CASE("convert")
 {
-    test_expected(u8"decompress", btu::tex::decompress);
+    test_expected_dir(u8"convert", [](auto &&tex) {
+        auto c = btu::tex::CompressionDevice::make(0);
+        return btu::tex::convert(tex, DXGI_FORMAT_BC7_UNORM, *c);
+    });
 }
 TEST_CASE("generate_mipmaps")
 {
-    test_expected(u8"decompress", btu::tex::decompress);
+    test_expected_dir(u8"generate_mipmaps", btu::tex::generate_mipmaps);
 }
 TEST_CASE("resize")
 {
-    test_expected(u8"decompress", btu::tex::decompress);
+    test_expected_dir(u8"resize", [](auto &&tex) {
+        const auto args = btu::tex::util::ResizeRatio{3, {200, 200}};
+        const auto dim  = btu::tex::util::compute_resize_dimension({tex.GetMetadata().width,
+                                                                   tex.GetMetadata().height},
+                                                                  args);
+        return btu::tex::resize(tex, dim);
+    });
 }
 TEST_CASE("optimal_mip_count")
 {

@@ -56,6 +56,11 @@ macro(acquire_test NAME)
 	)
 endmacro()
 
+acquire_test("convert")
+acquire_test("decompress")
+acquire_test("generate_mipmaps")
+acquire_test("make_opaque_alpha")
+acquire_test("resize")
 
 if("${BETHUTIL-TEX_BUILD_EXAMPLES}")
 	target_include_directories(
