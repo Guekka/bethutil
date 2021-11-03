@@ -215,7 +215,7 @@ auto generate_mipmaps(const ScratchImage &tex) -> Result
     return prepare_generate_mipmaps(tex).and_then(generate_mipmaps_impl);
 }
 
-auto resize(const ScratchImage &tex, size_t x, size_t y) -> Result
+auto resize(const ScratchImage &tex, Dimension dim) -> Result
 {
     const auto &info = tex.GetMetadata();
 
@@ -225,7 +225,7 @@ auto resize(const ScratchImage &tex, size_t x, size_t y) -> Result
         return tl::make_unexpected(TextureErr::BadInput);
 
     constexpr auto filter = DirectX::TEX_FILTER_SEPARATE_ALPHA;
-    const HRESULT hr      = DirectX::Resize(img, tex.GetImageCount(), info, x, y, filter, timage);
+    const HRESULT hr      = DirectX::Resize(img, tex.GetImageCount(), info, dim.w, dim.h, filter, timage);
     if (FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
 
