@@ -4,6 +4,8 @@
 #include "btu/tex/detail/formats.hpp"
 #include "btu/tex/dimension.hpp"
 
+#include <filesystem>
+
 namespace DirectX { // NOLINT
 auto operator==(const ScratchImage &lhs, const ScratchImage &rhs) noexcept -> bool;
 auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool;
@@ -11,6 +13,10 @@ auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool
 
 namespace btu::tex {
 class CompressionDevice;
+
+[[nodiscard]] auto load_file(const std::filesystem::path &path) noexcept -> Result;
+[[nodiscard]] auto save_file(const ScratchImage &tex, const std::filesystem::path &path) noexcept
+    -> tl::expected<std::monostate, std::error_code>;
 
 [[nodiscard]] auto decompress(const ScratchImage &tex) -> Result;
 [[nodiscard]] auto make_opaque_alpha(const ScratchImage &tex) -> Result;

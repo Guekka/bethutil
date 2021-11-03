@@ -27,11 +27,9 @@ auto load_tex(const std::filesystem::path &path) -> DirectX::ScratchImage
 {
     CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
-    DirectX::ScratchImage in;
-    DirectX::TexMetadata info{};
-    const auto res = DirectX::LoadFromDDSFile(path.wstring().c_str(), DirectX::DDS_FLAGS_NONE, &info, in);
-    REQUIRE(SUCCEEDED(res));
-    return in;
+    auto res = btu::tex::load_file(path);
+    REQUIRE(res.has_value());
+    return std::move(res).value();
 }
 
 template<typename Func>
@@ -49,12 +47,8 @@ auto test_expected(const std::filesystem::path &root,
     const auto expected_path = root / "expected" / filename;
     if (!std::filesystem::exists(expected_path) && approve)
     {
-        const auto res = DirectX::SaveToDDSFile(out->GetImages(),
-                                                out->GetImageCount(),
-                                                out->GetMetadata(),
-                                                DirectX::DDS_FLAGS_NONE,
-                                                expected_path.wstring().c_str());
-        CHECK(SUCCEEDED(res));
+        const auto res = btu::tex::save_file(out.value(), expected_path);
+        CHECK(res.has_value());
         FAIL("Expected file not found:" + expected_path.string());
     }
     else

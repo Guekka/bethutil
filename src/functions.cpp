@@ -14,6 +14,7 @@
 #include <btu/common/metaprogramming.hpp>
 
 #include <algorithm>
+#include <fstream>
 
 namespace DirectX {
 auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool
@@ -44,6 +45,36 @@ auto operator==(const ScratchImage &lhs, const ScratchImage &rhs) noexcept -> bo
 } // namespace DirectX
 
 namespace btu::tex {
+
+auto load_file(const std::filesystem::path &path) noexcept -> Result
+{
+    DirectX::ScratchImage in;
+    DirectX::TexMetadata info{};
+    auto res = DirectX::LoadFromDDSFile(path.wstring().c_str(), DirectX::DDS_FLAGS_NONE, &info, in);
+    if (FAILED(res))
+    {
+        // Maybe it's a TGA then?
+        res = DirectX::LoadFromTGAFile(path.wstring().c_str(), DirectX::TGA_FLAGS_NONE, &info, in);
+        if (FAILED(res))
+            return tl::make_unexpected(error_from_hresult(res));
+    }
+
+    return in;
+}
+
+auto save_file(const ScratchImage &tex, const std::filesystem::path &path) noexcept
+    -> tl::expected<std::monostate, std::error_code>
+{
+    const auto res = DirectX::SaveToDDSFile(tex.GetImages(),
+                                            tex.GetImageCount(),
+                                            tex.GetMetadata(),
+                                            DirectX::DDS_FLAGS_NONE,
+                                            path.wstring().c_str());
+    if (FAILED(res))
+        return tl::make_unexpected(error_from_hresult(res));
+    return {};
+}
+
 auto decompress(const ScratchImage &tex) -> Result
 {
     const auto &img    = tex.GetImages();
