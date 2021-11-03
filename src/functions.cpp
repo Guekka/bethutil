@@ -197,7 +197,6 @@ auto convert(const ScratchImage &tex, DXGI_FORMAT format, CompressionDevice &dev
     return timage;
 }
 
-
 auto prepare_generate_mipmaps(const ScratchImage &tex) -> Result
 {
     // Mips generation only works on a single base image, so strip off existing mip levels
