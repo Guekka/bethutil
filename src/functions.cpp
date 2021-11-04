@@ -16,67 +16,10 @@
 #include <algorithm>
 #include <fstream>
 
-namespace DirectX {
-auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool
-{
-    auto cmp = [&](auto... ptrs) { return ((std::invoke(ptrs, lhs) == std::invoke(ptrs, rhs)) && ...); };
-    return cmp(&TexMetadata::arraySize,
-               &TexMetadata::depth,
-               &TexMetadata::format,
-               &TexMetadata::height,
-               &TexMetadata::mipLevels,
-               &TexMetadata::miscFlags,
-               &TexMetadata::miscFlags2,
-               &TexMetadata::width);
-}
-
-auto operator==(const ScratchImage &lhs, const ScratchImage &rhs) noexcept -> bool
-{
-    auto cmp = [&](auto... ptrs) { return ((std::invoke(ptrs, lhs) == std::invoke(ptrs, rhs)) && ...); };
-    const bool first = cmp(&ScratchImage::GetMetadata,
-                           &ScratchImage::GetImageCount,
-                           &ScratchImage::GetPixelsSize);
-    if (!first)
-        return false;
-
-    const auto end = lhs.GetPixels() + lhs.GetPixelsSize(); // NOLINT
-    return std::equal(lhs.GetPixels(), end, rhs.GetPixels());
-}
-} // namespace DirectX
-
 namespace btu::tex {
-
-auto load_file(const std::filesystem::path &path) noexcept -> Result
+auto decompress(Texture &&file) -> Result
 {
-    DirectX::ScratchImage in;
-    DirectX::TexMetadata info{};
-    auto res = DirectX::LoadFromDDSFile(path.wstring().c_str(), DirectX::DDS_FLAGS_NONE, &info, in);
-    if (FAILED(res))
-    {
-        // Maybe it's a TGA then?
-        res = DirectX::LoadFromTGAFile(path.wstring().c_str(), DirectX::TGA_FLAGS_NONE, &info, in);
-        if (FAILED(res))
-            return tl::make_unexpected(error_from_hresult(res));
-    }
-
-    return in;
-}
-
-auto save_file(const ScratchImage &tex, const std::filesystem::path &path) noexcept
-    -> tl::expected<std::monostate, Error>
-{
-    const auto res = DirectX::SaveToDDSFile(tex.GetImages(),
-                                            tex.GetImageCount(),
-                                            tex.GetMetadata(),
-                                            DirectX::DDS_FLAGS_NONE,
-                                            path.wstring().c_str());
-    if (FAILED(res))
-        return tl::make_unexpected(error_from_hresult(res));
-    return {};
-}
-
-auto decompress(const ScratchImage &tex) -> Result
-{
+    const auto &tex    = file.get();
     const auto &img    = tex.GetImages();
     const size_t &nimg = tex.GetImageCount();
     const auto &info   = tex.GetMetadata();
@@ -86,11 +29,14 @@ auto decompress(const ScratchImage &tex) -> Result
     if (FAILED(hr))
         return tl::make_unexpected(Error(TextureErr::Unknown));
 
-    return timage;
+    file.set(std::move(timage));
+    return file;
 }
 
-auto make_opaque_alpha(const ScratchImage &tex) -> Result
+auto make_opaque_alpha(Texture &&file) -> Result
 {
+    const auto &tex = file.get();
+
     if (!DirectX::HasAlpha(tex.GetMetadata().format))
         return tl::make_unexpected(Error(TextureErr::BadInput));
 
@@ -115,7 +61,8 @@ auto make_opaque_alpha(const ScratchImage &tex) -> Result
     if (FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
 
-    return timage;
+    file.set(std::move(timage));
+    return file;
 }
 
 auto convert_uncompressed(const ScratchImage &image,
@@ -179,9 +126,11 @@ auto convert_compressed(const ScratchImage &image,
                              timage);
 }
 
-auto convert(const ScratchImage &tex, DXGI_FORMAT format, CompressionDevice &dev) -> Result
+auto convert(Texture &&file, DXGI_FORMAT format, CompressionDevice &dev) -> Result
 {
-    const auto info                  = tex.GetMetadata();
+    const auto &tex = file.get();
+    const auto info = tex.GetMetadata();
+
     const bool uncompressed_required = info.width < 4 || info.height < 4;
     //Textures smaller than that cannot be compressed
     if (uncompressed_required && DirectX::IsCompressed(info.format))
@@ -194,11 +143,13 @@ auto convert(const ScratchImage &tex, DXGI_FORMAT format, CompressionDevice &dev
     if (auto result = f(tex, timage, format, dev); FAILED(result))
         return tl::make_unexpected(error_from_hresult(result));
 
-    return timage;
+    file.set(std::move(timage));
+    return file;
 }
 
-auto prepare_generate_mipmaps(const ScratchImage &tex) -> Result
+auto prepare_generate_mipmaps(Texture &&file) -> Result
 {
+    const auto &tex = file.get();
     // Mips generation only works on a single base image, so strip off existing mip levels
     const auto &info = tex.GetMetadata();
     DirectX::ScratchImage timage;
@@ -219,11 +170,14 @@ auto prepare_generate_mipmaps(const ScratchImage &tex) -> Result
         if (FAILED(hr))
             return tl::make_unexpected(error_from_hresult(hr));
     }
-    return timage;
+
+    file.set(std::move(timage));
+    return file;
 }
 
-auto generate_mipmaps_impl(ScratchImage tex) -> Result
+auto generate_mipmaps_impl(Texture &&file) -> Result
 {
+    const auto &tex   = file.get();
     const auto &info  = tex.GetMetadata();
     const size_t mips = optimal_mip_count({info.width, info.height});
 
@@ -237,16 +191,19 @@ auto generate_mipmaps_impl(ScratchImage tex) -> Result
 
     if (FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
-    return timage;
+
+    file.set(std::move(timage));
+    return file;
 }
 
-auto generate_mipmaps(const ScratchImage &tex) -> Result
+auto generate_mipmaps(Texture &&file) -> Result
 {
-    return prepare_generate_mipmaps(tex).and_then(generate_mipmaps_impl);
+    return prepare_generate_mipmaps(std::move(file)).and_then(generate_mipmaps_impl);
 }
 
-auto resize(const ScratchImage &tex, Dimension dim) -> Result
+auto resize(Texture &&file, Dimension dim) -> Result
 {
+    const auto &tex  = file.get();
     const auto &info = tex.GetMetadata();
 
     DirectX::ScratchImage timage;
@@ -259,7 +216,8 @@ auto resize(const ScratchImage &tex, Dimension dim) -> Result
     if (FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
 
-    return timage;
+    file.set(std::move(timage));
+    return file;
 }
 
 } // namespace btu::tex

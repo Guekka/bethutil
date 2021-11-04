@@ -97,4 +97,9 @@ Error::Error(TextureErr ec, SourceLocation l)
 {
 }
 
+auto Error::what() const -> const char *
+{
+    return "btu::tex exception";
+}
+
 } // namespace btu::tex

@@ -4,16 +4,12 @@
 
 #include <tl/expected.hpp>
 
-namespace DirectX { // NOLINT
-class ScratchImage;
-class TexMetadata;
-} // namespace DirectX
 
 namespace btu::tex {
-using DirectX::ScratchImage;
-using DirectX::TexMetadata; // NOLINT Not actually unused
+class Texture;
 
-using Result = tl::expected<ScratchImage, Error>;
+using Result      = tl::expected<Texture, Error>;
+using ResultError = tl::expected<std::monostate, Error>;
 
 enum class CommandState
 {

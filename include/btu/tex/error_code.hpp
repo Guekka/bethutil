@@ -73,10 +73,12 @@ struct SourceLocation
 #endif
 auto operator<<(std::ostream &os, SourceLocation loc) -> std::ostream &;
 
-struct Error
+struct Error : public std::exception
 {
     explicit Error(std::error_code ec, SourceLocation l = BETHUTIL_CURRENT_SOURCE_LOC);
     explicit Error(TextureErr ec, SourceLocation l = BETHUTIL_CURRENT_SOURCE_LOC);
+
+    auto what() const -> const char * override;
 
     SourceLocation loc;
     std::error_code ec;

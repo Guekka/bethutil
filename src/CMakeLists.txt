@@ -10,6 +10,7 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/tex/dimension.hpp"
     "${INCLUDE_DIR}/btu/tex/functions.hpp"
     "${INCLUDE_DIR}/btu/tex/optimize.hpp"
+    "${INCLUDE_DIR}/btu/tex/texture.hpp"
 
     "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
     "${INCLUDE_DIR}/btu/tex/detail/formats.hpp"
@@ -22,6 +23,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/compression_device.cpp"
     "${SOURCE_DIR}/functions.cpp"
     "${SOURCE_DIR}/optimize.cpp"
+    "${SOURCE_DIR}/texture.cpp"
     )
 
 source_group(
