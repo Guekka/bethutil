@@ -8,6 +8,7 @@
 #include "btu/tex/dimension.hpp"
 
 #include <DirectXTex.h>
+#include <btu/common/string.hpp>
 
 namespace DirectX {
 auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool
@@ -94,6 +95,15 @@ auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noex
 
 } // namespace detail
 
+auto canonize_path(std::filesystem::path path) noexcept -> std::u8string
+{
+    auto str              = path.generic_u8string();
+    const auto start      = std::u8string_view(u8"textures/");
+    auto prefix_end       = str.rfind(start);
+    prefix_end            = prefix_end == std::string::npos ? 0 : prefix_end;
+    return btu::common::to_lower(str.substr(prefix_end));
+}
+
 auto Texture::load_file(std::filesystem::path path) noexcept -> ResultError
 {
     load_path_ = std::move(path);
@@ -161,4 +171,10 @@ auto Texture::get_load_path() const noexcept -> const std::filesystem::path &
 {
     return load_path_;
 }
+
+auto Texture::set_load_path(std::filesystem::path path) noexcept -> void
+{
+    load_path_ = std::move(path);
+}
+
 } // namespace btu::tex

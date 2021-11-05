@@ -55,6 +55,8 @@ private:
 auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noexcept -> bool;
 } // namespace detail
 
+auto canonize_path(std::filesystem::path path) noexcept -> std::u8string;
+
 class Texture
 {
 public:
@@ -69,7 +71,9 @@ public:
     auto get_images() const noexcept -> std::span<const Image>;
 
     auto get_dimension() const noexcept -> Dimension;
+
     auto get_load_path() const noexcept -> const std::filesystem::path &;
+    auto set_load_path(std::filesystem::path path) noexcept -> void;
 
     auto operator==(const Texture &) const noexcept -> bool = default;
 
