@@ -18,8 +18,9 @@ auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result
 #define F(FUNC) [&](Texture &&f) { return FUNC; }
 
     auto dev = CompressionDevice::make(0).value();
+    const auto compressed = DirectX::IsCompressed(file.get().GetMetadata().format);
     return Result{std::move(file)}
-        .and_then(decompress)
+        .and_then(F(compressed ? decompress(std::move(f)) : std::move(f)))
         .and_then(F(sets.resize ? resize(std::move(f), sets.resize.value()) : std::move(f)))
         .and_then(F(sets.add_opaque_alpha ? make_opaque_alpha(std::move(f)) : std::move(f)))
         .and_then(F(sets.mipmaps ? generate_mipmaps(std::move(f)) : std::move(f)))
