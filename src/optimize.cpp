@@ -79,7 +79,7 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
 auto Settings::get(common::Game game) noexcept -> const Settings &
 {
     // FIXME
-    static const auto default_sets = Settings{};
+    static const auto default_sets = Settings{.game = game};
     return default_sets;
 }
 
