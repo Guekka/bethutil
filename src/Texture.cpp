@@ -67,7 +67,10 @@ auto ScratchImagePimpl::operator=(ScratchImagePimpl &&other) noexcept -> Scratch
     return *this;
 }
 
-ScratchImagePimpl::~ScratchImagePimpl() {}
+ScratchImagePimpl::~ScratchImagePimpl()
+{
+    get().~ScratchImage();
+}
 
 auto ScratchImagePimpl::get() &noexcept -> ScratchImage &
 {
