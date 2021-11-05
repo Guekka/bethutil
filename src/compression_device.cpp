@@ -158,6 +158,22 @@ auto CompressionDevice::make(uint32_t adapter_index, bool allow_software) -> std
     return std::make_optional(std::move(ret));
 }
 
+CompressionDevice::CompressionDevice(CompressionDevice &&other) noexcept
+    : device_(std::move(other.device_))
+    , gpu_name_(std::move(other.gpu_name_))
+{
+}
+
+auto CompressionDevice::operator=(CompressionDevice &&other) noexcept -> CompressionDevice &
+{
+    if (this != &other)
+    {
+        device_   = std::move(other.device_);
+        gpu_name_ = std::move(other.gpu_name_);
+    }
+    return *this;
+}
+
 CompressionDevice::CompressionDevice()
     : device_(std::make_unique<Microsoft::WRL::ComPtr<ID3D11Device>>())
 {

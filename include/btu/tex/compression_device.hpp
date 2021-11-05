@@ -30,10 +30,10 @@ public:
     static auto make(uint32_t adapter_index, bool allow_software = false) -> std::optional<CompressionDevice>;
 
     CompressionDevice(const CompressionDevice &) = delete;
-    CompressionDevice(CompressionDevice &&)      = default;
+    CompressionDevice(CompressionDevice &&other) noexcept;
 
-    CompressionDevice &operator=(const CompressionDevice &) = delete;
-    CompressionDevice &operator=(CompressionDevice &&) = default;
+    auto operator=(const CompressionDevice &) -> CompressionDevice & = delete;
+    auto operator=(CompressionDevice &&other) noexcept -> CompressionDevice &;
 
     ~CompressionDevice();
 
