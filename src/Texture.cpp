@@ -144,10 +144,21 @@ auto Texture::get() const noexcept -> const ScratchImage &
     return tex_.get();
 }
 
+auto Texture::get_images() const noexcept -> std::span<const Image>
+{
+    const auto begin = get().GetImages();
+    const auto end   = begin + get().GetImageCount(); // NOLINT
+    return std::span(begin, end);
+}
+
 auto Texture::get_dimension() const noexcept -> Dimension
 {
     const auto info = get().GetMetadata();
     return {info.width, info.height};
 }
 
+auto Texture::get_load_path() const noexcept -> const std::filesystem::path &
+{
+    return load_path_;
+}
 } // namespace btu::tex

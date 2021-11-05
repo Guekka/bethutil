@@ -8,9 +8,11 @@
 #include "btu/tex/detail/common.hpp"
 
 #include <filesystem>
+#include <span>
 #include <type_traits>
 
 namespace DirectX { // NOLINT
+class Image;
 class ScratchImage;
 class TexMetadata;
 
@@ -19,6 +21,7 @@ auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool
 } // namespace DirectX
 
 namespace btu::tex {
+using DirectX::Image;
 using DirectX::ScratchImage;
 using DirectX::TexMetadata; // NOLINT Not actually unused
 
@@ -63,7 +66,10 @@ public:
     auto get() noexcept -> ScratchImage &;
     auto get() const noexcept -> const ScratchImage &;
 
+    auto get_images() const noexcept -> std::span<const Image>;
+
     auto get_dimension() const noexcept -> Dimension;
+    auto get_load_path() const noexcept -> const std::filesystem::path &;
 
     auto operator==(const Texture &) const noexcept -> bool = default;
 
