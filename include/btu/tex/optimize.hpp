@@ -6,7 +6,7 @@
 #pragma once
 
 #include "btu/tex/detail/common.hpp"
-#include "btu/tex/detail/formats.hpp"
+#include "btu/tex/detail/formats_string.hpp"
 #include "btu/tex/dimension.hpp"
 
 #include <btu/common/games.hpp>
