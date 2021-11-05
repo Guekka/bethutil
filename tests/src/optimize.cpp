@@ -5,10 +5,18 @@
 
 #include "btu/tex/optimize.hpp"
 
-#include <DirectXTex.h>
+#include "btu/tex/texture.hpp"
+
 #include <catch.hpp>
 
 TEST_CASE("optimize")
 {
-    CHECK(btu::tex::optimize({}, {}).has_value());
+    SECTION("compiles")
+    {
+        auto tex         = btu::tex::Texture{};
+        const auto &sets = btu::tex::Settings::get(btu::common::Game::SSE);
+        const auto steps = btu::tex::compute_optimization_steps(tex, sets);
+        const auto res   = btu::tex::optimize(std::move(tex), steps);
+    }
+    CHECK_FALSE(btu::tex::optimize({}, {}).has_value());
 }
