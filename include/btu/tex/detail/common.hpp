@@ -4,7 +4,6 @@
 
 #include <tl/expected.hpp>
 
-
 namespace btu::tex {
 class Texture;
 

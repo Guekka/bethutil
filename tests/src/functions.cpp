@@ -28,7 +28,6 @@ using btu::tex::Dimension, btu::tex::Texture;
 
 auto load_tex(const std::filesystem::path &path) -> Texture
 {
-
     Texture tex;
     auto res = tex.load_file(path);
     REQUIRE(res.has_value());

@@ -17,7 +17,7 @@ auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result
 // Idea from https://vector-of-bool.github.io/2021/04/20/terse-lambda-macro.html
 #define F(FUNC) [&](Texture &&f) { return FUNC; }
 
-    auto dev = CompressionDevice::make(0).value();
+    auto dev              = CompressionDevice::make(0).value();
     const auto compressed = DirectX::IsCompressed(file.get().GetMetadata().format);
     return Result{std::move(file)}
         .and_then(F(compressed ? decompress(std::move(f)) : std::move(f)))
@@ -55,7 +55,7 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     if (sets.use_format_whitelist && !btu::common::contains(sets.allowed_formats, info.format))
         res.format = sets.output_format;
 
-    const auto dim = Dimension{info.width, info.height};
+    const auto dim                            = Dimension{info.width, info.height};
     const std::optional<Dimension> target_dim = std::visit(
         btu::common::overload{
             [](std::monostate) -> std::optional<Dimension> { return {}; },
