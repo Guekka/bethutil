@@ -33,7 +33,7 @@ auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result
 auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bool
 {
     const auto &tex         = file.get();
-    const auto path         = btu::common::to_lower(file.get_load_path().u8string());
+    const auto path         = canonize_path(file.get_load_path());
     const bool is_landscape = btu::common::contains(sets.landscape_textures, path);
     if (!is_landscape)
         return false;
