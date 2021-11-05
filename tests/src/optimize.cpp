@@ -87,7 +87,6 @@ const auto generate_tex2 = [] {
     auto file = btu::tex::Texture{};
     file.set(std::move(timage));
     file.set_load_path(u8"textures/file.dds");
-    file.save_file("test.dds");
     return file;
 };
 
