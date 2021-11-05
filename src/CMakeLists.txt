@@ -8,6 +8,7 @@ set(HEADER_FILES
 
     "${INCLUDE_DIR}/btu/tex/compression_device.hpp"
     "${INCLUDE_DIR}/btu/tex/dimension.hpp"
+    "${INCLUDE_DIR}/btu/tex/formats.hpp"
     "${INCLUDE_DIR}/btu/tex/functions.hpp"
     "${INCLUDE_DIR}/btu/tex/optimize.hpp"
     "${INCLUDE_DIR}/btu/tex/texture.hpp"
@@ -22,6 +23,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/error_code.cpp"
 
     "${SOURCE_DIR}/compression_device.cpp"
+    "${SOURCE_DIR}/formats.cpp"
     "${SOURCE_DIR}/functions.cpp"
     "${SOURCE_DIR}/optimize.cpp"
     "${SOURCE_DIR}/texture.cpp"
