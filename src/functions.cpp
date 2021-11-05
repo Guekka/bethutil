@@ -44,7 +44,7 @@ auto make_opaque_alpha(Texture &&file) -> Result
                                   const DirectX::XMVECTOR *in_pixels,
                                   const size_t width,
                                   [[maybe_unused]] size_t) {
-        const auto black = DirectX::XMVectorSet(0, 0, 0, 0);
+        const auto black = DirectX::XMVectorSet(0, 0, 0, 1);
         const auto end   = in_pixels + width; // NOLINT
         std::transform(in_pixels, end, out_pixels, [&](auto &&pix) {
             return XMVectorSelect(black, pix, DirectX::g_XMSelect1110);
