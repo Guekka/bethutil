@@ -39,6 +39,8 @@ struct OptimizationSteps
     bool add_opaque_alpha = false;
     bool mipmaps;
     std::optional<DXGI_FORMAT> format;
+
+    auto operator<=>(const OptimizationSteps &) const noexcept = default;
 };
 
 [[nodiscard]] auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result;
