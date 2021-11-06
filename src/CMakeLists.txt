@@ -14,6 +14,7 @@ set(HEADER_FILES
 
     "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
     "${INCLUDE_DIR}/btu/tex/detail/formats.hpp"
+    "${INCLUDE_DIR}/btu/tex/detail/functional.hpp"
     )
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
