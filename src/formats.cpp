@@ -34,7 +34,7 @@ auto guess_texture_type(std::u8string_view path) -> std::optional<TextureType>
     if (type == u8"msn")
         return TextureType::ModelSpaceNormal;
     if (type == u8"b")
-        return TextureType::Blur;
+        return TextureType::Backlight;
     if (type == u8"sk")
         return TextureType::Skin;
     if (type == u8"em" || type == u8"m")

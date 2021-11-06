@@ -14,7 +14,7 @@ enum class TextureType
     Glow,
     Parallax,
     ModelSpaceNormal,
-    Blur,
+    Backlight,
     Skin,
     EnvironmentMask
 };

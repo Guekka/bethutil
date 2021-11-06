@@ -23,14 +23,17 @@ TEST_CASE("guess_texture_type")
         // Unknown underscore
         CHECK(guess_texture_type(u8"some_name.dds") == std::nullopt);
 
+        // Case insensitive
         CHECK(guess_texture_type(u8"some_name_n.dds") == TextureType::Normal);
+        CHECK(guess_texture_type(u8"some_name_N.dds") == TextureType::Normal);
+
         CHECK(guess_texture_type(u8"some_name_s.dds") == TextureType::Specular);
         CHECK(guess_texture_type(u8"some_name_d.dds") == TextureType::Diffuse);
         CHECK(guess_texture_type(u8"some_name_g.dds") == TextureType::Glow);
         CHECK(guess_texture_type(u8"some_name_p.dds") == TextureType::Parallax);
         CHECK(guess_texture_type(u8"some_name_e.dds") == TextureType::Cube);
         CHECK(guess_texture_type(u8"some_name_msn.dds") == TextureType::ModelSpaceNormal);
-        CHECK(guess_texture_type(u8"some_name_b.dds") == TextureType::Blur);
+        CHECK(guess_texture_type(u8"some_name_b.dds") == TextureType::Backlight);
         CHECK(guess_texture_type(u8"some_name_sk.dds") == TextureType::Skin);
         CHECK(guess_texture_type(u8"some_name_em.dds") == TextureType::EnvironmentMask);
         CHECK(guess_texture_type(u8"some_name_m.dds") == TextureType::EnvironmentMask);
