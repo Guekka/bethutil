@@ -34,5 +34,6 @@ enum class TextureType
 /// Based on https://forums.nexusmods.com/index.php?/topic/476227-skyrim-nif-files-with-underscores/
 auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<TextureType>;
 
-auto guess_best_format(const Texture &tex, BestFormatFor formats) noexcept -> DXGI_FORMAT;
+auto guess_best_format(const Texture &tex, BestFormatFor formats, bool force_uncompressed = false) noexcept
+    -> DXGI_FORMAT;
 } // namespace btu::tex

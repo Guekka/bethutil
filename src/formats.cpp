@@ -46,9 +46,10 @@ auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<Textu
     return std::nullopt;
 }
 
-auto guess_best_format(const Texture &tex, BestFormatFor formats) noexcept -> DXGI_FORMAT
+auto guess_best_format(const Texture &tex, BestFormatFor formats, bool force_uncompressed) noexcept
+    -> DXGI_FORMAT
 {
-    const bool compressed = DirectX::IsCompressed(tex.get().GetMetadata().format);
+    const bool compressed = !force_uncompressed && DirectX::IsCompressed(tex.get().GetMetadata().format);
     const bool alpha      = DirectX::IsCompressed(tex.get().GetMetadata().format);
     if (compressed && alpha)
         return formats.compressed;
