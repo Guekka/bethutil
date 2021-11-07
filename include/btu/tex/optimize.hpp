@@ -6,8 +6,8 @@
 #pragma once
 
 #include "btu/tex/detail/common.hpp"
-#include "btu/tex/detail/formats_string.hpp"
 #include "btu/tex/dimension.hpp"
+#include "btu/tex/formats.hpp"
 
 #include <btu/common/games.hpp>
 
@@ -27,8 +27,9 @@ struct Settings
     bool mipmaps;
 
     bool use_format_whitelist;
-    DXGI_FORMAT output_format;
     std::vector<DXGI_FORMAT> allowed_formats;
+
+    BestFormatFor output_format;
 
     std::vector<std::u8string> landscape_textures;
 };

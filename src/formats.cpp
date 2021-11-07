@@ -1,5 +1,8 @@
 #include "btu/tex/formats.hpp"
 
+#include "btu/tex/texture.hpp"
+
+#include <DirectXTex.h>
 #include <btu/common/string.hpp>
 
 namespace btu::tex {
@@ -43,9 +46,18 @@ auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<Textu
     return std::nullopt;
 }
 
-DXGI_FORMAT guess_best_format(const Texture &tex, std::optional<TextureType> type) noexcept
+auto guess_best_format(const Texture &tex, BestFormatFor formats) noexcept -> DXGI_FORMAT
 {
-    return DXGI_FORMAT_UNKNOWN;
+    const bool compressed = DirectX::IsCompressed(tex.get().GetMetadata().format);
+    const bool alpha      = DirectX::IsCompressed(tex.get().GetMetadata().format);
+    if (compressed && alpha)
+        return formats.compressed;
+    if (compressed && !alpha)
+        return formats.compressed_without_alpha;
+    if (!compressed && !alpha)
+        return formats.uncompressed_without_alpha;
+
+    return formats.uncompressed;
 }
 
 } // namespace btu::tex

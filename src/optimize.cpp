@@ -53,11 +53,12 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
 
     auto res = OptimizationSteps{};
 
-    if (sets.compress && !DirectX::IsCompressed(info.format))
-        res.format = sets.output_format;
+    const bool forbidden_format = sets.use_format_whitelist
+                                  && !btu::common::contains(sets.allowed_formats, info.format);
+    const bool compress = sets.compress && !DirectX::IsCompressed(info.format);
 
-    if (sets.use_format_whitelist && !btu::common::contains(sets.allowed_formats, info.format))
-        res.format = sets.output_format;
+    if (forbidden_format || compress)
+        res.format = guess_best_format(file, sets.output_format);
 
     const auto dim                            = Dimension{info.width, info.height};
     const std::optional<Dimension> target_dim = std::visit(
@@ -84,8 +85,66 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
 auto Settings::get(common::Game game) noexcept -> const Settings &
 {
     // FIXME
-    static const auto default_sets = Settings{.game = game};
-    return default_sets;
+    static auto tes3_sets = [&] {
+        return Settings{.game          = common::Game::TES3,
+                        .output_format = {.uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
+                                          .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
+                                          .compressed                 = DXGI_FORMAT_BC3_UNORM,
+                                          .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM}};
+    }();
+
+    switch (game)
+    {
+        case btu::common::Game::TES3: return tes3_sets;
+        case btu::common::Game::TES4:
+        {
+            static auto tes4_sets = [&] {
+                auto sets = tes3_sets;
+                sets.game = btu::common::Game::TES4;
+                return sets;
+            }();
+            return tes4_sets;
+        }
+        case btu::common::Game::FNV:
+        {
+            static auto fnv_sets = [&] {
+                auto sets = tes3_sets;
+                sets.game = btu::common::Game::FNV;
+                return sets;
+            }();
+            return fnv_sets;
+        }
+        case btu::common::Game::SLE:
+        {
+            static auto sle_sets = [&] {
+                auto sets = tes3_sets;
+                sets.game = btu::common::Game::SLE;
+                return sets;
+            }();
+            return sle_sets;
+        }
+        case btu::common::Game::SSE:
+        {
+            static auto sse_sets = [&] {
+                auto sets                     = tes3_sets;
+                sets.output_format.compressed = DXGI_FORMAT_BC7_UNORM;
+                sets.game                     = btu::common::Game::SSE;
+                return sets;
+            }();
+            return sse_sets;
+        }
+        case btu::common::Game::FO4:
+        {
+            static auto fo4_sets = [&] {
+                auto sets = Settings::get(common::Game::SSE);
+                sets.game = btu::common::Game::FO4;
+                return sets;
+            }();
+            return fo4_sets;
+        }
+        case btu::common::Game::Custom: return tes3_sets;
+    }
+    return tes3_sets;
 }
 
 } // namespace btu::tex

@@ -38,7 +38,6 @@ const auto generate_sets1 = [] {
     sets.allowed_formats      = {DXGI_FORMAT_BC7_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM};
     sets.compress             = true;
     sets.mipmaps              = true;
-    sets.output_format        = DXGI_FORMAT_BC7_UNORM;
     sets.resize               = btu::tex::util::ResizeRatio{.ratio = 7, .min = {256, 256}};
     return sets;
 };
@@ -54,7 +53,6 @@ const auto generate_sets2 = [] {
     sets.use_format_whitelist = false;
     sets.compress             = false;
     sets.mipmaps              = false;
-    sets.output_format        = DXGI_FORMAT_BC7_UNORM;
     sets.resize               = std::monostate{};
     sets.landscape_textures   = {u8"textures/file.dds"};
     return sets;
