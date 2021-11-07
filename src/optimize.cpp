@@ -6,6 +6,7 @@
 #include "btu/tex/optimize.hpp"
 
 #include "btu/tex/compression_device.hpp"
+#include "btu/tex/detail/functional.hpp"
 #include "btu/tex/functions.hpp"
 
 #include <DirectXTex.h>
@@ -14,19 +15,22 @@
 namespace btu::tex {
 auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result
 {
-// Idea from https://vector-of-bool.github.io/2021/04/20/terse-lambda-macro.html
-#define F(FUNC) [&](Texture &&f) { return FUNC; }
-
     auto dev              = CompressionDevice::make(0).value();
     const auto compressed = DirectX::IsCompressed(file.get().GetMetadata().format);
-    return Result{std::move(file)}
-        .and_then(F(compressed ? decompress(std::move(f)) : std::move(f)))
-        .and_then(F(sets.resize ? resize(std::move(f), sets.resize.value()) : std::move(f)))
-        .and_then(F(sets.add_opaque_alpha ? make_opaque_alpha(std::move(f)) : std::move(f)))
-        .and_then(F(sets.mipmaps ? generate_mipmaps(std::move(f)) : std::move(f)))
-        .and_then(F(sets.format ? convert(std::move(f), sets.format.value(), dev) : std::move(f)));
+    auto res              = Result{std::move(file)};
 
-#undef F
+    if (compressed)
+        res = std::move(res).and_then(decompress);
+    if (sets.resize)
+        res = std::move(res).and_then(detail::bind_back(resize, sets.resize.value()));
+    if (sets.add_opaque_alpha)
+        res = std::move(res).and_then(make_opaque_alpha);
+    if (sets.mipmaps)
+        res = std::move(res).and_then(generate_mipmaps);
+    if (sets.format)
+        res = std::move(res).and_then(detail::bind_back(convert, sets.format.value(), std::ref(dev)));
+
+    return res;
 }
 
 /// SSE landscape textures are way more shiny than LE textures.
