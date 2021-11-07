@@ -46,6 +46,46 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
     return !tex.IsAlphaAllOpaque();
 }
 
+[[nodiscard]] auto is_bad_cubemap(const TexMetadata &info) noexcept -> bool
+{
+    const bool isCubemap    = info.IsCubemap();
+    const bool uncompressed = !DirectX::IsCompressed(info.format);
+
+    const bool opaqueAlpha = info.GetAlphaMode() == DirectX::TEX_ALPHA_MODE::TEX_ALPHA_MODE_OPAQUE;
+    const bool noAlpha     = !DirectX::HasAlpha(info.format);
+    const bool badAlpha    = opaqueAlpha || noAlpha;
+
+    return isCubemap && uncompressed && badAlpha;
+}
+
+[[nodiscard]] auto can_be_compressed(const TexMetadata &info) noexcept -> bool
+{
+    const bool too_small = info.width < 4 || info.height < 4;
+    const bool pow2      = util::is_pow2(info.width) && util::is_pow2(info.height);
+
+    return !too_small && pow2;
+}
+
+[[nodiscard]] auto compute_output_format(const Texture &file, const Settings &sets) noexcept
+    -> std::optional<DXGI_FORMAT>
+{
+    const auto &info = file.get().GetMetadata();
+
+    const bool forbidden_format = sets.use_format_whitelist
+                                  && !btu::common::contains(sets.allowed_formats, info.format);
+
+    const bool is_bad_cube = is_bad_cubemap(info);
+
+    const bool bad = forbidden_format || is_bad_cube;
+    if (!bad && !sets.compress) // All good, no need to change anything
+        return std::nullopt;
+
+    if (!sets.compress && bad) // No need to compress but texture is not good
+        return guess_best_format(file, sets.output_format, true);
+
+    return guess_best_format(file, sets.output_format, !can_be_compressed(info));
+}
+
 auto compute_optimization_steps(const Texture &file, const Settings &sets) noexcept -> OptimizationSteps
 {
     const auto &tex  = file.get();
@@ -53,13 +93,7 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
 
     auto res = OptimizationSteps{};
 
-    const bool forbidden_format = sets.use_format_whitelist
-                                  && !btu::common::contains(sets.allowed_formats, info.format);
-    const bool compress = sets.compress && !DirectX::IsCompressed(info.format);
-    const bool good_compress_size = info.width >= 4 && info.height >= 4;
-
-    if (good_compress_size && !(forbidden_format || compress))
-        res.format = guess_best_format(file, sets.output_format);
+    res.format = compute_output_format(file, sets);
 
     const auto dim                            = Dimension{info.width, info.height};
     const std::optional<Dimension> target_dim = std::visit(
