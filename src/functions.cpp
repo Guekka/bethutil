@@ -211,8 +211,11 @@ auto resize(Texture &&file, Dimension dim) -> Result
     if (img == nullptr)
         return tl::make_unexpected(Error(TextureErr::BadInput));
 
-    constexpr auto filter = DirectX::TEX_FILTER_SEPARATE_ALPHA;
-    const HRESULT hr      = DirectX::Resize(img, tex.GetImageCount(), info, dim.w, dim.h, filter, timage);
+    // DirectX::Resize is dumb. If WIC is used, it will convert the image to
+    // R32G32B32A32 It works for small image.. But will, for example, allocate
+    // 1gb for a 8k picture. So disable WIC
+    const auto filter = DirectX::TEX_FILTER_SEPARATE_ALPHA | DirectX::TEX_FILTER_FORCE_NON_WIC;
+    const HRESULT hr  = DirectX::Resize(img, tex.GetImageCount(), info, dim.w, dim.h, filter, timage);
     if (FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
 
