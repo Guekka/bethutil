@@ -4,7 +4,7 @@
 
 namespace btu::tex {
 
-auto guess_texture_type(std::u8string_view path) -> std::optional<TextureType>
+auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<TextureType>
 {
     constexpr auto suffix = std::u8string_view(u8".dds");
     if (path.size() < suffix.size() + 2)
@@ -41,6 +41,11 @@ auto guess_texture_type(std::u8string_view path) -> std::optional<TextureType>
         return TextureType::EnvironmentMask;
 
     return std::nullopt;
+}
+
+DXGI_FORMAT guess_best_format(const Texture &tex, std::optional<TextureType> type) noexcept
+{
+    return DXGI_FORMAT_UNKNOWN;
 }
 
 } // namespace btu::tex
