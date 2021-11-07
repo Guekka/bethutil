@@ -76,7 +76,8 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
         if (can_be_optimized_landscape(file, sets))
             res.add_opaque_alpha = true;
 
-    if (sets.mipmaps && optimal_mip_count(file.get_dimension()) != info.mipLevels)
+    const bool opt_mip = optimal_mip_count(file.get_dimension()) == info.mipLevels;
+    if (sets.mipmaps && (!opt_mip || res.resize)) // resize removes mips
         res.mipmaps = true;
 
     return res;
