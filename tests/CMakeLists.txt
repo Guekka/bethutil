@@ -2,13 +2,14 @@ set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 set(INCLUDE_DIR "${ROOT_DIR}/tests")
 set(HEADER_FILES
-
+        "${INCLUDE_DIR}/src/utils.hpp"
 )
 
 set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
         "${SOURCE_DIR}/src/formats.cpp"
         "${SOURCE_DIR}/src/functions.cpp"
+        "${SOURCE_DIR}/src/main.cpp"
         "${SOURCE_DIR}/src/optimize.cpp"
         "${SOURCE_DIR}/src/detail/functional.cpp"
 )

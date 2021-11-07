@@ -1,74 +1,11 @@
 #include "btu/tex/functions.hpp"
 
+#include "./utils.hpp"
 #include "btu/tex/compression_device.hpp"
 
-#define CATCH_CONFIG_MAIN
-
-#include <catch2/catch.hpp>
-
 #include <filesystem>
-namespace Catch {
-template<>
-struct StringMaker<btu::tex::Dimension>
-{
-    static auto convert(const btu::tex::Dimension &value) -> std::string
-    {
-        auto ts = [](auto &&a) { return StringMaker<decltype(a)>::convert(a); };
-        return "{" + ts(value.w) + ", " + ts(value.h) + "}";
-    }
-};
-template<>
-struct StringMaker<btu::tex::ScratchImage>
-{
-    static auto convert(const btu::tex::ScratchImage &) -> std::string { return "scratch_image"; }
-};
-} // namespace Catch
 
 using btu::tex::Dimension, btu::tex::Texture;
-
-auto load_tex(const std::filesystem::path &path) -> Texture
-{
-    Texture tex;
-    auto res = tex.load_file(path);
-    REQUIRE(res.has_value());
-    return tex;
-}
-
-template<typename Func>
-auto test_expected(const std::filesystem::path &root,
-                   const std::filesystem::path &filename,
-                   Func f,
-                   bool approve = false)
-{
-    auto in                    = load_tex(root / "in" / filename);
-    const btu::tex::Result out = f(std::move(in));
-    if (!out.has_value())
-    {
-        UNSCOPED_INFO(out.error().ec.message());
-        UNSCOPED_INFO(out.error().loc);
-    }
-    REQUIRE(out.has_value());
-
-    const auto expected_path = root / "expected" / filename;
-    if (!std::filesystem::exists(expected_path) && approve)
-    {
-        const auto res = out.value().save_file(expected_path);
-        CHECK(res.has_value());
-        FAIL("Expected file not found:" + expected_path.string());
-    }
-    else
-    {
-        const auto expected = load_tex(expected_path);
-        CHECK(out->get() == expected.get());
-    }
-}
-
-template<typename Func>
-auto test_expected_dir(const std::filesystem::path &root, const Func &f) -> void
-{
-    for (const auto &file : std::filesystem::directory_iterator(root / "in"))
-        test_expected(root, file.path().filename(), f);
-}
 
 TEST_CASE("decompress")
 {
