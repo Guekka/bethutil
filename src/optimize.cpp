@@ -56,8 +56,9 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     const bool forbidden_format = sets.use_format_whitelist
                                   && !btu::common::contains(sets.allowed_formats, info.format);
     const bool compress = sets.compress && !DirectX::IsCompressed(info.format);
+    const bool good_compress_size = info.width >= 4 && info.height >= 4;
 
-    if (forbidden_format || compress)
+    if (good_compress_size && !(forbidden_format || compress))
         res.format = guess_best_format(file, sets.output_format);
 
     const auto dim                            = Dimension{info.width, info.height};
