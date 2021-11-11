@@ -98,6 +98,14 @@ TEST_CASE("scale_fit")
     CHECK(y == 4);
 }
 
+TEST_CASE("canonize_path")
+{
+    using btu::tex::canonize_path;
+    CHECK(canonize_path("a/b/textures/x/y.dds") == u8"x/y.dds");
+    CHECK(canonize_path("a\\b\\Textures\\x\\y.dds") == u8"x/y.dds");
+    CHECK(canonize_path("x/y.dds") == u8"x/y.dds");
+}
+
 TEST_CASE("sanitize_dimensions")
 {
     using btu::tex::util::sanitize_dimensions;
