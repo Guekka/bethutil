@@ -23,8 +23,8 @@ auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result
         res = std::move(res).and_then(decompress);
     if (sets.resize)
         res = std::move(res).and_then(detail::bind_back(resize, sets.resize.value()));
-    if (sets.add_opaque_alpha)
-        res = std::move(res).and_then(make_opaque_alpha);
+    if (sets.add_transparent_alpha)
+        res = std::move(res).and_then(make_transparent_alpha);
     if (sets.mipmaps)
         res = std::move(res).and_then(generate_mipmaps);
     if (sets.format)
@@ -33,8 +33,9 @@ auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result
     return res;
 }
 
-/// SSE landscape textures are way more shiny than LE textures.
-/// To fix this, alpha has to be made opaque
+/// SSE landscape textures uses alpha channel as specularity
+/// Textures with opaque alpha are thus rendered shiny
+/// To fix this, alpha has to be made transparent
 auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bool
 {
     const auto &tex         = file.get();
@@ -43,7 +44,7 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
     if (!is_landscape)
         return false;
 
-    return !tex.IsAlphaAllOpaque();
+    return tex.IsAlphaAllOpaque();
 }
 
 [[nodiscard]] auto is_bad_cubemap(const TexMetadata &info) noexcept -> bool
@@ -109,7 +110,7 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
 
     if (sets.game == btu::common::Game::SSE)
         if (can_be_optimized_landscape(file, sets))
-            res.add_opaque_alpha = true;
+            res.add_transparent_alpha = true;
 
     const bool opt_mip = optimal_mip_count(file.get_dimension()) == info.mipLevels;
     if (sets.mipmaps && (!opt_mip || res.resize)) // resize removes mips

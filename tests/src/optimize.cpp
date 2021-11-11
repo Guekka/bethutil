@@ -5,11 +5,11 @@
 
 #include "btu/tex/optimize.hpp"
 
+#include "./utils.hpp"
 #include "btu/tex/texture.hpp"
 
 #include <DirectXTex.h>
 #include <btu/tex/optimize.hpp>
-#include <catch.hpp>
 
 const auto generate_info1 = [] {
     return DirectX::TexMetadata{
@@ -54,7 +54,7 @@ const auto generate_sets2 = [] {
     sets.compress             = false;
     sets.mipmaps              = false;
     sets.resize               = std::monostate{};
-    sets.landscape_textures   = {u8"textures/file.dds"};
+    sets.landscape_textures   = {u8"textures/landscape/file.dds"};
     return sets;
 };
 
@@ -62,12 +62,12 @@ const auto generate_tex2 = [] {
     auto tex = DirectX::ScratchImage{};
     tex.Initialize(generate_info2());
 
-    // We create a texture with white alpha
+    // We create a texture with opaque alpha
     constexpr auto transform = [](DirectX::XMVECTOR *out_pixels,
                                   const DirectX::XMVECTOR *,
                                   const size_t width,
                                   [[maybe_unused]] size_t) {
-        const auto color = DirectX::XMVectorSet(0.250, 0.25, .25, .5);
+        const auto color = DirectX::XMVectorSet(1, 1, 1, 1);
         const auto end   = out_pixels + width; // NOLINT
         std::fill(out_pixels, end, color);
     };
@@ -80,11 +80,11 @@ const auto generate_tex2 = [] {
                                             timage);
 
     REQUIRE(hr >= 0);
-    REQUIRE_FALSE(timage.IsAlphaAllOpaque());
+    REQUIRE(timage.IsAlphaAllOpaque());
 
     auto file = btu::tex::Texture{};
     file.set(std::move(timage));
-    file.set_load_path(u8"textures/file.dds");
+    file.set_load_path(u8"textures/landscape/file.dds");
     return file;
 };
 
@@ -97,7 +97,7 @@ TEST_CASE("compute_optimization_steps")
         auto tex = generate_tex(generate_info1());
         auto res = compute_optimization_steps(tex, generate_sets1());
         CHECK(res.resize == btu::tex::Dimension{256, 256});
-        CHECK(res.add_opaque_alpha == false);
+        CHECK(res.add_transparent_alpha == false);
         CHECK(res.mipmaps == true);
         CHECK(res.format == DXGI_FORMAT_BC7_UNORM);
     }
@@ -106,7 +106,7 @@ TEST_CASE("compute_optimization_steps")
         auto tex = generate_tex2();
         auto res = compute_optimization_steps(tex, generate_sets2());
         CHECK(res.resize == std::nullopt);
-        CHECK(res.add_opaque_alpha == true);
+        CHECK(res.add_transparent_alpha == true);
         CHECK(res.mipmaps == false);
         CHECK(res.format == std::nullopt);
     }
@@ -149,6 +149,7 @@ TEST_CASE("optimize")
         CHECK(res_info.format == DXGI_FORMAT_R8G8B8A8_UNORM);
         CHECK(res_info.dimension == DirectX::TEX_DIMENSION_TEXTURE2D);
 
-        CHECK(res->get().IsAlphaAllOpaque());
+        CHECK(!res->get().IsAlphaAllOpaque());
+    }
     }
 }

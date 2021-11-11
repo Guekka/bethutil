@@ -12,9 +12,9 @@ TEST_CASE("decompress")
     test_expected_dir(u8"decompress", btu::tex::decompress);
 }
 
-TEST_CASE("make_opaque_alpha")
+TEST_CASE("make_transparent_alpha")
 {
-    test_expected_dir(u8"make_opaque_alpha", btu::tex::make_opaque_alpha);
+    test_expected_dir(u8"make_transparent_alpha", btu::tex::make_transparent_alpha);
 }
 TEST_CASE("convert")
 {

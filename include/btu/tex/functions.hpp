@@ -11,7 +11,7 @@ namespace btu::tex {
 class CompressionDevice;
 
 [[nodiscard]] auto decompress(Texture &&file) -> Result;
-[[nodiscard]] auto make_opaque_alpha(Texture &&file) -> Result;
+[[nodiscard]] auto make_transparent_alpha(Texture &&file) -> Result;
 [[nodiscard]] auto convert(Texture &&file, DXGI_FORMAT format, CompressionDevice &dev) -> Result;
 
 [[nodiscard]] constexpr auto optimal_mip_count(Dimension dim) noexcept -> size_t

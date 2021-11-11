@@ -37,7 +37,7 @@ struct Settings
 struct OptimizationSteps
 {
     std::optional<Dimension> resize;
-    bool add_opaque_alpha = false;
+    bool add_transparent_alpha = false;
     bool mipmaps;
     std::optional<DXGI_FORMAT> format;
 

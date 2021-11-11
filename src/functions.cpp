@@ -33,7 +33,7 @@ auto decompress(Texture &&file) -> Result
     return file;
 }
 
-auto make_opaque_alpha(Texture &&file) -> Result
+auto make_transparent_alpha(Texture &&file) -> Result
 {
     const auto &tex = file.get();
 
@@ -44,10 +44,10 @@ auto make_opaque_alpha(Texture &&file) -> Result
                                   const DirectX::XMVECTOR *in_pixels,
                                   const size_t width,
                                   [[maybe_unused]] size_t) {
-        const auto black = DirectX::XMVectorSet(0, 0, 0, 1);
+        const auto transparent = DirectX::XMVectorSet(0, 0, 0, 0);
         const auto end   = in_pixels + width; // NOLINT
         std::transform(in_pixels, end, out_pixels, [&](auto &&pix) {
-            return XMVectorSelect(black, pix, DirectX::g_XMSelect1110);
+            return XMVectorSelect(transparent, pix, DirectX::g_XMSelect1110);
         });
     };
 
