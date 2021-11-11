@@ -54,7 +54,7 @@ const auto generate_sets2 = [] {
     sets.compress             = false;
     sets.mipmaps              = false;
     sets.resize               = std::monostate{};
-    sets.landscape_textures   = {u8"textures/landscape/file.dds"};
+    sets.landscape_textures   = {u8"landscape/file.dds"};
     return sets;
 };
 
