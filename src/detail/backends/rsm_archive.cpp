@@ -260,9 +260,9 @@ auto RsmArchive::unpack(const Path &out_path) -> void
         },
         [&](libbsa::fo4::archive &ba2) {
             std::for_each(std::execution::par, ba2.begin(), ba2.end(), [&](auto &&pair) {
-                auto &&[key, file]  = pair;
-                const auto path     = out_path / detail::virtual_to_local_path(key);
-                const auto ver      = detail::archive_version<libbsa::fo4::format>(archive_, version_);
+                auto &&[key, file] = pair;
+                const auto path    = out_path / detail::virtual_to_local_path(key);
+                const auto ver     = detail::archive_version<libbsa::fo4::format>(archive_, version_);
                 make_dir(path);
                 file.write(path, ver);
             });
