@@ -12,36 +12,12 @@
 #include <mutex>
 
 namespace btu::bsa {
-auto open_virtual_path(const common::Path &path) -> std::ofstream
-{
-    fs::create_directories(path.parent_path());
-    std::ofstream out{path, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc};
-    out.exceptions(std::ios_base::failbit);
-    return out;
-}
-
 void unpack(UnpackSettings sets)
 {
     {
         auto arch        = detail::RsmArchive(sets.file_path);
-        const auto &root = sets.root_opt != nullptr ? *sets.root_opt : sets.file_path.parent_path();
-        arch.iterate_files([&](const Path &rel, std::span<const std::byte> data) {
-            auto raw_out = [&]() -> std::optional<std::ofstream> {
-                std::mutex mut;
-                std::scoped_lock lock(mut);
-                const auto path = root / rel;
-                if (fs::exists(path) && !sets.overwrite_existing_files)
-                    return std::nullopt;
-
-                return open_virtual_path(path);
-            }();
-
-            if (!raw_out.has_value())
-                return;
-            auto &out = *raw_out;
-
-            out.write(reinterpret_cast<const char *>(data.data()), data.size());
-        });
+        const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
+        arch.unpack(root);
     }
     if (sets.remove_arch && !fs::remove(sets.file_path))
     {

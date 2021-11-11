@@ -12,6 +12,7 @@ namespace libbsa = ::bsa;
 
 namespace btu::bsa::detail {
 using UnderlyingArchive = std::variant<libbsa::tes3::archive, libbsa::tes4::archive, libbsa::fo4::archive>;
+using UnderlyingFile    = std::variant<libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file>;
 
 template<class... Keys>
 [[nodiscard]] auto virtual_to_local_path(Keys &&...a_keys) -> std::string
@@ -45,11 +46,11 @@ public:
     auto read(Path a_path) -> ArchiveVersion override;
     auto write(Path a_path) -> void override;
 
+    auto add_file(const Path &a_relative, UnderlyingFile file) -> void;
     auto add_file(const Path &a_root, const Path &a_path) -> void override;
     auto add_file(const Path &a_relative, std::vector<std::byte> a_data) -> void override;
 
-    using iteration_callback = std::function<void(const Path &, std::span<const std::byte>)>;
-    auto iterate_files(const iteration_callback &a_callback, bool skip_compressed = false) -> void override;
+    virtual auto unpack(const Path &out_path) -> void override;
 
     [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion override;
     [[nodiscard]] auto get_archive() const noexcept -> const UnderlyingArchive &;

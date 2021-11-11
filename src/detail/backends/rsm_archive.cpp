@@ -8,10 +8,6 @@
 
 namespace btu::bsa::detail {
 
-// Defined in fo4 part
-auto pack_fo4dx_file(std::span<std::byte> data, bool compress) -> libbsa::fo4::file;
-auto unpack_fo4dx_file(libbsa::fo4::file &file) -> std::vector<std::byte>;
-
 [[nodiscard]] auto get_archive_identifier(const UnderlyingArchive &archive) -> std::string_view
 {
     const auto visiter = btu::common::overload{
@@ -87,6 +83,7 @@ RsmArchive::RsmArchive(ArchiveVersion a_version, bool a_compressed)
             {
                 flags |= libbsa::tes4::archive_flag::compressed;
             }
+
             bsa.archive_flags(flags);
             archive_ = std::move(bsa);
             break;
@@ -141,34 +138,14 @@ auto RsmArchive::write(Path a_path) -> void
     std::visit(writer, archive_);
 }
 
-auto RsmArchive::add_file(const Path &a_root, const Path &a_path) -> void
+void RsmArchive::add_file(const common::Path &a_relative, UnderlyingFile file)
 {
-    const auto relative = a_path.lexically_relative(a_root).lexically_normal();
-    const auto data     = btu::common::read_file(a_path);
-    return add_file(relative, data);
-}
-
-auto RsmArchive::add_file(const Path &a_relative, std::vector<std::byte> a_data) -> void
-{
+    std::scoped_lock lock(mutex_);
     const auto adder = btu::common::overload{
-        [&](libbsa::tes3::archive &bsa) {
-            libbsa::tes3::file f;
-
-            f.set_data(std::move(a_data));
-
-            std::scoped_lock lock(mutex_);
-
-            bsa.insert(a_relative.lexically_normal().generic_string(), std::move(f));
+        [&](libbsa::tes3::archive &bsa, libbsa::tes3::file &&f) {
+            bsa.insert(a_relative.generic_string(), std::move(f));
         },
-        [&, this](libbsa::tes4::archive &bsa) {
-            libbsa::tes4::file f;
-            const auto version = detail::archive_version<libbsa::tes4::version>(archive_, version_);
-            f.set_data(std::move(a_data));
-
-            if (compressed_)
-                f.compress(version);
-
-            std::scoped_lock lock(mutex_);
+        [&](libbsa::tes4::archive &bsa, libbsa::tes4::file &&f) {
             const auto d = [&]() {
                 const auto key = a_relative.parent_path().lexically_normal().generic_string();
                 if (bsa.find(key) == bsa.end())
@@ -180,100 +157,114 @@ auto RsmArchive::add_file(const Path &a_relative, std::vector<std::byte> a_data)
 
             d->insert(a_relative.filename().lexically_normal().generic_string(), std::move(f));
         },
-        [&, this](libbsa::fo4::archive &ba2) {
-            const auto version = detail::archive_version<libbsa::fo4::format>(archive_, version_);
+        [&](libbsa::fo4::archive &ba2, libbsa::fo4::file &&f) {
+            ba2.insert(a_relative.lexically_normal().generic_string(), std::move(f));
+        },
+        [](auto &&, auto &&) { throw libbsa::exception("Trying to add x type file to y type bsa"); }};
 
-            auto file = [&] {
-                if (version == libbsa::fo4::format::general)
-                {
-                    libbsa::fo4::file f;
-                    auto &chunk = f.emplace_back();
-                    chunk.set_data(std::move(a_data));
+    std::visit(adder, archive_, std::move(file));
+}
 
-                    if (compressed_)
-                        chunk.compress();
-                    return f;
-                }
-                return pack_fo4dx_file(a_data, compressed_);
-            }();
+auto RsmArchive::add_file(const Path &a_root, const Path &a_path) -> void
+{
+    const auto relative = a_path.lexically_relative(a_root).lexically_normal();
+    const auto compress = compressed_ ? libbsa::compression_type::compressed
+                                      : libbsa::compression_type::decompressed;
 
-            std::scoped_lock lock(mutex_);
+    const auto adder = btu::common::overload{
+        [&](libbsa::tes3::archive &) {
+            libbsa::tes3::file f;
+            f.read(a_path);
+            add_file(relative, std::move(f));
+        },
+        [&, this](libbsa::tes4::archive &) {
+            libbsa::tes4::file f;
+            const auto version = detail::archive_version<libbsa::tes4::version>(archive_, version_);
+            f.read(a_path, version, libbsa::tes4::compression_codec::normal, compress);
+            add_file(relative, std::move(f));
+        },
+        [&, this](libbsa::fo4::archive &) {
+            libbsa::fo4::file f;
+            const auto format = detail::archive_version<libbsa::fo4::format>(archive_, version_);
+            f.read(a_path,
+                   format,
+                   512u * 512u, // Default
+                   libbsa::fo4::compression_level::normal,
+                   compress);
+            add_file(relative, std::move(f));
+        },
+    };
+    std::visit(adder, archive_);
+}
 
-            ba2.insert(a_relative.lexically_normal().generic_string(), std::move(file));
+auto RsmArchive::add_file(const Path &relative, std::vector<std::byte> a_data) -> void
+{
+    const auto adder = btu::common::overload{
+        [&](libbsa::tes3::archive &) {
+            libbsa::tes3::file f;
+            f.set_data(std::move(a_data));
+            add_file(relative, std::move(f));
+        },
+        [&, this](libbsa::tes4::archive &) {
+            libbsa::tes4::file f;
+            const auto version = detail::archive_version<libbsa::tes4::version>(archive_, version_);
+            f.set_data(std::move(a_data));
+            if (compressed_)
+                f.compress(version);
+            add_file(relative, std::move(f));
+        },
+        [&, this](libbsa::fo4::archive &) {
+            libbsa::fo4::file f;
+            const auto compress = compressed_ ? libbsa::compression_type::compressed
+                                              : libbsa::compression_type::decompressed;
+            const auto format   = detail::archive_version<libbsa::fo4::format>(archive_, version_);
+            f.read(a_data,
+                   format,
+                   512u * 512u, // Default
+                   libbsa::fo4::compression_level::normal,
+                   compress);
+            add_file(relative, std::move(f));
         },
     };
 
     std::visit(adder, archive_);
 }
 
-auto RsmArchive::iterate_files(const iteration_callback &a_callback, bool skip_compressed) -> void
+auto RsmArchive::unpack(const Path &out_path) -> void
 {
+    auto make_dir = [](const Path &p) {
+        const auto dir = p.parent_path();
+        if (!std::filesystem::exists(dir))
+            std::filesystem::create_directories(dir);
+    };
+
     auto visiter = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) {
             std::for_each(std::execution::par, bsa.cbegin(), bsa.cend(), [&](auto &&pair) {
                 const auto [key, file] = pair;
-                const auto relative    = detail::virtual_to_local_path(key);
-                const auto bytes       = file.as_bytes();
-                a_callback(relative, bytes);
+                const auto path        = out_path / detail::virtual_to_local_path(key);
+                make_dir(path);
+                file.write(path);
             });
         },
         [&](libbsa::tes4::archive &bsa) {
             for (auto &dir : bsa)
             {
                 std::for_each(std::execution::par, dir.second.begin(), dir.second.end(), [&](auto &&file) {
-                    const auto relative = detail::virtual_to_local_path(dir.first, file.first);
-                    const auto ver      = detail::archive_version<libbsa::tes4::version>(archive_, version_);
-
-                    if (file.second.compressed())
-                    {
-                        if (skip_compressed)
-                        {
-                            return;
-                        }
-                        file.second.decompress(ver);
-                    }
-                    a_callback(relative, file.second.as_bytes());
+                    const auto path = out_path / detail::virtual_to_local_path(dir.first, file.first);
+                    const auto ver  = detail::archive_version<libbsa::tes4::version>(archive_, version_);
+                    make_dir(path);
+                    file.second.write(path, ver);
                 });
             }
         },
         [&](libbsa::fo4::archive &ba2) {
             std::for_each(std::execution::par, ba2.begin(), ba2.end(), [&](auto &&pair) {
                 auto &&[key, file]  = pair;
-                const auto relative = detail::virtual_to_local_path(key);
-
-                if (version_ == ArchiveVersion::fo4)
-                {
-                    // Fast path, one chunk
-                    if (file.size() == 1)
-                    {
-                        a_callback(relative, file[0].as_bytes());
-                    }
-                    else
-                    {
-                        std::vector<std::byte> bytes;
-                        for (auto &chunk : file)
-                        {
-                            if (chunk.compressed())
-                            {
-                                if (skip_compressed)
-                                {
-                                    return;
-                                }
-                                chunk.decompress();
-                            }
-
-                            const auto chunk_bytes = chunk.as_bytes();
-                            bytes.reserve(bytes.size() + chunk_bytes.size());
-                            bytes.insert(bytes.end(), chunk_bytes.begin(), chunk_bytes.end());
-                        }
-                        a_callback(relative, bytes);
-                    }
-                }
-                else
-                {
-                    const auto data = unpack_fo4dx_file(file);
-                    a_callback(relative, data);
-                }
+                const auto path     = out_path / detail::virtual_to_local_path(key);
+                const auto ver      = detail::archive_version<libbsa::fo4::format>(archive_, version_);
+                make_dir(path);
+                file.write(path, ver);
             });
         },
     };
