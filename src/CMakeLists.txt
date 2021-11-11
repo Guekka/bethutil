@@ -29,7 +29,6 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/detail/archive_type.cpp"
 
     "${SOURCE_DIR}/detail/backends/rsm_archive.cpp"
-    "${SOURCE_DIR}/detail/backends/rsm_archive_fo4.cpp"
 )
 
 source_group(
