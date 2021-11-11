@@ -27,7 +27,7 @@ auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result
         res = std::move(res).and_then(make_transparent_alpha);
     if (sets.mipmaps)
         res = std::move(res).and_then(generate_mipmaps);
-    if (sets.format)
+    if (sets.format && res && res.value().get().GetMetadata().format != sets.format)
         res = std::move(res).and_then(detail::bind_back(convert, sets.format.value(), std::ref(dev)));
 
     return res;
