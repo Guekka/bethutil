@@ -49,14 +49,16 @@ auto test_expected(const std::filesystem::path &root,
         UNSCOPED_INFO(out.error().ec.message());
         UNSCOPED_INFO(out.error().loc);
     }
+    INFO(filename);
     REQUIRE(out.has_value());
 
     const auto expected_path = root / "expected" / filename;
     if (!std::filesystem::exists(expected_path) && approve)
     {
+        std::filesystem::create_directories(expected_path.parent_path());
         const auto res = out.value().save_file(expected_path);
         CHECK(res.has_value());
-        FAIL("Expected file not found:" + expected_path.string());
+        FAIL_CHECK("Expected file not found:" + expected_path.string());
     }
     else
     {
@@ -68,7 +70,8 @@ auto test_expected(const std::filesystem::path &root,
 template<typename Func>
 auto test_expected_dir(const std::filesystem::path &root, const Func &f) -> void
 {
-    for (const auto &file : std::filesystem::directory_iterator(root / "in"))
+    const auto in_dir = root / "in";
+    for (const auto &file : std::filesystem::recursive_directory_iterator(in_dir))
         if (file.is_regular_file())
-            test_expected(root, file.path().filename(), f);
+            test_expected(root, file.path().lexically_relative(in_dir), f);
 }
