@@ -11,6 +11,16 @@
 #include <DirectXTex.h>
 #include <btu/tex/optimize.hpp>
 
+#include <iostream>
+
+auto operator<<(std::ostream &os, const btu::tex::OptimizationSteps &s) -> std::ostream &
+{
+    const auto dim = s.resize.value_or(btu::tex::Dimension{});
+    return os << "add_trans_alpha: " << s.add_transparent_alpha << ";format: "
+              << btu::common::as_ascii(btu::tex::to_string(s.format.value_or(DXGI_FORMAT_UNKNOWN))) << ""
+              << ";mips: " << s.mipmaps << "; resize x:" << dim.w << " y:" << dim.h;
+}
+
 const auto generate_info1 = [] {
     return DirectX::TexMetadata{
         .width     = 1024,
@@ -151,5 +161,13 @@ TEST_CASE("optimize")
 
         CHECK(!res->get().IsAlphaAllOpaque());
     }
+    SECTION("expected_dir")
+    {
+        auto sets   = generate_sets1();
+        sets.resize = btu::tex::Dimension{128, 128};
+        test_expected_dir(u8"optimize", [&](auto &&f) {
+            const btu::tex::OptimizationSteps steps = btu::tex::compute_optimization_steps(f, sets);
+            return btu::tex::optimize(std::move(f), steps);
+        });
     }
 }

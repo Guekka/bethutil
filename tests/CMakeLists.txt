@@ -65,6 +65,7 @@ acquire_test("decompress")
 acquire_test("generate_mipmaps")
 acquire_test("make_transparent_alpha")
 acquire_test("resize")
+acquire_test("optimize")
 
 if("${BETHUTIL-TEX_BUILD_EXAMPLES}")
 	target_include_directories(
