@@ -123,13 +123,20 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
 
 auto Settings::get(common::Game game) noexcept -> const Settings &
 {
-    // FIXME
     static auto tes3_sets = [&] {
-        return Settings{.game          = common::Game::TES3,
-                        .output_format = {.uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
-                                          .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
-                                          .compressed                 = DXGI_FORMAT_BC3_UNORM,
-                                          .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM}};
+        return Settings{
+            .game                 = common::Game::TES3,
+            .compress             = false,
+            .resize               = {},
+            .mipmaps              = true,
+            .use_format_whitelist = false,
+            .allowed_formats      = {}, // Unknown
+            .output_format        = {.uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
+                                     .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
+                                     .compressed                 = DXGI_FORMAT_BC3_UNORM,
+                                     .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
+            .landscape_textures   = {}, // Unknown
+        };
     }();
 
     switch (game)
@@ -166,6 +173,15 @@ auto Settings::get(common::Game game) noexcept -> const Settings &
         {
             static auto sse_sets = [&] {
                 auto sets                     = tes3_sets;
+                sets.compress                 = true;
+                sets.use_format_whitelist     = true;
+                sets.allowed_formats          = {
+                    DXGI_FORMAT_BC7_UNORM,
+                    DXGI_FORMAT_BC5_UNORM,
+                    DXGI_FORMAT_BC3_UNORM,
+                    DXGI_FORMAT_BC1_UNORM,
+                    DXGI_FORMAT_R8G8B8A8_UNORM,
+                };
                 sets.output_format.compressed = DXGI_FORMAT_BC7_UNORM;
                 sets.game                     = btu::common::Game::SSE;
                 return sets;
