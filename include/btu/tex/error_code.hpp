@@ -1,10 +1,11 @@
 #pragma once
 
+#include <btu/common/error.hpp>
+
 #include <optional>
-#include <source_location>
-#include <system_error>
 
 namespace btu::tex {
+using btu::common::Error, btu::common::SourceLocation;
 
 enum class TextureErr
 {
@@ -58,31 +59,6 @@ public:
 
 inline const FailureSourceCategory k_failure_source_category{};
 auto make_error_condition(FailureSource e) -> std::error_condition;
-
-struct SourceLocation
-#ifndef __clang__ // Missing support for source location in clang
-    : public std::source_location
-#endif
-{
-};
-#ifndef __clang__
-#define BETHUTIL_CURRENT_SOURCE_LOC static_cast<btu::tex::SourceLocation>(std::source_location::current())
-#else
-#define BETHUTIL_CURRENT_SOURCE_LOC \
-    btu::tex::SourceLocation {}
-#endif
-auto operator<<(std::ostream &os, SourceLocation loc) -> std::ostream &;
-
-struct Error : public std::exception
-{
-    explicit Error(std::error_code ec, SourceLocation l = BETHUTIL_CURRENT_SOURCE_LOC);
-    explicit Error(TextureErr ec, SourceLocation l = BETHUTIL_CURRENT_SOURCE_LOC);
-
-    auto what() const -> const char * override;
-
-    SourceLocation loc;
-    std::error_code ec;
-};
 
 auto error_from_hresult(int64_t hr,
                         std::error_code default_err = TextureErr::Unknown,

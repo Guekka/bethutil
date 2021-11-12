@@ -94,30 +94,4 @@ auto error_from_hresult(int64_t hr, std::error_code default_err, SourceLocation 
     return Error(default_err, loc);
 }
 
-auto operator<<(std::ostream &os, [[maybe_unused]] SourceLocation loc) -> std::ostream &
-{
-#ifdef __clang__
-    return os << std::string_view("source location unsupported with clang");
-#else
-    return os << "file: " << loc.file_name() << "(" << loc.line() << ":" << loc.column() << ") `"
-              << loc.function_name() << "`";
-#endif
-}
-
-Error::Error(std::error_code ec, SourceLocation l)
-    : loc(l)
-    , ec(ec)
-{
-}
-
-Error::Error(TextureErr ec, SourceLocation l)
-    : Error(make_error_code(ec), l)
-{
-}
-
-auto Error::what() const -> const char *
-{
-    return "btu::tex exception";
-}
-
 } // namespace btu::tex

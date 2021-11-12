@@ -11,7 +11,6 @@ set(SOURCE_FILES
         "${SOURCE_DIR}/src/functions.cpp"
         "${SOURCE_DIR}/src/main.cpp"
         "${SOURCE_DIR}/src/optimize.cpp"
-        "${SOURCE_DIR}/src/detail/functional.cpp"
 )
 
 if("${BETHUTIL-TEX_BUILD_EXAMPLES}")

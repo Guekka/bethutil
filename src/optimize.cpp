@@ -11,24 +11,26 @@
 
 #include <DirectXTex.h>
 #include <btu/common/algorithms.hpp>
+#include <btu/common/functional.hpp>
 
 namespace btu::tex {
 auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result
 {
     auto dev              = CompressionDevice::make(0).value();
+    using btu::common::bind_back;
     const auto compressed = DirectX::IsCompressed(file.get().GetMetadata().format);
     auto res              = Result{std::move(file)};
 
     if (compressed)
         res = std::move(res).and_then(decompress);
     if (sets.resize)
-        res = std::move(res).and_then(detail::bind_back(resize, sets.resize.value()));
+        res = std::move(res).and_then(bind_back(resize, sets.resize.value()));
     if (sets.add_transparent_alpha)
         res = std::move(res).and_then(make_transparent_alpha);
     if (sets.mipmaps)
         res = std::move(res).and_then(generate_mipmaps);
     if (sets.format && res && res.value().get().GetMetadata().format != sets.format)
-        res = std::move(res).and_then(detail::bind_back(convert, sets.format.value(), std::ref(dev)));
+        res = std::move(res).and_then(bind_back(convert, sets.format.value(), std::ref(dev)));
 
     return res;
 }

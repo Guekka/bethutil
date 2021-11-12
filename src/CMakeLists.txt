@@ -14,7 +14,6 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/tex/texture.hpp"
 
     "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/functional.hpp"
     "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp"
     )
 
