@@ -1,7 +1,11 @@
 #include "btu/tex/error_code.hpp"
 
+#include <DirectXTex.h>
+
+#include <array>
 #include <iostream>
 #include <optional>
+#include <system_error>
 
 namespace btu::tex {
 auto TextureErrCategory::name() const noexcept -> const char *
@@ -57,22 +61,36 @@ auto make_error_condition(FailureSource e) -> std::error_condition
 
 auto error_from_hresult(int64_t hr, std::error_code default_err, SourceLocation loc) -> Error
 {
-    // MAKE_HRESULT(SEVERITY_ERROR, FACILITY_WIN32, 0)
-    constexpr auto win32_valid = 0x80070000L;
+    const auto make_error = [&](auto win32_code) {
+        return Error(std::error_code(win32_code, std::system_category()), loc);
+    };
+
+    // Most important DirectXTex error codes
+    constexpr auto known_codes = std::to_array({ERROR_ARITHMETIC_OVERFLOW,
+                                                ERROR_CANNOT_MAKE,
+                                                ERROR_FILE_TOO_LARGE,
+                                                ERROR_HANDLE_EOF,
+                                                ERROR_INVALID_DATA,
+                                                ERROR_NOT_SUPPORTED});
+
+    const auto it = std::find_if(known_codes.begin(), known_codes.end(), [&](auto err) {
+        return HRESULT_FROM_WIN32(err) == hr;
+    });
+    if (it != known_codes.end())
+        return make_error(*it);
+
+    // Didn't work. Does this code come from HRESULT_FROM_WIN32?
+    constexpr auto win32_valid = 0x80070000L; // MAKE_HRESULT(SEVERITY_ERROR, FACILITY_WIN32, 0)
     constexpr auto mask        = 0xFFFF0000U;
     if ((static_cast<uint64_t>(hr) & mask) == win32_valid)
     {
         // Could have come from many values, but we choose this one
-        const auto converted_code = static_cast<int32_t>(static_cast<uint64_t>(hr) & 0xFFFFU);
-        const auto ec = std::system_error(converted_code, std::system_category(), "DirectXTex error").code();
-        return Error(ec, loc);
+        return make_error(static_cast<int32_t>(static_cast<uint64_t>(hr) & 0xFFFFU));
     }
     if (hr == 0) // S_OK
-    {
-        const auto ec = std::system_error(0, std::system_category(), "DirectXTex success").code();
-        return Error(ec, loc);
-    }
-    // otherwise, we got an impossible value
+        return Error(TextureErr::Success, loc);
+
+    // It doesn't. We just return the default error
     return Error(default_err, loc);
 }
 

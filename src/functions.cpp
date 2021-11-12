@@ -27,7 +27,7 @@ auto decompress(Texture &&file) -> Result
     DirectX::ScratchImage timage;
     const auto hr = DirectX::Decompress(img, nimg, info, DXGI_FORMAT_UNKNOWN /* picks good default */, timage);
     if (FAILED(hr))
-        return tl::make_unexpected(Error(TextureErr::Unknown));
+        return tl::make_unexpected(error_from_hresult(hr));
 
     file.set(std::move(timage));
     return file;
@@ -140,8 +140,8 @@ auto convert(Texture &&file, DXGI_FORMAT format, CompressionDevice &dev) -> Resu
 
     auto f = DirectX::IsCompressed(format) ? convert_compressed : convert_uncompressed;
 
-    if (auto result = f(tex, timage, format, dev); FAILED(result))
-        return tl::make_unexpected(error_from_hresult(result));
+    if (const auto hr = f(tex, timage, format, dev); FAILED(hr))
+        return tl::make_unexpected(error_from_hresult(hr));
 
     file.set(std::move(timage));
     return file;
@@ -207,15 +207,12 @@ auto resize(Texture &&file, Dimension dim) -> Result
     const auto &info = tex.GetMetadata();
 
     DirectX::ScratchImage timage;
-    const auto &img = tex.GetImages();
-    if (img == nullptr)
-        return tl::make_unexpected(Error(TextureErr::BadInput));
 
     // DirectX::Resize is dumb. If WIC is used, it will convert the image to
     // R32G32B32A32 It works for small image.. But will, for example, allocate
     // 1gb for a 8k picture. So disable WIC
     const auto filter = DirectX::TEX_FILTER_SEPARATE_ALPHA | DirectX::TEX_FILTER_FORCE_NON_WIC;
-    const HRESULT hr  = DirectX::Resize(img, tex.GetImageCount(), info, dim.w, dim.h, filter, timage);
+    const auto hr = DirectX::Resize(tex.GetImages(), tex.GetImageCount(), info, dim.w, dim.h, filter, timage);
     if (FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
 

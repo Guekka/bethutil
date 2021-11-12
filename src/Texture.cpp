@@ -109,19 +109,19 @@ auto Texture::load_file(std::filesystem::path path) noexcept -> ResultError
     load_path_ = std::move(path);
 
     DirectX::TexMetadata info{};
-    auto res = DirectX::LoadFromDDSFile(load_path_.wstring().c_str(),
-                                        DirectX::DDS_FLAGS_NONE,
-                                        &info,
-                                        tex_.get());
-    if (FAILED(res))
-    {
-        // Maybe it's a TGA then?
-        res = DirectX::LoadFromTGAFile(load_path_.wstring().c_str(),
-                                       DirectX::TGA_FLAGS_NONE,
+    auto hr = DirectX::LoadFromDDSFile(load_path_.wstring().c_str(),
+                                       DirectX::DDS_FLAGS_NONE,
                                        &info,
                                        tex_.get());
-        if (FAILED(res))
-            return tl::make_unexpected(error_from_hresult(res));
+    if (FAILED(hr))
+    {
+        // Maybe it's a TGA then?
+        const auto hr2 = DirectX::LoadFromTGAFile(load_path_.wstring().c_str(),
+                                                  DirectX::TGA_FLAGS_NONE,
+                                                  &info,
+                                                  tex_.get());
+        if (FAILED(hr2))
+            return tl::make_unexpected(error_from_hresult(hr)); // preserve original error
     }
     return {};
 }
