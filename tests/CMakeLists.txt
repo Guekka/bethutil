@@ -9,6 +9,7 @@ set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
 	"${SOURCE_DIR}/main.cpp"
         "${SOURCE_DIR}/src/filesystem.cpp"
+        "${SOURCE_DIR}/src/functional.cpp"
         "${SOURCE_DIR}/src/metaprogramming.cpp"
         "${SOURCE_DIR}/src/path.cpp"
         "${SOURCE_DIR}/src/string.cpp"
