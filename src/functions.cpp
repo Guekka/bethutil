@@ -68,7 +68,7 @@ auto make_transparent_alpha(Texture &&file) -> Result
 auto convert_uncompressed(const ScratchImage &image,
                           ScratchImage &timage,
                           DXGI_FORMAT format,
-                          [[maybe_unused]] CompressionDevice &dev) -> HRESULT
+                          [[maybe_unused]] ID3D11Device *dev) -> HRESULT
 {
     const auto *const img = image.GetImages();
     if (img == nullptr)
@@ -84,10 +84,8 @@ auto convert_uncompressed(const ScratchImage &image,
                    timage);
 }
 
-auto convert_compressed(const ScratchImage &image,
-                        ScratchImage &timage,
-                        DXGI_FORMAT format,
-                        CompressionDevice &dev) -> HRESULT
+auto convert_compressed(const ScratchImage &image, ScratchImage &timage, DXGI_FORMAT format, ID3D11Device *dev)
+    -> HRESULT
 {
     const auto *const img = image.GetImages();
     if (img == nullptr)
@@ -108,7 +106,7 @@ auto convert_compressed(const ScratchImage &image,
     }();
 
     if (bc6hbc7 && dev)
-        return DirectX::Compress(dev.get_device(),
+        return DirectX::Compress(dev,
                                  img,
                                  nimg,
                                  image.GetMetadata(),
@@ -126,7 +124,7 @@ auto convert_compressed(const ScratchImage &image,
                              timage);
 }
 
-auto convert(Texture &&file, DXGI_FORMAT format, CompressionDevice &dev) -> Result
+auto convert(Texture &&file, DXGI_FORMAT format, ID3D11Device *dev) -> Result
 {
     const auto &tex = file.get();
     const auto info = tex.GetMetadata();

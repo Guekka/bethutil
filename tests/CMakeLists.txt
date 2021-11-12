@@ -60,6 +60,7 @@ macro(acquire_test NAME)
 endmacro()
 
 acquire_test("convert")
+acquire_test("convert2")
 acquire_test("decompress")
 acquire_test("generate_mipmaps")
 acquire_test("make_transparent_alpha")

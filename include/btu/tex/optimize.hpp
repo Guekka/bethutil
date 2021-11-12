@@ -13,6 +13,7 @@
 
 #include <variant>
 
+struct ID3D11Device;
 namespace btu::tex {
 class Texture;
 
@@ -44,7 +45,9 @@ struct OptimizationSteps
     auto operator<=>(const OptimizationSteps &) const noexcept = default;
 };
 
-[[nodiscard]] auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result;
+/// `dev` may be null
+/// Thread-safety : see `convert`
+[[nodiscard]] auto optimize(Texture &&file, OptimizationSteps sets, ID3D11Device *dev) noexcept -> Result;
 [[nodiscard]] auto compute_optimization_steps(const Texture &file, const Settings &sets) noexcept
     -> OptimizationSteps;
 } // namespace btu::tex

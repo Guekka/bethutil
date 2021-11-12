@@ -14,10 +14,10 @@
 #include <btu/common/functional.hpp>
 
 namespace btu::tex {
-auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result
+auto optimize(Texture &&file, OptimizationSteps sets, ID3D11Device *dev) noexcept -> Result
 {
-    auto dev              = CompressionDevice::make(0).value();
     using btu::common::bind_back;
+
     const auto compressed = DirectX::IsCompressed(file.get().GetMetadata().format);
     auto res              = Result{std::move(file)};
 
@@ -30,7 +30,7 @@ auto optimize(Texture &&file, OptimizationSteps sets) noexcept -> Result
     if (sets.mipmaps)
         res = std::move(res).and_then(generate_mipmaps);
     if (sets.format && res && res.value().get().GetMetadata().format != sets.format)
-        res = std::move(res).and_then(bind_back(convert, sets.format.value(), std::ref(dev)));
+        res = std::move(res).and_then(bind_back(convert, sets.format.value(), dev));
 
     return res;
 }

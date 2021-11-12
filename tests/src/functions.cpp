@@ -16,13 +16,25 @@ TEST_CASE("make_transparent_alpha")
 {
     test_expected_dir(u8"make_transparent_alpha", btu::tex::make_transparent_alpha);
 }
+
 TEST_CASE("convert")
 {
-    test_expected_dir(u8"convert", [](auto &&tex) {
-        auto c = btu::tex::CompressionDevice::make(0);
-        return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, *c);
-    });
+    SECTION("With compression device")
+    {
+        auto cdev = btu::tex::CompressionDevice::make(0).value();
+        auto dev  = cdev.get_device();
+        test_expected_dir(u8"convert", [dev](auto &&tex) {
+            return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, dev);
+        });
+    }
+    SECTION("Without compression device")
+    {
+        test_expected_dir(u8"convert2", [](auto &&tex) {
+            return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, nullptr);
+        });
+    }
 }
+
 TEST_CASE("generate_mipmaps")
 {
     test_expected_dir(u8"generate_mipmaps", btu::tex::generate_mipmaps);

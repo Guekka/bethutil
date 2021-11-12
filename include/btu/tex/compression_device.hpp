@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 #pragma once
 
-class ID3D11Device;
+struct ID3D11Device;
 class IDXGIFactory1;
 
 #include <memory>

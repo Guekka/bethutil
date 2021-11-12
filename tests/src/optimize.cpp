@@ -6,6 +6,7 @@
 #include "btu/tex/optimize.hpp"
 
 #include "./utils.hpp"
+#include "btu/tex/compression_device.hpp"
 #include "btu/tex/texture.hpp"
 
 #include <DirectXTex.h>
@@ -128,7 +129,8 @@ TEST_CASE("optimize")
         auto tex   = generate_tex(generate_info1());
         auto sets  = generate_sets1();
         auto steps = compute_optimization_steps(tex, sets);
-        auto res   = optimize(std::move(tex), steps);
+        auto dev   = btu::tex::CompressionDevice::make(0).value();
+        auto res   = optimize(std::move(tex), steps, dev.get_device());
         REQUIRE(res.has_value());
 
         const auto res_info = res->get().GetMetadata();
@@ -146,7 +148,8 @@ TEST_CASE("optimize")
         auto tex   = generate_tex2();
         auto sets  = generate_sets2();
         auto steps = compute_optimization_steps(tex, sets);
-        auto res   = optimize(std::move(tex), steps);
+        auto dev   = btu::tex::CompressionDevice::make(0).value();
+        auto res   = optimize(std::move(tex), steps, dev.get_device());
         REQUIRE(res.has_value());
 
         const auto res_info = res->get().GetMetadata();
@@ -166,8 +169,9 @@ TEST_CASE("optimize")
         auto sets   = generate_sets1();
         sets.resize = btu::tex::Dimension{128, 128};
         test_expected_dir(u8"optimize", [&](auto &&f) {
+            thread_local auto dev                   = btu::tex::CompressionDevice::make(0).value();
             const btu::tex::OptimizationSteps steps = btu::tex::compute_optimization_steps(f, sets);
-            return btu::tex::optimize(std::move(f), steps);
+            return btu::tex::optimize(std::move(f), steps, dev.get_device());
         });
     }
 }

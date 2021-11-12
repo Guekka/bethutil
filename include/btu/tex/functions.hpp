@@ -7,13 +7,13 @@
 
 #include <filesystem>
 
+struct ID3D11Device;
 namespace btu::tex {
-class CompressionDevice;
-
 [[nodiscard]] auto decompress(Texture &&file) -> Result;
 [[nodiscard]] auto make_transparent_alpha(Texture &&file) -> Result;
-[[nodiscard]] auto convert(Texture &&file, DXGI_FORMAT format, CompressionDevice &dev) -> Result;
 
+/// dev may be null
+/// Thread-safety : this function is thread-safe IF ID3D11Device is not shared among threads[[nodiscard]] auto convert(Texture &&file, DXGI_FORMAT format, ID3D11Device *dev) -> Result;
 [[nodiscard]] constexpr auto optimal_mip_count(Dimension dim) noexcept -> size_t
 {
     size_t mips = 1;
