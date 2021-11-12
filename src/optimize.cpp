@@ -132,9 +132,9 @@ auto Settings::get(common::Game game) noexcept -> const Settings &
             .use_format_whitelist = false,
             .allowed_formats      = {}, // Unknown
             .output_format        = {.uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
-                                     .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
-                                     .compressed                 = DXGI_FORMAT_BC3_UNORM,
-                                     .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
+                              .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
+                              .compressed                 = DXGI_FORMAT_BC3_UNORM,
+                              .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
             .landscape_textures   = {}, // Unknown
         };
     }();
@@ -172,10 +172,10 @@ auto Settings::get(common::Game game) noexcept -> const Settings &
         case btu::common::Game::SSE:
         {
             static auto sse_sets = [&] {
-                auto sets                     = tes3_sets;
-                sets.compress                 = true;
-                sets.use_format_whitelist     = true;
-                sets.allowed_formats          = {
+                auto sets                 = tes3_sets;
+                sets.compress             = true;
+                sets.use_format_whitelist = true;
+                sets.allowed_formats      = {
                     DXGI_FORMAT_BC7_UNORM,
                     DXGI_FORMAT_BC5_UNORM,
                     DXGI_FORMAT_BC3_UNORM,
