@@ -69,6 +69,12 @@ target_compile_options(
         "$<$<CXX_COMPILER_ID:MSVC>:/utf-8>"
 )
 
+target_compile_options(
+        "${PROJECT_NAME}"
+        PUBLIC
+        "$<$<CXX_COMPILER_ID:MSVC>:/Zc:__cplusplus>"
+)
+
 target_include_directories(
 	"${PROJECT_NAME}"
         SYSTEM PUBLIC
