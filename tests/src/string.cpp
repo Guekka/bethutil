@@ -71,10 +71,10 @@ TEST_CASE("str_compare", "[string]")
 
     SECTION("Basic ASCII")
     {
-        CHECK_FALSE(str_compare(u8"A", u8"a"));
-        CHECK(str_compare(u8"A", u8"a", false));
+        STATIC_REQUIRE_FALSE(str_compare(u8"A", u8"a"));
+        CHECK(str_compare(u8"A", u8"a", false)); // could be constexpr but msvc doesn't want it
 
-        CHECK_FALSE(str_compare(u8"somepath/c/x/d!", u8"somepath/C/X/D!"));
+        STATIC_REQUIRE_FALSE(str_compare(u8"somepath/c/x/d!", u8"somepath/C/X/D!"));
         CHECK(str_compare(u8"somepath/c/x/d!", u8"somepath/C/X/D!", false));
     }
 }
@@ -83,17 +83,17 @@ TEST_CASE("str_find", "[string]")
 {
     using bc::str_find;
 
-    CHECK(str_find(u8"abcdÀ👒<f¹øì►", u8"à👒") == std::string::npos);
-    CHECK(str_find(u8"abcdÀ👒<f¹øì►", u8"À👒") == 4);
-    CHECK(str_find(u8"abcdÀ👒<f¹øì►", u8"à👒", false) == 4);
+    STATIC_REQUIRE(str_find(u8"abcdÀ👒<f¹øì►", u8"à👒") == std::string::npos);
+    STATIC_REQUIRE(str_find(u8"abcdÀ👒<f¹øì►", u8"À👒") == 4);
+    STATIC_REQUIRE(str_find(u8"abcdÀ👒<f¹øì►", u8"à👒", false) == 4);
 }
 
 TEST_CASE("str_contain", "[string]")
 {
     using bc::str_contain;
 
-    CHECK_FALSE(str_contain(u8"abcdÀ👒<f¹øì►", u8"à👒"));
-    CHECK(str_contain(u8"abcdÀ👒<f¹øì►", u8"à👒", false));
+    STATIC_REQUIRE_FALSE(str_contain(u8"abcdÀ👒<f¹øì►", u8"à👒"));
+    STATIC_REQUIRE(str_contain(u8"abcdÀ👒<f¹øì►", u8"à👒", false));
 }
 
 TEST_CASE("to_lower", "[string]")
@@ -155,54 +155,54 @@ TEST_CASE("str_match", "[string]")
 
     SECTION("Basic")
     {
-        CHECK(str_match(u8"geeks", u8"g*ks"));
-        CHECK(str_match(u8"geeksforgeeks", u8"ge?ks*"));
-        CHECK(str_match(u8"abcdhghgbcd", u8"abc*bcd"));
-        CHECK(str_match(u8"abcd", u8"*c*d"));
-        CHECK(str_match(u8"abcd", u8"*?c*d"));
-        CHECK(str_match(u8"abcd", u8"*?*?c*d"));
-        CHECK(str_match(u8"", u8""));
-        CHECK(str_match(u8"", u8"*"));
-        CHECK(str_match(u8"a", u8"[abc]"));
-        CHECK(str_match(u8"abcd", u8"*?*?[dc]*d"));
-        CHECK(str_match(u8"aa*a", u8"aa[*]a"));
+        STATIC_REQUIRE(str_match(u8"geeks", u8"g*ks"));
+        STATIC_REQUIRE(str_match(u8"geeksforgeeks", u8"ge?ks*"));
+        STATIC_REQUIRE(str_match(u8"abcdhghgbcd", u8"abc*bcd"));
+        STATIC_REQUIRE(str_match(u8"abcd", u8"*c*d"));
+        STATIC_REQUIRE(str_match(u8"abcd", u8"*?c*d"));
+        STATIC_REQUIRE(str_match(u8"abcd", u8"*?*?c*d"));
+        STATIC_REQUIRE(str_match(u8"", u8""));
+        STATIC_REQUIRE(str_match(u8"", u8"*"));
+        STATIC_REQUIRE(str_match(u8"a", u8"[abc]"));
+        STATIC_REQUIRE(str_match(u8"abcd", u8"*?*?[dc]*d"));
+        STATIC_REQUIRE(str_match(u8"aa*a", u8"aa[*]a"));
 
-        CHECK_FALSE(str_match(u8"pqrst", u8"*pqrs"));
-        CHECK_FALSE(str_match(u8"gee", u8"g*k"));
-        CHECK_FALSE(str_match(u8"abcd", u8"abc*c?d"));
-        CHECK_FALSE(str_match(u8"", u8"?"));
-        CHECK_FALSE(str_match(u8"s", u8"[abc]"));
-        CHECK_FALSE(str_match(u8"a_aa ", u8"[ab][ab]*"));
+        STATIC_REQUIRE_FALSE(str_match(u8"pqrst", u8"*pqrs"));
+        STATIC_REQUIRE_FALSE(str_match(u8"gee", u8"g*k"));
+        STATIC_REQUIRE_FALSE(str_match(u8"abcd", u8"abc*c?d"));
+        STATIC_REQUIRE_FALSE(str_match(u8"", u8"?"));
+        STATIC_REQUIRE_FALSE(str_match(u8"s", u8"[abc]"));
+        STATIC_REQUIRE_FALSE(str_match(u8"a_aa ", u8"[ab][ab]*"));
     }
     SECTION("Case sensitivity", "[string]")
     {
-        CHECK(str_match(u8"geEksforgeeks", u8"ge?ks*"));
-        CHECK(str_match(u8"ABCD", u8"*c*d", false));
+        STATIC_REQUIRE(str_match(u8"geEksforgeeks", u8"ge?ks*"));
+        STATIC_REQUIRE(str_match(u8"ABCD", u8"*c*d", false));
 
-        CHECK_FALSE(str_match(u8"geeks", u8"G*ks"));
+        STATIC_REQUIRE_FALSE(str_match(u8"geeks", u8"G*ks"));
     }
     SECTION("Set", "[string]")
     {
-        CHECK(str_match(u8"c", u8"[abc]"));
-        CHECK_FALSE(str_match(u8"c", u8"[ab]"));
+        STATIC_REQUIRE(str_match(u8"c", u8"[abc]"));
+        STATIC_REQUIRE_FALSE(str_match(u8"c", u8"[ab]"));
     }
     SECTION("paths", "[string]")
     {
         constexpr auto path = u8"E:/Documents/SomeData/SomeFolder/file.dds";
-        CHECK(str_match(path, u8"*.dds"));
-        CHECK(str_match(path, u8"e:/*", false));
-        CHECK(str_match(path, u8"E:/*/SomeFolder/*.*"));
+        STATIC_REQUIRE(str_match(path, u8"*.dds"));
+        STATIC_REQUIRE(str_match(path, u8"e:/*", false));
+        STATIC_REQUIRE(str_match(path, u8"E:/*/SomeFolder/*.*"));
 
-        CHECK_FALSE(str_match(path, u8"E:/*/SomeFolder/*.bsa"));
+        STATIC_REQUIRE_FALSE(str_match(path, u8"E:/*/SomeFolder/*.bsa"));
 
-        CHECK(str_match(u8"textures/hello.tga", u8"*[s]/*.[td][gd][as]"));
-        CHECK(str_match(u8"textures/my/world/is/purple/hello.dds", u8"*[s]/*.[td][gd][as]"));
+        STATIC_REQUIRE(str_match(u8"textures/hello.tga", u8"*[s]/*.[td][gd][as]"));
+        STATIC_REQUIRE(str_match(u8"textures/my/world/is/purple/hello.dds", u8"*[s]/*.[td][gd][as]"));
     }
     SECTION("malformed input", "[string]")
     {
-        CHECK_FALSE(str_match(u8"abc", u8"["));
-        CHECK_FALSE(str_match(u8"abc", u8"]"));
-        CHECK_FALSE(str_match(u8"abc", u8"]"));
-        CHECK_FALSE(str_match(u8"abc", u8"[[[abc]]]"));
+        STATIC_REQUIRE_FALSE(str_match(u8"abc", u8"["));
+        STATIC_REQUIRE_FALSE(str_match(u8"abc", u8"]"));
+        STATIC_REQUIRE_FALSE(str_match(u8"abc", u8"]"));
+        STATIC_REQUIRE_FALSE(str_match(u8"abc", u8"[[[abc]]]"));
     }
 }
