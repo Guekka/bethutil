@@ -7,7 +7,11 @@
 
 #include "btu/common/metaprogramming.hpp"
 
+#include <utf8h/utf8.h>
+
+#include <algorithm>
 #include <cctype>
+#include <codecvt>
 #include <string>
 
 namespace btu::common {
@@ -22,20 +26,20 @@ public:
     using pointer           = U8Unit;
     using reference         = U8Unit;
 
-    explicit UTF8Iterator(std::u8string_view string);
-    [[nodiscard]] static auto end(std::u8string_view string) -> UTF8Iterator;
+    constexpr explicit UTF8Iterator(std::u8string_view string);
+    [[nodiscard]] constexpr static auto end(std::u8string_view string) -> UTF8Iterator;
 
-    [[nodiscard]] auto operator*() const -> reference;
-    [[nodiscard]] auto operator->() const -> pointer;
+    [[nodiscard]] constexpr auto operator*() const -> reference;
+    [[nodiscard]] constexpr auto operator->() const -> pointer;
 
     // Prefix increment
-    auto operator++() -> UTF8Iterator &;
+    constexpr auto operator++() -> UTF8Iterator &;
 
     // Postfix increment
-    auto operator++(int) -> UTF8Iterator;
+    constexpr auto operator++(int) -> UTF8Iterator;
 
-    [[nodiscard]] auto operator<=>(const UTF8Iterator &other) const -> std::strong_ordering;
-    [[nodiscard]] auto operator==(const UTF8Iterator &other) const -> bool;
+    [[nodiscard]] constexpr auto operator<=>(const UTF8Iterator &other) const -> std::strong_ordering;
+    [[nodiscard]] constexpr auto operator==(const UTF8Iterator &other) const -> bool;
 
 private:
     std::u8string_view string_;
@@ -46,14 +50,14 @@ private:
 class InvalidUTF8 : public std::exception
 {
 public:
-    [[nodiscard]] auto what() const -> const char * override
+    [[nodiscard]] constexpr auto what() const -> const char * override
     {
         return "Invalid UTF8 string given in argument";
     }
 };
 
-auto as_utf8(std::string_view str) -> std::u8string_view;
-auto as_ascii(std::u8string_view str) -> std::string_view;
+constexpr auto as_utf8(std::string_view str) -> std::u8string_view;
+constexpr auto as_ascii(std::u8string_view str) -> std::string_view;
 
 auto as_utf8_string(std::string str) -> std::u8string;
 auto as_ascii_string(std::u8string str) -> std::string;
@@ -61,9 +65,12 @@ auto as_ascii_string(std::u8string str) -> std::string;
 auto to_utf8(const std::wstring &str) -> std::u8string;
 auto to_utf16(const std::u8string &str) -> std::wstring;
 
-auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive = true) -> bool;
-auto str_find(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true) -> size_t;
-auto str_contain(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true) -> bool;
+constexpr auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive = true)
+    -> bool;
+constexpr auto str_find(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true)
+    -> size_t;
+constexpr auto str_contain(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true)
+    -> bool;
 
 struct Cards
 {
@@ -75,14 +82,234 @@ struct Cards
 
 constexpr Cards default_cards{u8'?', u8'*', u8'[', u8']'};
 
-auto str_match(std::u8string_view string,
-               std::u8string_view pattern,
-               bool case_sensitive = true,
-               Cards cards         = default_cards) -> bool;
+constexpr auto str_match(std::u8string_view string,
+                         std::u8string_view pattern,
+                         bool case_sensitive = true,
+                         Cards cards         = default_cards) -> bool;
 
 auto to_lower(std::u8string_view string) -> std::u8string;
 
-auto first_codepoint(std::u8string_view string) -> U8Unit;
+constexpr auto first_codepoint(std::u8string_view string) -> U8Unit;
 auto concat_codepoint(std::u8string &string, U8Unit cp) -> void;
+
+namespace detail {
+
+constexpr void assert_valid_utf8([[maybe_unused]] std::u8string_view str)
+{
+#ifndef NDEBUG
+    if (auto *err = utf8nvalid(str.data(), str.size()))
+        throw InvalidUTF8{};
+#endif
+}
+} // namespace detail
+
+constexpr UTF8Iterator::UTF8Iterator(std::u8string_view string)
+    : string_(string)
+{
+    if (string_.empty())
+        return;
+
+    detail::assert_valid_utf8(string_);
+    utf8codepoint(string_.data(), &cur_);
+}
+
+constexpr auto UTF8Iterator::end(std::u8string_view string) -> UTF8Iterator
+{
+    UTF8Iterator it(string);
+    while (it.idx_ < it.string_.size())
+        ++it;
+    return it;
+}
+
+constexpr auto UTF8Iterator::operator*() const -> UTF8Iterator::value_type
+{
+    return cur_;
+}
+
+constexpr auto UTF8Iterator::operator->() const -> UTF8Iterator::pointer
+{
+    return cur_;
+}
+
+constexpr auto UTF8Iterator::operator++() -> UTF8Iterator &
+{
+    idx_ += utf8codepointsize(cur_);
+    utf8codepoint(string_.data() + idx_, &cur_);
+    return *this;
+}
+
+constexpr auto UTF8Iterator::operator==(const UTF8Iterator &other) const -> bool
+{
+    return (*this <=> other) == 0;
+}
+
+constexpr auto UTF8Iterator::operator<=>(const UTF8Iterator &other) const -> std::strong_ordering
+{
+    if (idx_ != other.idx_)
+        return idx_ <=> other.idx_;
+
+    if (cur_ != other.cur_)
+        return cur_ <=> other.cur_;
+
+    return string_.data() <=> other.string_.data();
+}
+
+constexpr auto UTF8Iterator::operator++(int) -> UTF8Iterator
+{
+    auto copy = *this;
+    ++*this;
+    return copy;
+}
+
+static_assert(sizeof(std::string_view::value_type) == sizeof(std::u8string_view::value_type)
+                  && sizeof(std::string::value_type) == sizeof(std::u8string::value_type),
+              "btu::common string assumption violated");
+
+constexpr auto as_utf8(std::string_view str) -> std::u8string_view
+{
+    return {std::bit_cast<const char8_t *>(str.data()), str.size()};
+}
+
+constexpr auto as_ascii(std::u8string_view str) -> std::string_view
+{
+    return {std::bit_cast<const char *>(str.data()), str.size()};
+}
+
+constexpr auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive) -> bool
+{
+    if (lhs.size() != rhs.size())
+        return false;
+
+    detail::assert_valid_utf8(lhs);
+    detail::assert_valid_utf8(rhs);
+
+    auto f = case_sensitive ? utf8ncmp : utf8ncasecmp;
+    return f(lhs.data(), rhs.data(), lhs.size()) == 0;
+}
+
+constexpr auto str_find(std::u8string_view string, std::u8string_view snippet, bool case_sensitive) -> size_t
+{
+    detail::assert_valid_utf8(string);
+    detail::assert_valid_utf8(snippet);
+
+    using std::cbegin, std::cend;
+
+    auto f    = case_sensitive ? utf8str : utf8casestr;
+    auto *ptr = f(string.data(), snippet.data());
+
+    if (ptr == nullptr)
+        return std::u8string::npos;
+
+    return ptr - string.data();
+}
+
+constexpr auto str_contain(std::u8string_view string, std::u8string_view snippet, bool case_sensitive) -> bool
+{
+    return str_find(string, snippet, case_sensitive) != std::string::npos;
+}
+
+
+constexpr auto first_codepoint(std::u8string_view string) -> U8Unit
+{
+    U8Unit res{};
+    utf8codepoint(string.data(), &res);
+    return res;
+}
+
+constexpr auto str_match(std::u8string_view string,
+                         std::u8string_view pattern,
+                         bool case_sensitive,
+                         Cards cards) -> bool
+{
+    // Empty pattern can only match with empty sting
+    if (pattern.empty())
+        return string.empty();
+
+    auto pat_it        = UTF8Iterator(pattern);
+    const auto pat_end = UTF8Iterator::end(pattern);
+
+    auto str_it        = UTF8Iterator(string);
+    const auto str_end = UTF8Iterator::end(string);
+
+    auto anyrep_pos_pat = pat_end;
+    auto anyrep_pos_str = str_end;
+
+    auto set_pos_pat = pat_end;
+
+    while (str_it != str_end)
+    {
+        U8Unit current_pat = 0;
+        U8Unit current_str = -1;
+        if (pat_it != pat_end)
+        {
+            current_pat = case_sensitive ? *pat_it : utf8lwrcodepoint(*pat_it);
+            current_str = case_sensitive ? *str_it : utf8lwrcodepoint(*str_it);
+        }
+        if (pat_it != pat_end && current_pat == cards.set_begin)
+        {
+            set_pos_pat = pat_it;
+            ++pat_it;
+        }
+        else if (pat_it != pat_end && current_pat == cards.set_end)
+        {
+            if (anyrep_pos_pat != pat_end)
+            {
+                set_pos_pat = pat_end;
+                pat_it++;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (set_pos_pat != pat_end)
+        {
+            if (current_pat == current_str)
+            {
+                set_pos_pat = pat_end;
+                pat_it      = std::next(std::find(pat_it, pat_end, cards.set_end));
+                ++str_it;
+            }
+            else
+            {
+                if (pat_it == pat_end)
+                {
+                    return false;
+                }
+                ++pat_it;
+            }
+        }
+        else if (pat_it != pat_end && (current_pat == current_str || current_pat == cards.any))
+        {
+            ++pat_it;
+            ++str_it;
+        }
+        else if (pat_it != pat_end && current_pat == cards.any_repeat)
+        {
+            anyrep_pos_pat = pat_it;
+            anyrep_pos_str = str_it;
+            ++pat_it;
+        }
+        else if (anyrep_pos_pat != pat_end)
+        {
+            pat_it = std::next(anyrep_pos_pat);
+            str_it = std::next(anyrep_pos_str);
+            ++anyrep_pos_str;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    while (pat_it != pat_end)
+    {
+        const U8Unit cur = case_sensitive ? *pat_it : utf8lwrcodepoint(*pat_it);
+        if (cur == cards.any_repeat)
+            ++pat_it;
+        else
+            break;
+    }
+    return pat_it == pat_end;
+}
 
 } // namespace btu::common
