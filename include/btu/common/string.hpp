@@ -208,7 +208,6 @@ constexpr auto str_contain(std::u8string_view string, std::u8string_view snippet
     return str_find(string, snippet, case_sensitive) != std::string::npos;
 }
 
-
 constexpr auto first_codepoint(std::u8string_view string) -> U8Unit
 {
     U8Unit res{};
