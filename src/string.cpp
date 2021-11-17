@@ -1,6 +1,6 @@
 #include "btu/common/string.hpp"
 
-namespace btu::common{
+namespace btu::common {
 auto as_utf8_string(std::string str) -> std::u8string
 {
     return {std::bit_cast<const char8_t *>(str.data()), str.size()};
@@ -10,7 +10,6 @@ auto as_ascii_string(std::u8string str) -> std::string
 {
     return {std::bit_cast<const char *>(str.data()), str.size()};
 }
-
 
 namespace detail {
 thread_local std::wstring_convert<std::codecvt_utf8<wchar_t>> converter{};
@@ -47,4 +46,4 @@ void concat_codepoint(std::u8string &string, U8Unit cp)
     string.resize(oldsize + cp_size);
     utf8catcodepoint(string.data() + oldsize, cp, cp_size);
 }
-}
+} // namespace btu::common
