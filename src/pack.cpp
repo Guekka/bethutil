@@ -8,7 +8,9 @@
 #include "btu/bsa/detail/backends/rsm_archive.hpp"
 #include "btu/bsa/detail/common.hpp"
 #include "btu/bsa/settings.hpp"
-#include "btu/common/algorithms.hpp"
+
+#include <btu/common/algorithms.hpp>
+#include <btu/common/functional.hpp>
 
 #include <deque>
 #include <execution>
@@ -38,7 +40,7 @@ auto write(bool compressed, ArchiveData &&data, const Settings &sets, const Path
     auto arch = detail::RsmArchive(data.get_version(), compressed);
     auto ret  = std::vector<std::pair<Path, std::string>>();
 
-    std::for_each(std::execution::par, data.begin(), data.end(), [&](auto &&f) {
+    btu::common::for_each_mt(data, [&](auto &&f) {
         try
         {
             arch.add_file(root, f);

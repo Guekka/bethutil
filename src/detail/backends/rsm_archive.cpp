@@ -1,7 +1,9 @@
 #include "btu/bsa/detail/backends/rsm_archive.hpp"
 
 #include "btu/bsa/detail/common.hpp"
-#include "btu/common/filesystem.hpp"
+
+#include <btu/common/filesystem.hpp>
+#include <btu/common/functional.hpp>
 
 #include <execution>
 #include <fstream>
@@ -240,7 +242,7 @@ auto RsmArchive::unpack(const Path &out_path) -> void
 
     auto visiter = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) {
-            std::for_each(std::execution::par, bsa.cbegin(), bsa.cend(), [&](auto &&pair) {
+            btu::common::for_each_mt(bsa, [&](auto &&pair) {
                 const auto [key, file] = pair;
                 const auto path        = out_path / detail::virtual_to_local_path(key);
                 make_dir(path);
@@ -250,7 +252,7 @@ auto RsmArchive::unpack(const Path &out_path) -> void
         [&](libbsa::tes4::archive &bsa) {
             for (auto &dir : bsa)
             {
-                std::for_each(std::execution::par, dir.second.begin(), dir.second.end(), [&](auto &&file) {
+                btu::common::for_each_mt(dir.second, [&](auto &&file) {
                     const auto path = out_path / detail::virtual_to_local_path(dir.first, file.first);
                     const auto ver  = detail::archive_version<libbsa::tes4::version>(archive_, version_);
                     make_dir(path);
@@ -259,7 +261,7 @@ auto RsmArchive::unpack(const Path &out_path) -> void
             }
         },
         [&](libbsa::fo4::archive &ba2) {
-            std::for_each(std::execution::par, ba2.begin(), ba2.end(), [&](auto &&pair) {
+            btu::common::for_each_mt(ba2, [&](auto &&pair) {
                 auto &&[key, file] = pair;
                 const auto path    = out_path / detail::virtual_to_local_path(key);
                 const auto ver     = detail::archive_version<libbsa::fo4::format>(archive_, version_);
