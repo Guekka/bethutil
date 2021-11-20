@@ -7,6 +7,8 @@
 
 #include <catch.hpp>
 
+#include <iostream>
+#include <set>
 TEST_CASE("bind_back")
 {
     using btu::common::bind_back;
@@ -20,4 +22,20 @@ TEST_CASE("bind_back")
     CHECK(bind_back(func, std::move(c))(a, b) == 6);
     std::tie(a, b, c) = init();
     CHECK(bind_back(func, std::ref(b), std::move(c))(a) == 6);
+}
+
+TEST_CASE("for_each_mt")
+{
+    using btu::common::for_each_mt;
+    SECTION("exception safe")
+    {
+        std::vector<int> v(100);
+        CHECK_THROWS(for_each_mt(v, [](auto &&) { throw std::runtime_error("e"); }));
+    }
+    SECTION("keeps lvalue/rvalue")
+    {
+        std::vector<std::string> v(100);
+        for_each_mt(v, [](std::string &) {});
+        for_each_mt(std::move(v), [](std::string) {});
+    }
 }

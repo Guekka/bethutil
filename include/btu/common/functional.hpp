@@ -1,4 +1,9 @@
-/// \file
+/* Copyright (C) 2021 Edgar B
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+// bind_back is from range v3 :
 // Range v3 library
 //
 //  Copyright Andrey Diduh 2019
@@ -12,7 +17,11 @@
 //
 
 #pragma once
+#include <exception>
+#include <execution>
+#include <iterator>
 #include <tuple>
+#include <utility>
 
 namespace btu::common {
 namespace detail {
@@ -152,4 +161,38 @@ struct bind_back_fn
 /// \ingroup group-utility
 /// \sa `bind_back_fn`
 inline constexpr detail::bind_back_fn bind_back{};
+
+template<typename Range, typename Func>
+auto for_each_mt(Range &&rng, Func &&func)
+{
+    auto eptr = std::exception_ptr{};
+    auto call = [&eptr, f = std::forward<Func>(func)](auto &&elem) noexcept {
+        if (eptr)
+            return; // We do not process the remaining elements if an exception has been encountered
+
+        try
+        {
+            f(std::forward<decltype(elem)>(elem));
+        }
+        catch (const std::exception &)
+        {
+            eptr = std::current_exception();
+        }
+    };
+
+    using std::begin, std::end, std::make_move_iterator;
+    if constexpr (std::is_lvalue_reference_v<Range>)
+        std::for_each(std::execution::par,
+                      begin(std::forward<Range>(rng)),
+                      end(std::forward<Range>(rng)),
+                      std::move(call));
+    else
+        std::for_each(std::execution::par,
+                      make_move_iterator(begin(std::forward<Range>(rng))),
+                      make_move_iterator(end(std::forward<Range>(rng))),
+                      std::move(call));
+
+    if (eptr)
+        std::rethrow_exception(eptr);
+}
 } // namespace btu::common
