@@ -2,6 +2,8 @@
   "name": "bethutil-hkx",
   "version-string": "1",
   "dependencies": [
-    "catch2"
+	"bethutil-common",
+        "catch2",
+	"reproc"
   ]
 }

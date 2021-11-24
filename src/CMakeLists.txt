@@ -2,12 +2,12 @@ set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 set(INCLUDE_DIR "${ROOT_DIR}/include")
 set(HEADER_FILES
-    "${INCLUDE_DIR}/btu/hkx.hpp"
+    "${INCLUDE_DIR}/btu/hkx/convert.hpp"
 )
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
-	
+    "${SOURCE_DIR}/convert.cpp"
 )
 
 source_group(
@@ -26,6 +26,12 @@ add_library(
 	"${ROOT_DIR}/.clang-tidy"
 )
 add_library("btu::hkx" ALIAS "${PROJECT_NAME}")
+
+find_package(reproc++ CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)
+
+find_package(bethutil-common CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE bethutil-common)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -51,6 +57,12 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang|GNU")
 			"-fvisibility=hidden"
 	)
 endif()
+
+target_compile_options(
+        "${PROJECT_NAME}"
+        PUBLIC
+        "$<$<CXX_COMPILER_ID:MSVC>:/Zc:__cplusplus>"
+)
 
 target_include_directories(
 	"${PROJECT_NAME}"
