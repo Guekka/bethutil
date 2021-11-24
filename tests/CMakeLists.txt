@@ -7,7 +7,8 @@ set(HEADER_FILES
 
 set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
-	"${SOURCE_DIR}/main.cpp"
+    "${SOURCE_DIR}/main.cpp"
+    "${SOURCE_DIR}/src/convert.cpp"
 )
 
 if("${BETHUTIL-HKX_BUILD_EXAMPLES}")
@@ -56,6 +57,8 @@ macro(acquire_test NAME)
 	)
 endmacro()
 
+acquire_test("convert")
+acquire_test("exe")
 
 if("${BETHUTIL-HKX_BUILD_EXAMPLES}")
 	target_include_directories(

@@ -31,7 +31,7 @@ find_package(reproc++ CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)
 
 find_package(bethutil-common CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE bethutil-common)
+target_link_libraries("${PROJECT_NAME}" PRIVATE btu::bethutil-common)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
