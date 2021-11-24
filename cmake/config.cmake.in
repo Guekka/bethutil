@@ -1,4 +1,7 @@
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-targets.cmake")
 include(CMakeFindDependencyMacro)
 
+find_dependency("bethutil-common")
+find_dependency("reproc++")
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
