@@ -7,7 +7,6 @@
 #include <fstream>
 
 namespace fs = std::filesystem;
-using btu::hkx::load, btu::hkx::save, btu::hkx::convert;
 
 const fs::path dir     = "convert";
 const fs::path exe_dir = "exe";
@@ -35,18 +34,20 @@ bool compare_files(const fs::path &filename1, const fs::path &filename2)
 
 TEST_CASE("Converting from LE to SE")
 {
-    REQUIRE_FALSE(load(dir / "LE_INPUT.hkx", exe_dir));
-    REQUIRE_FALSE(convert(btu::common::Game::SSE, exe_dir));
+    btu::hkx::Anim anim(exe_dir);
+    REQUIRE_FALSE(anim.load(dir / "LE_INPUT.hkx"));
+    REQUIRE_FALSE(anim.convert(btu::common::Game::SSE));
     std::filesystem::remove(dir / "LE_OUTPUT.hkx");
-    REQUIRE_FALSE(save(dir / "LE_OUTPUT.hkx", exe_dir));
+    REQUIRE_FALSE(anim.save(dir / "LE_OUTPUT.hkx"));
     CHECK(compare_files(dir / "LE_EXPECTED.hkx", dir / "LE_OUTPUT.hkx"));
 }
 
 TEST_CASE("Converting from SE to LE")
 {
-    REQUIRE_FALSE(load(dir / "SE_INPUT.hkx", exe_dir));
-    REQUIRE_FALSE(convert(btu::common::Game::SLE, exe_dir));
+    btu::hkx::Anim anim(exe_dir);
+    REQUIRE_FALSE(anim.load(dir / "SE_INPUT.hkx"));
+    REQUIRE_FALSE(anim.convert(btu::common::Game::SLE));
     std::filesystem::remove(dir / "SE_OUTPUT.hkx");
-    REQUIRE_FALSE(save(dir / "SE_OUTPUT.hkx", exe_dir));
+    REQUIRE_FALSE(anim.save(dir / "SE_OUTPUT.hkx"));
     CHECK(compare_files(dir / "SE_EXPECTED.hkx", dir / "SE_OUTPUT.hkx"));
 }

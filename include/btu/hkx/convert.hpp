@@ -13,11 +13,26 @@
 
 namespace btu::hkx {
 
-auto load(const std::filesystem::path &path, const std::filesystem::path &exe_dir) noexcept
-    -> std::error_code;
-auto save(const std::filesystem::path &path, const std::filesystem::path &exe_dir) noexcept
-    -> std::error_code;
+class Anim
+{
+    std::filesystem::path path_;
+    std::filesystem::path exe_dir_;
 
-auto convert(btu::common::Game target_game, const std::filesystem::path &exe_dir) -> std::error_code;
+    auto generate_name() const noexcept -> std::string;
+    void get_name() const noexcept;
+
+    auto sle_args() const noexcept -> std::vector<std::string>;
+    auto sse_args() const noexcept -> std::vector<std::string>;
+
+public:
+    Anim(std::filesystem::path exe_dir)
+        : exe_dir_(exe_dir)
+    {
+    }
+
+    auto load(const std::filesystem::path &path) noexcept -> std::error_code;
+    auto save(const std::filesystem::path &path) noexcept -> std::error_code;
+    auto convert(btu::common::Game target_game) -> std::error_code;
+};
 
 } // namespace btu::hkx

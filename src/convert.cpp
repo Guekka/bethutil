@@ -10,15 +10,16 @@
 #include <btu/common/path.hpp>
 #include <reproc++/run.hpp>
 
+#include <atomic>
 #include <filesystem>
+#include <mutex>
+#include <string>
 
 namespace btu::hkx {
 using btu::common::Path;
 namespace fs = std::filesystem;
 
 using namespace std::literals;
-
-static constexpr auto k_temp_filename = "TEMPFILE_btu__hkx.hkx";
 
 auto run_process(const std::vector<std::string> &args, const Path &working_dir) -> std::error_code
 {
@@ -33,34 +34,41 @@ auto run_process(const std::vector<std::string> &args, const Path &working_dir) 
     return ec ? ec : std::error_code(result, std::generic_category());
 }
 
-auto load(const std::filesystem::path &path, const std::filesystem::path &exe_dir) noexcept -> std::error_code
+auto Anim::generate_name() const noexcept -> std::string
 {
+    static std::atomic_uint32_t counter{0};
+    return "TEMPFILE_btu__hkx" + std::to_string(counter++) + ".hkx ";
+}
+
+auto Anim::load(const std::filesystem::path &path) noexcept -> std::error_code
+{
+    path_ = exe_dir_ / generate_name();
     std::error_code ec;
-    std::filesystem::remove(exe_dir / k_temp_filename, ec);
+    std::filesystem::remove(path_, ec);
     if (ec)
         return ec;
-    std::filesystem::copy(path, exe_dir / k_temp_filename, ec);
+    std::filesystem::copy(path, path_, ec);
     return ec;
 }
 
-auto save(const std::filesystem::path &path, const std::filesystem::path &exe_dir) noexcept -> std::error_code
+auto Anim::save(const std::filesystem::path &path) noexcept -> std::error_code
 {
     std::error_code ec;
-    std::filesystem::copy(exe_dir / k_temp_filename, path, ec);
+    std::filesystem::copy(path_, path, ec);
     return ec;
 }
 
-auto sle_args(const Path &exe_dir) noexcept -> std::vector<std::string>
+auto Anim::sle_args() const noexcept -> std::vector<std::string>
 {
-    return {(exe_dir / "hkx64to32.exe").string(), k_temp_filename, "-s"s, "32ref.hko"s};
+    return {(exe_dir_ / "hkx64to32.exe").string(), path_.filename().string(), "-s"s, "32ref.hko"s};
 }
 
-auto sse_args(const Path &exe_dir) noexcept -> std::vector<std::string>
+auto Anim::sse_args() const noexcept -> std::vector<std::string>
 {
-    return {(exe_dir / "hkx32to64.exe").string(), k_temp_filename};
+    return {(exe_dir_ / "hkx32to64.exe").string(), path_.filename().string()};
 }
 
-auto convert(btu::common::Game target_game, const Path &exe_dir) -> std::error_code
+auto Anim::convert(btu::common::Game target_game) -> std::error_code
 {
     const auto args = [&]() noexcept -> std::vector<std::string> {
         switch (target_game)
@@ -70,8 +78,8 @@ auto convert(btu::common::Game target_game, const Path &exe_dir) -> std::error_c
             case btu::common::Game::FNV:
             case btu::common::Game::FO4:
             case btu::common::Game::Custom: return {};
-            case btu::common::Game::SLE: return sle_args(exe_dir);
-            case btu::common::Game::SSE: return sse_args(exe_dir);
+            case btu::common::Game::SLE: return sle_args();
+            case btu::common::Game::SSE: return sse_args();
         }
         return {};
     }();
@@ -79,7 +87,7 @@ auto convert(btu::common::Game target_game, const Path &exe_dir) -> std::error_c
     if (args.empty())
         return std::error_code(1, std::generic_category());
 
-    return run_process(args, exe_dir);
+    return run_process(args, exe_dir_);
 }
 
 } // namespace btu::hkx
