@@ -1,18 +1,43 @@
 #include "btu/common/string.hpp"
 
+#include <locale>
+
 namespace btu::common {
 auto as_utf8_string(std::string str) -> std::u8string
 {
-    return {std::bit_cast<const char8_t *>(str.data()), str.size()};
+    return {reinterpret_cast<const char8_t *>(str.data()), str.size()};
 }
 
 auto as_ascii_string(std::u8string str) -> std::string
 {
-    return {std::bit_cast<const char *>(str.data()), str.size()};
+    return {reinterpret_cast<const char *>(str.data()), str.size()};
+}
+
+auto as_utf8(std::string_view str) -> std::u8string_view
+{
+    return {reinterpret_cast<const char8_t *>(str.data()), str.size()};
+}
+
+auto as_ascii(std::u8string_view str) -> std::string_view
+{
+    return {reinterpret_cast<const char *>(str.data()), str.size()};
 }
 
 namespace detail {
-thread_local std::wstring_convert<std::codecvt_utf8<wchar_t>> converter{};
+// utility wrapper to adapt locale-bound facets for wstring/wbuffer convert
+template<class Facet>
+struct deletable_facet : Facet
+{
+    template<class... Args>
+    deletable_facet(Args &&...args)
+        : Facet(std::forward<Args>(args)...)
+    {
+    }
+    ~deletable_facet() {}
+};
+
+thread_local std::wstring_convert<deletable_facet<std::codecvt<wchar_t, char, std::mbstate_t>>, wchar_t>
+    converter{};
 } // namespace detail
 
 auto to_utf8(const std::wstring &str) -> std::u8string

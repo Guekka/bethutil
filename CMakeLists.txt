@@ -23,7 +23,7 @@ if("${BETHUTIL-COMMON_BUILD_EXAMPLES}")
 	add_subdirectory(examples)
 endif()
 
-if("${BUILD_TESTING}" AND "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
+if("${BUILD_TESTING}")
 	add_subdirectory(tests)
 endif()
 
