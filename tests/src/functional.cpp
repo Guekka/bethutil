@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <set>
-TEST_CASE("bind_back")
+TEST_CASE("bind_back", "[src]")
 {
     using btu::common::bind_back;
 
@@ -24,7 +24,7 @@ TEST_CASE("bind_back")
     CHECK(bind_back(func, std::ref(b), std::move(c))(a) == 6);
 }
 
-TEST_CASE("for_each_mt")
+TEST_CASE("for_each_mt", "[src]")
 {
     using btu::common::for_each_mt;
     SECTION("exception safe")

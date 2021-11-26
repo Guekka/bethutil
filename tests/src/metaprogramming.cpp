@@ -7,7 +7,7 @@
 
 #include <catch2/catch.hpp>
 
-TEST_CASE("is_equiv", "[metaprogramming]")
+TEST_CASE("is_equiv", "[src]")
 {
     using btu::common::is_equiv_v;
     STATIC_REQUIRE(is_equiv_v<const int &, int>);
@@ -17,7 +17,7 @@ TEST_CASE("is_equiv", "[metaprogramming]")
     STATIC_REQUIRE_FALSE(is_equiv_v<std::vector<int &>, std::vector<int>>);
 }
 
-TEST_CASE("to_underlying", "[metaprogramming]")
+TEST_CASE("to_underlying", "[src]")
 {
     using btu::common::to_underlying;
     enum class E : std::uint16_t
@@ -29,7 +29,7 @@ TEST_CASE("to_underlying", "[metaprogramming]")
     STATIC_REQUIRE(to_underlying(E::val) == 4);
 }
 
-TEST_CASE("overload", "[metaprogramming]")
+TEST_CASE("overload", "[src]")
 {
     using btu::common::overload;
     auto callable = overload{
