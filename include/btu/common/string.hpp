@@ -50,14 +50,14 @@ private:
 class InvalidUTF8 : public std::exception
 {
 public:
-    [[nodiscard]] constexpr auto what() const -> const char * override
+    [[nodiscard]] constexpr auto what() const noexcept -> const char * override
     {
         return "Invalid UTF8 string given in argument";
     }
 };
 
-constexpr auto as_utf8(std::string_view str) -> std::u8string_view;
-constexpr auto as_ascii(std::u8string_view str) -> std::string_view;
+auto as_utf8(std::string_view str) -> std::u8string_view;
+auto as_ascii(std::u8string_view str) -> std::string_view;
 
 auto as_utf8_string(std::string str) -> std::u8string;
 auto as_ascii_string(std::u8string str) -> std::string;
@@ -164,16 +164,6 @@ constexpr auto UTF8Iterator::operator++(int) -> UTF8Iterator
 static_assert(sizeof(std::string_view::value_type) == sizeof(std::u8string_view::value_type)
                   && sizeof(std::string::value_type) == sizeof(std::u8string::value_type),
               "btu::common string assumption violated");
-
-constexpr auto as_utf8(std::string_view str) -> std::u8string_view
-{
-    return {std::bit_cast<const char8_t *>(str.data()), str.size()};
-}
-
-constexpr auto as_ascii(std::u8string_view str) -> std::string_view
-{
-    return {std::bit_cast<const char *>(str.data()), str.size()};
-}
 
 constexpr auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive) -> bool
 {

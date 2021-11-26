@@ -24,7 +24,7 @@ jobs:
       run: sudo pip install poxy
 
     - name: Configure CMake
-      run: cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} -DBETHUTIL-COMMON_BUILD_DOCS=ON -DBETHUTIL-BETHUTIL-COMMON_BUILD_SRC=OFF -DBUILD_TESTING=OFF
+      run: cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} -DBETHUTIL-COMMON_BUILD_DOCS=ON -DBETHUTIL-COMMON_BUILD_SRC=OFF -DBUILD_TESTING=OFF
 
     - name: Build
       run: cmake --build ${{ github.workspace }}/build --target docs

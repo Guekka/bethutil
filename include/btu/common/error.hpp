@@ -45,7 +45,7 @@ struct Error : public std::exception
     {
     }
 
-    auto what() const -> const char * override { return "btu::common exception"; }
+    auto what() const noexcept -> const char * override { return "btu::common exception"; }
 
     SourceLocation loc;
     std::error_code ec;

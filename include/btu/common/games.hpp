@@ -1,7 +1,5 @@
 #pragma once
 
-#include "path.hpp"
-
 namespace btu::common {
 enum class Game
 {
