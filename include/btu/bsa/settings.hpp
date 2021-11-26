@@ -200,6 +200,7 @@ struct Settings
                 s.suffix         = u8"Main";
                 s.texture_files  = {AllowedPath{u8".dds", {u8"textures", u8"interface"}}};
                 s.standard_files.emplace_back(AllowedPath{u8".png", {u8"textures"}});
+                s.standard_files.emplace_back(AllowedPath{u8".uvd", {u8"vis"}});
                 s.s_dummy_plugin = std::vector(std::begin(dummy::fo4), std::end(dummy::fo4));
                 return s;
             }();
