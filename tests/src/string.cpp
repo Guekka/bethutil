@@ -37,7 +37,7 @@ struct StringMaker<std::u8string>
 
 } // namespace Catch
 
-TEST_CASE("UTF8 Iterator", "[string]")
+TEST_CASE("UTF8 Iterator", "[src]")
 {
     using bc::UTF8Iterator;
     SECTION("Random data")
@@ -59,13 +59,13 @@ TEST_CASE("UTF8 Iterator", "[string]")
     }
 }
 
-TEST_CASE("as_utf8 / as_ascii", "[string]")
+TEST_CASE("as_utf8 / as_ascii", "[src]")
 {
     constexpr auto *orig = u8R"(🮕🖜🞭📎🸘🴆🄧🂟🂰🖷🴚🎣👒🹓🱸🈪🗐🌦🋡)";
     CHECK(bc::as_utf8(bc::as_ascii(orig)) == orig);
 }
 
-TEST_CASE("str_compare", "[string]")
+TEST_CASE("str_compare", "[src]")
 {
     using bc::str_compare;
 
@@ -79,7 +79,7 @@ TEST_CASE("str_compare", "[string]")
     }
 }
 
-TEST_CASE("str_find", "[string]")
+TEST_CASE("str_find", "[src]")
 {
     using bc::str_find;
 
@@ -88,7 +88,7 @@ TEST_CASE("str_find", "[string]")
     STATIC_REQUIRE(str_find(u8"abcdÀ👒<f¹øì►", u8"à👒", false) == 4);
 }
 
-TEST_CASE("str_contain", "[string]")
+TEST_CASE("str_contain", "[src]")
 {
     using bc::str_contain;
 
@@ -96,7 +96,7 @@ TEST_CASE("str_contain", "[string]")
     STATIC_REQUIRE(str_contain(u8"abcdÀ👒<f¹øì►", u8"à👒", false));
 }
 
-TEST_CASE("to_lower", "[string]")
+TEST_CASE("to_lower", "[src]")
 {
     using namespace std::literals;
 
@@ -113,7 +113,7 @@ TEST_CASE("to_lower", "[string]")
         CHECK(lower == bc::to_lower(upper));
 }
 
-TEST_CASE("first_codepoint", "[string]")
+TEST_CASE("first_codepoint", "[src]")
 {
     using btu::common::first_codepoint;
 
@@ -132,7 +132,7 @@ TEST_CASE("first_codepoint", "[string]")
     }
 }
 
-TEST_CASE("concat_codepoint", "[string]")
+TEST_CASE("concat_codepoint", "[src]")
 {
     using btu::common::concat_codepoint, btu::common::UTF8Iterator;
 
@@ -149,7 +149,7 @@ TEST_CASE("concat_codepoint", "[string]")
         add_codepoint(cp);
 }
 
-TEST_CASE("str_match", "[string]")
+TEST_CASE("str_match", "[src]")
 {
     using btu::common::str_match;
 
@@ -174,19 +174,19 @@ TEST_CASE("str_match", "[string]")
         STATIC_REQUIRE_FALSE(str_match(u8"s", u8"[abc]"));
         STATIC_REQUIRE_FALSE(str_match(u8"a_aa ", u8"[ab][ab]*"));
     }
-    SECTION("Case sensitivity", "[string]")
+    SECTION("Case sensitivity", "[src]")
     {
         STATIC_REQUIRE(str_match(u8"geEksforgeeks", u8"ge?ks*"));
         STATIC_REQUIRE(str_match(u8"ABCD", u8"*c*d", false));
 
         STATIC_REQUIRE_FALSE(str_match(u8"geeks", u8"G*ks"));
     }
-    SECTION("Set", "[string]")
+    SECTION("Set", "[src]")
     {
         STATIC_REQUIRE(str_match(u8"c", u8"[abc]"));
         STATIC_REQUIRE_FALSE(str_match(u8"c", u8"[ab]"));
     }
-    SECTION("paths", "[string]")
+    SECTION("paths", "[src]")
     {
         constexpr auto path = u8"E:/Documents/SomeData/SomeFolder/file.dds";
         STATIC_REQUIRE(str_match(path, u8"*.dds"));
@@ -198,7 +198,7 @@ TEST_CASE("str_match", "[string]")
         STATIC_REQUIRE(str_match(u8"textures/hello.tga", u8"*[s]/*.[td][gd][as]"));
         STATIC_REQUIRE(str_match(u8"textures/my/world/is/purple/hello.dds", u8"*[s]/*.[td][gd][as]"));
     }
-    SECTION("malformed input", "[string]")
+    SECTION("malformed input", "[src]")
     {
         STATIC_REQUIRE_FALSE(str_match(u8"abc", u8"["));
         STATIC_REQUIRE_FALSE(str_match(u8"abc", u8"]"));

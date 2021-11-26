@@ -7,7 +7,7 @@
 
 #include "catch2/catch.hpp"
 
-TEST_CASE("read_file", "[fs]")
+TEST_CASE("read_file", "[src]")
 {
     SECTION("invalid path throw exception") { REQUIRE_THROWS(btu::common::read_file("")); }
     SECTION("100space.bin")

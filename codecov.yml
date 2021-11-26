@@ -11,6 +11,7 @@ fixes:
 
 ignore:
   - "tests/"
+  - "build/"
 
 parsers:
   gcov:
