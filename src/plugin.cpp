@@ -8,6 +8,7 @@
 #include "btu/common/algorithms.hpp"
 
 #include <fstream>
+#include <ios>
 
 namespace btu::bsa {
 FilePath::FilePath(Path dir, std::u8string name, std::u8string suffix, std::u8string ext, FileTypes type)
@@ -165,7 +166,7 @@ void clean_dummy_plugins(const Path &folder_path, const Settings &sets)
         std::fstream file(path, std::ios::binary | std::ios::in | std::ios::ate);
 
         // It is safe to evaluate file size, as the embedded dummies are the smallest plugins possible
-        if (file && file.tellg() == dummy.size())
+        if (file && file.tellg() == static_cast<std::streamoff>(dummy.size()))
         {
             file.close();
             fs::remove(path);

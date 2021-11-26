@@ -18,11 +18,11 @@ struct StringMaker<ArchiveData>
 {
     static std::string convert(const ArchiveData &in)
     {
-        return (std::stringstream() << "ArchiveData{"
-                                    << "size:{" << in.size().compressed << ", " << in.size().uncompressed
-                                    << "max_size: " << in.max_size()
-                                    << "type: " << btu::common::to_underlying(in.type()))
-            .str();
+        std::stringstream os;
+        os << "ArchiveData{"
+           << "size:{" << in.size().compressed << ", " << in.size().uncompressed
+           << "max_size: " << in.max_size() << "type: " << btu::common::to_underlying(in.type());
+        return os.str();
     }
 };
 

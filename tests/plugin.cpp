@@ -5,7 +5,7 @@
 
 #include "utils.hpp"
 
-TEST_CASE("Plugin names are correctly parsed")
+TEST_CASE("Plugin names are correctly parsed", "[src]")
 {
     SECTION("Simple (SSE)")
     {

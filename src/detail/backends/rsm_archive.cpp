@@ -190,7 +190,8 @@ auto RsmArchive::add_file(const Path &a_root, const Path &a_path) -> void
             const auto format = detail::archive_version<libbsa::fo4::format>(archive_, version_);
             f.read(a_path,
                    format,
-                   512u * 512u, // Default
+                   512u,
+                   512u, // Default
                    libbsa::fo4::compression_level::normal,
                    compress);
             add_file(relative, std::move(f));
@@ -222,7 +223,8 @@ auto RsmArchive::add_file(const Path &relative, std::vector<std::byte> a_data) -
             const auto format   = detail::archive_version<libbsa::fo4::format>(archive_, version_);
             f.read(a_data,
                    format,
-                   512u * 512u, // Default
+                   512u,
+                   512u, // Default
                    libbsa::fo4::compression_level::normal,
                    compress);
             add_file(relative, std::move(f));
