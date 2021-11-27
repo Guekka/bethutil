@@ -80,8 +80,8 @@ struct ResizeRatio
 constexpr auto scale_fit(size_t &number, size_t target, size_t &number2) -> void
 {
     const auto ratio = target / static_cast<double>(number);
-    number2 *= ratio;
-    number = target;
+    number2          = static_cast<size_t>(number2 * ratio);
+    number           = target;
 }
 
 [[nodiscard]] constexpr auto compute_resize_dimension(Dimension dim, Dimension target) noexcept -> Dimension
