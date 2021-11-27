@@ -206,3 +206,19 @@ TEST_CASE("str_match", "[src]")
         STATIC_REQUIRE_FALSE(str_match(u8"abc", u8"[[[abc]]]"));
     }
 }
+
+TEST_CASE("make_valid", "[src]")
+{
+    using btu::common::make_valid;
+
+    const auto data = std::to_array<std::pair<std::u8string, std::u8string>>({
+        {u8"valid text ᔔ", u8"valid text ᔔ"},
+        {{234, 238, 239, 232, 255}, u8"_____"},
+    });
+
+    for (const auto &[input, expect] : data)
+    {
+        std::u8string in = input;
+        CHECK(make_valid(in, '_') == expect);
+    }
+}

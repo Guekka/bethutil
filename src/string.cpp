@@ -1,5 +1,7 @@
 #include "btu/common/string.hpp"
 
+#include "utf8h/utf8.h"
+
 #include <locale>
 
 namespace btu::common {
@@ -71,4 +73,11 @@ void concat_codepoint(std::u8string &string, U8Unit cp)
     string.resize(oldsize + cp_size);
     utf8catcodepoint(string.data() + oldsize, cp, cp_size);
 }
+
+auto make_valid(std::u8string &string, char8_t replacement) noexcept -> std::u8string &
+{
+    utf8makevalid(string.data(), replacement);
+    return string;
+}
+
 } // namespace btu::common
