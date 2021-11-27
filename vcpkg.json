@@ -4,8 +4,9 @@
   "dependencies": [
     "catch2",
     "directxtex",
+    "reproc",
     "rsm-bsa",
     "tl-expected",
-	"utf8h"
+    "utf8h"
   ]
 }
