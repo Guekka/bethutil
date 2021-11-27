@@ -117,7 +117,7 @@ auto CompressionDevice::make(uint32_t adapter_index, bool allow_software) -> std
                                         nullptr,
                                         create_device_flags,
                                         feature_levels.data(),
-                                        feature_levels.size(),
+                                        static_cast<UINT>(feature_levels.size()),
                                         D3D11_SDK_VERSION,
                                         device,
                                         &fl,

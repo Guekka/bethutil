@@ -58,7 +58,7 @@ add_library(
   "${ROOT_DIR}/.clang-tidy")
 add_library("btu::btu" ALIAS "${PROJECT_NAME}")
 
-find_path(UTF8H_INCLUDE_DIRS "utf8h/utf8.h")
+find_path(UTF8H_INCLUDE_DIRS "utf8h/utf8.h" REQUIRED)
 target_include_directories("${PROJECT_NAME}" PRIVATE ${UTF8H_INCLUDE_DIRS})
 
 find_package(bsa CONFIG REQUIRED)
