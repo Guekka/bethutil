@@ -3,11 +3,11 @@
     {
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "bethutil_BUILD_DOCS": {
+        "BETHUTIL_BUILD_DOCS": {
           "type": "BOOL",
           "value": "ON"
         },
-        "bethutil_BUILD_EXAMPLES": {
+        "BETHUTIL_BUILD_EXAMPLES": {
           "type": "BOOL",
           "value": "ON"
         },
