@@ -21,7 +21,21 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/backends/archive.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/backends/rsm_archive.hpp")
+    "${INCLUDE_DIR}/btu/bsa/detail/backends/rsm_archive.hpp"
+
+    "${INCLUDE_DIR}/btu/tex.hpp"
+
+    "${INCLUDE_DIR}/btu/tex/error_code.hpp"
+
+    "${INCLUDE_DIR}/btu/tex/compression_device.hpp"
+    "${INCLUDE_DIR}/btu/tex/dimension.hpp"
+    "${INCLUDE_DIR}/btu/tex/formats.hpp"
+    "${INCLUDE_DIR}/btu/tex/functions.hpp"
+    "${INCLUDE_DIR}/btu/tex/optimize.hpp"
+    "${INCLUDE_DIR}/btu/tex/texture.hpp"
+
+    "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
+    "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp")
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
@@ -32,7 +46,15 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/archive_data.cpp"
     "${SOURCE_DIR}/bsa/plugin.cpp"
     "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
-    "${SOURCE_DIR}/bsa/detail/backends/rsm_archive.cpp")
+    "${SOURCE_DIR}/bsa/detail/backends/rsm_archive.cpp"
+
+    "${SOURCE_DIR}/error_code.cpp"
+
+    "${SOURCE_DIR}/compression_device.cpp"
+    "${SOURCE_DIR}/formats.cpp"
+    "${SOURCE_DIR}/functions.cpp"
+    "${SOURCE_DIR}/optimize.cpp"
+    "${SOURCE_DIR}/texture.cpp")
 
 source_group(TREE "${ROOT_DIR}" FILES ${HEADER_FILES} ${SOURCE_FILES})
 
@@ -52,6 +74,9 @@ find_package(directx-headers CONFIG REQUIRED)
 find_package(directxmath CONFIG REQUIRED)
 find_package(directxtex CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)
+
+find_package(tl-expected CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -97,8 +122,6 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-install(DIRECTORY "${INCLUDE_DIR}/btu/common"
+install(DIRECTORY "${INCLUDE_DIR}/btu"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/btu")
 
-install(DIRECTORY "${INCLUDE_DIR}/btu/bsa"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/btu")

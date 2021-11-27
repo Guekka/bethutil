@@ -5,6 +5,7 @@
     "catch2",
     "directxtex",
     "rsm-bsa",
+    "tl-expected",
 	"utf8h"
   ]
 }
