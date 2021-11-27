@@ -35,7 +35,9 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/tex/texture.hpp"
 
     "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp")
+    "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp"
+
+    "${INCLUDE_DIR}/btu/hkx/convert.hpp")
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
@@ -48,13 +50,15 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
     "${SOURCE_DIR}/bsa/detail/backends/rsm_archive.cpp"
 
-    "${SOURCE_DIR}/error_code.cpp"
+    "${SOURCE_DIR}/tex/error_code.cpp"
 
-    "${SOURCE_DIR}/compression_device.cpp"
-    "${SOURCE_DIR}/formats.cpp"
-    "${SOURCE_DIR}/functions.cpp"
-    "${SOURCE_DIR}/optimize.cpp"
-    "${SOURCE_DIR}/texture.cpp")
+    "${SOURCE_DIR}/tex/compression_device.cpp"
+    "${SOURCE_DIR}/tex/formats.cpp"
+    "${SOURCE_DIR}/tex/functions.cpp"
+    "${SOURCE_DIR}/tex/optimize.cpp"
+    "${SOURCE_DIR}/tex/texture.cpp"
+
+    "${SOURCE_DIR}/hkx/convert.cpp")
 
 source_group(TREE "${ROOT_DIR}" FILES ${HEADER_FILES} ${SOURCE_FILES})
 
@@ -74,6 +78,9 @@ find_package(directx-headers CONFIG REQUIRED)
 find_package(directxmath CONFIG REQUIRED)
 find_package(directxtex CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)
+
+find_package(reproc++ CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)
 
 find_package(tl-expected CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
@@ -124,4 +131,3 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
 
 install(DIRECTORY "${INCLUDE_DIR}/btu"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/btu")
-

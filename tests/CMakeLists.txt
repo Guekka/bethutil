@@ -21,7 +21,9 @@ set(SOURCE_FILES
 
     "${SOURCE_DIR}/tex/formats.cpp"
     "${SOURCE_DIR}/tex/functions.cpp"
-    "${SOURCE_DIR}/tex/optimize.cpp")
+    "${SOURCE_DIR}/tex/optimize.cpp"
+
+    "${SOURCE_DIR}/hkx/convert.cpp")
 
 if("${BETHUTIL_BUILD_EXAMPLES}")
   list(APPEND SOURCE_FILES)
@@ -77,6 +79,8 @@ acquire_test("generate_mipmaps")
 acquire_test("make_transparent_alpha")
 acquire_test("resize")
 acquire_test("optimize")
+acquire_test("convert-hkx")
+acquire_test("exe")
 
 if("${BETHUTIL-TEX_BUILD_EXAMPLES}")
         target_include_directories(
