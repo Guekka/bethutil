@@ -76,7 +76,7 @@ jobs:
           gcovr: gcovr -r .. . --coveralls --exclude-unreachable-branches --exclude-function-lines --exclude-throw-branches
         run: |
           ls
-          
+
           (cd tests && ./tests [src])
           ${{ env.gcovr }} -f ".*/src/.*" -f ".*/include/.*" -o src.json
 

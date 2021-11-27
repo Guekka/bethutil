@@ -3,6 +3,10 @@
     {
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
+        "BUILD_TESTING": {
+          "type": "BOOL",
+          "value": "ON"
+        },
         "BETHUTIL_BUILD_DOCS": {
           "type": "BOOL",
           "value": "ON"
@@ -46,6 +50,14 @@
     },
     {
       "cacheVariables": {
+        "BETHUTIL_HKX": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "BETHUTIL_TEX": {
+          "type": "BOOL",
+          "value": "ON"
+        },
         "CMAKE_EXE_LINKER_FLAGS_RELEASE": {
           "type": "STRING",
           "value": "/DEBUG:FASTLINK"
@@ -56,7 +68,7 @@
         },
         "VCPKG_MANIFEST_FEATURES": {
           "type": "STRING",
-          "value": ""
+          "value": "hkx;tex;tests"
         },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
@@ -82,7 +94,7 @@
         },
         "VCPKG_MANIFEST_FEATURES": {
           "type": "STRING",
-          "value": ""
+          "value": "tests"
         },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",

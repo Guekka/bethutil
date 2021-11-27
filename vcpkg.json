@@ -2,11 +2,28 @@
   "name": "bethutil",
   "version-string": "1",
   "dependencies": [
-    "catch2",
-    "directxtex",
-    "reproc",
-    "rsm-bsa",
-    "tl-expected",
-    "utf8h"
-  ]
+    "utf8h",
+	"rsm-bsa"
+  ],
+  "features": {
+    "tex": {
+      "description": "Build texture part. Windows only",
+      "dependencies": [
+        "directxtex",
+        "tl-expected"
+      ]
+    },
+    "hkx": {
+      "description": "Build hkx part. Windows only",
+      "dependencies": [
+        "reproc"
+      ]
+    },
+    "tests": {
+      "description": "Build tests",
+      "dependencies": [
+        "catch2"
+      ]
+    }
+  }
 }

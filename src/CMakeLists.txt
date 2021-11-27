@@ -20,18 +20,7 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/backends/archive.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/backends/rsm_archive.hpp"
-    "${INCLUDE_DIR}/btu/tex.hpp"
-    "${INCLUDE_DIR}/btu/tex/error_code.hpp"
-    "${INCLUDE_DIR}/btu/tex/compression_device.hpp"
-    "${INCLUDE_DIR}/btu/tex/dimension.hpp"
-    "${INCLUDE_DIR}/btu/tex/formats.hpp"
-    "${INCLUDE_DIR}/btu/tex/functions.hpp"
-    "${INCLUDE_DIR}/btu/tex/optimize.hpp"
-    "${INCLUDE_DIR}/btu/tex/texture.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp"
-    "${INCLUDE_DIR}/btu/hkx/convert.hpp")
+    "${INCLUDE_DIR}/btu/bsa/detail/backends/rsm_archive.hpp")
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
@@ -41,14 +30,41 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/archive_data.cpp"
     "${SOURCE_DIR}/bsa/plugin.cpp"
     "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
-    "${SOURCE_DIR}/bsa/detail/backends/rsm_archive.cpp"
-    "${SOURCE_DIR}/tex/error_code.cpp"
+    "${SOURCE_DIR}/bsa/detail/backends/rsm_archive.cpp")
+
+option(BETHUTIL_HKX "Build hkx part" OFF)
+if(${BETHUTIL_HKX})
+  list(APPEND HEADER_FILES "${INCLUDE_DIR}/btu/hkx/convert.hpp")
+
+  list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/convert.cpp")
+endif()
+
+option(BETHUTIL_TEX "Build tex part" OFF)
+if(${BETHUTIL_TEX})
+  list(
+    APPEND
+    HEADER_FILES
+    "${INCLUDE_DIR}/btu/tex.hpp"
+    "${INCLUDE_DIR}/btu/tex/error_code.hpp"
+    "${INCLUDE_DIR}/btu/tex/compression_device.hpp"
+    "${INCLUDE_DIR}/btu/tex/dimension.hpp"
+    "${INCLUDE_DIR}/btu/tex/formats.hpp"
+    "${INCLUDE_DIR}/btu/tex/functions.hpp"
+    "${INCLUDE_DIR}/btu/tex/optimize.hpp"
+    "${INCLUDE_DIR}/btu/tex/texture.hpp"
+    "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
+    "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp")
+
+  list(
+    APPEND
+    SOURCE_FILES
     "${SOURCE_DIR}/tex/compression_device.cpp"
     "${SOURCE_DIR}/tex/formats.cpp"
     "${SOURCE_DIR}/tex/functions.cpp"
     "${SOURCE_DIR}/tex/optimize.cpp"
     "${SOURCE_DIR}/tex/texture.cpp"
-    "${SOURCE_DIR}/hkx/convert.cpp")
+    "${SOURCE_DIR}/tex/error_code.cpp")
+endif()
 
 source_group(TREE "${ROOT_DIR}" FILES ${HEADER_FILES} ${SOURCE_FILES})
 
@@ -59,21 +75,26 @@ add_library(
 add_library("btu::btu" ALIAS "${PROJECT_NAME}")
 
 find_path(UTF8H_INCLUDE_DIRS "utf8h/utf8.h" REQUIRED)
-target_include_directories("${PROJECT_NAME}" PRIVATE ${UTF8H_INCLUDE_DIRS})
+target_include_directories(
+  "${PROJECT_NAME}" SYSTEM
+  PUBLIC "$<BUILD_INTERFACE:${UTF8H_INCLUDE_DIRS}>"
+         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
 find_package(bsa CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE bsa::bsa)
 
-find_package(directx-headers CONFIG REQUIRED)
-find_package(directxmath CONFIG REQUIRED)
-find_package(directxtex CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)
+if(${BETHUTIL_TEX})
+  find_package(directxtex CONFIG REQUIRED)
+  target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)
 
-find_package(reproc++ CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)
+  find_package(tl-expected CONFIG REQUIRED)
+  target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
+endif()
 
-find_package(tl-expected CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
+if(${BETHUTIL_HKX})
+  find_package(reproc++ CONFIG REQUIRED)
+  target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)
+endif()
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
