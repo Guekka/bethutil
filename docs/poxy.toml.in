@@ -1,19 +1,19 @@
 author = 'Edgar B'
 cpp = 20
 description = 'Utilities for Bethesda games'
-github = 'Guekka/bethutil-common'
-license = [ 'MPL', 'https://github.com/Guekka/bethutil-common/blob/main/LICENSE' ]
-name = 'bethutil-common'
+github = 'Guekka/bethutil'
+license = [ 'MPL', 'https://github.com/Guekka/bethutil/blob/main/LICENSE' ]
+name = 'bethutil'
 navbar = [ 'classes', 'namespaces' ]
 
 [badges]
 'build' = [
-	'https://img.shields.io/github/workflow/status/Guekka/bethutil-common/Main%20CI?logo=github&style=flat-square',
-	'https://github.com/Guekka/bethutil-common/actions/workflows/main_ci.yml'
+	'https://img.shields.io/github/workflow/status/Guekka/bethutil/Main%20CI?logo=github&style=flat-square',
+	'https://github.com/Guekka/bethutil/actions/workflows/main_ci.yml'
 ]
 'codecov' = [
-	'https://img.shields.io/codecov/c/github/Guekka/bethutil-common?logo=codecov&logoColor=white&style=flat-square',
-	'https://app.codecov.io/gh/Guekka/bethutil-common'
+	'https://img.shields.io/codecov/c/github/Guekka/bethutil?logo=codecov&logoColor=white&style=flat-square',
+	'https://app.codecov.io/gh/Guekka/bethutil'
 ]
 
 [macros]

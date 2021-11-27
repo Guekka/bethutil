@@ -8,3 +8,4 @@ macro(add_example NAME)
 endmacro()
 
 add_example(empty)
+add_example(tool)
