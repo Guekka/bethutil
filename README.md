@@ -1,1 +1,1 @@
-# bethutil-common
+# bethutil
