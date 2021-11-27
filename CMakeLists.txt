@@ -12,14 +12,12 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(FATAL_ERROR "in-source builds are not allowed")
 endif()
 
-option(BETHUTIL_BUILD_SRC "whether we should build the library itself"
-       ON)
+option(BETHUTIL_BUILD_SRC "whether we should build the library itself" ON)
 if("${BETHUTIL_BUILD_SRC}")
   add_subdirectory(src)
 endif()
 
-option(BETHUTIL_BUILD_EXAMPLES "whether we should build the examples"
-       OFF)
+option(BETHUTIL_BUILD_EXAMPLES "whether we should build the examples" OFF)
 if("${BETHUTIL_BUILD_EXAMPLES}")
   add_subdirectory(examples)
 endif()

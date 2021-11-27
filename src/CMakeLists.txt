@@ -11,7 +11,6 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/common/metaprogramming.hpp"
     "${INCLUDE_DIR}/btu/common/path.hpp"
     "${INCLUDE_DIR}/btu/common/string.hpp"
-
     "${INCLUDE_DIR}/btu/bsa/pack.hpp"
     "${INCLUDE_DIR}/btu/bsa/unpack.hpp"
     "${INCLUDE_DIR}/btu/bsa/transform.hpp"
@@ -22,42 +21,33 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/backends/archive.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/backends/rsm_archive.hpp"
-
     "${INCLUDE_DIR}/btu/tex.hpp"
-
     "${INCLUDE_DIR}/btu/tex/error_code.hpp"
-
     "${INCLUDE_DIR}/btu/tex/compression_device.hpp"
     "${INCLUDE_DIR}/btu/tex/dimension.hpp"
     "${INCLUDE_DIR}/btu/tex/formats.hpp"
     "${INCLUDE_DIR}/btu/tex/functions.hpp"
     "${INCLUDE_DIR}/btu/tex/optimize.hpp"
     "${INCLUDE_DIR}/btu/tex/texture.hpp"
-
     "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
     "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp"
-
     "${INCLUDE_DIR}/btu/hkx/convert.hpp")
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
     "${SOURCE_DIR}/common/string.cpp"
-
     "${SOURCE_DIR}/bsa/pack.cpp"
     "${SOURCE_DIR}/bsa/unpack.cpp"
     "${SOURCE_DIR}/bsa/archive_data.cpp"
     "${SOURCE_DIR}/bsa/plugin.cpp"
     "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
     "${SOURCE_DIR}/bsa/detail/backends/rsm_archive.cpp"
-
     "${SOURCE_DIR}/tex/error_code.cpp"
-
     "${SOURCE_DIR}/tex/compression_device.cpp"
     "${SOURCE_DIR}/tex/formats.cpp"
     "${SOURCE_DIR}/tex/functions.cpp"
     "${SOURCE_DIR}/tex/optimize.cpp"
     "${SOURCE_DIR}/tex/texture.cpp"
-
     "${SOURCE_DIR}/hkx/convert.cpp")
 
 source_group(TREE "${ROOT_DIR}" FILES ${HEADER_FILES} ${SOURCE_FILES})
