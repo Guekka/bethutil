@@ -23,6 +23,7 @@ if("${BETHUTIL_BUILD_EXAMPLES}")
 endif()
 
 if("${BUILD_TESTING}")
+  include(CTest)
   add_subdirectory(tests)
 endif()
 
