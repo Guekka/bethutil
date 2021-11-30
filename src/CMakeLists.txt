@@ -83,6 +83,9 @@ target_include_directories(
 find_package(bsa CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE bsa::bsa)
 
+find_package(nifly CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE nifly)
+
 if(${BETHUTIL_TEX})
   find_package(directxtex CONFIG REQUIRED)
   target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)

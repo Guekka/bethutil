@@ -2,8 +2,9 @@
   "name": "bethutil",
   "version-string": "1",
   "dependencies": [
-    "utf8h",
-	"rsm-bsa"
+    "nifly",
+    "rsm-bsa",
+    "utf8h"
   ],
   "features": {
     "tex": {
