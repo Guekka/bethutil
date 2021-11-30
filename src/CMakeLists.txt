@@ -20,7 +20,8 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/backends/archive.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/backends/rsm_archive.hpp")
+    "${INCLUDE_DIR}/btu/bsa/detail/backends/rsm_archive.hpp"
+    "${INCLUDE_DIR}/btu/nif/functions.hpp")
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
@@ -30,7 +31,8 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/archive_data.cpp"
     "${SOURCE_DIR}/bsa/plugin.cpp"
     "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
-    "${SOURCE_DIR}/bsa/detail/backends/rsm_archive.cpp")
+    "${SOURCE_DIR}/bsa/detail/backends/rsm_archive.cpp"
+    "${SOURCE_DIR}/nif/functions.cpp")
 
 option(BETHUTIL_HKX "Build hkx part" OFF)
 if(${BETHUTIL_HKX})
@@ -86,12 +88,12 @@ target_link_libraries("${PROJECT_NAME}" PRIVATE bsa::bsa)
 find_package(nifly CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE nifly)
 
+find_package(tl-expected CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
+
 if(${BETHUTIL_TEX})
   find_package(directxtex CONFIG REQUIRED)
   target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)
-
-  find_package(tl-expected CONFIG REQUIRED)
-  target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
 endif()
 
 if(${BETHUTIL_HKX})

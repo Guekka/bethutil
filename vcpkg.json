@@ -4,14 +4,14 @@
   "dependencies": [
     "nifly",
     "rsm-bsa",
+    "tl-expected",
     "utf8h"
   ],
   "features": {
     "tex": {
       "description": "Build texture part. Windows only",
       "dependencies": [
-        "directxtex",
-        "tl-expected"
+        "directxtex"
       ]
     },
     "hkx": {
