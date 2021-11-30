@@ -1,7 +1,7 @@
 #include "btu/nif/functions.hpp"
 
 namespace btu::nif {
-auto convert(Mesh &file, common::Game game) -> void
+auto convert(Mesh &file, bool convert, common::Game game) -> void
 {
     // See https://gitlab.com/G_ka/Cathedral_Assets_Optimizer/-/blob/dev/src/Commands/Meshes/MeshConvert.cpp
 }

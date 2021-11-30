@@ -20,7 +20,7 @@ struct Settings
 
     bool rename_referenced_textures;
     std::optional<nifly::NiVersion> target_version;
-    std::vector<std::u8string> landscape_textures;
+    std::vector<std::u8string> landscape_textures; // This will be filled by the user, no need to fill it now
 };
 
 struct OptimizationSteps
