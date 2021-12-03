@@ -23,11 +23,6 @@ auto ArchiveData::Size::operator+=(const Size &other) -> ArchiveData::Size &
     return *this;
 }
 
-auto ArchiveData::find_name(const Path &folder, const Settings &sets) const -> Path
-{
-    return find_archive_name(folder, sets, type_).full_path();
-}
-
 auto ArchiveData::empty() const -> bool
 {
     return size().uncompressed == 0;

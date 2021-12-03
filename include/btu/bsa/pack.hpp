@@ -28,7 +28,7 @@ void merge(std::vector<ArchiveData> &archives,
            MergeSettings sets = MergeSettings::MergeIncompressible | MergeSettings::MergeTextures);
 
 /// Returns the list of files which failed to pack
-auto write(bool compressed, ArchiveData &&data, const Settings &sets, const Path &root)
+auto write(bool compressed, ArchiveData &&data, const Path &root)
     -> std::vector<std::pair<Path, std::string>>;
 
 } // namespace btu::bsa
