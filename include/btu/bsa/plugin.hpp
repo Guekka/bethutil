@@ -20,7 +20,7 @@ public:
         -> std::optional<FilePath>;
 
     [[nodiscard]] auto full_path() const -> Path;
-    [[nodiscard]] auto full_name() const -> Path;
+    [[nodiscard]] auto full_name() const -> std::u8string;
 
     Path dir;
     std::u8string name;
@@ -35,7 +35,6 @@ private:
 
     explicit FilePath() = default;
 };
-
 [[nodiscard]] auto find_archive_name(const Path &folder_path, const Settings &sets, ArchiveType type)
     -> FilePath;
 
