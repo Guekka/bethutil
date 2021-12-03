@@ -130,7 +130,7 @@ auto find_archive_name(const Path &folder_path, const Settings &sets, ArchiveTyp
     const std::u8string suffix = [type, &sets] {
         if (type == ArchiveType::Textures)
         {
-            return sets.texture_suffix.value();
+            return sets.texture_suffix.value_or(u8"");
         }
         return sets.suffix.value_or(u8"");
     }();
