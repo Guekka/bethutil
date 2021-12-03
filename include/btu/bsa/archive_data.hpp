@@ -36,7 +36,8 @@ public:
     auto begin() { return files_.begin(); }
     auto end() { return files_.end(); }
 
-    [[nodiscard]] auto find_name(const Path &folder, const Settings &sets) const -> Path;
+    auto set_out_path(Path out_path) { out_path_ = std::move(out_path); }
+    [[nodiscard]] auto get_out_path() { return out_path_; }
 
     [[nodiscard]] auto size() const -> Size { return size_; }
     [[nodiscard]] auto max_size() const -> uintmax_t { return max_size_; }
@@ -58,5 +59,6 @@ private:
     ArchiveType type_   = ArchiveType::Standard;
     ArchiveVersion version_{};
     std::vector<Path> files_;
+    Path out_path_;
 };
 } // namespace btu::bsa

@@ -20,7 +20,7 @@ void process_args(std::vector<std::string_view> args, const Path &dir)
         auto bsas = split(dir, sets);
         merge(bsas);
         for (auto bsa : std::move(bsas))
-            write(/*compressed=*/true, std::move(bsa), sets, dir);
+            write(/*compressed=*/true, std::move(bsa), dir);
     }
     else if (arg == "unpack")
     {

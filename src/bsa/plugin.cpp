@@ -85,16 +85,6 @@ auto FilePath::eat_suffix(std::u8string &str, const Settings &sets) -> std::u8st
     return suffix;
 }
 
-auto list_helper(const Path &folder_path, const Settings &sets, FileTypes type) -> std::vector<FilePath>
-{
-    std::vector<FilePath> res;
-    for (const auto &f : fs::directory_iterator(folder_path))
-        if (auto file = FilePath::make(f.path(), sets, type))
-            res.emplace_back(*file);
-
-    return res;
-}
-
 auto is_loaded(const FilePath &archive, const Settings &sets) -> bool
 {
     return std::any_of(sets.plugin_extensions.cbegin(),
@@ -109,23 +99,10 @@ auto is_loaded(const FilePath &archive, const Settings &sets) -> bool
                        });
 }
 
-auto list_plugins(const Path &folder_path, const Settings &sets) -> std::vector<FilePath>
+auto find_archive_name(std::span<const FilePath> plugins, const Settings &sets, ArchiveType type) -> FilePath
 {
-    return list_helper(folder_path, sets, FileTypes::Plugin);
-}
-
-auto list_archive(const Path &folder_path, const Settings &sets) -> std::vector<FilePath>
-{
-    return list_helper(folder_path, sets, FileTypes::BSA);
-}
-
-auto find_archive_name(const Path &folder_path, const Settings &sets, ArchiveType type) -> FilePath
-{
-    std::vector<FilePath> plugins = list_plugins(folder_path, sets);
-
     if (plugins.empty())
-        plugins.emplace_back(
-            FilePath(folder_path, folder_path.filename().u8string(), {}, u8".esp", FileTypes::Plugin));
+        throw std::invalid_argument("Plugins cannot be empty");
 
     const std::u8string suffix = [type, &sets] {
         if (type == ArchiveType::Textures)
@@ -141,7 +118,7 @@ auto find_archive_name(const Path &folder_path, const Settings &sets, ArchiveTyp
         return !fs::exists(file.full_path());
     };
 
-    for (auto &plugin : plugins)
+    for (auto plugin : plugins)
         if (check_plugin(plugin))
             return plugin;
 
@@ -154,15 +131,15 @@ auto find_archive_name(const Path &folder_path, const Settings &sets, ArchiveTyp
     throw std::runtime_error("No btu/bsa/plugin name found after 256 tries.");
 }
 
-void clean_dummy_plugins(const Path &folder_path, const Settings &sets)
+void clean_dummy_plugins(std::vector<FilePath> &plugins, const Settings &sets)
 {
     if (!sets.s_dummy_plugin.has_value())
         return;
     const auto &dummy = *sets.s_dummy_plugin;
 
-    for (const auto &plug : list_plugins(folder_path, sets))
+    for (auto it = plugins.begin(); it != plugins.end(); ++it)
     {
-        const auto path = plug.full_path();
+        const auto path = it->full_path();
         std::fstream file(path, std::ios::binary | std::ios::in | std::ios::ate);
 
         // It is safe to evaluate file size, as the embedded dummies are the smallest plugins possible
@@ -170,23 +147,25 @@ void clean_dummy_plugins(const Path &folder_path, const Settings &sets)
         {
             file.close();
             fs::remove(path);
+            it = plugins.erase(it);
         }
     }
 }
 
-void make_dummy_plugins(const Path &folder_path, const Settings &sets)
+void make_dummy_plugins(std::span<const FilePath> archives, const Settings &sets)
 {
     if (!sets.s_dummy_plugin.has_value())
         return;
 
-    for (auto &&bsa : list_archive(folder_path, sets))
+    for (auto &&bsa : archives)
     {
         if (is_loaded(bsa, sets))
             continue;
 
-        bsa.ext    = sets.plugin_extensions.back();
-        bsa.suffix = {};
-        std::ofstream dummy(bsa.full_path(), std::ios::out | std::ios::binary);
+        auto mut_bsa   = bsa;
+        mut_bsa.ext    = sets.plugin_extensions.back();
+        mut_bsa.suffix = {};
+        std::ofstream dummy(mut_bsa.full_path(), std::ios::out | std::ios::binary);
 
         const auto dummy_bytes = *sets.s_dummy_plugin;
         dummy.write(reinterpret_cast<const char *>(dummy_bytes.data()), dummy_bytes.size()); // NOLINT

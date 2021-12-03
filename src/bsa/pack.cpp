@@ -29,8 +29,7 @@ auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinf
     return !is_dir && !is_root;
 }
 
-auto write(bool compressed, ArchiveData &&data, const Settings &sets, const Path &root)
-    -> std::vector<std::pair<Path, std::string>>
+auto write(bool compressed, ArchiveData &&data, const Path &root) -> std::vector<std::pair<Path, std::string>>
 {
     if (std::distance(data.begin(), data.end()) == 0)
         return {}; // Do not write empty archive
@@ -51,7 +50,7 @@ auto write(bool compressed, ArchiveData &&data, const Settings &sets, const Path
         }
     });
 
-    arch.write(data.find_name(root, sets));
+    arch.write(data.get_out_path());
     return ret;
 }
 

@@ -35,9 +35,35 @@ private:
 
     explicit FilePath() = default;
 };
-[[nodiscard]] auto find_archive_name(const Path &folder_path, const Settings &sets, ArchiveType type)
+
+[[nodiscard]] auto find_archive_name(std::span<const FilePath> plugins, const Settings &sets, ArchiveType type)
     -> FilePath;
 
-void clean_dummy_plugins(const Path &folder_path, const Settings &sets);
-void make_dummy_plugins(const Path &folder_path, const Settings &sets);
+namespace detail {
+template<typename It>
+auto list_helper(It begin, It end, const Settings &sets, FileTypes type) -> std::vector<FilePath>
+{
+    std::vector<FilePath> res;
+    std::for_each(begin, end, [&](auto &&f) {
+        if (auto file = FilePath::make(f.path(), sets, type))
+            res.emplace_back(*file);
+    });
+    return res;
+}
+} // namespace detail
+
+template<typename It>
+auto list_plugins(It begin, It end, const Settings &sets) -> std::vector<FilePath>
+{
+    return detail::list_helper(begin, end, sets, FileTypes::Plugin);
+}
+
+template<typename It>
+auto list_archive(It begin, It end, const Settings &sets) -> std::vector<FilePath>
+{
+    return detail::list_helper(begin, end, sets, FileTypes::BSA);
+}
+
+void clean_dummy_plugins(std::vector<FilePath> &plugins, const Settings &sets);
+void make_dummy_plugins(std::span<const FilePath> archives, const Settings &sets);
 } // namespace btu::bsa
