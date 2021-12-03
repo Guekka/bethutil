@@ -96,9 +96,6 @@ if(${BETHUTIL_HKX})
   target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)
 endif()
 
-include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
-
 set_target_properties("${PROJECT_NAME}" PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties("${PROJECT_NAME}" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -122,6 +119,9 @@ target_include_directories(
   PRIVATE "$<BUILD_INTERFACE:${INCLUDE_DIR}>"
           "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
 install(TARGETS "${PROJECT_NAME}" EXPORT "${PROJECT_NAME}-targets")
 
 install(
@@ -141,4 +141,4 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
 install(DIRECTORY "${INCLUDE_DIR}/btu"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/btu")
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
