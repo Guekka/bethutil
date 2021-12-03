@@ -44,10 +44,10 @@ auto FilePath::make(const Path &path, const Settings &sets, FileTypes type) -> s
 
 auto FilePath::full_path() const -> Path
 {
-    return (dir / full_name()).replace_extension(ext);
+    return dir / (full_name() + ext);
 }
 
-auto FilePath::full_name() const -> Path
+auto FilePath::full_name() const -> std::u8string
 {
     const auto count = counter ? btu::common::as_utf8_string(std::to_string(*counter)) : u8"";
     const auto suf   = suffix.empty() ? u8"" : suffix_separator + suffix;

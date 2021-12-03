@@ -59,4 +59,16 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
         CHECK(plug->counter.value() == 1);
         CHECK(plug->ext == u8".bsa");
     }
+    SECTION("Complex 4 (FO4)")
+    {
+        auto sets = Settings::get(Game::FO4);
+        auto plug = FilePath::make("C:/Mk. II - Frag.esp", sets, FileTypes::Plugin);
+
+        REQUIRE(plug.has_value());
+        CHECK(plug->dir == "C:/");
+        CHECK(plug->name == u8"Mk. II - Frag");
+        CHECK(plug->suffix == u8"");
+        CHECK_FALSE(plug->counter.has_value());
+        CHECK(plug->ext == u8".esp");
+    }
 }
