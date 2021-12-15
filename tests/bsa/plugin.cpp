@@ -70,4 +70,26 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
         CHECK_FALSE(plug->counter.has_value());
         CHECK(plug->ext == u8".esp");
     }
+    SECTION("Complex 5 (FO4)")
+    {
+        auto sets = Settings::get(Game::FO4);
+        auto plug = FilePath::make("some_dir/Colt 6520.esp", sets, FileTypes::Plugin);
+
+        REQUIRE(plug.has_value());
+        CHECK(plug->name == u8"Colt ");
+        CHECK(plug->suffix == u8"");
+        CHECK(plug->counter == 6520);
+        CHECK(plug->ext == u8".esp");
+    }
+    SECTION("Complex 6 (FO4)")
+    {
+        auto sets = Settings::get(Game::FO4);
+        auto plug = FilePath::make("some_dir/Colt. 6520.esp", sets, FileTypes::Plugin);
+
+        REQUIRE(plug.has_value());
+        CHECK(plug->name == u8"Colt. ");
+        CHECK(plug->suffix == u8"");
+        CHECK(plug->counter == 6520);
+        CHECK(plug->ext == u8".esp");
+    }
 }

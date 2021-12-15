@@ -26,7 +26,7 @@ public:
     std::u8string name;
     std::u8string suffix;
     std::u8string ext;
-    std::optional<uint8_t> counter;
+    std::optional<uint32_t> counter;
     FileTypes type{};
 
 private:
