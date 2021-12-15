@@ -15,10 +15,10 @@ using UnderlyingArchive = std::variant<libbsa::tes3::archive, libbsa::tes4::arch
 using UnderlyingFile    = std::variant<libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file>;
 
 template<class... Keys>
-[[nodiscard]] auto virtual_to_local_path(Keys &&...a_keys) -> std::string
+[[nodiscard]] auto virtual_to_local_path(Keys &&...a_keys) -> std::u8string
 {
-    std::string local;
-    ((local += a_keys.name(), local += '/'), ...);
+    std::u8string local;
+    ((local += btu::common::as_utf8(a_keys.name()), local += u8'/'), ...);
     local.pop_back();
 
     for (auto &c : local)
@@ -28,7 +28,7 @@ template<class... Keys>
             c = Path::preferred_separator;
         }
     }
-
+    btu::common::make_valid(local, '_');
     return local;
 }
 
