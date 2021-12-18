@@ -5,7 +5,7 @@
 
 #include "btu/bsa/pack.hpp"
 
-#include "btu/bsa/detail/backends/rsm_archive.hpp"
+#include "btu/bsa/archive.hpp"
 #include "btu/bsa/detail/common.hpp"
 #include "btu/bsa/settings.hpp"
 
@@ -16,7 +16,6 @@
 #include <execution>
 #include <fstream>
 #include <functional>
-#include <ranges>
 
 namespace btu::bsa {
 auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinfo) -> bool
@@ -36,7 +35,7 @@ auto write(bool compressed, ArchiveData &&data, const Path &root) -> std::vector
 
     compressed &= data.get_type() != ArchiveType::Incompressible;
 
-    auto arch = detail::RsmArchive(data.get_version(), compressed);
+    auto arch = Archive(data.get_version(), compressed);
     auto ret  = std::vector<std::pair<Path, std::string>>();
 
     btu::common::for_each_mt(data, [&](auto &&f) {

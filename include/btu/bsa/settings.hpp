@@ -1,6 +1,6 @@
 #pragma once
 
-#include "btu/bsa/detail/backends/archive.hpp"
+#include "btu/bsa/archive.hpp"
 #include "btu/bsa/detail/common.hpp"
 #include "btu/common/algorithms.hpp"
 #include "btu/common/metaprogramming.hpp"

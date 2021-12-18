@@ -1,6 +1,7 @@
 #pragma once
 
-#include "btu/bsa/detail/backends/archive.hpp"
+#include "btu/bsa/detail/archive_type.hpp"
+#include "btu/bsa/detail/common.hpp"
 
 #include <bsa/bsa.hpp>
 
@@ -10,7 +11,7 @@
 
 namespace libbsa = ::bsa;
 
-namespace btu::bsa::detail {
+namespace btu::bsa {
 using UnderlyingArchive = std::variant<libbsa::tes3::archive, libbsa::tes4::archive, libbsa::fo4::archive>;
 using UnderlyingFile    = std::variant<libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file>;
 
@@ -37,22 +38,22 @@ template<class... Keys>
 template<typename Version>
 [[nodiscard]] auto archive_version(const UnderlyingArchive &archive, Version a_version) -> Version;
 
-class RsmArchive final : public Archive
+class Archive final
 {
 public:
-    explicit RsmArchive(const Path &a_path); // Read
-    RsmArchive(ArchiveVersion a_version, bool a_compressed);
+    explicit Archive(const Path &a_path); // Read
+    Archive(ArchiveVersion a_version, bool a_compressed);
 
-    auto read(Path a_path) -> ArchiveVersion override;
-    auto write(Path a_path) -> void override;
+    auto read(Path a_path) -> ArchiveVersion;
+    auto write(Path a_path) -> void;
 
     auto add_file(const Path &a_relative, UnderlyingFile file) -> void;
-    auto add_file(const Path &a_root, const Path &a_path) -> void override;
-    auto add_file(const Path &a_relative, std::vector<std::byte> a_data) -> void override;
+    auto add_file(const Path &a_root, const Path &a_path) -> void;
+    auto add_file(const Path &a_relative, std::vector<std::byte> a_data) -> void;
 
-    virtual auto unpack(const Path &out_path) -> void override;
+    auto unpack(const Path &out_path) -> void;
 
-    [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion override;
+    [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion;
     [[nodiscard]] auto get_archive() const noexcept -> const UnderlyingArchive &;
 
 private:
@@ -63,4 +64,4 @@ private:
     bool compressed_{false};
 };
 
-} // namespace btu::bsa::detail
+} // namespace btu::bsa
