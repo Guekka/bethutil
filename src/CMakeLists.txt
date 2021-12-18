@@ -14,23 +14,24 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/pack.hpp"
     "${INCLUDE_DIR}/btu/bsa/unpack.hpp"
     "${INCLUDE_DIR}/btu/bsa/transform.hpp"
+    "${INCLUDE_DIR}/btu/bsa/archive.hpp"
     "${INCLUDE_DIR}/btu/bsa/archive_data.hpp"
     "${INCLUDE_DIR}/btu/bsa/settings.hpp"
     "${INCLUDE_DIR}/btu/bsa/plugin.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/backends/archive.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/backends/rsm_archive.hpp")
+    )
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
     "${SOURCE_DIR}/common/string.cpp"
-    "${SOURCE_DIR}/bsa/pack.cpp"
-    "${SOURCE_DIR}/bsa/unpack.cpp"
+    "${SOURCE_DIR}/bsa/archive.cpp"
     "${SOURCE_DIR}/bsa/archive_data.cpp"
+    "${SOURCE_DIR}/bsa/pack.cpp"
     "${SOURCE_DIR}/bsa/plugin.cpp"
+    "${SOURCE_DIR}/bsa/unpack.cpp"
     "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
-    "${SOURCE_DIR}/bsa/detail/backends/rsm_archive.cpp")
+    )
 
 option(BETHUTIL_HKX "Build hkx part" OFF)
 if(${BETHUTIL_HKX})
