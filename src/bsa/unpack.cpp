@@ -5,7 +5,7 @@
 
 #include "btu/bsa/unpack.hpp"
 
-#include "btu/bsa/detail/backends/rsm_archive.hpp"
+#include "btu/bsa/archive.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -15,7 +15,7 @@ namespace btu::bsa {
 void unpack(UnpackSettings sets)
 {
     {
-        auto arch        = detail::RsmArchive(sets.file_path);
+        auto arch        = Archive(sets.file_path);
         const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
         arch.unpack(root);
     }

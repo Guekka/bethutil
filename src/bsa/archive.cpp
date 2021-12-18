@@ -1,6 +1,4 @@
-#include "btu/bsa/detail/backends/rsm_archive.hpp"
-
-#include "btu/bsa/detail/common.hpp"
+#include "btu/bsa/archive.hpp"
 
 #include <btu/common/filesystem.hpp>
 #include <btu/common/functional.hpp>
@@ -8,7 +6,7 @@
 #include <execution>
 #include <fstream>
 
-namespace btu::bsa::detail {
+namespace btu::bsa {
 
 [[nodiscard]] auto get_archive_identifier(const UnderlyingArchive &archive) -> std::string_view
 {
@@ -62,12 +60,12 @@ template auto archive_version<libbsa::tes4::version>(const UnderlyingArchive &, 
 template auto archive_version<libbsa::fo4::format>(const UnderlyingArchive &, ArchiveVersion)
     -> libbsa::fo4::format;
 
-RsmArchive::RsmArchive(const Path &a_path)
+Archive::Archive(const Path &a_path)
 {
     read(a_path);
 }
 
-RsmArchive::RsmArchive(ArchiveVersion a_version, bool a_compressed)
+Archive::Archive(ArchiveVersion a_version, bool a_compressed)
     : version_(a_version)
     , compressed_(a_compressed)
 {
@@ -95,7 +93,7 @@ RsmArchive::RsmArchive(ArchiveVersion a_version, bool a_compressed)
     }
 }
 
-auto RsmArchive::read(Path a_path) -> ArchiveVersion
+auto Archive::read(Path a_path) -> ArchiveVersion
 {
     const auto format = libbsa::guess_file_format(a_path).value();
 
@@ -123,16 +121,16 @@ auto RsmArchive::read(Path a_path) -> ArchiveVersion
     return version_;
 }
 
-auto RsmArchive::write(Path a_path) -> void
+auto Archive::write(Path a_path) -> void
 {
     const auto writer = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) { bsa.write(a_path); },
         [&](libbsa::tes4::archive &bsa) {
-            const auto version = detail::archive_version<libbsa::tes4::version>(archive_, version_);
+            const auto version = archive_version<libbsa::tes4::version>(archive_, version_);
             bsa.write(a_path, version);
         },
         [&](libbsa::fo4::archive &ba2) {
-            const auto version = detail::archive_version<libbsa::fo4::format>(archive_, version_);
+            const auto version = archive_version<libbsa::fo4::format>(archive_, version_);
             ba2.write(a_path, version);
         },
     };
@@ -140,7 +138,7 @@ auto RsmArchive::write(Path a_path) -> void
     std::visit(writer, archive_);
 }
 
-void RsmArchive::add_file(const common::Path &a_relative, UnderlyingFile file)
+void Archive::add_file(const common::Path &a_relative, UnderlyingFile file)
 {
     std::scoped_lock lock(mutex_);
     const auto adder = btu::common::overload{
@@ -167,7 +165,7 @@ void RsmArchive::add_file(const common::Path &a_relative, UnderlyingFile file)
     std::visit(adder, archive_, std::move(file));
 }
 
-auto RsmArchive::add_file(const Path &a_root, const Path &a_path) -> void
+auto Archive::add_file(const Path &a_root, const Path &a_path) -> void
 {
     const auto relative = a_path.lexically_relative(a_root).lexically_normal();
     const auto compress = compressed_ ? libbsa::compression_type::compressed
@@ -181,13 +179,13 @@ auto RsmArchive::add_file(const Path &a_root, const Path &a_path) -> void
         },
         [&, this](libbsa::tes4::archive &) {
             libbsa::tes4::file f;
-            const auto version = detail::archive_version<libbsa::tes4::version>(archive_, version_);
+            const auto version = archive_version<libbsa::tes4::version>(archive_, version_);
             f.read(a_path, version, libbsa::tes4::compression_codec::normal, compress);
             add_file(relative, std::move(f));
         },
         [&, this](libbsa::fo4::archive &) {
             libbsa::fo4::file f;
-            const auto format = detail::archive_version<libbsa::fo4::format>(archive_, version_);
+            const auto format = archive_version<libbsa::fo4::format>(archive_, version_);
             f.read(a_path,
                    format,
                    512u,
@@ -200,7 +198,7 @@ auto RsmArchive::add_file(const Path &a_root, const Path &a_path) -> void
     std::visit(adder, archive_);
 }
 
-auto RsmArchive::add_file(const Path &relative, std::vector<std::byte> a_data) -> void
+auto Archive::add_file(const Path &relative, std::vector<std::byte> a_data) -> void
 {
     const auto adder = btu::common::overload{
         [&](libbsa::tes3::archive &) {
@@ -210,7 +208,7 @@ auto RsmArchive::add_file(const Path &relative, std::vector<std::byte> a_data) -
         },
         [&, this](libbsa::tes4::archive &) {
             libbsa::tes4::file f;
-            const auto version = detail::archive_version<libbsa::tes4::version>(archive_, version_);
+            const auto version = archive_version<libbsa::tes4::version>(archive_, version_);
             f.set_data(std::move(a_data));
             if (compressed_)
                 f.compress(version);
@@ -220,7 +218,7 @@ auto RsmArchive::add_file(const Path &relative, std::vector<std::byte> a_data) -
             libbsa::fo4::file f;
             const auto compress = compressed_ ? libbsa::compression_type::compressed
                                               : libbsa::compression_type::decompressed;
-            const auto format   = detail::archive_version<libbsa::fo4::format>(archive_, version_);
+            const auto format   = archive_version<libbsa::fo4::format>(archive_, version_);
             f.read(a_data,
                    format,
                    512u,
@@ -234,7 +232,7 @@ auto RsmArchive::add_file(const Path &relative, std::vector<std::byte> a_data) -
     std::visit(adder, archive_);
 }
 
-auto RsmArchive::unpack(const Path &out_path) -> void
+auto Archive::unpack(const Path &out_path) -> void
 {
     auto make_dir = [](const Path &p) {
         const auto dir = p.parent_path();
@@ -246,7 +244,7 @@ auto RsmArchive::unpack(const Path &out_path) -> void
         [&](libbsa::tes3::archive &bsa) {
             btu::common::for_each_mt(bsa, [&](auto &&pair) {
                 const auto [key, file] = pair;
-                const auto path        = out_path / detail::virtual_to_local_path(key);
+                const auto path        = out_path / virtual_to_local_path(key);
                 make_dir(path);
                 file.write(path);
             });
@@ -255,8 +253,8 @@ auto RsmArchive::unpack(const Path &out_path) -> void
             for (auto &dir : bsa)
             {
                 btu::common::for_each_mt(dir.second, [&](auto &&file) {
-                    const auto path = out_path / detail::virtual_to_local_path(dir.first, file.first);
-                    const auto ver  = detail::archive_version<libbsa::tes4::version>(archive_, version_);
+                    const auto path = out_path / virtual_to_local_path(dir.first, file.first);
+                    const auto ver  = archive_version<libbsa::tes4::version>(archive_, version_);
                     make_dir(path);
                     file.second.write(path, ver);
                 });
@@ -265,8 +263,8 @@ auto RsmArchive::unpack(const Path &out_path) -> void
         [&](libbsa::fo4::archive &ba2) {
             btu::common::for_each_mt(ba2, [&](auto &&pair) {
                 auto &&[key, file] = pair;
-                const auto path    = out_path / detail::virtual_to_local_path(key);
-                const auto ver     = detail::archive_version<libbsa::fo4::format>(archive_, version_);
+                const auto path    = out_path / virtual_to_local_path(key);
+                const auto ver     = archive_version<libbsa::fo4::format>(archive_, version_);
                 make_dir(path);
                 file.write(path, ver);
             });
@@ -276,13 +274,13 @@ auto RsmArchive::unpack(const Path &out_path) -> void
     std::visit(visiter, archive_);
 }
 
-auto RsmArchive::get_version() const noexcept -> ArchiveVersion
+auto Archive::get_version() const noexcept -> ArchiveVersion
 {
     return version_;
 }
 
-auto RsmArchive::get_archive() const noexcept -> const UnderlyingArchive &
+auto Archive::get_archive() const noexcept -> const UnderlyingArchive &
 {
     return archive_;
 }
-} // namespace btu::bsa::detail
+} // namespace btu::bsa
