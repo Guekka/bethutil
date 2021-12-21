@@ -232,7 +232,7 @@ auto Archive::add_file(const Path &relative, std::vector<std::byte> a_data) -> v
     std::visit(adder, archive_);
 }
 
-auto Archive::unpack(const Path &out_path) -> void
+auto Archive::write_file(const UnderlyingFile &file, const Path &path) -> void
 {
     auto make_dir = [](const Path &p) {
         const auto dir = p.parent_path();
@@ -241,37 +241,79 @@ auto Archive::unpack(const Path &out_path) -> void
     };
 
     auto visiter = btu::common::overload{
+        [&](const libbsa::tes3::file &file) {
+            make_dir(path);
+            file.write(path);
+        },
+        [&](const libbsa::tes4::file &file) {
+            const auto ver = archive_version<libbsa::tes4::version>(archive_, version_);
+            make_dir(path);
+            file.write(path, ver);
+        },
+        [&](const libbsa::fo4::file &file) {
+            const auto ver = archive_version<libbsa::fo4::format>(archive_, version_);
+            make_dir(path);
+            file.write(path, ver);
+        },
+    };
+
+    std::visit(visiter, file);
+}
+
+auto Archive::unpack(const Path &out_path) -> void
+{
+    auto visiter = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) {
             btu::common::for_each_mt(bsa, [&](auto &&pair) {
                 const auto [key, file] = pair;
-                const auto path        = out_path / virtual_to_local_path(key);
-                make_dir(path);
-                file.write(path);
+                write_file(file, out_path / virtual_to_local_path(key));
             });
         },
         [&](libbsa::tes4::archive &bsa) {
             for (auto &dir : bsa)
             {
-                btu::common::for_each_mt(dir.second, [&](auto &&file) {
-                    const auto path = out_path / virtual_to_local_path(dir.first, file.first);
-                    const auto ver  = archive_version<libbsa::tes4::version>(archive_, version_);
-                    make_dir(path);
-                    file.second.write(path, ver);
+                btu::common::for_each_mt(dir.second, [&](auto &&pair) {
+                    const auto [key, file] = pair;
+                    write_file(file, out_path / virtual_to_local_path(dir.first, key));
                 });
             }
         },
         [&](libbsa::fo4::archive &ba2) {
             btu::common::for_each_mt(ba2, [&](auto &&pair) {
                 auto &&[key, file] = pair;
-                const auto path    = out_path / virtual_to_local_path(key);
-                const auto ver     = archive_version<libbsa::fo4::format>(archive_, version_);
-                make_dir(path);
-                file.write(path, ver);
+                write_file(file, out_path / virtual_to_local_path(key));
             });
         },
     };
 
     std::visit(visiter, archive_);
+}
+
+void Archive::unpack_file(const common::Path &rel_path, const common::Path &out_path)
+{
+    auto visiter = btu::common::overload{
+        [&](libbsa::tes3::archive &bsa) {
+            auto f = UnderlyingFile{*bsa[rel_path.string()]};
+            write_file(f, out_path);
+        },
+        [&](libbsa::tes4::archive &bsa) {
+            auto dir   = rel_path.parent_path();
+            auto fname = rel_path.filename();
+            auto f     = UnderlyingFile{*bsa[dir.string()][fname.string()]};
+            write_file(f, out_path);
+        },
+        [&](libbsa::fo4::archive &ba2) {
+            auto f = UnderlyingFile{*ba2[rel_path.string()]};
+            write_file(f, out_path);
+        },
+    };
+
+    std::visit(visiter, archive_);
+}
+
+auto Archive::file_count() const noexcept -> size_t
+{
+    return std::visit([](auto &&arch) { return arch.size(); }, archive_);
 }
 
 auto Archive::get_version() const noexcept -> ArchiveVersion
@@ -283,4 +325,5 @@ auto Archive::get_archive() const noexcept -> const UnderlyingArchive &
 {
     return archive_;
 }
+
 } // namespace btu::bsa

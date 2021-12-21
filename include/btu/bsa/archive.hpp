@@ -51,7 +51,11 @@ public:
     auto add_file(const Path &a_root, const Path &a_path) -> void;
     auto add_file(const Path &a_relative, std::vector<std::byte> a_data) -> void;
 
-    virtual auto unpack(const Path &out_path) -> void;
+    auto write_file(const UnderlyingFile &file, const Path &path) -> void;
+    auto unpack(const Path &out_path) -> void;
+    auto unpack_file(const Path &rel_path, const Path &out_path) -> void;
+
+    auto file_count() const noexcept -> size_t;
 
     [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion;
     [[nodiscard]] auto get_archive() const noexcept -> const UnderlyingArchive &;
