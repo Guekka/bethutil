@@ -63,7 +63,16 @@ auto FilePath::eat_digits(std::u8string &str) -> std::optional<int>
 
     if (first_digit != str.length())
     {
-        auto ret = std::stoi(btu::common::as_ascii_string(str.substr(first_digit)));
+        std::optional<int> ret{};
+        try
+        {
+            ret = std::stoi(btu::common::as_ascii_string(str.substr(first_digit)));
+        }
+        catch (const std::exception &)
+        {
+            return std::nullopt;
+        }
+
         str.erase(first_digit);
         return ret;
     }
