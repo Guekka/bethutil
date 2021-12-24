@@ -3,6 +3,7 @@
 #include "btu/bsa/detail/archive_type.hpp"
 #include "btu/bsa/detail/common.hpp"
 
+#include <boost/stl_interfaces/iterator_interface.hpp>
 #include <bsa/bsa.hpp>
 
 #include <functional>
@@ -57,8 +58,14 @@ public:
 
     auto file_count() const noexcept -> size_t;
 
+    class Iterator;
+
+    auto begin() -> Iterator;
+    auto end() -> Iterator;
+
     [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion;
     [[nodiscard]] auto get_archive() const noexcept -> const UnderlyingArchive &;
+
 
 private:
     UnderlyingArchive archive_;
@@ -66,6 +73,72 @@ private:
 
     ArchiveVersion version_{};
     bool compressed_{false};
+};
+
+class tes4Iter
+    : public boost::stl_interfaces::iterator_interface<Archive::Iterator,
+                                                       std::forward_iterator_tag,
+                                                       std::string,
+                                                       std::string,
+                                                       boost::stl_interfaces::proxy_arrow_result<std::string>>
+{
+public:
+    using base_type
+        = boost::stl_interfaces::iterator_interface<Archive::Iterator,
+                                                    std::forward_iterator_tag,
+                                                    std::string,
+                                                    std::string,
+                                                    boost::stl_interfaces::proxy_arrow_result<std::string>>;
+
+    tes4Iter() noexcept = default;
+    tes4Iter(libbsa::tes4::archive &arch) noexcept;
+
+    static auto end(libbsa::tes4::archive &arch) -> tes4Iter;
+
+    auto operator*() noexcept -> std::string;
+
+    tes4Iter &operator++() noexcept;
+    using base_type::operator++;
+
+    auto operator==(tes4Iter other) const noexcept -> bool;
+
+private:
+    libbsa::tes4::archive::iterator dir_;
+    libbsa::tes4::archive::iterator dir_end_;
+    libbsa::tes4::archive::mapped_type::iterator file_;
+};
+
+using UnderlyingIterator
+    = std::variant<libbsa::tes3::archive::iterator, tes4Iter, libbsa::fo4::archive::iterator>;
+
+class Archive::Iterator
+    : public boost::stl_interfaces::iterator_interface<Archive::Iterator,
+                                                       std::forward_iterator_tag,
+                                                       std::string,
+                                                       std::string,
+                                                       boost::stl_interfaces::proxy_arrow_result<std::string>>
+{
+public:
+    using base_type
+        = boost::stl_interfaces::iterator_interface<Archive::Iterator,
+                                                    std::forward_iterator_tag,
+                                                    std::string,
+                                                    std::string,
+                                                    boost::stl_interfaces::proxy_arrow_result<std::string>>;
+
+    Iterator() noexcept {}
+
+    Iterator(UnderlyingIterator it) noexcept;
+
+    auto operator*() noexcept -> std::string;
+
+    using base_type::operator++;
+    Iterator &operator++() noexcept; // namespace btu::bsa
+
+    auto operator==(Iterator other) const noexcept -> bool;
+
+private:
+    UnderlyingIterator it_;
 };
 
 } // namespace btu::bsa

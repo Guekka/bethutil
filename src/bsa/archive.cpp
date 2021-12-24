@@ -316,6 +316,30 @@ auto Archive::file_count() const noexcept -> size_t
     return std::visit([](auto &&arch) { return arch.size(); }, archive_);
 }
 
+auto Archive::begin() -> Iterator
+{
+    // Stack corruption without constexpr.
+    // See https://developercommunity.visualstudio.com/t/runtime-stack-corruption-using-stdvisit/346200
+    constexpr auto visitor = btu::common::overload{
+        [](libbsa::tes4::archive &a) { return Iterator(tes4Iter(a)); },
+        [](auto &a) { return Iterator{a.begin()}; },
+    };
+
+    return std::visit(visitor, archive_);
+}
+
+auto Archive::end() -> Iterator
+{
+    // Stack corruption without constexpr.
+    // See https://developercommunity.visualstudio.com/t/runtime-stack-corruption-using-stdvisit/346200
+    constexpr auto visiter = btu::common::overload{
+        [&](libbsa::tes4::archive &a) { return Iterator(tes4Iter::end(a)); },
+        [&](auto &a) { return Iterator(a.end()); },
+    };
+
+    return std::visit(visiter, archive_);
+}
+
 auto Archive::get_version() const noexcept -> ArchiveVersion
 {
     return version_;
@@ -324,6 +348,66 @@ auto Archive::get_version() const noexcept -> ArchiveVersion
 auto Archive::get_archive() const noexcept -> const UnderlyingArchive &
 {
     return archive_;
+}
+
+tes4Iter::tes4Iter(libbsa::tes4::archive &arch) noexcept
+    : dir_(arch.begin())
+    , dir_end_(arch.end())
+    , file_(arch.empty() ? libbsa::tes4::archive::mapped_type::iterator{} : arch.begin()->second.begin())
+{
+}
+
+auto tes4Iter::end(libbsa::tes4::archive &arch) -> tes4Iter
+{
+    auto it = tes4Iter(arch);
+    it.dir_ = it.dir_end_;
+    return it;
+}
+
+auto tes4Iter::operator*() noexcept -> std::string
+{
+    return btu::common::as_ascii_string(virtual_to_local_path(dir_->first, file_->first));
+}
+
+auto tes4Iter::operator++() noexcept -> tes4Iter &
+{
+    ++file_;
+    if (file_ == dir_->second.end())
+    {
+        ++dir_;
+        if (dir_ != dir_end_)
+            file_ = dir_->second.begin();
+    }
+    return *this;
+}
+
+auto tes4Iter::operator==(tes4Iter other) const noexcept -> bool
+{
+    // If we're at end, only compare dir
+    return dir_ == other.dir_ && (dir_ == dir_end_ || file_ == other.file_);
+}
+
+Archive::Iterator::Iterator(UnderlyingIterator it) noexcept
+    : it_(it)
+{
+}
+
+auto Archive::Iterator::operator*() noexcept -> std::string
+{
+    return std::visit(btu::common::overload{[](tes4Iter &i) { return *i; },
+                                            [](auto &i) { return std::string(i->first.name()); }},
+                      it_);
+}
+
+auto Archive::Iterator::operator++() noexcept -> Archive::Iterator &
+{
+    std::visit([](auto &i) { ++i; }, it_);
+    return *this;
+}
+
+auto Archive::Iterator::operator==(Iterator other) const noexcept -> bool
+{
+    return it_ == other.it_;
 }
 
 } // namespace btu::bsa
