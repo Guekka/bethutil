@@ -2,8 +2,9 @@
   "name": "bethutil",
   "version-string": "1",
   "dependencies": [
+    "boost-stl-interfaces",
     "utf8h",
-	"rsm-bsa"
+    "rsm-bsa"
   ],
   "features": {
     "tex": {

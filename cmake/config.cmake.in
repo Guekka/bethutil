@@ -5,6 +5,7 @@ set(BETHUTIL_TEX @BETHUTIL_TEX@)
 set(BETHUTIL_HKX @BETHUTIL_HKX@)
 
 find_dependency("bsa")
+find_dependency("Boost")
 if(${BETHUTIL_TEX})
 	find_dependency("directxtex")
 	find_dependency("tl-expected")
@@ -12,5 +13,6 @@ endif()
 if(${BETHUTIL_HKX})
 	find_dependency("reproc++")
 endif()
+
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")

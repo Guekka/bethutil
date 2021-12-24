@@ -20,6 +20,7 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/plugin.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
+    "${INCLUDE_DIR}/btu/modmanager/mod_folder.hpp"
     )
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
@@ -31,6 +32,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/plugin.cpp"
     "${SOURCE_DIR}/bsa/unpack.cpp"
     "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
+    "${SOURCE_DIR}/modmanager/mod_folder.cpp"
     )
 
 option(BETHUTIL_HKX "Build hkx part" OFF)
@@ -83,6 +85,9 @@ target_include_directories(
 
 find_package(bsa CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE bsa::bsa)
+
+find_package(Boost REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PUBLIC Boost::headers)
 
 if(${BETHUTIL_TEX})
   find_package(directxtex CONFIG REQUIRED)
