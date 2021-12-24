@@ -66,7 +66,6 @@ public:
     [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion;
     [[nodiscard]] auto get_archive() const noexcept -> const UnderlyingArchive &;
 
-
 private:
     UnderlyingArchive archive_;
     std::mutex mutex_;
@@ -96,6 +95,7 @@ public:
     static auto end(libbsa::tes4::archive &arch) -> tes4Iter;
 
     auto operator*() noexcept -> std::string;
+    auto write(binary_io::any_ostream &os) const -> void;
 
     tes4Iter &operator++() noexcept;
     using base_type::operator++;
@@ -103,6 +103,8 @@ public:
     auto operator==(tes4Iter other) const noexcept -> bool;
 
 private:
+    libbsa::tes4::version ver_;
+
     libbsa::tes4::archive::iterator dir_;
     libbsa::tes4::archive::iterator dir_end_;
     libbsa::tes4::archive::mapped_type::iterator file_;
@@ -128,9 +130,11 @@ public:
 
     Iterator() noexcept {}
 
-    Iterator(UnderlyingIterator it) noexcept;
+    Iterator(UnderlyingIterator it, libbsa::fo4::format fo4_ver = libbsa::fo4::format::general) noexcept;
 
     auto operator*() noexcept -> std::string;
+
+    auto write(binary_io::any_ostream &os) const -> void;
 
     using base_type::operator++;
     Iterator &operator++() noexcept; // namespace btu::bsa
@@ -139,6 +143,7 @@ public:
 
 private:
     UnderlyingIterator it_;
+    libbsa::fo4::format fo4_ver_;
 };
 
 } // namespace btu::bsa

@@ -318,11 +318,14 @@ auto Archive::file_count() const noexcept -> size_t
 
 auto Archive::begin() -> Iterator
 {
-    // Stack corruption without constexpr.
-    // See https://developercommunity.visualstudio.com/t/runtime-stack-corruption-using-stdvisit/346200
-    constexpr auto visitor = btu::common::overload{
+    const auto ver = archive_version<libbsa::fo4::format>(archive_, version_);
+
+    const auto visitor = btu::common::overload{
+        [](libbsa::tes3::archive &a) { return Iterator{a.begin()}; },
         [](libbsa::tes4::archive &a) { return Iterator(tes4Iter(a)); },
-        [](auto &a) { return Iterator{a.begin()}; },
+        [ver](libbsa::fo4::archive &a) {
+            return Iterator{a.begin(), ver};
+        },
     };
 
     return std::visit(visitor, archive_);
@@ -330,11 +333,14 @@ auto Archive::begin() -> Iterator
 
 auto Archive::end() -> Iterator
 {
-    // Stack corruption without constexpr.
-    // See https://developercommunity.visualstudio.com/t/runtime-stack-corruption-using-stdvisit/346200
-    constexpr auto visiter = btu::common::overload{
-        [&](libbsa::tes4::archive &a) { return Iterator(tes4Iter::end(a)); },
-        [&](auto &a) { return Iterator(a.end()); },
+    const auto ver = archive_version<libbsa::fo4::format>(archive_, version_);
+
+    const auto visiter = btu::common::overload{
+        [](libbsa::tes3::archive &a) { return Iterator(a.end()); },
+        [](libbsa::tes4::archive &a) { return Iterator(tes4Iter::end(a)); },
+        [ver](libbsa::fo4::archive &a) {
+            return Iterator{a.end(), ver};
+        },
     };
 
     return std::visit(visiter, archive_);
@@ -369,6 +375,11 @@ auto tes4Iter::operator*() noexcept -> std::string
     return btu::common::as_ascii_string(virtual_to_local_path(dir_->first, file_->first));
 }
 
+auto tes4Iter::write(binary_io::any_ostream &os) const -> void
+{
+    file_->second.write(os, ver_);
+}
+
 auto tes4Iter::operator++() noexcept -> tes4Iter &
 {
     ++file_;
@@ -387,8 +398,9 @@ auto tes4Iter::operator==(tes4Iter other) const noexcept -> bool
     return dir_ == other.dir_ && (dir_ == dir_end_ || file_ == other.file_);
 }
 
-Archive::Iterator::Iterator(UnderlyingIterator it) noexcept
+Archive::Iterator::Iterator(UnderlyingIterator it, libbsa::fo4::format fo4_ver) noexcept
     : it_(it)
+    , fo4_ver_(fo4_ver)
 {
 }
 
@@ -397,6 +409,17 @@ auto Archive::Iterator::operator*() noexcept -> std::string
     return std::visit(btu::common::overload{[](tes4Iter &i) { return *i; },
                                             [](auto &i) { return std::string(i->first.name()); }},
                       it_);
+}
+
+auto Archive::Iterator::write(binary_io::any_ostream &os) const -> void
+{
+    const auto visitor = btu::common::overload{
+        [&](const libbsa::tes3::archive::iterator &i) -> void { i->second.write(os); },
+        [&](const tes4Iter &i) -> void { i.write(os); },
+        [&, this](const libbsa::fo4::archive::iterator &i) -> void { i->second.write(os, fo4_ver_); },
+    };
+
+    std::visit(visitor, it_);
 }
 
 auto Archive::Iterator::operator++() noexcept -> Archive::Iterator &
