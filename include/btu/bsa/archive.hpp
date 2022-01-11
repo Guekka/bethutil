@@ -74,33 +74,32 @@ private:
     bool compressed_{false};
 };
 
-class tes4Iter
-    : public boost::stl_interfaces::iterator_interface<Archive::Iterator,
-                                                       std::forward_iterator_tag,
-                                                       std::string,
-                                                       std::string,
-                                                       boost::stl_interfaces::proxy_arrow_result<std::string>>
+namespace detail {
+
+using tes4IterBase
+    = boost::stl_interfaces::iterator_interface<Archive::Iterator,
+                                                std::forward_iterator_tag,
+                                                std::string,
+                                                std::string,
+                                                boost::stl_interfaces::proxy_arrow_result<std::string>>;
+
+class Tes4Iter : public tes4IterBase
 {
 public:
-    using base_type
-        = boost::stl_interfaces::iterator_interface<Archive::Iterator,
-                                                    std::forward_iterator_tag,
-                                                    std::string,
-                                                    std::string,
-                                                    boost::stl_interfaces::proxy_arrow_result<std::string>>;
+    using base_type = tes4IterBase;
 
-    tes4Iter() noexcept = default;
-    tes4Iter(libbsa::tes4::archive &arch) noexcept;
+    Tes4Iter() noexcept = default;
+    Tes4Iter(libbsa::tes4::archive &arch) noexcept;
 
-    static auto end(libbsa::tes4::archive &arch) -> tes4Iter;
+    static auto end(libbsa::tes4::archive &arch) -> Tes4Iter;
 
     auto operator*() noexcept -> std::string;
     auto write(binary_io::any_ostream &os) const -> void;
 
-    tes4Iter &operator++() noexcept;
+    Tes4Iter &operator++() noexcept;
     using base_type::operator++;
 
-    auto operator==(tes4Iter other) const noexcept -> bool;
+    auto operator==(Tes4Iter other) const noexcept -> bool;
 
 private:
     libbsa::tes4::version ver_;
@@ -110,23 +109,21 @@ private:
     libbsa::tes4::archive::mapped_type::iterator file_;
 };
 
-using UnderlyingIterator
-    = std::variant<libbsa::tes3::archive::iterator, tes4Iter, libbsa::fo4::archive::iterator>;
+using ArchiveIteratorBase
+    = boost::stl_interfaces::iterator_interface<Archive::Iterator,
+                                                std::forward_iterator_tag,
+                                                std::string,
+                                                std::string,
+                                                boost::stl_interfaces::proxy_arrow_result<std::string>>;
+} // namespace detail
 
-class Archive::Iterator
-    : public boost::stl_interfaces::iterator_interface<Archive::Iterator,
-                                                       std::forward_iterator_tag,
-                                                       std::string,
-                                                       std::string,
-                                                       boost::stl_interfaces::proxy_arrow_result<std::string>>
+using UnderlyingIterator
+    = std::variant<libbsa::tes3::archive::iterator, detail::Tes4Iter, libbsa::fo4::archive::iterator>;
+
+class Archive::Iterator : public detail::ArchiveIteratorBase
 {
 public:
-    using base_type
-        = boost::stl_interfaces::iterator_interface<Archive::Iterator,
-                                                    std::forward_iterator_tag,
-                                                    std::string,
-                                                    std::string,
-                                                    boost::stl_interfaces::proxy_arrow_result<std::string>>;
+    using base_type = detail::ArchiveIteratorBase;
 
     Iterator() noexcept {}
 

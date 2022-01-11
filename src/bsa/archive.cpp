@@ -322,7 +322,7 @@ auto Archive::begin() -> Iterator
 
     const auto visitor = btu::common::overload{
         [](libbsa::tes3::archive &a) { return Iterator{a.begin()}; },
-        [](libbsa::tes4::archive &a) { return Iterator(tes4Iter(a)); },
+        [](libbsa::tes4::archive &a) { return Iterator(detail::Tes4Iter(a)); },
         [ver](libbsa::fo4::archive &a) {
             return Iterator{a.begin(), ver};
         },
@@ -337,7 +337,7 @@ auto Archive::end() -> Iterator
 
     const auto visiter = btu::common::overload{
         [](libbsa::tes3::archive &a) { return Iterator(a.end()); },
-        [](libbsa::tes4::archive &a) { return Iterator(tes4Iter::end(a)); },
+        [](libbsa::tes4::archive &a) { return Iterator(detail::Tes4Iter::end(a)); },
         [ver](libbsa::fo4::archive &a) {
             return Iterator{a.end(), ver};
         },
@@ -356,31 +356,32 @@ auto Archive::get_archive() const noexcept -> const UnderlyingArchive &
     return archive_;
 }
 
-tes4Iter::tes4Iter(libbsa::tes4::archive &arch) noexcept
+namespace detail {
+Tes4Iter::Tes4Iter(libbsa::tes4::archive &arch) noexcept
     : dir_(arch.begin())
     , dir_end_(arch.end())
     , file_(arch.empty() ? libbsa::tes4::archive::mapped_type::iterator{} : arch.begin()->second.begin())
 {
 }
 
-auto tes4Iter::end(libbsa::tes4::archive &arch) -> tes4Iter
+auto Tes4Iter::end(libbsa::tes4::archive &arch) -> Tes4Iter
 {
-    auto it = tes4Iter(arch);
+    auto it = Tes4Iter(arch);
     it.dir_ = it.dir_end_;
     return it;
 }
 
-auto tes4Iter::operator*() noexcept -> std::string
+auto Tes4Iter::operator*() noexcept -> std::string
 {
     return btu::common::as_ascii_string(virtual_to_local_path(dir_->first, file_->first));
 }
 
-auto tes4Iter::write(binary_io::any_ostream &os) const -> void
+auto Tes4Iter::write(binary_io::any_ostream &os) const -> void
 {
     file_->second.write(os, ver_);
 }
 
-auto tes4Iter::operator++() noexcept -> tes4Iter &
+auto Tes4Iter::operator++() noexcept -> Tes4Iter &
 {
     ++file_;
     if (file_ == dir_->second.end())
@@ -392,11 +393,12 @@ auto tes4Iter::operator++() noexcept -> tes4Iter &
     return *this;
 }
 
-auto tes4Iter::operator==(tes4Iter other) const noexcept -> bool
+auto Tes4Iter::operator==(Tes4Iter other) const noexcept -> bool
 {
     // If we're at end, only compare dir
     return dir_ == other.dir_ && (dir_ == dir_end_ || file_ == other.file_);
 }
+} // namespace detail
 
 Archive::Iterator::Iterator(UnderlyingIterator it, libbsa::fo4::format fo4_ver) noexcept
     : it_(it)
@@ -406,7 +408,7 @@ Archive::Iterator::Iterator(UnderlyingIterator it, libbsa::fo4::format fo4_ver) 
 
 auto Archive::Iterator::operator*() noexcept -> std::string
 {
-    return std::visit(btu::common::overload{[](tes4Iter &i) { return *i; },
+    return std::visit(btu::common::overload{[](detail::Tes4Iter &i) { return *i; },
                                             [](auto &i) { return std::string(i->first.name()); }},
                       it_);
 }
@@ -415,7 +417,7 @@ auto Archive::Iterator::write(binary_io::any_ostream &os) const -> void
 {
     const auto visitor = btu::common::overload{
         [&](const libbsa::tes3::archive::iterator &i) -> void { i->second.write(os); },
-        [&](const tes4Iter &i) -> void { i.write(os); },
+        [&](const detail::Tes4Iter &i) -> void { i.write(os); },
         [&, this](const libbsa::fo4::archive::iterator &i) -> void { i->second.write(os, fo4_ver_); },
     };
 
