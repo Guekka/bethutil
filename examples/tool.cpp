@@ -11,7 +11,6 @@
 
 using namespace btu::bsa;
 
-
 auto main(int argc, char *argv[]) -> int
 {
     std::vector<std::string_view> files(argv + 1, argv + argc);
