@@ -5,16 +5,14 @@
 
 #pragma once
 
+#define _SILENCE_CLANG_COROUTINE_MESSAGE
 #include "btu/bsa/archive.hpp"
 #include "btu/common/path.hpp"
 
-#include <boost/stl_interfaces/iterator_interface.hpp>
+#include <flow.hpp>
+#include <neo/iterator_facade.hpp>
 
 #include <variant>
-
-namespace btu::bsa {
-class Archive;
-}
 
 namespace btu::modmanager {
 using btu::common::Path;
@@ -54,13 +52,18 @@ public:
     [[nodiscard]] auto size() -> size_t;
 
     class Iterator;
+    class Sentinel
+    {
+    };
+
+    auto dereference() { return; }
 
     [[nodiscard]] auto begin() -> Iterator;
-    [[nodiscard]] auto end() -> Iterator;
+    [[nodiscard]] auto end() -> Sentinel;
 
 private:
-    std::vector<Path> archives_;
-    std::vector<Path> files_;
+    std::vector<std::unique_ptr<btu::bsa::Archive>> archives_;
+    std::vector<ModFile> loose_files_;
 
     size_t count_;
 
@@ -68,73 +71,42 @@ private:
     std::u8string archive_ext_;
 };
 
-class ModFolder::Iterator
-    : public boost::stl_interfaces::iterator_interface<Iterator,
-                                                       std::forward_iterator_tag,
-                                                       ModFile,
-                                                       ModFile,
-                                                       boost::stl_interfaces::proxy_arrow_result<ModFile>>
+class ModFolder::Iterator : public neo::iterator_facade<ModFolder::Iterator>
 {
-    using base_type
-        = boost::stl_interfaces::iterator_interface<Iterator,
-                                                    std::forward_iterator_tag,
-                                                    ModFile,
-                                                    ModFile,
-                                                    boost::stl_interfaces::proxy_arrow_result<ModFile>>;
+    static constexpr auto init = [](ModFolder &mf) {
+        return flow::from(mf.archives_)
+            .flat_map([](auto &a) { return flow::from(*a); })
+            .map([](const std::string &) { return ModFile{}; })
+            .chain(flow::copy(mf.loose_files_));
+    };
 
-    Iterator() noexcept {}
+    using IteratorType = std::invoke_result_t<decltype(init), ModFolder &>;
+    using ValueType    = flow::next_t<IteratorType>;
 
+    static constexpr bool single_pass_iterator = true;
+
+public:
     Iterator(ModFolder &mf) noexcept
-        : is_archive(true)
-        , mf_(&mf)
-        , files_(mf.archives_)
+        : it_(init(mf))
     {
-        if (files_.empty())
-        {
-            files_     = mf_->files_;
-            is_archive = false;
-        }
-
-        if (is_archive)
-            load_archive();
-        else
-            file_ = ModFile(detail::ModFileDisk{files_.front()});
+        increment();
     }
 
-    auto operator*() const noexcept -> const ModFile & { return file_; }
-    Iterator &operator++() noexcept
+    auto increment() -> Iterator &
     {
-        files_ = files_.subspan(1);
-        if (files_.empty() && is_archive)
-            file_ = ModFile(detail::ModFileDisk{files_.front()});
-        else if (is_archive)
-            load_archive();
-        else
-            file_ = ModFile(detail::ModFileDisk{files_.front()});
+        val_ = it_.next();
         return *this;
     }
-    auto operator==(const ModFolder::Iterator &other) const noexcept -> bool
-    {
-        return mf_ == other.mf_ && files_.data() == other.files_.data() && arch_ == other.arch_;
-    }
 
-    using base_type::operator++;
+    auto dereference() const -> ValueType { return val_; }
+
+    auto operator==(ModFolder::Sentinel) -> bool;
 
 private:
-    void load_archive()
-    {
-        arch_ = std::make_unique<btu::bsa::Archive>(files_.front());
-        file_ = ModFile(arch_->begin());
-    }
-
-    std::unique_ptr<btu::bsa::Archive> arch_;
-    bool is_archive;
-
-    ModFolder *mf_{};
-    std::span<Path> files_{};
-
-    ModFile file_{};
+    IteratorType it_;
+    ValueType val_;
 };
 
-//BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(Iterator, std::forward_iterator);
+static_assert(std::input_iterator<ModFolder::Iterator>);
+
 } // namespace btu::modmanager

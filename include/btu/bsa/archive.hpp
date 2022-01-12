@@ -75,6 +75,11 @@ private:
 };
 
 namespace detail {
+class WriteableFile
+{
+private:
+    std::string name_;
+};
 
 class Tes4Iter : public neo::iterator_facade<Tes4Iter>
 {

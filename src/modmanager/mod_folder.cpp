@@ -37,8 +37,8 @@ ModFolder::ModFolder(Path directory, std::u8string archive_ext)
     , archive_ext_(btu::common::to_lower(std::move(archive_ext)))
 {
     //Typical amount of medium mod
-    archives_.reserve(5);
-    files_.reserve(1'000);
+    archives_.reserve(4);
+    loose_files_.reserve(1'000);
 
     auto is_arch = [this](const Path &file_name) {
         auto ext = btu::common::to_lower(file_name.extension().u8string());
@@ -52,19 +52,34 @@ ModFolder::ModFolder(Path directory, std::u8string archive_ext)
         const auto path = f.path();
         if (is_arch(path))
         {
-            btu::bsa::Archive arch(path);
-            count_ += arch.file_count();
-            archives_.emplace_back(std::move(path));
+            auto arch = std::make_unique<btu::bsa::Archive>(path);
+            count_ += arch->file_count();
+            archives_.emplace_back(std::move(arch));
         }
         else
         {
-            files_.emplace_back(std::move(path));
+            loose_files_.emplace_back(detail::ModFileDisk{std::move(path)});
         }
     }
 
     //Memory optimization
     archives_.shrink_to_fit();
-    files_.shrink_to_fit();
+    loose_files_.shrink_to_fit();
+}
+
+ModFolder::Iterator ModFolder::begin()
+{
+    return Iterator(*this);
+}
+
+auto ModFolder::end() -> ModFolder::Sentinel
+{
+    return {};
+}
+
+bool ModFolder::Iterator::operator==(Sentinel)
+{
+    return !val_.has_value();
 }
 
 } // namespace btu::modmanager
