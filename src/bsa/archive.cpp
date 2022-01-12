@@ -318,12 +318,11 @@ auto Archive::file_count() const noexcept -> size_t
 
 auto Archive::begin() -> Iterator
 {
-    const auto ver = archive_version<libbsa::fo4::format>(archive_, version_);
-
     const auto visitor = btu::common::overload{
         [](libbsa::tes3::archive &a) { return Iterator{a.begin()}; },
         [](libbsa::tes4::archive &a) { return Iterator(detail::Tes4Iter(a)); },
-        [ver](libbsa::fo4::archive &a) {
+        [&](libbsa::fo4::archive &a) {
+            const auto ver = archive_version<libbsa::fo4::format>(archive_, version_);
             return Iterator{a.begin(), ver};
         },
     };
@@ -333,12 +332,11 @@ auto Archive::begin() -> Iterator
 
 auto Archive::end() -> Iterator
 {
-    const auto ver = archive_version<libbsa::fo4::format>(archive_, version_);
-
     const auto visiter = btu::common::overload{
         [](libbsa::tes3::archive &a) { return Iterator(a.end()); },
         [](libbsa::tes4::archive &a) { return Iterator(detail::Tes4Iter::end(a)); },
-        [ver](libbsa::fo4::archive &a) {
+        [&](libbsa::fo4::archive &a) {
+            const auto ver = archive_version<libbsa::fo4::format>(archive_, version_);
             return Iterator{a.end(), ver};
         },
     };
@@ -371,7 +369,7 @@ auto Tes4Iter::end(libbsa::tes4::archive &arch) -> Tes4Iter
     return it;
 }
 
-auto Tes4Iter::operator*() noexcept -> std::string
+auto Tes4Iter::dereference() const noexcept -> std::string
 {
     return btu::common::as_ascii_string(virtual_to_local_path(dir_->first, file_->first));
 }
@@ -381,7 +379,7 @@ auto Tes4Iter::write(binary_io::any_ostream &os) const -> void
     file_->second.write(os, ver_);
 }
 
-auto Tes4Iter::operator++() noexcept -> Tes4Iter &
+auto Tes4Iter::increment() noexcept -> Tes4Iter &
 {
     ++file_;
     if (file_ == dir_->second.end())
@@ -406,10 +404,10 @@ Archive::Iterator::Iterator(UnderlyingIterator it, libbsa::fo4::format fo4_ver) 
 {
 }
 
-auto Archive::Iterator::operator*() noexcept -> std::string
+auto Archive::Iterator::dereference() const noexcept -> std::string
 {
-    return std::visit(btu::common::overload{[](detail::Tes4Iter &i) { return *i; },
-                                            [](auto &i) { return std::string(i->first.name()); }},
+    return std::visit(btu::common::overload{[](const detail::Tes4Iter &i) { return *i; },
+                                            [](const auto &i) { return std::string(i->first.name()); }},
                       it_);
 }
 
@@ -424,7 +422,7 @@ auto Archive::Iterator::write(binary_io::any_ostream &os) const -> void
     std::visit(visitor, it_);
 }
 
-auto Archive::Iterator::operator++() noexcept -> Archive::Iterator &
+auto Archive::Iterator::increment() noexcept -> Archive::Iterator &
 {
     std::visit([](auto &i) { ++i; }, it_);
     return *this;
