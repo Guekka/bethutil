@@ -75,6 +75,12 @@ add_library(
   "${ROOT_DIR}/.clang-tidy")
 add_library("btu::btu" ALIAS "${PROJECT_NAME}")
 
+find_path(LIBFLOW_INCLUDE_DIRS "flow.hpp")
+target_include_directories("${PROJECT_NAME}" PRIVATE ${LIBFLOW_INCLUDE_DIRS})
+
+find_package(neo-fun CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE neo::neo-fun)
+
 find_path(UTF8H_INCLUDE_DIRS "utf8h/utf8.h" REQUIRED)
 target_include_directories(
   "${PROJECT_NAME}" SYSTEM
@@ -83,9 +89,6 @@ target_include_directories(
 
 find_package(bsa CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE bsa::bsa)
-
-find_package(Boost REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PUBLIC Boost::headers)
 
 if(${BETHUTIL_TEX})
   find_package(directxtex CONFIG REQUIRED)

@@ -2,7 +2,8 @@
   "name": "bethutil",
   "version-string": "1",
   "dependencies": [
-    "boost-stl-interfaces",
+    "libflow",
+    "neo-fun",
     "utf8h",
     "rsm-bsa"
   ],
