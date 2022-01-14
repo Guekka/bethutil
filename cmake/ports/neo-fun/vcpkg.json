@@ -1,0 +1,17 @@
+{
+    "name": "neo-fun",
+    "version-date": "2021-10-21",
+    "description": "Single header utf8 string functions for C and C++",
+    "homepage": "https://github.com/sheredom/utf8.h",
+	"dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ]
+}
+  

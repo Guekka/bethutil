@@ -51,15 +51,14 @@ public:
 
     [[nodiscard]] auto size() -> size_t;
 
-    class Iterator;
-    class Sentinel
+    [[nodiscard]] auto as_range() const
     {
-    };
-
-    auto dereference() { return; }
-
-    [[nodiscard]] auto begin() -> Iterator;
-    [[nodiscard]] auto end() -> Sentinel;
+        return flow::from(archives_)
+            .flat_map([](auto &a) { return flow::from(*a); })
+            .map([](const std::string &) { return ModFile{}; })
+            .chain(flow::copy(loose_files_))
+            .to_range();
+    }
 
 private:
     std::vector<std::unique_ptr<btu::bsa::Archive>> archives_;
@@ -70,14 +69,11 @@ private:
     Path dir_;
     std::u8string archive_ext_;
 };
-
+/*
 class ModFolder::Iterator : public neo::iterator_facade<ModFolder::Iterator>
 {
     static constexpr auto init = [](ModFolder &mf) {
-        return flow::from(mf.archives_)
-            .flat_map([](auto &a) { return flow::from(*a); })
-            .map([](const std::string &) { return ModFile{}; })
-            .chain(flow::copy(mf.loose_files_));
+
     };
 
     using IteratorType = std::invoke_result_t<decltype(init), ModFolder &>;
@@ -108,5 +104,5 @@ private:
 };
 
 static_assert(std::input_iterator<ModFolder::Iterator>);
-
+*/
 } // namespace btu::modmanager

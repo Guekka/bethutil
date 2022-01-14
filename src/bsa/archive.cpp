@@ -18,48 +18,6 @@ namespace btu::bsa {
     return std::visit(visiter, archive);
 }
 
-template<typename VersionType>
-[[nodiscard]] auto archive_version(const UnderlyingArchive &archive, ArchiveVersion a_version) -> VersionType
-{
-    const bool correct = [&] {
-        switch (a_version)
-        {
-            case ArchiveVersion::tes3:
-            {
-                const bool same = std::same_as<VersionType, std::uint32_t>;
-                return same && std::holds_alternative<libbsa::tes3::archive>(archive);
-            }
-            case ArchiveVersion::tes4:
-            case ArchiveVersion::fo3:
-            case ArchiveVersion::sse:
-            {
-                const bool same = std::same_as<VersionType, libbsa::tes4::version>;
-                return same && std::holds_alternative<libbsa::tes4::archive>(archive);
-            }
-            case ArchiveVersion::fo4:
-            case ArchiveVersion::fo4dx:
-            {
-                const bool same = std::same_as<VersionType, libbsa::fo4::format>;
-                return same && std::holds_alternative<libbsa::fo4::archive>(archive);
-            }
-            default: return false;
-        }
-    }();
-
-    if (!correct)
-    {
-        throw std::runtime_error("Mismatch between requested version and variant type");
-    }
-
-    return static_cast<VersionType>(libbsa::detail::to_underlying(a_version));
-}
-
-template auto archive_version<std::uint32_t>(const UnderlyingArchive &, ArchiveVersion) -> std::uint32_t;
-template auto archive_version<libbsa::tes4::version>(const UnderlyingArchive &, ArchiveVersion)
-    -> libbsa::tes4::version;
-template auto archive_version<libbsa::fo4::format>(const UnderlyingArchive &, ArchiveVersion)
-    -> libbsa::fo4::format;
-
 Archive::Archive(const Path &a_path)
 {
     read(a_path);
@@ -126,16 +84,55 @@ auto Archive::write(Path a_path) -> void
     const auto writer = btu::common::overload{
         [&](libbsa::tes3::archive &bsa) { bsa.write(a_path); },
         [&](libbsa::tes4::archive &bsa) {
-            const auto version = archive_version<libbsa::tes4::version>(archive_, version_);
+            const auto version = get_version<libbsa::tes4::version>();
             bsa.write(a_path, version);
         },
         [&](libbsa::fo4::archive &ba2) {
-            const auto version = archive_version<libbsa::fo4::format>(archive_, version_);
+            const auto version = get_version<libbsa::fo4::format>();
             ba2.write(a_path, version);
         },
     };
 
     std::visit(writer, archive_);
+}
+
+auto Archive::as_flow() -> Flow
+{
+    auto tes4 = [this](libbsa::tes4::archive &a) -> Flow {
+        return flow::from(a).flat_map([this](const auto &dir) {
+            return flow::from(dir.second)
+                .map([&, this](const auto &file) {
+                    const auto u8str = virtual_to_local_path(dir.first, file.first);
+                    const auto str   = btu::common::as_ascii_string(u8str);
+                    return FlowValue{str, File(file.second, *this)};
+                })
+                .to_vector();
+        });
+    };
+
+    const auto visitor = btu::common::overload
+    {
+        [this](libbsa::tes3::archive &a) -> Flow {
+            return flow::from(a).map([this](const auto &p) {
+                return FlowValue{p.first.name(), File(p.second, *this)};
+            });
+        },
+#if 0
+            [this](libbsa::tes4::archive &) -> Flow {
+                auto vec = std::vector<FlowValue>{{"", File(libbsa::tes4::file{}, *this)}};
+                return Flow(flow::copy(vec));
+            },
+#else
+            tes4,
+#endif
+            [this](libbsa::fo4::archive &a) -> Flow {
+                return flow::from(a).map([this](const auto &p) {
+                    return FlowValue{p.first.name(), File(p.second, *this)};
+                });
+            },
+    };
+
+    return std::visit(visitor, archive_);
 }
 
 void Archive::add_file(const common::Path &a_relative, UnderlyingFile file)
@@ -179,13 +176,13 @@ auto Archive::add_file(const Path &a_root, const Path &a_path) -> void
         },
         [&, this](libbsa::tes4::archive &) {
             libbsa::tes4::file f;
-            const auto version = archive_version<libbsa::tes4::version>(archive_, version_);
+            const auto version = get_version<libbsa::tes4::version>();
             f.read(a_path, version, libbsa::tes4::compression_codec::normal, compress);
             add_file(relative, std::move(f));
         },
         [&, this](libbsa::fo4::archive &) {
             libbsa::fo4::file f;
-            const auto format = archive_version<libbsa::fo4::format>(archive_, version_);
+            const auto format = get_version<libbsa::fo4::format>();
             f.read(a_path,
                    format,
                    512u,
@@ -208,7 +205,7 @@ auto Archive::add_file(const Path &relative, std::vector<std::byte> a_data) -> v
         },
         [&, this](libbsa::tes4::archive &) {
             libbsa::tes4::file f;
-            const auto version = archive_version<libbsa::tes4::version>(archive_, version_);
+            const auto version = get_version<libbsa::tes4::version>();
             f.set_data(std::move(a_data));
             if (compressed_)
                 f.compress(version);
@@ -218,7 +215,7 @@ auto Archive::add_file(const Path &relative, std::vector<std::byte> a_data) -> v
             libbsa::fo4::file f;
             const auto compress = compressed_ ? libbsa::compression_type::compressed
                                               : libbsa::compression_type::decompressed;
-            const auto format   = archive_version<libbsa::fo4::format>(archive_, version_);
+            const auto format   = get_version<libbsa::fo4::format>();
             f.read(a_data,
                    format,
                    512u,
@@ -246,12 +243,12 @@ auto Archive::write_file(const UnderlyingFile &file, const Path &path) -> void
             file.write(path);
         },
         [&](const libbsa::tes4::file &file) {
-            const auto ver = archive_version<libbsa::tes4::version>(archive_, version_);
+            const auto ver = get_version<libbsa::tes4::version>();
             make_dir(path);
             file.write(path, ver);
         },
         [&](const libbsa::fo4::file &file) {
-            const auto ver = archive_version<libbsa::fo4::format>(archive_, version_);
+            const auto ver = get_version<libbsa::fo4::format>();
             make_dir(path);
             file.write(path, ver);
         },
@@ -322,7 +319,7 @@ auto Archive::begin() -> Iterator
         [](libbsa::tes3::archive &a) { return Iterator{a.begin()}; },
         [](libbsa::tes4::archive &a) { return Iterator(detail::Tes4Iter(a)); },
         [&](libbsa::fo4::archive &a) {
-            const auto ver = archive_version<libbsa::fo4::format>(archive_, version_);
+            const auto ver = get_version<libbsa::fo4::format>();
             return Iterator{a.begin(), ver};
         },
     };
@@ -336,13 +333,53 @@ auto Archive::end() -> Iterator
         [](libbsa::tes3::archive &a) { return Iterator(a.end()); },
         [](libbsa::tes4::archive &a) { return Iterator(detail::Tes4Iter::end(a)); },
         [&](libbsa::fo4::archive &a) {
-            const auto ver = archive_version<libbsa::fo4::format>(archive_, version_);
+            const auto ver = get_version<libbsa::fo4::format>();
             return Iterator{a.end(), ver};
         },
     };
 
     return std::visit(visiter, archive_);
 }
+
+template<typename VersionType>
+[[nodiscard]] auto Archive::get_version() const -> VersionType
+{
+    const bool correct = [&] {
+        switch (version_)
+        {
+            case ArchiveVersion::tes3:
+            {
+                const bool same = std::same_as<VersionType, std::uint32_t>;
+                return same && std::holds_alternative<libbsa::tes3::archive>(archive_);
+            }
+            case ArchiveVersion::tes4:
+            case ArchiveVersion::fo3:
+            case ArchiveVersion::sse:
+            {
+                const bool same = std::same_as<VersionType, libbsa::tes4::version>;
+                return same && std::holds_alternative<libbsa::tes4::archive>(archive_);
+            }
+            case ArchiveVersion::fo4:
+            case ArchiveVersion::fo4dx:
+            {
+                const bool same = std::same_as<VersionType, libbsa::fo4::format>;
+                return same && std::holds_alternative<libbsa::fo4::archive>(archive_);
+            }
+            default: return false;
+        }
+    }();
+
+    if (!correct)
+    {
+        throw std::runtime_error("Mismatch between requested version and variant type");
+    }
+
+    return static_cast<VersionType>(libbsa::detail::to_underlying(version_));
+}
+
+template auto Archive::get_version<std::uint32_t>() const -> std::uint32_t;
+template auto Archive::get_version<libbsa::tes4::version>() const -> libbsa::tes4::version;
+template auto Archive::get_version<libbsa::fo4::format>() const -> libbsa::fo4::format;
 
 auto Archive::get_version() const noexcept -> ArchiveVersion
 {
@@ -371,7 +408,11 @@ auto Tes4Iter::end(libbsa::tes4::archive &arch) -> Tes4Iter
 
 auto Tes4Iter::dereference() const noexcept -> std::string
 {
-    return btu::common::as_ascii_string(virtual_to_local_path(dir_->first, file_->first));
+    /*
+    const auto s = btu::common::as_ascii_string(virtual_to_local_path(dir_->first, file_->first));
+    return {s, UnderlyingFile(file_->second)};
+    */
+    return {};
 }
 
 auto Tes4Iter::write(binary_io::any_ostream &os) const -> void
@@ -431,6 +472,21 @@ auto Archive::Iterator::increment() noexcept -> Archive::Iterator &
 auto Archive::Iterator::operator==(Iterator other) const noexcept -> bool
 {
     return it_ == other.it_;
+}
+
+void File::write(binary_io::any_ostream &os) const
+{
+    const auto visitor = btu::common::overload{
+        [&](const libbsa::tes3::file &f) { f.write(os); },
+        [&, this](const libbsa::tes4::file &f) {
+            f.write(os, parent_.get().get_version<libbsa::tes4::version>());
+        },
+        [&, this](const libbsa::fo4::file &f) {
+            f.write(os, parent_.get().get_version<libbsa::fo4::format>());
+        },
+    };
+
+    std::visit(visitor, file_);
 }
 
 } // namespace btu::bsa

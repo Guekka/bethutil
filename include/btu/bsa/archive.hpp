@@ -1,14 +1,38 @@
 #pragma once
 
+#define _SILENCE_CLANG_COROUTINE_MESSAGE
 #include "btu/bsa/detail/archive_type.hpp"
 #include "btu/bsa/detail/common.hpp"
 
 #include <bsa/bsa.hpp>
+#include <flow.hpp>
 #include <neo/iterator_facade.hpp>
 
 #include <functional>
 #include <mutex>
 #include <variant>
+
+template<typename Iterators>
+class IteratorsVariant : public neo::iterator_facade<IteratorsVariant<Iterators>>
+{
+    Iterators iterators_;
+
+public:
+    IteratorsVariant(Iterators its)
+        : iterators_(std::move(its))
+    {
+    }
+
+    auto dereference() const
+    {
+        return std::visit([](const auto &it) { return *it; }, iterators_);
+    }
+
+    auto increment()
+    {
+        return std::visit([](const auto &it) { return ++it; }, iterators_);
+    }
+};
 
 namespace libbsa = ::bsa;
 
@@ -36,8 +60,7 @@ template<class... Keys>
 
 [[nodiscard]] auto get_archive_identifier(const UnderlyingArchive &archive) -> std::string_view;
 
-template<typename Version>
-[[nodiscard]] auto archive_version(const UnderlyingArchive &archive, Version a_version) -> Version;
+class File;
 
 class Archive final
 {
@@ -47,6 +70,10 @@ public:
 
     auto read(Path a_path) -> ArchiveVersion;
     auto write(Path a_path) -> void;
+
+    using FlowValue = std::pair<std::string, File>;
+    using Flow      = flow::any_flow<FlowValue>;
+    auto as_flow() -> Flow;
 
     auto add_file(const Path &a_relative, UnderlyingFile file) -> void;
     auto add_file(const Path &a_root, const Path &a_path) -> void;
@@ -63,6 +90,9 @@ public:
     auto begin() -> Iterator;
     auto end() -> Iterator;
 
+    template<typename VersionType>
+    [[nodiscard]] auto get_version() const -> VersionType;
+
     [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion;
     [[nodiscard]] auto get_archive() const noexcept -> const UnderlyingArchive &;
 
@@ -74,19 +104,29 @@ private:
     bool compressed_{false};
 };
 
-namespace detail {
-class WriteableFile
+class File final
 {
+public:
+    File(UnderlyingFile f, Archive &parent)
+        : file_(std::move(f))
+        , parent_(parent)
+    {
+    }
+
+    auto write(binary_io::any_ostream &os) const -> void;
+
 private:
-    std::string name_;
+    UnderlyingFile file_;
+    std::reference_wrapper<Archive> parent_;
 };
+
+namespace detail {
 
 class Tes4Iter : public neo::iterator_facade<Tes4Iter>
 {
 public:
     using base_type = neo::iterator_facade<Tes4Iter>;
 
-    Tes4Iter() noexcept = default;
     Tes4Iter(libbsa::tes4::archive &arch) noexcept;
 
     static auto end(libbsa::tes4::archive &arch) -> Tes4Iter;
@@ -106,7 +146,7 @@ private:
     libbsa::tes4::archive::mapped_type::iterator file_;
 };
 
-static_assert(std::forward_iterator<Tes4Iter>);
+//static_assert(std::forward_iterator<Tes4Iter>);
 } // namespace detail
 
 using UnderlyingIterator

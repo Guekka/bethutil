@@ -66,7 +66,7 @@ ModFolder::ModFolder(Path directory, std::u8string archive_ext)
     archives_.shrink_to_fit();
     loose_files_.shrink_to_fit();
 }
-
+/*
 ModFolder::Iterator ModFolder::begin()
 {
     return Iterator(*this);
@@ -81,5 +81,5 @@ bool ModFolder::Iterator::operator==(Sentinel)
 {
     return !val_.has_value();
 }
-
+*/
 } // namespace btu::modmanager
