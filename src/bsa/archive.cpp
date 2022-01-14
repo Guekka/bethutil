@@ -98,38 +98,26 @@ auto Archive::write(Path a_path) -> void
 
 auto Archive::as_flow() -> Flow
 {
-    auto tes4 = [this](libbsa::tes4::archive &a) -> Flow {
-        return flow::from(a).flat_map([this](const auto &dir) {
-            return flow::from(dir.second)
-                .map([&, this](const auto &file) {
-                    const auto u8str = virtual_to_local_path(dir.first, file.first);
-                    const auto str   = btu::common::as_ascii_string(u8str);
-                    return FlowValue{str, File(file.second, *this)};
-                })
-                .to_vector();
-        });
-    };
-
-    const auto visitor = btu::common::overload
-    {
+    const auto visitor = btu::common::overload{
         [this](libbsa::tes3::archive &a) -> Flow {
             return flow::from(a).map([this](const auto &p) {
                 return FlowValue{p.first.name(), File(p.second, *this)};
             });
         },
-#if 0
-            [this](libbsa::tes4::archive &) -> Flow {
-                auto vec = std::vector<FlowValue>{{"", File(libbsa::tes4::file{}, *this)}};
-                return Flow(flow::copy(vec));
-            },
-#else
-            tes4,
-#endif
-            [this](libbsa::fo4::archive &a) -> Flow {
-                return flow::from(a).map([this](const auto &p) {
-                    return FlowValue{p.first.name(), File(p.second, *this)};
+        [this](libbsa::tes4::archive &a) -> Flow {
+            return flow::from(a).flat_map([this](const auto &dir) {
+                return flow::from(dir.second).map([&, this](const auto &file) mutable {
+                    const auto u8str = virtual_to_local_path(dir.first, file.first);
+                    const auto str   = btu::common::as_ascii_string(u8str);
+                    return FlowValue{str, File(file.second, *this)};
                 });
-            },
+            });
+        },
+        [this](libbsa::fo4::archive &a) -> Flow {
+            return flow::from(a).map([this](const auto &p) {
+                return FlowValue{p.first.name(), File(p.second, *this)};
+            });
+        },
     };
 
     return std::visit(visitor, archive_);
@@ -313,34 +301,6 @@ auto Archive::file_count() const noexcept -> size_t
     return std::visit([](auto &&arch) { return arch.size(); }, archive_);
 }
 
-auto Archive::begin() -> Iterator
-{
-    const auto visitor = btu::common::overload{
-        [](libbsa::tes3::archive &a) { return Iterator{a.begin()}; },
-        [](libbsa::tes4::archive &a) { return Iterator(detail::Tes4Iter(a)); },
-        [&](libbsa::fo4::archive &a) {
-            const auto ver = get_version<libbsa::fo4::format>();
-            return Iterator{a.begin(), ver};
-        },
-    };
-
-    return std::visit(visitor, archive_);
-}
-
-auto Archive::end() -> Iterator
-{
-    const auto visiter = btu::common::overload{
-        [](libbsa::tes3::archive &a) { return Iterator(a.end()); },
-        [](libbsa::tes4::archive &a) { return Iterator(detail::Tes4Iter::end(a)); },
-        [&](libbsa::fo4::archive &a) {
-            const auto ver = get_version<libbsa::fo4::format>();
-            return Iterator{a.end(), ver};
-        },
-    };
-
-    return std::visit(visiter, archive_);
-}
-
 template<typename VersionType>
 [[nodiscard]] auto Archive::get_version() const -> VersionType
 {
@@ -389,89 +349,6 @@ auto Archive::get_version() const noexcept -> ArchiveVersion
 auto Archive::get_archive() const noexcept -> const UnderlyingArchive &
 {
     return archive_;
-}
-
-namespace detail {
-Tes4Iter::Tes4Iter(libbsa::tes4::archive &arch) noexcept
-    : dir_(arch.begin())
-    , dir_end_(arch.end())
-    , file_(arch.empty() ? libbsa::tes4::archive::mapped_type::iterator{} : arch.begin()->second.begin())
-{
-}
-
-auto Tes4Iter::end(libbsa::tes4::archive &arch) -> Tes4Iter
-{
-    auto it = Tes4Iter(arch);
-    it.dir_ = it.dir_end_;
-    return it;
-}
-
-auto Tes4Iter::dereference() const noexcept -> std::string
-{
-    /*
-    const auto s = btu::common::as_ascii_string(virtual_to_local_path(dir_->first, file_->first));
-    return {s, UnderlyingFile(file_->second)};
-    */
-    return {};
-}
-
-auto Tes4Iter::write(binary_io::any_ostream &os) const -> void
-{
-    file_->second.write(os, ver_);
-}
-
-auto Tes4Iter::increment() noexcept -> Tes4Iter &
-{
-    ++file_;
-    if (file_ == dir_->second.end())
-    {
-        ++dir_;
-        if (dir_ != dir_end_)
-            file_ = dir_->second.begin();
-    }
-    return *this;
-}
-
-auto Tes4Iter::operator==(Tes4Iter other) const noexcept -> bool
-{
-    // If we're at end, only compare dir
-    return dir_ == other.dir_ && (dir_ == dir_end_ || file_ == other.file_);
-}
-} // namespace detail
-
-Archive::Iterator::Iterator(UnderlyingIterator it, libbsa::fo4::format fo4_ver) noexcept
-    : it_(it)
-    , fo4_ver_(fo4_ver)
-{
-}
-
-auto Archive::Iterator::dereference() const noexcept -> std::string
-{
-    return std::visit(btu::common::overload{[](const detail::Tes4Iter &i) { return *i; },
-                                            [](const auto &i) { return std::string(i->first.name()); }},
-                      it_);
-}
-
-auto Archive::Iterator::write(binary_io::any_ostream &os) const -> void
-{
-    const auto visitor = btu::common::overload{
-        [&](const libbsa::tes3::archive::iterator &i) -> void { i->second.write(os); },
-        [&](const detail::Tes4Iter &i) -> void { i.write(os); },
-        [&, this](const libbsa::fo4::archive::iterator &i) -> void { i->second.write(os, fo4_ver_); },
-    };
-
-    std::visit(visitor, it_);
-}
-
-auto Archive::Iterator::increment() noexcept -> Archive::Iterator &
-{
-    std::visit([](auto &i) { ++i; }, it_);
-    return *this;
-}
-
-auto Archive::Iterator::operator==(Iterator other) const noexcept -> bool
-{
-    return it_ == other.it_;
 }
 
 void File::write(binary_io::any_ostream &os) const

@@ -21,11 +21,11 @@ auto ModFile::get_or_write(const Path *out) -> const Path &
     {
         return fd->file_path;
     }
-    else if (auto *it = std::get_if<btu::bsa::Archive::Iterator>(&file_))
+    else if (auto *it = std::get_if<detail::ModFileArchive>(&file_))
     {
         assert(out);
         binary_io::any_ostream stream{std::in_place_type<binary_io::file_ostream>, *out};
-        it->write(stream);
+        it->file.write(stream);
         file_ = detail::ModFileDisk{*out};
         return std::get<detail::ModFileDisk>(file_).file_path;
     }
@@ -66,20 +66,5 @@ ModFolder::ModFolder(Path directory, std::u8string archive_ext)
     archives_.shrink_to_fit();
     loose_files_.shrink_to_fit();
 }
-/*
-ModFolder::Iterator ModFolder::begin()
-{
-    return Iterator(*this);
-}
 
-auto ModFolder::end() -> ModFolder::Sentinel
-{
-    return {};
-}
-
-bool ModFolder::Iterator::operator==(Sentinel)
-{
-    return !val_.has_value();
-}
-*/
 } // namespace btu::modmanager
