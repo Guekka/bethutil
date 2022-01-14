@@ -12,8 +12,14 @@ vcpkg_from_github(
   master)
 
 # Put the licence file where vcpkg expects it
-file(COPY ${CMAKE_CURRENT_LIST_DIR}/LICENSE DESTINATION ${CURRENT_PACKAGES_DIR}/share/libflow)
-file(RENAME ${CURRENT_PACKAGES_DIR}/share/libflow/LICENSE ${CURRENT_PACKAGES_DIR}/share/libflow/copyright)
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/LICENSE
+     DESTINATION ${CURRENT_PACKAGES_DIR}/share/libflow)
+file(RENAME ${CURRENT_PACKAGES_DIR}/share/libflow/LICENSE
+     ${CURRENT_PACKAGES_DIR}/share/libflow/copyright)
 
 # Copy header files
-file(INSTALL ${SOURCE_PATH}/include DESTINATION ${CURRENT_PACKAGES_DIR} FILES_MATCHING PATTERN "*.hpp")
+file(
+  INSTALL ${SOURCE_PATH}/include
+  DESTINATION ${CURRENT_PACKAGES_DIR}
+  FILES_MATCHING
+  PATTERN "*.hpp")

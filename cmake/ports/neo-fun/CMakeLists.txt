@@ -64,29 +64,32 @@ set(SOURCE_FILES
     ${SOURCE_DIR}/utf8.hpp
     ${SOURCE_DIR}/utility.hpp
     ${SOURCE_DIR}/version.hpp
-    ${SOURCE_DIR}/zstring_view.hpp
-    )
+    ${SOURCE_DIR}/zstring_view.hpp)
 
 add_library("${PROJECT_NAME}" STATIC ${SOURCE_FILES})
 add_library("neo::fun" ALIAS "${PROJECT_NAME}")
 
 # See Microsoft STL issue 1814
 if(MSVC)
-    target_compile_features("${PROJECT_NAME}" PUBLIC cxx_std_23)
+  target_compile_features("${PROJECT_NAME}" PUBLIC cxx_std_23)
 else()
-    target_compile_features("${PROJECT_NAME}" PUBLIC cxx_std_20)
+  target_compile_features("${PROJECT_NAME}" PUBLIC cxx_std_20)
 endif()
 
 if(MSVC)
-    target_compile_options("${PROJECT_NAME}" PRIVATE /utf-8 PRIVATE /Zc:__cplusplus PRIVATE /Zc:preprocessor)
+  target_compile_options(
+    "${PROJECT_NAME}"
+    PRIVATE /utf-8
+    PRIVATE /Zc:__cplusplus
+    PRIVATE /Zc:preprocessor)
 endif()
 
 target_include_directories(
-    "${PROJECT_NAME}" SYSTEM
-    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
-    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
-    PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
-    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+  "${PROJECT_NAME}" SYSTEM
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
+         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+  PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
+          "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -94,20 +97,18 @@ include(GNUInstallDirs)
 install(TARGETS "${PROJECT_NAME}" EXPORT "${PROJECT_NAME}-targets")
 
 install(
-    EXPORT "${PROJECT_NAME}-targets"
-    NAMESPACE "neo::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  EXPORT "${PROJECT_NAME}-targets"
+  NAMESPACE "neo::"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-configure_file("config.cmake.in"
-    "${PROJECT_NAME}Config.cmake" @ONLY)
+configure_file("config.cmake.in" "${PROJECT_NAME}Config.cmake" @ONLY)
 
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    COMPATIBILITY SameMajorVersion)
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  COMPATIBILITY SameMajorVersion)
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+              "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-install(DIRECTORY "src/neo"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+install(DIRECTORY "src/neo" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
