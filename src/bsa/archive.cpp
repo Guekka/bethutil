@@ -96,7 +96,7 @@ auto Archive::write(Path a_path) -> void
     std::visit(writer, archive_);
 }
 
-auto Archive::as_flow() -> Flow
+auto Archive::to_flow() -> Flow
 {
     const auto visitor = btu::common::overload{
         [this](libbsa::tes3::archive &a) -> Flow {

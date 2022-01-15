@@ -17,7 +17,7 @@ auto main(int argc, char *argv[]) -> int
     for (auto fpath : files)
     {
         Archive a(fpath);
-        for (auto f : a.as_flow().to_range())
+        for (auto f : a.to_flow().to_range())
             std::cout << f.first << '\n';
     }
     std::cout << "\n\n";

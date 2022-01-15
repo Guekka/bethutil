@@ -57,7 +57,7 @@ public:
     [[nodiscard]] auto as_flow() const
     {
         return flow::from(archives_)
-            .flat_map([](auto &a) { return a->as_flow(); })
+            .flat_map([](auto &a) { return a->to_flow(); })
             .map([](const auto &pair) {
                 return ModFile(detail::ModFileArchive{pair.first, pair.second});
             })

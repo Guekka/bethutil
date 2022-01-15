@@ -49,7 +49,7 @@ public:
 
     using FlowValue = std::pair<std::string, File>;
     using Flow      = flow::any_flow<FlowValue>;
-    auto as_flow() -> Flow;
+    auto to_flow() -> Flow;
 
     auto add_file(const Path &a_relative, UnderlyingFile file) -> void;
     auto add_file(const Path &a_root, const Path &a_path) -> void;
