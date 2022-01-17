@@ -33,7 +33,7 @@ std::optional<QString> GeneralSettings::isValid() const
 */
 
 namespace btu::modmanager {
-auto find_manager(const common::Path &dir) -> ModManager
+auto find_manager(const Path &dir) -> ModManager
 {
     namespace fs = std::filesystem;
 
@@ -58,4 +58,15 @@ auto find_manager(const common::Path &dir) -> ModManager
 
     return ModManager::None;
 }
+
+ModsFolder::ModsFolder(Path root, std::u8string archive_ext)
+    : root_(std::move(root))
+    , folders_(flow::from(std::filesystem::directory_iterator(root_))
+                   .filter([](auto &&e) { return e.is_directory(); })
+                   .map([](auto &&e) { return FLOW_FWD(e).path(); })
+                   .to_vector())
+    , archive_ext_(std::move(archive_ext))
+{
+}
+
 } // namespace btu::modmanager
