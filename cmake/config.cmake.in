@@ -5,6 +5,7 @@ set(BETHUTIL_TEX @BETHUTIL_TEX@)
 set(BETHUTIL_HKX @BETHUTIL_HKX@)
 
 find_dependency("bsa")
+find_dependency("libflow")
 if(${BETHUTIL_TEX})
 	find_dependency("directxtex")
 	find_dependency("tl-expected")

@@ -2,6 +2,7 @@
   "name": "bethutil",
   "version-string": "1",
   "dependencies": [
+    "libflow",
     "utf8h",
 	"rsm-bsa"
   ],
