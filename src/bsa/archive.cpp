@@ -274,6 +274,11 @@ auto Archive::unpack(const Path &out_path) -> void
     std::visit(visiter, archive_);
 }
 
+auto Archive::file_count() const noexcept -> size_t
+{
+    return std::visit([](const auto &arch) { return arch.size(); }, archive_);
+}
+
 auto Archive::get_version() const noexcept -> ArchiveVersion
 {
     return version_;
