@@ -53,6 +53,8 @@ public:
 
     auto unpack(const Path &out_path) -> void;
 
+    [[nodiscard]] auto file_count() const noexcept -> size_t;
+
     [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion;
     [[nodiscard]] auto get_archive() const noexcept -> const UnderlyingArchive &;
 
