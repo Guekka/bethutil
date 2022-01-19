@@ -86,7 +86,8 @@ target_link_libraries("${PROJECT_NAME}" PRIVATE bsa::bsa)
 find_path(LIBFLOW_INCLUDE_DIRS "flow.hpp")
 target_include_directories("${PROJECT_NAME}" PRIVATE ${LIBFLOW_INCLUDE_DIRS})
 # Necessary for libflow
-target_compile_definitions("${PROJECT_NAME}" PRIVATE _SILENCE_CLANG_COROUTINE_MESSAGE)
+target_compile_definitions("${PROJECT_NAME}"
+                           PRIVATE _SILENCE_CLANG_COROUTINE_MESSAGE)
 
 if(${BETHUTIL_TEX})
   find_package(directxtex CONFIG REQUIRED)
