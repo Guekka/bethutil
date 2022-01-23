@@ -35,9 +35,6 @@ template<class... Keys>
 
 [[nodiscard]] auto get_archive_identifier(const UnderlyingArchive &archive) -> std::string_view;
 
-template<typename Version>
-[[nodiscard]] auto archive_version(const UnderlyingArchive &archive, Version a_version) -> Version;
-
 class Archive final
 {
 public:
@@ -54,6 +51,9 @@ public:
     auto unpack(const Path &out_path) -> void;
 
     [[nodiscard]] auto file_count() const noexcept -> size_t;
+
+    template<typename VersionType>
+    [[nodiscard]] auto get_version() const -> VersionType;
 
     [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion;
     [[nodiscard]] auto get_archive() const noexcept -> const UnderlyingArchive &;
