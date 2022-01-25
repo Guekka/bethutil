@@ -181,15 +181,12 @@ auto for_each_mt(Range &&rng, Func &&func)
     };
 
     using std::begin, std::end, std::make_move_iterator;
-    if constexpr (std::is_lvalue_reference_v<Range>)
-        std::for_each(std::execution::par,
-                      begin(std::forward<Range>(rng)),
-                      end(std::forward<Range>(rng)),
-                      std::move(call));
+    if constexpr (std::is_lvalue_reference_v<decltype(rng)>)
+        std::for_each(std::execution::par, begin(rng), end(rng), std::move(call));
     else
         std::for_each(std::execution::par,
-                      make_move_iterator(begin(std::forward<Range>(rng))),
-                      make_move_iterator(end(std::forward<Range>(rng))),
+                      make_move_iterator(begin(rng)),
+                      make_move_iterator(end(rng)),
                       std::move(call));
 
     if (eptr)

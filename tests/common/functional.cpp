@@ -36,6 +36,6 @@ TEST_CASE("for_each_mt", "[src]")
     {
         std::vector<std::string> v(100);
         for_each_mt(v, [](std::string &) {});
-        for_each_mt(std::move(v), [](std::string) {});
+        for_each_mt(std::move(v), [](std::string &&) {});
     }
 }
