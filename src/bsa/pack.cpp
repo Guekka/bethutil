@@ -35,21 +35,27 @@ auto write(bool compressed, ArchiveData &&data, const Path &root) -> std::vector
 
     compressed &= data.get_type() != ArchiveType::Incompressible;
 
-    auto arch = Archive(data.get_version(), compressed);
+    auto arch      = Archive{};
     auto ret  = std::vector<std::pair<Path, std::string>>();
-
-    btu::common::for_each_mt(data, [&](auto &&f) {
+    const auto ver = data.get_version();
+    auto out_path  = data.get_out_path();
+    btu::common::for_each_mt(std::move(data), [&](Path &&fpath) {
         try
         {
-            arch.add_file(root, f);
+            auto file = File(ver);
+            file.read(fpath);
+            if (compressed)
+                file.compress();
+
+            auto path = btu::common::as_ascii_string(fpath.lexically_relative(root).u8string());
+            arch.emplace(std::move(path), std::move(file));
         }
         catch (const std::exception &e)
         {
-            ret.emplace_back(f, e.what());
+            ret.emplace_back(fpath, e.what());
         }
     });
-
-    arch.write(data.get_out_path());
+    write_archive(std::move(arch), std::move(out_path));
     return ret;
 }
 

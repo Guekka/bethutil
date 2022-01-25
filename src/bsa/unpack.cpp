@@ -6,6 +6,7 @@
 #include "btu/bsa/unpack.hpp"
 
 #include "btu/bsa/archive.hpp"
+#include "btu/common/functional.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -15,9 +16,12 @@ namespace btu::bsa {
 void unpack(UnpackSettings sets)
 {
     {
-        auto arch        = Archive(sets.file_path);
+        auto arch = read_archive(sets.file_path);
+        if (!arch)
+            return;
         const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
-        arch.unpack(root);
+        btu::common::for_each_mt(std::move(*arch),
+                                 [root](auto &&elem) { elem.second.write(root / elem.first); });
     }
     if (sets.remove_arch && !fs::remove(sets.file_path))
     {
