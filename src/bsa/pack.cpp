@@ -36,7 +36,7 @@ auto write(bool compressed, ArchiveData &&data, const Path &root) -> std::vector
     compressed &= data.get_type() != ArchiveType::Incompressible;
 
     auto arch      = Archive{};
-    auto ret  = std::vector<std::pair<Path, std::string>>();
+    auto ret       = std::vector<std::pair<Path, std::string>>();
     const auto ver = data.get_version();
     auto out_path  = data.get_out_path();
     btu::common::for_each_mt(std::move(data), [&](Path &&fpath) {

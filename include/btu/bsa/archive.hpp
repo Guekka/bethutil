@@ -27,7 +27,7 @@ template<class... Keys>
     return local;
 }
 
-namespace libbsa = ::bsa;
+namespace libbsa     = ::bsa;
 using UnderlyingFile = std::variant<libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file>;
 
 class File final
