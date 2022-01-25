@@ -6,15 +6,9 @@
 #include <bsa/bsa.hpp>
 
 #include <functional>
-#include <mutex>
 #include <variant>
 
-namespace libbsa = ::bsa;
-
 namespace btu::bsa {
-using UnderlyingArchive = std::variant<libbsa::tes3::archive, libbsa::tes4::archive, libbsa::fo4::archive>;
-using UnderlyingFile    = std::variant<libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file>;
-
 template<class... Keys>
 [[nodiscard]] auto virtual_to_local_path(Keys &&...a_keys) -> std::u8string
 {
@@ -33,37 +27,40 @@ template<class... Keys>
     return local;
 }
 
-[[nodiscard]] auto get_archive_identifier(const UnderlyingArchive &archive) -> std::string_view;
+namespace libbsa = ::bsa;
+using UnderlyingFile = std::variant<libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file>;
 
-class Archive final
+class File final
 {
 public:
-    explicit Archive(const Path &a_path); // Read
-    Archive(ArchiveVersion a_version, bool a_compressed);
+    File(ArchiveVersion v);
+    File(UnderlyingFile f);
 
-    auto read(Path a_path) -> ArchiveVersion;
-    auto write(Path a_path) -> void;
+    [[nodiscard]] auto compressed() const noexcept -> bool;
+    void decompress();
+    void compress();
 
-    auto add_file(const Path &a_relative, UnderlyingFile file) -> void;
-    auto add_file(const Path &a_root, const Path &a_path) -> void;
-    auto add_file(const Path &a_relative, std::vector<std::byte> a_data) -> void;
+    void read(std::filesystem::path path);
+    void read(std::span<std::byte> src);
 
-    auto unpack(const Path &out_path) -> void;
+    void write(std::filesystem::path path) const;
+    void write(binary_io::any_ostream &dst) const;
 
-    [[nodiscard]] auto file_count() const noexcept -> size_t;
+    [[nodiscard]] auto version() const noexcept -> ArchiveVersion;
 
-    template<typename VersionType>
-    [[nodiscard]] auto get_version() const -> VersionType;
-
-    [[nodiscard]] auto get_version() const noexcept -> ArchiveVersion;
-    [[nodiscard]] auto get_archive() const noexcept -> const UnderlyingArchive &;
+    template<typename T>
+    [[nodiscard]] auto as_raw_file() &&
+    {
+        return std::get<T>(std::move(file_));
+    }
 
 private:
-    UnderlyingArchive archive_;
-    std::mutex mutex_;
-
-    ArchiveVersion version_{};
-    bool compressed_{false};
+    UnderlyingFile file_;
+    ArchiveVersion ver_;
 };
 
+using Archive = std::map<std::string, File, std::less<>>;
+
+auto read_archive(Path path) -> std::optional<Archive>;
+void write_archive(Archive arch, Path path);
 } // namespace btu::bsa
