@@ -107,6 +107,7 @@ struct Settings
             AllowedPath{u8".dtl", {u8"meshes"}}, // Unsure
             AllowedPath{u8".egm", {u8"meshes"}}, // Unsure
             AllowedPath{u8".jpg", {u8"root"}},
+            AllowedPath{u8".hkb", {u8"meshes"}},
             AllowedPath{u8".hkx", {u8"meshes"}},
             AllowedPath{u8".lst", {u8"meshes"}},
             AllowedPath{u8".nif", {u8"meshes"}},
