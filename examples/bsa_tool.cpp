@@ -32,6 +32,24 @@ void process_args(std::vector<std::string_view> args, const Path &dir)
             unpack({.file_path = dir});
         }
     }
+    else if (arg == "list")
+    {
+        std::vector files(fs::directory_iterator(dir), fs::directory_iterator{});
+        erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
+        for (const auto &file : files)
+        {
+            std::cout << "Files of: " << file.path().string() << std::endl;
+            auto arch = read_archive(file.path());
+            if (!arch)
+                continue;
+            for (auto &&elem : std::move(*arch))
+                std::cout << elem.first + '\n';
+        }
+    }
+    else
+    {
+        std::cout << "Unknown arg: " << arg;
+    }
 }
 
 auto main(int argc, char *argv[]) -> int
