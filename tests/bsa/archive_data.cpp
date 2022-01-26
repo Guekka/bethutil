@@ -25,7 +25,7 @@ ArchiveData make_arch(uintmax_t max, uintmax_t size, ArchiveType type, uint32_t 
     return arch;
 }
 
-TEST_CASE("Full archives are not merged")
+TEST_CASE("Full archives are not merged", "[src]")
 {
     auto input = std::vector{
         make_arch(1'000, 500, ArchiveType::Standard),
@@ -40,7 +40,7 @@ TEST_CASE("Full archives are not merged")
     CHECK(input == expected);
 }
 
-TEST_CASE("Testing merge settings")
+TEST_CASE("Testing merge settings", "[src]")
 {
     auto input = std::vector{
         make_arch(1'000, 1, ArchiveType::Standard),

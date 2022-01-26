@@ -101,7 +101,7 @@ const auto generate_tex2 = [] {
 
 using btu::tex::compute_optimization_steps, btu::tex::optimize;
 
-TEST_CASE("compute_optimization_steps")
+TEST_CASE("compute_optimization_steps", "[src]")
 {
     SECTION("tex1")
     {
@@ -123,7 +123,7 @@ TEST_CASE("compute_optimization_steps")
     }
 }
 
-TEST_CASE("optimize")
+TEST_CASE("optimize", "[src]")
 {
     {
         auto tex   = generate_tex(generate_info1());

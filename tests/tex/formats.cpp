@@ -2,7 +2,7 @@
 
 #include <catch.hpp>
 
-TEST_CASE("guess_texture_type")
+TEST_CASE("guess_texture_type", "[src]")
 {
     using btu::tex::guess_texture_type, btu::tex::TextureType;
 
@@ -16,7 +16,7 @@ TEST_CASE("guess_texture_type")
         CHECK(guess_texture_type(u8"aaaaa") == std::nullopt);
     }
 
-    SECTION("Classification")
+    SECTION("Classification", "[src]")
     {
         // No underscore means diffuse
         CHECK(guess_texture_type(u8"somename.dds") == TextureType::Diffuse);

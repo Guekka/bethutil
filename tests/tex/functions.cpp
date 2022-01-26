@@ -7,17 +7,17 @@
 
 using btu::tex::Dimension, btu::tex::Texture;
 
-TEST_CASE("decompress")
+TEST_CASE("decompress", "[src]")
 {
     test_expected_dir(u8"decompress", btu::tex::decompress);
 }
 
-TEST_CASE("make_transparent_alpha")
+TEST_CASE("make_transparent_alpha", "[src]")
 {
     test_expected_dir(u8"make_transparent_alpha", btu::tex::make_transparent_alpha);
 }
 
-TEST_CASE("convert")
+TEST_CASE("convert", "[src]")
 {
     SECTION("With compression device")
     {
@@ -35,11 +35,11 @@ TEST_CASE("convert")
     }
 }
 
-TEST_CASE("generate_mipmaps")
+TEST_CASE("generate_mipmaps", "[src]")
 {
     test_expected_dir(u8"generate_mipmaps", btu::tex::generate_mipmaps);
 }
-TEST_CASE("resize")
+TEST_CASE("resize", "[src]")
 {
     test_expected_dir(u8"resize", [](auto &&tex) {
         const auto args = btu::tex::util::ResizeRatio{3, {200, 200}};
@@ -47,7 +47,7 @@ TEST_CASE("resize")
         return btu::tex::resize(std::move(tex), dim);
     });
 }
-TEST_CASE("optimal_mip_count")
+TEST_CASE("optimal_mip_count", "[src]")
 {
     using btu::tex::optimal_mip_count;
     STATIC_REQUIRE(optimal_mip_count({1024, 1024}) == 11);
@@ -55,7 +55,7 @@ TEST_CASE("optimal_mip_count")
     STATIC_REQUIRE(optimal_mip_count({1, 1}) == 1);
 }
 
-TEST_CASE("is_pow2")
+TEST_CASE("is_pow2", "[src]")
 {
     constexpr size_t limit = 1'000'000;
 
@@ -77,7 +77,7 @@ TEST_CASE("is_pow2")
     }
 }
 
-TEST_CASE("upper_pow2")
+TEST_CASE("upper_pow2", "[src]")
 {
     using btu::tex::util::upper_pow2;
 
@@ -88,7 +88,7 @@ TEST_CASE("upper_pow2")
     STATIC_REQUIRE(upper_pow2(8524) == 16384);
 }
 
-TEST_CASE("nearest_pow2")
+TEST_CASE("nearest_pow2", "[src]")
 {
     using btu::tex::util::nearest_pow2;
 
@@ -101,7 +101,7 @@ TEST_CASE("nearest_pow2")
     STATIC_REQUIRE(nearest_pow2((512 + 1024) / 2) == 1024);
 }
 
-TEST_CASE("scale_fit")
+TEST_CASE("scale_fit", "[src]")
 {
     using btu::tex::util::scale_fit;
     size_t x = 10, y = 20, tx = 2;
@@ -110,7 +110,7 @@ TEST_CASE("scale_fit")
     CHECK(y == 4);
 }
 
-TEST_CASE("canonize_path")
+TEST_CASE("canonize_path", "[src]")
 {
     using btu::tex::canonize_path;
     CHECK(canonize_path("a/b/textures/x/y.dds") == u8"x/y.dds");
@@ -118,7 +118,7 @@ TEST_CASE("canonize_path")
     CHECK(canonize_path("x/y.dds") == u8"x/y.dds");
 }
 
-TEST_CASE("sanitize_dimensions")
+TEST_CASE("sanitize_dimensions", "[src]")
 {
     using btu::tex::util::sanitize_dimensions;
 
@@ -141,7 +141,7 @@ TEST_CASE("sanitize_dimensions")
     STATIC_REQUIRE(sanitize_dimensions({1066, 576}) == Dimension{1066, 576});
 }
 
-TEST_CASE("compute_resize_dimension")
+TEST_CASE("compute_resize_dimension", "[src]")
 {
     using btu::tex::util::compute_resize_dimension, btu::tex::util::ResizeRatio;
 

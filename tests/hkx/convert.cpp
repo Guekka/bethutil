@@ -32,7 +32,7 @@ bool compare_files(const fs::path &filename1, const fs::path &filename2)
                       begin2); //Second argument is end-of-range iterator
 }
 
-TEST_CASE("Converting from LE to SE")
+TEST_CASE("Converting from LE to SE", "[src]")
 {
     btu::hkx::Anim anim(exe_dir);
     REQUIRE_FALSE(anim.load(dir / "LE_INPUT.hkx"));
@@ -42,7 +42,7 @@ TEST_CASE("Converting from LE to SE")
     CHECK(compare_files(dir / "LE_EXPECTED.hkx", dir / "LE_OUTPUT.hkx"));
 }
 
-TEST_CASE("Converting from SE to LE")
+TEST_CASE("Converting from SE to LE", "[src]")
 {
     btu::hkx::Anim anim(exe_dir);
     REQUIRE_FALSE(anim.load(dir / "SE_INPUT.hkx"));
