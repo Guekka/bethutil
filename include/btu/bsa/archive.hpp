@@ -34,7 +34,7 @@ class File final
 {
 public:
     File(ArchiveVersion v);
-    File(UnderlyingFile f);
+    File(UnderlyingFile f, ArchiveVersion v);
 
     [[nodiscard]] auto compressed() const noexcept -> bool;
     void decompress();

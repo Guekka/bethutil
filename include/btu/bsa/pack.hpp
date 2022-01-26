@@ -24,8 +24,7 @@ auto split(const Path &dir,
            const Settings &sets,
            const AllowFilePred &allow_path_pred = default_is_allowed_path) -> std::vector<ArchiveData>;
 
-void merge(std::vector<ArchiveData> &archives,
-           MergeSettings sets = MergeSettings::MergeIncompressible | MergeSettings::MergeTextures);
+void merge(std::vector<ArchiveData> &archives, MergeSettings sets = MergeSettings::MergeIncompressible);
 
 /// Returns the list of files which failed to pack
 auto write(bool compressed, ArchiveData &&data, const Path &root)
