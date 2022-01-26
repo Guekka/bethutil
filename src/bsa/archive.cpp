@@ -9,6 +9,7 @@
 
 namespace btu::bsa {
 File::File(ArchiveVersion v)
+    : ver_(v)
 {
     file_ = [v]() -> UnderlyingFile {
         switch (v)
@@ -24,9 +25,10 @@ File::File(ArchiveVersion v)
     }();
 }
 
-File::File(UnderlyingFile f)
+File::File(UnderlyingFile f, ArchiveVersion v)
+    : file_(std::move(f))
+    , ver_(std::move(v))
 {
-    file_ = std::move(f);
 }
 
 auto File::compressed() const noexcept -> bool
@@ -131,32 +133,32 @@ auto read_archive(Path path) -> std::optional<Archive>
         {
             libbsa::tes3::archive arch;
             arch.read(std::move(path));
-            btu::common::for_each_mt(std::move(arch), [&](auto &&elem) {
-                res.emplace(elem.first.name(), std::move(elem.second));
-            });
+            for (auto &&elem : std::move(arch))
+                res.emplace(elem.first.name(), File(std::move(elem.second), ArchiveVersion::tes3));
             return res;
         }
         case libbsa::file_format::tes4:
         {
             libbsa::tes4::archive arch;
-            arch.read(std::move(path));
-            btu::common::for_each_mt(std::move(arch), [&](auto &&dir) {
+            auto ver = arch.read(std::move(path));
+            for (auto &&dir : std::move(arch))
+            {
                 for (auto &&file : std::move(dir.second))
                 {
                     const auto u8str = virtual_to_local_path(dir.first, file.first);
                     const auto str   = btu::common::as_ascii_string(u8str);
-                    res.emplace(std::move(str), std::move(file.second));
+                    res.emplace(std::move(str),
+                                File(std::move(file.second), static_cast<ArchiveVersion>(ver)));
                 }
-            });
+            }
             return res;
         }
         case libbsa::file_format::fo4:
         {
             libbsa::fo4::archive arch;
-            arch.read(std::move(path));
-            btu::common::for_each_mt(std::move(arch), [&](auto &&elem) {
-                res.emplace(elem.first.name(), std::move(elem.second));
-            });
+            auto ver = arch.read(std::move(path));
+            for (auto &&elem : std::move(arch))
+                res.emplace(elem.first.name(), File(std::move(elem.second), static_cast<ArchiveVersion>(ver)));
             return res;
         }
     }
@@ -174,18 +176,23 @@ void write_archive(Archive arch, Path path)
         case btu::bsa::ArchiveVersion::tes3:
         {
             libbsa::tes3::archive bsa;
-            btu::common::for_each_mt(std::move(arch), [&](Archive::value_type &&elem) {
+            for (auto &&elem : std::move(arch))
+            {
                 bsa.insert(elem.first, std::move(elem.second).template as_raw_file<libbsa::tes3::file>());
-            });
+            }
             bsa.write(std::move(path));
-            break;
+            return;
         }
         case btu::bsa::ArchiveVersion::tes4: [[fallthrough]];
         case btu::bsa::ArchiveVersion::tes5: [[fallthrough]];
         case btu::bsa::ArchiveVersion::sse:
         {
             libbsa::tes4::archive bsa;
-            btu::common::for_each_mt(std::move(arch), [&](Archive::value_type &&elem) {
+            auto flags = libbsa::tes4::archive_flag::directory_strings
+                         | libbsa::tes4::archive_flag::file_strings;
+
+            for (auto &&elem : std::move(arch))
+            {
                 auto elem_path = Path(elem.first);
                 const auto d   = [&]() {
                     const auto key = elem_path.parent_path().lexically_normal().generic_string();
@@ -194,21 +201,26 @@ void write_archive(Archive arch, Path path)
                     return bsa[key];
                 }();
 
+                if (elem.second.compressed())
+                    flags |= libbsa::tes4::archive_flag::compressed;
+
                 d->insert(elem_path.filename().lexically_normal().generic_string(),
                           std::move(elem.second).as_raw_file<libbsa::tes4::file>());
-            });
+            }
+            bsa.archive_flags(flags);
             bsa.write(std::move(path), static_cast<libbsa::tes4::version>(version));
-            break;
+            return;
         }
         case btu::bsa::ArchiveVersion::fo4: [[fallthrough]];
         case btu::bsa::ArchiveVersion::fo4dx:
         {
             libbsa::fo4::archive ba2;
-            btu::common::for_each_mt(std::move(arch), [&](Archive::value_type &&elem) {
+            for (auto &&elem : std::move(arch))
+            {
                 ba2.insert(elem.first, std::move(elem.second).template as_raw_file<libbsa::fo4::file>());
-            });
+            }
             ba2.write(std::move(path), static_cast<libbsa::fo4::format>(version));
-            break;
+            return;
         }
     }
     libbsa::detail::declare_unreachable();

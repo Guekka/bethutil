@@ -11,6 +11,7 @@
 
 #include <btu/common/algorithms.hpp>
 #include <btu/common/functional.hpp>
+#include <flow.hpp>
 
 #include <deque>
 #include <execution>
@@ -39,6 +40,7 @@ auto write(bool compressed, ArchiveData &&data, const Path &root) -> std::vector
     auto ret       = std::vector<std::pair<Path, std::string>>();
     const auto ver = data.get_version();
     auto out_path  = data.get_out_path();
+    std::mutex mut;
     btu::common::for_each_mt(std::move(data), [&](Path &&fpath) {
         try
         {
@@ -48,6 +50,7 @@ auto write(bool compressed, ArchiveData &&data, const Path &root) -> std::vector
                 file.compress();
 
             auto path = btu::common::as_ascii_string(fpath.lexically_relative(root).u8string());
+            std::lock_guard lock(mut);
             arch.emplace(std::move(path), std::move(file));
         }
         catch (const std::exception &e)
@@ -116,7 +119,8 @@ auto merge(std::vector<ArchiveData> &archives, MergeSettings sets) -> void
     // Merge textures into standard if possible
     if (test_flag(MergeSettings::MergeTextures))
     {
-        if (textures->size().compressed + standard->size().compressed < standard->max_size())
+        const bool size = textures->size().compressed + standard->size().compressed < standard->max_size();
+        if (size && !standard->empty())
         {
             *standard += *textures;
             archives.erase(textures);
@@ -125,12 +129,16 @@ auto merge(std::vector<ArchiveData> &archives, MergeSettings sets) -> void
 
     if (test_flag(MergeSettings::MergeIncompressible))
     {
-        if (incompressible->size().uncompressed + standard->size().uncompressed < standard->max_size())
+        const bool size = incompressible->size().uncompressed + standard->size().uncompressed
+                          < standard->max_size();
+        if (size && !standard->empty())
         {
             *standard += *incompressible;
             archives.erase(incompressible);
         }
     }
+    // Remove potentially empty archives
+    std::erase_if(archives, [](auto &arch) { return std::distance(arch.begin(), arch.end()) == 0; });
 }
 
 } // namespace btu::bsa

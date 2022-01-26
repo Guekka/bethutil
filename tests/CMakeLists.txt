@@ -6,6 +6,7 @@ set(HEADER_FILES "${INCLUDE_DIR}/bsa/utils.hpp")
 set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
     "${SOURCE_DIR}/main.cpp"
+    "${SOURCE_DIR}/utils.hpp"
     "${SOURCE_DIR}/common/filesystem.cpp"
     "${SOURCE_DIR}/common/functional.cpp"
     "${SOURCE_DIR}/common/metaprogramming.cpp"
@@ -68,6 +69,7 @@ acquire_test("resize")
 acquire_test("optimize")
 acquire_test("convert-hkx")
 acquire_test("exe")
+acquire_test("pack")
 
 if("${BETHUTIL-TEX_BUILD_EXAMPLES}")
   target_include_directories(tests PRIVATE "${ROOT_DIR}/examples")
