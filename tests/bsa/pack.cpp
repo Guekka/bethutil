@@ -7,6 +7,7 @@
 
 #include "../utils.hpp"
 #include "btu/bsa/plugin.hpp"
+#include "btu/common/filesystem.hpp"
 
 #include <iostream>
 
@@ -28,7 +29,7 @@ TEST_CASE("Pack", "[src]")
         auto errs = write(true, std::move(arch), dir);
         REQUIRE(errs.empty());
 
-        REQUIRE(compare_files(out, dir / (u8"expected_"s + name + sets.extension)));
+        REQUIRE(btu::common::compare_files(out, dir / (u8"expected_"s + name + sets.extension)));
         std::filesystem::remove(out);
     };
 
