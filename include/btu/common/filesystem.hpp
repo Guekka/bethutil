@@ -24,4 +24,48 @@ namespace fs = std::filesystem;
 
     return data;
 }
+
+[[nodiscard]] inline auto compare_files(const Path &filename1, const Path &filename2) -> bool
+{
+    std::ifstream file1(filename1, std::ifstream::ate | std::ifstream::binary); //open file at the end
+    std::ifstream file2(filename2, std::ifstream::ate | std::ifstream::binary); //open file at the end
+
+    if (file1.tellg() != file2.tellg())
+    {
+        return false; //different file size
+    }
+
+    file1.seekg(0); //rewind
+    file2.seekg(0); //rewind
+
+    std::istreambuf_iterator<char> begin1(file1);
+    std::istreambuf_iterator<char> begin2(file2);
+
+    return std::equal(begin1,
+                      std::istreambuf_iterator<char>(),
+                      begin2); //Second argument is end-of-range iterator
+}
+
+[[nodiscard]] inline auto compare_directories(const Path &dir1, const Path &dir2) -> bool
+{
+    auto beg1 = fs::recursive_directory_iterator(dir1);
+    auto beg2 = fs::recursive_directory_iterator(dir2);
+
+    while (beg1 != fs::recursive_directory_iterator{} && beg2 != fs::recursive_directory_iterator{})
+    {
+        auto path1 = beg1->path();
+        auto path2 = beg2->path();
+
+        if (path1.lexically_relative(dir1) != path2.lexically_relative(dir2))
+            return false;
+
+        if (!compare_files(path1, path2))
+            return false;
+
+        ++beg1;
+        ++beg2;
+    }
+    return beg1 == fs::recursive_directory_iterator{} && beg2 == fs::recursive_directory_iterator{};
+}
+
 } // namespace btu::common
