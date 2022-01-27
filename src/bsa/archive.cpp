@@ -4,7 +4,6 @@
 #include <btu/common/functional.hpp>
 #include <flow.hpp>
 
-#include <execution>
 #include <fstream>
 
 namespace btu::bsa {
