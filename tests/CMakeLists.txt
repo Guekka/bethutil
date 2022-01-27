@@ -14,7 +14,9 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/common/string.cpp"
     "${SOURCE_DIR}/bsa/archive_data.cpp"
     "${SOURCE_DIR}/bsa/pack.cpp"
-    "${SOURCE_DIR}/bsa/plugin.cpp")
+    "${SOURCE_DIR}/bsa/plugin.cpp"
+    "${SOURCE_DIR}/modmanager/mod_folder.cpp"
+    "${SOURCE_DIR}/modmanager/mod_manager.cpp")
 
 if(${BETHUTIL_TEX})
   list(APPEND HEADER_FILES "${INCLUDE_DIR}/tex/utils.hpp")

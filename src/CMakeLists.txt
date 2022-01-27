@@ -19,7 +19,9 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/settings.hpp"
     "${INCLUDE_DIR}/btu/bsa/plugin.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp")
+    "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
+    "${INCLUDE_DIR}/btu/modmanager/mod_folder.hpp"
+    "${INCLUDE_DIR}/btu/modmanager/mod_manager.hpp")
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
@@ -29,7 +31,9 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/pack.cpp"
     "${SOURCE_DIR}/bsa/plugin.cpp"
     "${SOURCE_DIR}/bsa/unpack.cpp"
-    "${SOURCE_DIR}/bsa/detail/archive_type.cpp")
+    "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
+    "${SOURCE_DIR}/modmanager/mod_folder.cpp"
+    "${SOURCE_DIR}/modmanager/mod_manager.cpp")
 
 option(BETHUTIL_HKX "Build hkx part" OFF)
 if(${BETHUTIL_HKX})
