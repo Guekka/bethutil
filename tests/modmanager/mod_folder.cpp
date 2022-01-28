@@ -8,6 +8,8 @@
 #include "../utils.hpp"
 #include "btu/common/filesystem.hpp"
 
+#include <binary_io/memory_stream.hpp>
+
 TEST_CASE("ModFolder", "[src]")
 {
     const Path dir = "modfolder";
@@ -17,8 +19,30 @@ TEST_CASE("ModFolder", "[src]")
     flow::from(mf).for_each([&](auto &&f) {
         const auto out = dir / "output" / f.get_relative_path();
         std::filesystem::create_directories(out.parent_path());
+        f.load();
         f.write(out);
     });
     REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
+}
+
+TEST_CASE("ModFolder reintegrate", "[src]")
+{
+    const Path dir = "modfolder_reintegrate";
+    // operate on copy
     std::filesystem::remove_all(dir / "output");
+    std::filesystem::copy(dir / "input", dir / "output");
+
+    auto mf = btu::modmanager::ModFolder(dir / "output", u8".ba2");
+    // Change one byte in each file
+    flow::from(mf).for_each([&](auto &&f) {
+        f.load();
+        binary_io::any_ostream buffer{binary_io::memory_ostream{}};
+        f.write(buffer);
+        auto &data  = buffer.get<binary_io::memory_ostream>().rdbuf();
+        data.back() = std::byte{'0'}; // Change one byte
+        f.read(data);
+    });
+    mf.reintegrate();
+
+    REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
 }
