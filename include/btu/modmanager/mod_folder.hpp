@@ -16,10 +16,30 @@ namespace btu::modmanager {
 using btu::common::Path;
 
 namespace detail {
-struct ModFileDisk
+class ModFileDisk final
 {
-    Path file_path;
-    Path relative_path;
+public:
+    ModFileDisk(Path root, Path rel_path);
+
+    void load();
+
+    auto get_relative_path() const noexcept -> Path;
+    [[nodiscard]] auto size() const noexcept -> size_t;
+
+    [[nodiscard]] auto modified() const noexcept -> bool;
+
+    void read(const std::filesystem::path &path);
+    void read(std::span<std::byte> src);
+
+    void write(const std::filesystem::path &path) const;
+    void write(binary_io::any_ostream &dst) const;
+
+private:
+    std::vector<std::byte> content_;
+    Path relative_path_;
+    Path root_;
+
+    bool modified_{};
 };
 
 struct ModFileArchive
@@ -33,7 +53,11 @@ struct ModFileArchive
 class ModFile
 {
 public:
-    ModFile(std::variant<detail::ModFileArchive, detail::ModFileDisk> content);
+    using Underlying = std::variant<detail::ModFileArchive, std::reference_wrapper<detail::ModFileDisk>>;
+
+    ModFile(Underlying content);
+
+    void load();
 
     auto get_relative_path() const -> Path;
 
@@ -43,12 +67,20 @@ public:
     void write(std::filesystem::path path) const;
     void write(binary_io::any_ostream &dst) const;
 
+    const auto &get_underlying() const { return file_; }
+
 private:
-    std::variant<detail::ModFileArchive, detail::ModFileDisk> file_;
+    Underlying file_;
 };
 
 class ModFolder
 {
+    struct Archive
+    {
+        Path path;
+        btu::bsa::Archive arch;
+    };
+
 public:
     explicit ModFolder(Path directory, std::u8string archive_ext);
 
@@ -56,17 +88,19 @@ public:
 
     [[nodiscard]] auto to_flow()
     {
-        return flow::from(archives_)
+        return flow::map(archives_, &Archive::arch)
             .flatten()
             .map([](auto &pair) {
                 return ModFile(detail::ModFileArchive{pair.first, pair.second});
             })
-            .chain(flow::copy(loose_files_));
+            .chain(flow::map(loose_files_, [](auto &f) { return ModFile(std::ref(f)); }));
     }
 
+    void reintegrate();
+
 private:
-    std::vector<btu::bsa::Archive> archives_;
-    std::vector<ModFile> loose_files_;
+    std::vector<Archive> archives_;
+    std::vector<detail::ModFileDisk> loose_files_;
 
     Path dir_;
     std::u8string archive_ext_;
