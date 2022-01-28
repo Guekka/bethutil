@@ -32,7 +32,7 @@ File::File(UnderlyingFile f, ArchiveVersion v)
 
 auto File::compressed() const noexcept -> bool
 {
-    const auto visitor = btu::common::overload{
+    constexpr auto visitor = btu::common::overload{
         [](const libbsa::tes3::file &) { return false; },
         [](const libbsa::tes4::file &f) { return f.compressed(); },
         [](const libbsa::fo4::file &f) { return flow::any(f, &libbsa::fo4::chunk::compressed); },
