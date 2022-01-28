@@ -41,7 +41,7 @@ bool detail::ModFileDisk::modified() const noexcept
 void detail::ModFileDisk::read(const std::filesystem::path &path)
 {
     modified_ = true;
-    content_ = btu::common::read_file(path);
+    content_  = btu::common::read_file(path);
 }
 
 void detail::ModFileDisk::read(std::span<std::byte> src)
