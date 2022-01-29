@@ -45,6 +45,11 @@ struct Error : public std::exception
     {
     }
 
+    static auto success(SourceLocation l = BETHUTIL_CURRENT_SOURCE_LOC)
+    {
+        return Error(std::error_code(0, std::generic_category()), l);
+    }
+
     auto what() const noexcept -> const char * override { return "btu::common exception"; }
 
     SourceLocation loc;
