@@ -21,7 +21,10 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
     "${INCLUDE_DIR}/btu/modmanager/mod_folder.hpp"
-    "${INCLUDE_DIR}/btu/modmanager/mod_manager.hpp")
+    "${INCLUDE_DIR}/btu/modmanager/mod_manager.hpp"
+    "${INCLUDE_DIR}/btu/nif/functions.hpp"
+    "${INCLUDE_DIR}/btu/nif/mesh.hpp"
+    "${INCLUDE_DIR}/btu/nif/optimize.hpp")
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
@@ -33,7 +36,10 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/unpack.cpp"
     "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
     "${SOURCE_DIR}/modmanager/mod_folder.cpp"
-    "${SOURCE_DIR}/modmanager/mod_manager.cpp")
+    "${SOURCE_DIR}/modmanager/mod_manager.cpp"
+    "${SOURCE_DIR}/nif/functions.cpp"
+    "${SOURCE_DIR}/nif/mesh.cpp"
+    "${SOURCE_DIR}/nif/optimize.cpp")
 
 option(BETHUTIL_HKX "Build hkx part" OFF)
 if(${BETHUTIL_HKX})
@@ -92,12 +98,12 @@ target_include_directories("${PROJECT_NAME}" PRIVATE ${LIBFLOW_INCLUDE_DIRS})
 target_compile_definitions("${PROJECT_NAME}"
                            PUBLIC _SILENCE_CLANG_COROUTINE_MESSAGE)
 
+find_package(tl-expected CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
+
 if(${BETHUTIL_TEX})
   find_package(directxtex CONFIG REQUIRED)
   target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)
-
-  find_package(tl-expected CONFIG REQUIRED)
-  target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
 endif()
 
 if(${BETHUTIL_HKX})
