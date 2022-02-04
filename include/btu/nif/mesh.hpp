@@ -3,7 +3,7 @@
 #include "btu/common/error.hpp"
 #include "btu/common/path.hpp"
 
-#include <NifFile.hpp>
+#include <nifly/NifFile.hpp>
 #include <tl/expected.hpp>
 
 namespace btu::nif {

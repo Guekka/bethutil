@@ -3,7 +3,7 @@
 #include "btu/common/error.hpp"
 #include "btu/common/games.hpp"
 
-#include <BasicTypes.hpp>
+#include <nifly/BasicTypes.hpp>
 
 #include <optional>
 #include <string>
