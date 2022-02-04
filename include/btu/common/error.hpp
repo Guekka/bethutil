@@ -37,11 +37,11 @@ inline auto operator<<(std::ostream &os, [[maybe_unused]] SourceLocation loc) ->
 #endif
 }
 
-struct Error : public std::exception
+struct Error : public std::error_code
 {
     explicit Error(std::error_code ec, SourceLocation l = BETHUTIL_CURRENT_SOURCE_LOC)
-        : loc(l)
-        , ec(ec)
+        : std::error_code(ec)
+        , loc(l)
     {
     }
 
@@ -50,9 +50,11 @@ struct Error : public std::exception
         return Error(std::error_code(0, std::generic_category()), l);
     }
 
-    auto what() const noexcept -> const char * override { return "btu::common exception"; }
-
     SourceLocation loc;
-    std::error_code ec;
 };
+
+inline auto operator<<(std::ostream &os, const Error &err) -> std::ostream &
+{
+    return os << err.value() << ":" << err.category().name() << ":" << err.message() << "; " << err.loc;
+}
 } // namespace btu::common
