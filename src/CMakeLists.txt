@@ -101,6 +101,9 @@ target_compile_definitions("${PROJECT_NAME}"
 find_package(tl-expected CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
 
+find_package(nifly CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE nifly)
+
 if(${BETHUTIL_TEX})
   find_package(directxtex CONFIG REQUIRED)
   target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)
