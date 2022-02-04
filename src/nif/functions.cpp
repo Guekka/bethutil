@@ -2,8 +2,8 @@
 
 #include "btu/common/string.hpp"
 
-#include <NifFile.hpp>
 #include <flow.hpp>
+#include <nifly/NifFile.hpp>
 
 namespace btu::nif {
 auto get_niversion(btu::common::Game game) -> std::optional<nifly::NiVersion>
