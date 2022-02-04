@@ -33,6 +33,16 @@ ResultError Mesh::save(const Path &path)
     return {};
 }
 
+auto Mesh::get() noexcept -> nifly::NifFile &
+{
+    return file_;
+}
+
+auto Mesh::get() const noexcept -> const nifly::NifFile &
+{
+    return file_;
+}
+
 auto Mesh::get_load_path() const noexcept -> const Path &
 {
     return load_path_;
