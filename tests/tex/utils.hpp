@@ -60,12 +60,7 @@ auto test_expected(const std::filesystem::path &root,
 {
     auto in                    = load_tex(root / "in" / filename);
     const btu::tex::Result out = f(std::move(in));
-    if (!out.has_value())
-    {
-        UNSCOPED_INFO(out.error().ec.message());
-        UNSCOPED_INFO(out.error().loc);
-    }
-    INFO(filename);
+
     REQUIRE(out.has_value());
 
     const auto expected_path = root / "expected" / filename;
