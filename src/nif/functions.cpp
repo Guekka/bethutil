@@ -22,33 +22,28 @@ auto get_niversion(btu::common::Game game) -> std::optional<nifly::NiVersion>
     return std::nullopt;
 }
 
-auto convert(Mesh &file, bool headpart, btu::common::Game game) -> bool
+auto convert(Mesh &file, bool headpart, btu::common::Game game) -> ResultError
 {
     auto target_ver = get_niversion(game);
     if (!target_ver)
-        return false;
+        return tl::make_unexpected(btu::common::Error(std::error_code(1, std::generic_category())));
     nifly::OptOptions optOptions{.targetVersion  = *std::move(target_ver),
                                  .headParts      = headpart,
                                  .removeParallax = false};
 
     file.get().OptimizeFor(optOptions);
-    return true;
+    return {};
 }
 
-auto rename_referenced_textures(Mesh &file) -> bool
+void rename_referenced_textures(Mesh &file)
 {
-    bool meshChanged = false;
     flow::from(file.get().GetShapes())
         .flat_map([&](auto *s) { return file.get().GetTexturePathRefs(s); })
         .filter([](auto &tex) { return tex.get().size() >= 4; }) // Enough for ".tga"
         .for_each([&](auto &tex) {
             auto ext = btu::common::as_utf8(tex.get()).substr(tex.get().size() - 4);
             if (btu::common::str_compare(ext, u8".tga", false))
-            {
                 tex.get().replace(tex.get().size() - 4, 4, ".dds");
-                meshChanged = true;
-            }
         });
-    return meshChanged;
 }
 } // namespace btu::nif

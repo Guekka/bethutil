@@ -2,15 +2,12 @@
 
 #include "btu/common/error.hpp"
 #include "btu/common/path.hpp"
+#include "btu/nif/common.hpp"
 
 #include <nifly/NifFile.hpp>
 #include <tl/expected.hpp>
 
 namespace btu::nif {
-using btu::common::Path;
-using Error       = btu::common::Error;
-using ResultError = tl::expected<std::monostate, Error>;
-
 class Mesh
 {
     nifly::NifFile file_;
