@@ -1,7 +1,7 @@
 #pragma once
 
-#include "btu/common/error.hpp"
 #include "btu/common/games.hpp"
+#include "btu/nif/common.hpp"
 
 #include <nifly/BasicTypes.hpp>
 
@@ -32,6 +32,6 @@ struct OptimizationSteps
     auto operator<=>(const OptimizationSteps &) const noexcept = default;
 };
 
-auto optimize(Mesh &file, const OptimizationSteps &steps) -> btu::common::Error;
-auto compute_optimization_steps(const Mesh &file, const Settings &sets) -> OptimizationSteps;
+[[nodiscard]] auto optimize(Mesh &file, const OptimizationSteps &steps) -> ResultError;
+[[nodiscard]] auto compute_optimization_steps(const Mesh &file, const Settings &sets) -> OptimizationSteps;
 } // namespace btu::nif

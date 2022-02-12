@@ -45,11 +45,6 @@ struct Error : public std::error_code
     {
     }
 
-    static auto success(SourceLocation l = BETHUTIL_CURRENT_SOURCE_LOC)
-    {
-        return Error(std::error_code(0, std::generic_category()), l);
-    }
-
     SourceLocation loc;
 };
 

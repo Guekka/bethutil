@@ -22,6 +22,7 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
     "${INCLUDE_DIR}/btu/modmanager/mod_folder.hpp"
     "${INCLUDE_DIR}/btu/modmanager/mod_manager.hpp"
+    "${INCLUDE_DIR}/btu/nif/common.hpp"
     "${INCLUDE_DIR}/btu/nif/functions.hpp"
     "${INCLUDE_DIR}/btu/nif/mesh.hpp"
     "${INCLUDE_DIR}/btu/nif/optimize.hpp")

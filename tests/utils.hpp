@@ -19,4 +19,14 @@ struct StringMaker<tl::expected<T, E>>
         return expected.has_value() ? ts(expected.value()) : ts(expected.error());
     }
 };
+
+template<typename E>
+struct StringMaker<tl::expected<void, E>>
+{
+    static auto convert(const tl::expected<void, E> &expected) -> std::string
+    {
+        auto ts = [](auto &&a) { return StringMaker<decltype(a)>::convert(a); };
+        return expected.has_value() ? "void value" : ts(expected.error());
+    }
+};
 } // namespace Catch
