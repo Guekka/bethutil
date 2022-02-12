@@ -40,10 +40,10 @@ public:
     void decompress();
     void compress();
 
-    void read(std::filesystem::path path);
+    void read(Path path);
     void read(std::span<std::byte> src);
 
-    void write(std::filesystem::path path) const;
+    void write(Path path) const;
     void write(binary_io::any_ostream &dst) const;
 
     [[nodiscard]] auto version() const noexcept -> ArchiveVersion;

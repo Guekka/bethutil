@@ -9,8 +9,9 @@
 
 #include <filesystem>
 
-namespace btu::common {
-using Path     = std::filesystem::path;
+namespace btu {
+namespace fs   = std::filesystem;
+using Path     = fs::path;
 using OsString = Path::string_type;
 using OsChar   = OsString::value_type;
-} // namespace btu::common
+} // namespace btu

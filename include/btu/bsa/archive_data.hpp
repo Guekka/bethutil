@@ -52,7 +52,7 @@ public:
     static constexpr bool separate_different_types = false;
 
 private:
-    [[nodiscard]] static auto get_file_size(const common::Path &path, std::optional<Size> override) -> Size;
+    [[nodiscard]] static auto get_file_size(const Path &path, std::optional<Size> override) -> Size;
 
     Size size_{};
     uintmax_t max_size_ = UINT64_MAX;

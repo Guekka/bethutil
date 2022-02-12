@@ -34,7 +34,7 @@ std::optional<QString> GeneralSettings::isValid() const
 namespace btu::modmanager {
 auto find_manager(const Path &dir) -> ModManager
 {
-    namespace fs = std::filesystem;
+    namespace fs = fs;
 
     /* Manual forced */
     if (fs::exists(dir / k_force_process_folder))
@@ -60,7 +60,7 @@ auto find_manager(const Path &dir) -> ModManager
 
 ModsFolder::ModsFolder(Path root, std::u8string archive_ext)
     : root_(std::move(root))
-    , folders_(flow::from(std::filesystem::directory_iterator(root_))
+    , folders_(flow::from(fs::directory_iterator(root_))
                    .filter([](auto &&e) { return e.is_directory(); })
                    .map([](auto &&e) { return FLOW_FWD(e).path(); })
                    .to_vector())

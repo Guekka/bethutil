@@ -11,7 +11,7 @@
 
 using namespace btu::bsa;
 
-void process_args(std::vector<std::string_view> args, const Path &dir)
+void process_args(std::vector<std::string_view> args, const btu::Path &dir)
 {
     const auto &sets = Settings::get(Game::SSE);
     const auto arg   = args.at(0);
@@ -24,7 +24,7 @@ void process_args(std::vector<std::string_view> args, const Path &dir)
     }
     else if (arg == "unpack")
     {
-        std::vector files(fs::directory_iterator(dir), fs::directory_iterator{});
+        std::vector files(btu::fs::directory_iterator(dir), btu::fs::directory_iterator{});
         erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
         for (const auto &file : files)
         {
@@ -34,7 +34,7 @@ void process_args(std::vector<std::string_view> args, const Path &dir)
     }
     else if (arg == "list")
     {
-        std::vector files(fs::directory_iterator(dir), fs::directory_iterator{});
+        std::vector files(btu::fs::directory_iterator(dir), btu::fs::directory_iterator{});
         erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
         for (const auto &file : files)
         {
@@ -54,7 +54,7 @@ void process_args(std::vector<std::string_view> args, const Path &dir)
 
 auto main(int argc, char *argv[]) -> int
 {
-    Path dir = fs::current_path();
+    btu::Path dir = btu::fs::current_path();
     if (argc == 3)
     {
         dir = argv[2];

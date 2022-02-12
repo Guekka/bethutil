@@ -6,7 +6,8 @@
 
 #include <fstream>
 
-using btu::common::Path;
+using btu::Path;
+namespace fs = btu::fs;
 using namespace std::literals;
 
 namespace Catch {
@@ -28,5 +29,11 @@ struct StringMaker<tl::expected<void, E>>
         auto ts = [](auto &&a) { return StringMaker<decltype(a)>::convert(a); };
         return expected.has_value() ? "void value" : ts(expected.error());
     }
+};
+
+template<>
+struct StringMaker<btu::Path>
+{
+    static std::string convert(const btu::Path &in) { return in.string(); }
 };
 } // namespace Catch

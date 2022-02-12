@@ -15,7 +15,7 @@ TEST_CASE("read_file", "[src]")
         constexpr auto file = "read_file/100space.bin";
         const auto content  = std::string(100, ' ');
         const auto data     = btu::common::read_file(file);
-        REQUIRE(data.size() == btu::common::fs::file_size(file));
+        REQUIRE(data.size() == btu::fs::file_size(file));
         REQUIRE(std::equal(data.cbegin(), data.cend(), content.cbegin(), [](auto byte, auto c) {
             return static_cast<std::byte>(c) == byte;
         }));

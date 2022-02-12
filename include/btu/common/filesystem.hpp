@@ -12,8 +12,6 @@
 #include <vector>
 
 namespace btu::common {
-namespace fs = std::filesystem;
-
 [[nodiscard]] inline auto read_file(const Path &a_path) -> std::vector<std::byte>
 {
     std::vector<std::byte> data;

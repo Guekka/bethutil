@@ -11,7 +11,6 @@
 #include <tl/expected.hpp>
 
 namespace btu::nif {
-using btu::common::Path;
 using Error       = btu::common::Error;
 using ResultError = tl::expected<void, Error>;
 } // namespace btu::nif

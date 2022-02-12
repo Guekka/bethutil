@@ -44,9 +44,9 @@ set(SOURCE_FILES
 
 option(BETHUTIL_HKX "Build hkx part" OFF)
 if(${BETHUTIL_HKX})
-  list(APPEND HEADER_FILES "${INCLUDE_DIR}/btu/hkx/convert.hpp")
+  list(APPEND HEADER_FILES "${INCLUDE_DIR}/btu/hkx/functions.hpp")
 
-  list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/convert.cpp")
+  list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/functions.cpp")
 endif()
 
 option(BETHUTIL_TEX "Build tex part" OFF)

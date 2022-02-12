@@ -25,11 +25,4 @@ struct StringMaker<ArchiveData>
         return os.str();
     }
 };
-
-template<>
-struct StringMaker<Path>
-{
-    static std::string convert(const Path &in) { return in.string(); }
-};
-
 } // namespace Catch

@@ -24,6 +24,6 @@ public:
     void set_load_path(Path path) noexcept;
 };
 
-auto canonize_path(std::filesystem::path path) noexcept -> std::u8string;
+auto canonize_path(Path path) noexcept -> std::u8string;
 
 } // namespace btu::nif
