@@ -2,7 +2,6 @@ set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 set(INCLUDE_DIR "${ROOT_DIR}/include")
 set(HEADER_FILES
-    "${INCLUDE_DIR}/btu/common.hpp"
     "${INCLUDE_DIR}/btu/common/algorithms.hpp"
     "${INCLUDE_DIR}/btu/common/error.hpp"
     "${INCLUDE_DIR}/btu/common/filesystem.hpp"
@@ -18,7 +17,6 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/archive_data.hpp"
     "${INCLUDE_DIR}/btu/bsa/settings.hpp"
     "${INCLUDE_DIR}/btu/bsa/plugin.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/common.hpp"
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
     "${INCLUDE_DIR}/btu/modmanager/mod_folder.hpp"
     "${INCLUDE_DIR}/btu/modmanager/mod_manager.hpp"
@@ -54,7 +52,6 @@ if(${BETHUTIL_TEX})
   list(
     APPEND
     HEADER_FILES
-    "${INCLUDE_DIR}/btu/tex.hpp"
     "${INCLUDE_DIR}/btu/tex/error_code.hpp"
     "${INCLUDE_DIR}/btu/tex/compression_device.hpp"
     "${INCLUDE_DIR}/btu/tex/dimension.hpp"
