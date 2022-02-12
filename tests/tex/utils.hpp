@@ -80,7 +80,7 @@ auto test_expected(const Path &root,
 }
 
 template<typename Func>
-auto test_expected_dir(const Path &root, const Func &f) -> void
+void test_expected_dir(const Path &root, const Func &f)
 {
     const auto in_dir = root / "in";
     for (const auto &file : fs::recursive_directory_iterator(in_dir))
