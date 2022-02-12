@@ -9,12 +9,4 @@ class Texture;
 
 using Result      = tl::expected<Texture, Error>;
 using ResultError = tl::expected<void, Error>;
-
-enum class CommandState
-{
-    Applicable,
-    NotRequired,
-    NotApplicable
-};
-
 } // namespace btu::tex
