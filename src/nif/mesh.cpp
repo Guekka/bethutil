@@ -6,7 +6,7 @@
 #include "btu/nif/mesh.hpp"
 
 namespace btu::nif {
-auto canonize_path(std::filesystem::path path) noexcept -> std::u8string
+auto canonize_path(Path path) noexcept -> std::u8string
 {
     auto str         = btu::common::to_lower(path.generic_u8string());
     const auto start = std::u8string_view(u8"meshes/");

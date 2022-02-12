@@ -38,7 +38,7 @@ bool detail::ModFileDisk::modified() const noexcept
     return modified_;
 }
 
-void detail::ModFileDisk::read(const std::filesystem::path &path)
+void detail::ModFileDisk::read(const Path &path)
 {
     modified_ = true;
     content_  = btu::common::read_file(path);
@@ -50,7 +50,7 @@ void detail::ModFileDisk::read(std::span<std::byte> src)
     content_.assign(src.begin(), src.end());
 }
 
-void detail::ModFileDisk::write(const std::filesystem::path &path) const
+void detail::ModFileDisk::write(const Path &path) const
 {
     btu::common::write_file(path, content_);
 }
@@ -81,7 +81,7 @@ auto ModFile::get_relative_path() const -> Path
     return std::visit(visitor, file_);
 }
 
-void ModFile::read(std::filesystem::path path)
+void ModFile::read(Path path)
 {
     auto visitor = btu::common::overload{
         [&](detail::ModFileArchive &f) { f.file.read(std::move(path)); },
@@ -101,7 +101,7 @@ void ModFile::read(std::span<std::byte> src)
     return std::visit(visitor, file_);
 }
 
-void ModFile::write(std::filesystem::path path) const
+void ModFile::write(Path path) const
 {
     auto visitor = btu::common::overload{
         [path](const detail::ModFileArchive &f) { f.file.write(std::move(path)); },
@@ -134,7 +134,7 @@ ModFolder::ModFolder(Path directory, std::u8string archive_ext)
         return ext == archive_ext_;
     };
 
-    flow::from(std::filesystem::recursive_directory_iterator(dir_))
+    flow::from(fs::recursive_directory_iterator(dir_))
         .filter([](auto &&e) { return e.is_regular_file(); })
         .map([](auto &&e) { return e.path(); })
         .for_each([&](auto &&path) {

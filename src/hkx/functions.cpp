@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-#include "btu/hkx/convert.hpp"
+#include "btu/hkx/functions.hpp"
 
 #include "btu/common/string.hpp"
 
@@ -16,9 +16,6 @@
 #include <string>
 
 namespace btu::hkx {
-using btu::common::Path;
-namespace fs = std::filesystem;
-
 using namespace std::literals;
 
 auto run_process(const std::vector<std::string> &args, const Path &working_dir) -> std::error_code
@@ -40,21 +37,21 @@ auto Anim::generate_name() const noexcept -> std::string
     return "TEMPFILE_btu__hkx" + std::to_string(counter++) + ".hkx ";
 }
 
-auto Anim::load(const std::filesystem::path &path) noexcept -> std::error_code
+auto Anim::load(const Path &path) noexcept -> std::error_code
 {
     path_ = exe_dir_ / generate_name();
     std::error_code ec;
-    std::filesystem::remove(path_, ec);
+    fs::remove(path_, ec);
     if (ec)
         return ec;
-    std::filesystem::copy(path, path_, ec);
+    fs::copy(path, path_, ec);
     return ec;
 }
 
-auto Anim::save(const std::filesystem::path &path) noexcept -> std::error_code
+auto Anim::save(const Path &path) noexcept -> std::error_code
 {
     std::error_code ec;
-    std::filesystem::copy(path_, path, ec);
+    fs::copy(path_, path, ec);
     return ec;
 }
 

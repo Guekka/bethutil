@@ -95,7 +95,7 @@ auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noex
 
 } // namespace detail
 
-auto canonize_path(std::filesystem::path path) noexcept -> std::u8string
+auto canonize_path(Path path) noexcept -> std::u8string
 {
     auto str         = btu::common::to_lower(path.generic_u8string());
     const auto start = std::u8string_view(u8"textures/");
@@ -104,7 +104,7 @@ auto canonize_path(std::filesystem::path path) noexcept -> std::u8string
     return str.substr(prefix_end);
 }
 
-auto Texture::load_file(std::filesystem::path path) noexcept -> ResultError
+auto Texture::load_file(Path path) noexcept -> ResultError
 {
     load_path_ = std::move(path);
 
@@ -126,7 +126,7 @@ auto Texture::load_file(std::filesystem::path path) noexcept -> ResultError
     return {};
 }
 
-auto Texture::save_file(std::filesystem::path path) const noexcept -> ResultError
+auto Texture::save_file(Path path) const noexcept -> ResultError
 {
     const auto &tex = tex_.get();
     const auto res  = DirectX::SaveToDDSFile(tex.GetImages(),
@@ -167,12 +167,12 @@ auto Texture::get_dimension() const noexcept -> Dimension
     return {info.width, info.height};
 }
 
-auto Texture::get_load_path() const noexcept -> const std::filesystem::path &
+auto Texture::get_load_path() const noexcept -> const Path &
 {
     return load_path_;
 }
 
-auto Texture::set_load_path(std::filesystem::path path) noexcept -> void
+auto Texture::set_load_path(Path path) noexcept -> void
 {
     load_path_ = std::move(path);
 }

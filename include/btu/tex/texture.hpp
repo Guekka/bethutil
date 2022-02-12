@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "btu/common/path.hpp"
 #include "btu/tex/detail/common.hpp"
 
 #include <filesystem>
@@ -55,13 +56,13 @@ private:
 auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noexcept -> bool;
 } // namespace detail
 
-auto canonize_path(std::filesystem::path path) noexcept -> std::u8string;
+auto canonize_path(Path path) noexcept -> std::u8string;
 
 class Texture
 {
 public:
-    [[nodiscard]] auto load_file(std::filesystem::path path) noexcept -> ResultError;
-    [[nodiscard]] auto save_file(std::filesystem::path path) const noexcept -> ResultError;
+    [[nodiscard]] auto load_file(Path path) noexcept -> ResultError;
+    [[nodiscard]] auto save_file(Path path) const noexcept -> ResultError;
 
     auto set(ScratchImage &&tex) noexcept -> void;
 
@@ -72,13 +73,13 @@ public:
 
     auto get_dimension() const noexcept -> Dimension;
 
-    auto get_load_path() const noexcept -> const std::filesystem::path &;
-    auto set_load_path(std::filesystem::path path) noexcept -> void;
+    auto get_load_path() const noexcept -> const Path &;
+    auto set_load_path(Path path) noexcept -> void;
 
     auto operator==(const Texture &) const noexcept -> bool = default;
 
 private:
-    std::filesystem::path load_path_;
+    Path load_path_;
     detail::ScratchImagePimpl tex_;
 };
 } // namespace btu::tex

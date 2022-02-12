@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "../utils.hpp"
 #include "btu/tex/dimension.hpp"
 #include "btu/tex/texture.hpp"
 
@@ -43,7 +44,7 @@ struct StringMaker<std::u8string>
 };
 } // namespace Catch
 
-inline auto load_tex(const std::filesystem::path &path) -> btu::tex::Texture
+inline auto load_tex(const Path &path) -> btu::tex::Texture
 {
     btu::tex::Texture tex;
     auto res = tex.load_file(path);
@@ -53,8 +54,8 @@ inline auto load_tex(const std::filesystem::path &path) -> btu::tex::Texture
 }
 
 template<typename Func>
-auto test_expected(const std::filesystem::path &root,
-                   const std::filesystem::path &filename,
+auto test_expected(const Path &root,
+                   const Path &filename,
                    Func f,
                    bool approve = true)
 {
@@ -64,9 +65,9 @@ auto test_expected(const std::filesystem::path &root,
     REQUIRE(out.has_value());
 
     const auto expected_path = root / "expected" / filename;
-    if (!std::filesystem::exists(expected_path) && approve)
+    if (!fs::exists(expected_path) && approve)
     {
-        std::filesystem::create_directories(expected_path.parent_path());
+        fs::create_directories(expected_path.parent_path());
         const auto res = out.value().save_file(expected_path);
         CHECK(res.has_value());
         FAIL_CHECK("Expected file not found:" + expected_path.string());
@@ -79,10 +80,10 @@ auto test_expected(const std::filesystem::path &root,
 }
 
 template<typename Func>
-auto test_expected_dir(const std::filesystem::path &root, const Func &f) -> void
+auto test_expected_dir(const Path &root, const Func &f) -> void
 {
     const auto in_dir = root / "in";
-    for (const auto &file : std::filesystem::recursive_directory_iterator(in_dir))
+    for (const auto &file : fs::recursive_directory_iterator(in_dir))
         if (file.is_regular_file())
             test_expected(root, file.path().lexically_relative(in_dir), f);
 }

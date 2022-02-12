@@ -63,7 +63,7 @@ void File::compress()
     std::visit(visitor, file_);
 }
 
-void File::read(std::filesystem::path path)
+void File::read(Path path)
 {
     const auto visitor = btu::common::overload{
         [&](libbsa::tes3::file &f) { f.read(std::move(path)); },
@@ -87,7 +87,7 @@ void File::read(std::span<std::byte> src)
     std::visit(visitor, file_);
 }
 
-void File::write(std::filesystem::path path) const
+void File::write(Path path) const
 {
     const auto visitor = btu::common::overload{
         [&](const libbsa::tes3::file &f) { f.write(std::move(path)); },

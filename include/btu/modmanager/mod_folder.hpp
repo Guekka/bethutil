@@ -13,8 +13,6 @@
 #include <variant>
 
 namespace btu::modmanager {
-using btu::common::Path;
-
 namespace detail {
 class ModFileDisk final
 {
@@ -28,10 +26,10 @@ public:
 
     [[nodiscard]] auto modified() const noexcept -> bool;
 
-    void read(const std::filesystem::path &path);
+    void read(const Path &path);
     void read(std::span<std::byte> src);
 
-    void write(const std::filesystem::path &path) const;
+    void write(const Path &path) const;
     void write(binary_io::any_ostream &dst) const;
 
 private:
@@ -61,10 +59,10 @@ public:
 
     auto get_relative_path() const -> Path;
 
-    void read(std::filesystem::path path);
+    void read(Path path);
     void read(std::span<std::byte> src);
 
-    void write(std::filesystem::path path) const;
+    void write(Path path) const;
     void write(binary_io::any_ostream &dst) const;
 
     const auto &get_underlying() const { return file_; }

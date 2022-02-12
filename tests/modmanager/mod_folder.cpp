@@ -13,12 +13,12 @@
 TEST_CASE("ModFolder", "[src]")
 {
     const Path dir = "modfolder";
-    std::filesystem::remove_all(dir / "output");
+    fs::remove_all(dir / "output");
 
     auto mf = btu::modmanager::ModFolder(dir / "input", u8".ba2");
     flow::from(mf).for_each([&](auto &&f) {
         const auto out = dir / "output" / f.get_relative_path();
-        std::filesystem::create_directories(out.parent_path());
+        fs::create_directories(out.parent_path());
         f.load();
         f.write(out);
     });
@@ -29,8 +29,8 @@ TEST_CASE("ModFolder reintegrate", "[src]")
 {
     const Path dir = "modfolder_reintegrate";
     // operate on copy
-    std::filesystem::remove_all(dir / "output");
-    std::filesystem::copy(dir / "input", dir / "output");
+    fs::remove_all(dir / "output");
+    fs::copy(dir / "input", dir / "output");
 
     auto mf = btu::modmanager::ModFolder(dir / "output", u8".ba2");
     // Change one byte in each file

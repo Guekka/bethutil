@@ -16,7 +16,8 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/pack.cpp"
     "${SOURCE_DIR}/bsa/plugin.cpp"
     "${SOURCE_DIR}/modmanager/mod_folder.cpp"
-    "${SOURCE_DIR}/modmanager/mod_manager.cpp")
+    "${SOURCE_DIR}/modmanager/mod_manager.cpp"
+    "${SOURCE_DIR}/nif/functions.cpp")
 
 if(${BETHUTIL_TEX})
   list(APPEND HEADER_FILES "${INCLUDE_DIR}/tex/utils.hpp")
@@ -26,7 +27,7 @@ if(${BETHUTIL_TEX})
 endif()
 
 if(${BETHUTIL_HKX})
-  list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/convert.cpp")
+  list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/functions.cpp")
 endif()
 
 if("${BETHUTIL_BUILD_EXAMPLES}")
