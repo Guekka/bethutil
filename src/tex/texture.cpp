@@ -47,7 +47,7 @@ void initialize_com()
 {
     const auto hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
     if (FAILED(hr))
-        throw error_from_hresult(hr);
+        throw btu::common::Exception(error_from_hresult(hr));
 }
 
 ScratchImagePimpl::ScratchImagePimpl()
