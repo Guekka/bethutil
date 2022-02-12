@@ -44,7 +44,7 @@ const auto generate_tex = [](const auto &info) {
 };
 
 const auto generate_sets1 = [] {
-    auto sets                 = btu::tex::Settings::get(btu::common::Game::SSE);
+    auto sets                 = btu::tex::Settings::get(btu::Game::SSE);
     sets.use_format_whitelist = true;
     sets.allowed_formats      = {DXGI_FORMAT_BC7_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM};
     sets.compress             = true;
@@ -60,7 +60,7 @@ const auto generate_info2 = [] {
 };
 
 const auto generate_sets2 = [] {
-    auto sets                 = btu::tex::Settings::get(btu::common::Game::SSE);
+    auto sets                 = btu::tex::Settings::get(btu::Game::SSE);
     sets.use_format_whitelist = false;
     sets.compress             = false;
     sets.mipmaps              = false;

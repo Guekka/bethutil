@@ -19,9 +19,9 @@ class Texture;
 
 struct Settings
 {
-    [[nodiscard]] static auto get(btu::common::Game game) noexcept -> const Settings &;
+    [[nodiscard]] static auto get(Game game) noexcept -> const Settings &;
 
-    btu::common::Game game;
+    btu::Game game;
 
     bool compress;
     std::variant<std::monostate, util::ResizeRatio, Dimension> resize;

@@ -5,7 +5,6 @@
 #pragma once
 
 #include "btu/bsa/archive_data.hpp"
-#include "btu/bsa/detail/common.hpp"
 
 namespace btu::bsa {
 using AllowFilePred = std::function<bool(const Path &dir, fs::directory_entry const &fileinfo)>;

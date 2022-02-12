@@ -13,7 +13,7 @@ using namespace btu::bsa;
 
 void process_args(std::vector<std::string_view> args, const btu::Path &dir)
 {
-    const auto &sets = Settings::get(Game::SSE);
+    const auto &sets = Settings::get(btu::Game::SSE);
     const auto arg   = args.at(0);
     if (arg == "pack")
     {

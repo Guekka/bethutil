@@ -9,7 +9,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
 {
     SECTION("Simple (SSE)")
     {
-        auto sets = Settings::get(Game::SSE);
+        auto sets = Settings::get(btu::Game::SSE);
 
         REQUIRE_FALSE(FilePath::make("", sets, FileTypes::Plugin).has_value());
         auto plug = FilePath::make("C:/SomeDir/Requiem.esp", sets, FileTypes::Plugin);
@@ -21,7 +21,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
     }
     SECTION("Complex (SSE)")
     {
-        auto sets = Settings::get(Game::SSE);
+        auto sets = Settings::get(btu::Game::SSE);
 
         auto plug  = FilePath::make("C:/SomeDir/Requiem - Textures01.bsa", sets, FileTypes::BSA);
         auto plug2 = FilePath::make("C:/SomeDir/Requiem01 - Textures.bsa", sets, FileTypes::BSA);
@@ -35,7 +35,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
     }
     SECTION("Complex 2 (SSE)")
     {
-        auto sets = Settings::get(Game::SSE);
+        auto sets = Settings::get(btu::Game::SSE);
         auto plug = FilePath::make("C:/AnotherSomeDir/Requiem01 - Enhancement - Textures.bsa",
                                    sets,
                                    FileTypes::BSA);
@@ -49,7 +49,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
     }
     SECTION("Complex 3 (SSE)")
     {
-        auto sets = Settings::get(Game::SSE);
+        auto sets = Settings::get(btu::Game::SSE);
         auto plug = FilePath::make("C:/AnotherSomeDir/Requiem - Enhancement01.bsa", sets, FileTypes::BSA);
 
         REQUIRE(plug.has_value());
@@ -61,7 +61,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
     }
     SECTION("Complex 4 (FO4)")
     {
-        auto sets = Settings::get(Game::FO4);
+        auto sets = Settings::get(btu::Game::FO4);
         auto plug = FilePath::make("C:/Mk. II - Frag.esp", sets, FileTypes::Plugin);
 
         REQUIRE(plug.has_value());
@@ -72,7 +72,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
     }
     SECTION("Complex 5 (FO4)")
     {
-        auto sets = Settings::get(Game::FO4);
+        auto sets = Settings::get(btu::Game::FO4);
         auto plug = FilePath::make("some_dir/Colt 6520.esp", sets, FileTypes::Plugin);
 
         REQUIRE(plug.has_value());
@@ -83,7 +83,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
     }
     SECTION("Complex 6 (FO4)")
     {
-        auto sets = Settings::get(Game::FO4);
+        auto sets = Settings::get(btu::Game::FO4);
         auto plug = FilePath::make("some_dir/Colt. 6520.esp", sets, FileTypes::Plugin);
 
         REQUIRE(plug.has_value());

@@ -33,7 +33,7 @@ public:
 
     auto load(const Path &path) noexcept -> std::error_code;
     auto save(const Path &path) noexcept -> std::error_code;
-    auto convert(btu::common::Game target_game) -> std::error_code;
+    auto convert(btu::Game target_game) -> std::error_code;
 };
 
 } // namespace btu::hkx

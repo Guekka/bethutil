@@ -14,9 +14,9 @@ class Mesh;
 
 struct Settings
 {
-    [[nodiscard]] static auto get(btu::common::Game game) noexcept -> const Settings &;
+    [[nodiscard]] static auto get(btu::Game game) noexcept -> const Settings &;
 
-    btu::common::Game game;
+    btu::Game game;
 
     bool rename_referenced_textures;
     std::optional<nifly::NiVersion> target_version;
@@ -26,7 +26,7 @@ struct Settings
 struct OptimizationSteps
 {
     bool rename_referenced_textures;
-    std::optional<btu::common::Game> format;
+    std::optional<btu::Game> format;
     bool headpart = false;
 
     auto operator<=>(const OptimizationSteps &) const noexcept = default;

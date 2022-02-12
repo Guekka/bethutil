@@ -65,18 +65,18 @@ auto Anim::sse_args() const noexcept -> std::vector<std::string>
     return {(exe_dir_ / "hkx32to64.exe").string(), path_.filename().string()};
 }
 
-auto Anim::convert(btu::common::Game target_game) -> std::error_code
+auto Anim::convert(btu::Game target_game) -> std::error_code
 {
     const auto args = [&]() noexcept -> std::vector<std::string> {
         switch (target_game)
         {
-            case btu::common::Game::TES3:
-            case btu::common::Game::TES4:
-            case btu::common::Game::FNV:
-            case btu::common::Game::FO4:
-            case btu::common::Game::Custom: return {};
-            case btu::common::Game::SLE: return sle_args();
-            case btu::common::Game::SSE: return sse_args();
+            case btu::Game::TES3:
+            case btu::Game::TES4:
+            case btu::Game::FNV:
+            case btu::Game::FO4:
+            case btu::Game::Custom: return {};
+            case btu::Game::SLE: return sle_args();
+            case btu::Game::SSE: return sse_args();
         }
         return {};
     }();
