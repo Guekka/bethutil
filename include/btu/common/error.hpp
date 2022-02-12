@@ -52,4 +52,16 @@ inline auto operator<<(std::ostream &os, const Error &err) -> std::ostream &
 {
     return os << err.value() << ":" << err.category().name() << ":" << err.message() << "; " << err.loc;
 }
+
+class Exception : public std::exception
+{
+    Error err_;
+
+public:
+    Exception(Error err)
+        : err_(std::move(err))
+    {
+    }
+    virtual auto what() const -> const char * override { return "btu::common::Exception"; }
+};
 } // namespace btu::common
