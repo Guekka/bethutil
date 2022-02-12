@@ -21,10 +21,10 @@ auto compute_optimization_steps(const Mesh &file, const Settings &sets) -> Optim
     const bool is_headpart = btu::common::contains(sets.headpart_meshes, path);
 
     // We only convert SSE and LE
-    std::optional<btu::common::Game> format{};
-    if (sets.game == btu::common::Game::SSE && !file.get().IsSSECompatible())
+    std::optional<btu::Game> format{};
+    if (sets.game == btu::Game::SSE && !file.get().IsSSECompatible())
         format = sets.game;
-    else if (sets.game == btu::common::Game::SLE)
+    else if (sets.game == btu::Game::SLE)
         format = sets.game;
 
     return OptimizationSteps{

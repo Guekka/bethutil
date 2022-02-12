@@ -1,6 +1,6 @@
 #pragma once
 
-namespace btu::common {
+namespace btu {
 enum class Game
 {
     TES3,
@@ -12,4 +12,4 @@ enum class Game
     Custom
 };
 
-} // namespace btu::common
+} // namespace btu

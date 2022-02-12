@@ -1,7 +1,7 @@
 #pragma once
 
 #include "btu/bsa/detail/archive_type.hpp"
-#include "btu/bsa/detail/common.hpp"
+#include "btu/common/path.hpp"
 
 #include <bsa/bsa.hpp>
 

@@ -111,7 +111,7 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     if (target_dim.has_value() && dim != target_dim.value())
         res.resize = target_dim.value();
 
-    if (sets.game == btu::common::Game::SSE)
+    if (sets.game == btu::Game::SSE)
         if (can_be_optimized_landscape(file, sets))
             res.add_transparent_alpha = true;
 
@@ -122,55 +122,55 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     return res;
 }
 
-auto Settings::get(common::Game game) noexcept -> const Settings &
+auto Settings::get(Game game) noexcept -> const Settings &
 {
     static auto tes3_sets = [&] {
         return Settings{
-            .game                 = common::Game::TES3,
+            .game                 = Game::TES3,
             .compress             = false,
             .resize               = {},
             .mipmaps              = true,
             .use_format_whitelist = false,
             .allowed_formats      = {}, // Unknown
             .output_format        = {.uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
-                              .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
-                              .compressed                 = DXGI_FORMAT_BC3_UNORM,
-                              .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
+                                     .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
+                                     .compressed                 = DXGI_FORMAT_BC3_UNORM,
+                                     .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
             .landscape_textures   = {}, // Unknown
         };
     }();
 
     switch (game)
     {
-        case btu::common::Game::TES3: return tes3_sets;
-        case btu::common::Game::TES4:
+        case btu::Game::TES3: return tes3_sets;
+        case btu::Game::TES4:
         {
             static auto tes4_sets = [&] {
                 auto sets = tes3_sets;
-                sets.game = btu::common::Game::TES4;
+                sets.game = btu::Game::TES4;
                 return sets;
             }();
             return tes4_sets;
         }
-        case btu::common::Game::FNV:
+        case btu::Game::FNV:
         {
             static auto fnv_sets = [&] {
                 auto sets = tes3_sets;
-                sets.game = btu::common::Game::FNV;
+                sets.game = btu::Game::FNV;
                 return sets;
             }();
             return fnv_sets;
         }
-        case btu::common::Game::SLE:
+        case btu::Game::SLE:
         {
             static auto sle_sets = [&] {
                 auto sets = tes3_sets;
-                sets.game = btu::common::Game::SLE;
+                sets.game = btu::Game::SLE;
                 return sets;
             }();
             return sle_sets;
         }
-        case btu::common::Game::SSE:
+        case btu::Game::SSE:
         {
             static auto sse_sets = [&] {
                 auto sets                 = tes3_sets;
@@ -184,21 +184,21 @@ auto Settings::get(common::Game game) noexcept -> const Settings &
                     DXGI_FORMAT_R8G8B8A8_UNORM,
                 };
                 sets.output_format.compressed = DXGI_FORMAT_BC7_UNORM;
-                sets.game                     = btu::common::Game::SSE;
+                sets.game                     = btu::Game::SSE;
                 return sets;
             }();
             return sse_sets;
         }
-        case btu::common::Game::FO4:
+        case btu::Game::FO4:
         {
             static auto fo4_sets = [&] {
-                auto sets = Settings::get(common::Game::SSE);
-                sets.game = btu::common::Game::FO4;
+                auto sets = Settings::get(Game::SSE);
+                sets.game = btu::Game::FO4;
                 return sets;
             }();
             return fo4_sets;
         }
-        case btu::common::Game::Custom: return tes3_sets;
+        case btu::Game::Custom: return tes3_sets;
     }
     return tes3_sets;
 }

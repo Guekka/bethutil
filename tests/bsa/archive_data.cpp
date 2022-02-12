@@ -14,7 +14,7 @@ using namespace btu::bsa;
 
 ArchiveData make_arch(uintmax_t max, uintmax_t size, ArchiveType type, uint32_t file_count = 1)
 {
-    auto sets     = Settings::get(Game::SSE);
+    auto sets     = Settings::get(btu::Game::SSE);
     sets.max_size = max;
     auto arch     = ArchiveData(sets, type);
 

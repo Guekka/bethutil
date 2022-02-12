@@ -15,7 +15,7 @@ TEST_CASE("Converting from LE to SE", "[src]")
 {
     btu::hkx::Anim anim(exe_dir);
     REQUIRE_FALSE(anim.load(dir / "LE_INPUT.hkx"));
-    REQUIRE_FALSE(anim.convert(btu::common::Game::SSE));
+    REQUIRE_FALSE(anim.convert(btu::Game::SSE));
     fs::remove(dir / "LE_OUTPUT.hkx");
     REQUIRE_FALSE(anim.save(dir / "LE_OUTPUT.hkx"));
     CHECK(btu::common::compare_files(dir / "LE_EXPECTED.hkx", dir / "LE_OUTPUT.hkx"));
@@ -25,7 +25,7 @@ TEST_CASE("Converting from SE to LE", "[src]")
 {
     btu::hkx::Anim anim(exe_dir);
     REQUIRE_FALSE(anim.load(dir / "SE_INPUT.hkx"));
-    REQUIRE_FALSE(anim.convert(btu::common::Game::SLE));
+    REQUIRE_FALSE(anim.convert(btu::Game::SLE));
     fs::remove(dir / "SE_OUTPUT.hkx");
     REQUIRE_FALSE(anim.save(dir / "SE_OUTPUT.hkx"));
     CHECK(btu::common::compare_files(dir / "SE_EXPECTED.hkx", dir / "SE_OUTPUT.hkx"));

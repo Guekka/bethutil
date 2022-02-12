@@ -5,7 +5,6 @@
 #pragma once
 
 #include "btu/bsa/archive_data.hpp"
-#include "btu/bsa/detail/common.hpp"
 #include "catch2/catch.hpp"
 
 #include <sstream>

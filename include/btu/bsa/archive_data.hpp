@@ -5,9 +5,9 @@
 #pragma once
 
 #include "btu/bsa/detail/archive_type.hpp"
-#include "btu/bsa/detail/common.hpp"
 #include "btu/bsa/plugin.hpp"
 #include "btu/bsa/settings.hpp"
+#include "btu/common/path.hpp"
 
 #include <vector>
 
