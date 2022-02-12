@@ -100,7 +100,7 @@ auto split(const Path &dir, const Settings &sets, const AllowFilePred &allow_pat
     return res;
 }
 
-auto merge(std::vector<ArchiveData> &archives, MergeSettings sets) -> void
+void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
 {
     const auto test_flag = [&](MergeSettings flag) {
         return (btu::common::to_underlying(sets) & btu::common::to_underlying(flag)) != 0;

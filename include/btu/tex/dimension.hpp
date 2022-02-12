@@ -77,7 +77,7 @@ struct ResizeRatio
 }
 
 // Makes number equal to target, and scale number2 accordingly
-constexpr auto scale_fit(size_t &number, size_t target, size_t &number2) -> void
+constexpr void scale_fit(size_t &number, size_t target, size_t &number2)
 {
     const auto ratio = target / static_cast<double>(number);
     number2          = static_cast<size_t>(number2 * ratio);

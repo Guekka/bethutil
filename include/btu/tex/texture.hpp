@@ -64,7 +64,7 @@ public:
     [[nodiscard]] auto load_file(Path path) noexcept -> ResultError;
     [[nodiscard]] auto save_file(Path path) const noexcept -> ResultError;
 
-    auto set(ScratchImage &&tex) noexcept -> void;
+    void set(ScratchImage &&tex) noexcept;
 
     auto get() noexcept -> ScratchImage &;
     auto get() const noexcept -> const ScratchImage &;
@@ -74,7 +74,7 @@ public:
     auto get_dimension() const noexcept -> Dimension;
 
     auto get_load_path() const noexcept -> const Path &;
-    auto set_load_path(Path path) noexcept -> void;
+    void set_load_path(Path path) noexcept;
 
     auto operator==(const Texture &) const noexcept -> bool = default;
 

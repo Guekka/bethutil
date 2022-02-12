@@ -90,7 +90,7 @@ constexpr auto str_match(std::u8string_view string,
 auto to_lower(std::u8string_view string) -> std::u8string;
 
 constexpr auto first_codepoint(std::u8string_view string) -> U8Unit;
-auto concat_codepoint(std::u8string &string, U8Unit cp) -> void;
+void concat_codepoint(std::u8string &string, U8Unit cp);
 auto make_valid(std::u8string &string, char8_t replacement) noexcept -> std::u8string &;
 
 namespace detail {

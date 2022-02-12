@@ -43,7 +43,7 @@ namespace detail {
 static_assert(k_sizeof_scratchimage == sizeof(ScratchImage));
 static_assert(k_alignof_scratchimage == alignof(ScratchImage));
 
-auto initialize_com() -> void
+void initialize_com()
 {
     const auto hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
     if (FAILED(hr))
@@ -172,7 +172,7 @@ auto Texture::get_load_path() const noexcept -> const Path &
     return load_path_;
 }
 
-auto Texture::set_load_path(Path path) noexcept -> void
+void Texture::set_load_path(Path path) noexcept
 {
     load_path_ = std::move(path);
 }
