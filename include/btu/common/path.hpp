@@ -14,4 +14,16 @@ namespace fs   = std::filesystem;
 using Path     = fs::path;
 using OsString = Path::string_type;
 using OsChar   = OsString::value_type;
+
+namespace common {
+constexpr auto make_path_canonizer(std::u8string_view start)
+{
+    return [start = std::move(start)](const Path &path) noexcept -> std::u8string {
+        auto str        = btu::common::to_lower(path.generic_u8string());
+        auto prefix_end = str.find(start);
+        prefix_end      = prefix_end == std::string::npos ? 0 : prefix_end + start.size();
+        return str.substr(prefix_end);
+    };
+}
+} // namespace common
 } // namespace btu

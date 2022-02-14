@@ -6,15 +6,6 @@
 #include "btu/nif/mesh.hpp"
 
 namespace btu::nif {
-auto canonize_path(Path path) noexcept -> std::u8string
-{
-    auto str         = btu::common::to_lower(path.generic_u8string());
-    const auto start = std::u8string_view(u8"meshes/");
-    auto prefix_end  = str.find(start);
-    prefix_end       = prefix_end == std::string::npos ? 0 : prefix_end + start.size();
-    return str.substr(prefix_end);
-}
-
 ResultError Mesh::load(Path path)
 {
     load_path_ = std::move(path);

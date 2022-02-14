@@ -56,7 +56,7 @@ private:
 auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noexcept -> bool;
 } // namespace detail
 
-auto canonize_path(Path path) noexcept -> std::u8string;
+[[maybe_unused]] constexpr auto canonize_path = btu::common::make_path_canonizer(u8"textures/");
 
 class Texture
 {
