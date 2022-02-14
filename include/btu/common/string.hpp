@@ -88,6 +88,7 @@ constexpr auto str_match(std::u8string_view string,
                          Cards cards         = default_cards) -> bool;
 
 auto to_lower(std::u8string_view string) -> std::u8string;
+constexpr auto is_lower(std::u8string_view string) -> bool;
 
 constexpr auto first_codepoint(std::u8string_view string) -> U8Unit;
 void concat_codepoint(std::u8string &string, U8Unit cp);
@@ -204,6 +205,11 @@ constexpr auto first_codepoint(std::u8string_view string) -> U8Unit
     U8Unit res{};
     utf8codepoint(string.data(), &res);
     return res;
+}
+
+constexpr auto is_lower(std::u8string_view string) -> bool
+{
+    return std::all_of(UTF8Iterator(string), UTF8Iterator::end(string), utf8islower);
 }
 
 constexpr auto str_match(std::u8string_view string,
