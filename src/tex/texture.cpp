@@ -95,15 +95,6 @@ auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noex
 
 } // namespace detail
 
-auto canonize_path(Path path) noexcept -> std::u8string
-{
-    auto str         = btu::common::to_lower(path.generic_u8string());
-    const auto start = std::u8string_view(u8"textures/");
-    auto prefix_end  = str.find(start);
-    prefix_end       = prefix_end == std::string::npos ? 0 : prefix_end + start.size();
-    return str.substr(prefix_end);
-}
-
 auto Texture::load_file(Path path) noexcept -> ResultError
 {
     load_path_ = std::move(path);

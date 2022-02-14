@@ -24,6 +24,6 @@ public:
     void set_load_path(Path path) noexcept;
 };
 
-auto canonize_path(Path path) noexcept -> std::u8string;
+[[maybe_unused]] constexpr auto canonize_path = common::make_path_canonizer(u8"meshes/");
 
 } // namespace btu::nif
