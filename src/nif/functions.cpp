@@ -22,17 +22,17 @@ auto get_niversion(btu::Game game) -> std::optional<nifly::NiVersion>
     return std::nullopt;
 }
 
-auto convert(Mesh &file, bool headpart, btu::Game game) -> ResultError
+auto convert(Mesh file, bool headpart, btu::Game game) -> tl::expected<Mesh, Error>
 {
     auto target_ver = get_niversion(game);
     if (!target_ver)
-        return tl::make_unexpected(btu::common::Error(std::error_code(1, std::generic_category())));
+        return tl::make_unexpected(Error(std::error_code(1, std::generic_category())));
     nifly::OptOptions optOptions{.targetVersion  = *std::move(target_ver),
                                  .headParts      = headpart,
                                  .removeParallax = false};
 
     file.get().OptimizeFor(optOptions);
-    return {};
+    return file;
 }
 
 void rename_referenced_textures(Mesh &file)

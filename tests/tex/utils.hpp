@@ -46,11 +46,10 @@ struct StringMaker<std::u8string>
 
 inline auto load_tex(const Path &path) -> btu::tex::Texture
 {
-    btu::tex::Texture tex;
-    auto res = tex.load_file(path);
+    auto res = btu::tex::load(path);
     INFO(path);
     REQUIRE(res.has_value());
-    return tex;
+    return std::move(res).value();
 }
 
 template<typename Func>
@@ -68,7 +67,7 @@ auto test_expected(const Path &root,
     if (!fs::exists(expected_path) && approve)
     {
         fs::create_directories(expected_path.parent_path());
-        const auto res = out.value().save_file(expected_path);
+        const auto res = btu::tex::save(out.value(), expected_path);
         CHECK(res.has_value());
         FAIL_CHECK("Expected file not found:" + expected_path.string());
     }

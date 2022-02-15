@@ -6,19 +6,19 @@
 #include "btu/hkx/functions.hpp"
 
 #include "btu/common/string.hpp"
+#include "btu/hkx/anim.hpp"
 
 #include <btu/common/path.hpp>
 #include <reproc++/run.hpp>
 
 #include <atomic>
 #include <filesystem>
-#include <mutex>
 #include <string>
 
 namespace btu::hkx {
 using namespace std::literals;
 
-auto run_process(const std::vector<std::string> &args, const Path &working_dir) -> std::error_code
+auto run_process(const std::vector<std::string> &args, const Path &working_dir) -> ResultError
 {
     reproc::options options;
     options.deadline        = std::chrono::milliseconds(5000);
@@ -28,45 +28,16 @@ auto run_process(const std::vector<std::string> &args, const Path &working_dir) 
     options.working_directory = wdir.c_str();
 
     auto [result, ec] = reproc::run(args, options);
-    return ec ? ec : std::error_code(result, std::generic_category());
-}
-
-auto Anim::generate_name() const noexcept -> std::string
-{
-    static std::atomic_uint32_t counter{0};
-    return "TEMPFILE_btu__hkx" + std::to_string(counter++) + ".hkx ";
-}
-
-auto Anim::load(const Path &path) noexcept -> std::error_code
-{
-    path_ = exe_dir_ / generate_name();
-    std::error_code ec;
-    fs::remove(path_, ec);
     if (ec)
-        return ec;
-    fs::copy(path, path_, ec);
-    return ec;
+        return tl::make_unexpected(Error(ec));
+    if (result != 0)
+        return tl::make_unexpected(Error(std::error_code(result, std::generic_category())));
+    return {};
 }
 
-auto Anim::save(const Path &path) noexcept -> std::error_code
+auto convert(Anim &anim, const AnimExe &exe, btu::Game target_game) -> ResultError
 {
-    std::error_code ec;
-    fs::copy(path_, path, ec);
-    return ec;
-}
-
-auto Anim::sle_args() const noexcept -> std::vector<std::string>
-{
-    return {(exe_dir_ / "hkx64to32.exe").string(), path_.filename().string(), "-s"s, "32ref.hko"s};
-}
-
-auto Anim::sse_args() const noexcept -> std::vector<std::string>
-{
-    return {(exe_dir_ / "hkx32to64.exe").string(), path_.filename().string()};
-}
-
-auto Anim::convert(btu::Game target_game) -> std::error_code
-{
+    const auto &exe_dir = exe.get_directory();
     const auto args = [&]() noexcept -> std::vector<std::string> {
         switch (target_game)
         {
@@ -75,16 +46,27 @@ auto Anim::convert(btu::Game target_game) -> std::error_code
             case btu::Game::FNV:
             case btu::Game::FO4:
             case btu::Game::Custom: return {};
-            case btu::Game::SLE: return sle_args();
-            case btu::Game::SSE: return sse_args();
+            case btu::Game::SLE:
+                return {
+                    (exe_dir / AnimExe::exe64to32).string(),
+                    anim.get().filename().string(),
+                    "-s"s,
+                    "32ref.hko"s,
+                };
+
+            case btu::Game::SSE:
+                return {
+                    (exe_dir / AnimExe::exe32to64).string(),
+                    anim.get().filename().string(),
+                };
         }
         return {};
     }();
 
     if (args.empty())
-        return std::error_code(1, std::generic_category());
+        return tl::make_unexpected(Error(std::error_code(1, std::generic_category())));
 
-    return run_process(args, exe_dir_);
+    return run_process(args, exe_dir);
 }
 
 } // namespace btu::hkx

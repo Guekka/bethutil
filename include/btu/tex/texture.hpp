@@ -61,9 +61,6 @@ auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noex
 class Texture
 {
 public:
-    [[nodiscard]] auto load_file(Path path) noexcept -> ResultError;
-    [[nodiscard]] auto save_file(Path path) const noexcept -> ResultError;
-
     void set(ScratchImage &&tex) noexcept;
 
     auto get() noexcept -> ScratchImage &;
@@ -82,4 +79,8 @@ private:
     Path load_path_;
     detail::ScratchImagePimpl tex_;
 };
+
+[[nodiscard]] auto load(Path path) noexcept -> tl::expected<Texture, Error>;
+[[nodiscard]] auto save(const Texture &tex, Path path) noexcept -> ResultError;
+
 } // namespace btu::tex

@@ -5,14 +5,15 @@
 #include "btu/nif/mesh.hpp"
 
 namespace btu::nif {
-auto optimize(Mesh &file, const OptimizationSteps &sets) -> ResultError
+auto optimize(Mesh file, const OptimizationSteps &sets) -> tl::expected<Mesh, Error>
 {
+    auto res = tl::expected<Mesh, Error>(std::move(file));
     if (sets.rename_referenced_textures)
-        rename_referenced_textures(file);
+        res.map([](auto &m) { rename_referenced_textures(m); });
     if (sets.format)
-        if (!convert(file, sets.headpart, *sets.format))
-            return tl::make_unexpected(btu::common::Error({1, std::generic_category()}));
-    return {};
+        if (res = convert(std::move(res).value(), sets.headpart, *sets.format); !res)
+            return res;
+    return res;
 }
 
 auto compute_optimization_steps(const Mesh &file, const Settings &sets) -> OptimizationSteps

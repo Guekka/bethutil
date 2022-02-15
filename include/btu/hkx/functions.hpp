@@ -6,6 +6,7 @@
 #pragma once
 
 #include "btu/common/path.hpp"
+#include "btu/hkx/detail/common.hpp"
 
 #include <btu/common/error.hpp>
 #include <btu/common/games.hpp>
@@ -13,27 +14,9 @@
 #include <filesystem>
 
 namespace btu::hkx {
+class Anim;
+class AnimExe;
 
-class Anim
-{
-    Path path_;
-    Path exe_dir_;
-
-    auto generate_name() const noexcept -> std::string;
-    void get_name() const noexcept;
-
-    auto sle_args() const noexcept -> std::vector<std::string>;
-    auto sse_args() const noexcept -> std::vector<std::string>;
-
-public:
-    Anim(Path exe_dir)
-        : exe_dir_(exe_dir)
-    {
-    }
-
-    auto load(const Path &path) noexcept -> std::error_code;
-    auto save(const Path &path) noexcept -> std::error_code;
-    auto convert(btu::Game target_game) -> std::error_code;
-};
+[[nodiscard]] auto convert(Anim &anim, const AnimExe &exe, btu::Game target_game) -> ResultError;
 
 } // namespace btu::hkx

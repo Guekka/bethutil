@@ -2,7 +2,7 @@
 
 #include "btu/common/error.hpp"
 #include "btu/common/path.hpp"
-#include "btu/nif/common.hpp"
+#include "btu/nif/detail/common.hpp"
 
 #include <nifly/NifFile.hpp>
 #include <tl/expected.hpp>
@@ -14,9 +14,6 @@ class Mesh
     Path load_path_;
 
 public:
-    [[nodiscard]] auto load(Path path) -> ResultError;
-    [[nodiscard]] auto save(const Path &path) -> ResultError;
-
     auto get() noexcept -> nifly::NifFile &;
     auto get() const noexcept -> const nifly::NifFile &;
 
@@ -25,5 +22,8 @@ public:
 };
 
 [[maybe_unused]] constexpr auto canonize_path = common::make_path_canonizer(u8"meshes/");
+
+[[nodiscard]] auto load(Path path) noexcept -> tl::expected<Mesh, Error>;
+[[nodiscard]] auto save(Mesh mesh, const Path &path) noexcept -> ResultError;
 
 } // namespace btu::nif
