@@ -95,41 +95,6 @@ auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noex
 
 } // namespace detail
 
-auto Texture::load_file(Path path) noexcept -> ResultError
-{
-    load_path_ = std::move(path);
-
-    DirectX::TexMetadata info{};
-    auto hr = DirectX::LoadFromDDSFile(load_path_.wstring().c_str(),
-                                       DirectX::DDS_FLAGS_NONE,
-                                       &info,
-                                       tex_.get());
-    if (FAILED(hr))
-    {
-        // Maybe it's a TGA then?
-        const auto hr2 = DirectX::LoadFromTGAFile(load_path_.wstring().c_str(),
-                                                  DirectX::TGA_FLAGS_NONE,
-                                                  &info,
-                                                  tex_.get());
-        if (FAILED(hr2))
-            return tl::make_unexpected(error_from_hresult(hr)); // preserve original error
-    }
-    return {};
-}
-
-auto Texture::save_file(Path path) const noexcept -> ResultError
-{
-    const auto &tex = tex_.get();
-    const auto res  = DirectX::SaveToDDSFile(tex.GetImages(),
-                                            tex.GetImageCount(),
-                                            tex.GetMetadata(),
-                                            DirectX::DDS_FLAGS_NONE,
-                                            path.wstring().c_str());
-    if (FAILED(res))
-        return tl::make_unexpected(error_from_hresult(res));
-    return {};
-}
-
 void Texture::set(DirectX::ScratchImage &&tex) noexcept
 {
     tex_.get() = std::move(tex);
@@ -166,6 +131,39 @@ auto Texture::get_load_path() const noexcept -> const Path &
 void Texture::set_load_path(Path path) noexcept
 {
     load_path_ = std::move(path);
+}
+
+tl::expected<Texture, Error> load(Path path) noexcept
+{
+    Texture tex;
+    tex.set_load_path(std::move(path));
+
+    DirectX::TexMetadata info{};
+    const auto load_path = tex.get_load_path().wstring();
+    auto hr = DirectX::LoadFromDDSFile(load_path.c_str(), DirectX::DDS_FLAGS_NONE, &info, tex.get());
+    if (FAILED(hr))
+    {
+        // Maybe it's a TGA then?
+        const auto hr2 = DirectX::LoadFromTGAFile(load_path.c_str(),
+                                                  DirectX::TGA_FLAGS_NONE,
+                                                  &info,
+                                                  tex.get());
+        if (FAILED(hr2))
+            return tl::make_unexpected(error_from_hresult(hr)); // preserve original error
+    }
+    return tex;
+}
+
+ResultError save(const Texture &tex, Path path) noexcept
+{
+    const auto res = DirectX::SaveToDDSFile(tex.get().GetImages(),
+                                            tex.get().GetImageCount(),
+                                            tex.get().GetMetadata(),
+                                            DirectX::DDS_FLAGS_NONE,
+                                            path.wstring().c_str());
+    if (FAILED(res))
+        return tl::make_unexpected(error_from_hresult(res));
+    return {};
 }
 
 } // namespace btu::tex

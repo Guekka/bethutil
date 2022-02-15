@@ -6,24 +6,6 @@
 #include "btu/nif/mesh.hpp"
 
 namespace btu::nif {
-ResultError Mesh::load(Path path)
-{
-    load_path_ = std::move(path);
-
-    const int res = get().Load(path);
-    if (res != 0)
-        return tl::make_unexpected(btu::common::Error(std::error_code(res, std::generic_category())));
-    return {};
-}
-
-ResultError Mesh::save(const Path &path)
-{
-    const int res = get().Save(path);
-    if (res != 0)
-        return tl::make_unexpected(btu::common::Error(std::error_code(res, std::generic_category())));
-    return {};
-}
-
 auto Mesh::get() noexcept -> nifly::NifFile &
 {
     return file_;
@@ -42,6 +24,33 @@ auto Mesh::get_load_path() const noexcept -> const Path &
 void Mesh::set_load_path(Path path) noexcept
 {
     load_path_ = std::move(path);
+}
+
+auto load(Path path) noexcept -> tl::expected<Mesh, Error>
+{
+    Mesh m;
+    m.set_load_path(std::move(path));
+
+    try
+    {
+        const int res = m.get().Load(path);
+        if (res != 0)
+            return tl::make_unexpected(Error(std::error_code(res, std::generic_category())));
+    }
+    catch (const std::exception &)
+    {
+        return tl::make_unexpected(Error(std::error_code(1, std::generic_category())));
+    }
+
+    return m;
+}
+
+auto save(Mesh mesh, const Path &path) noexcept -> ResultError
+{
+    const int res = mesh.get().Save(path);
+    if (res != 0)
+        return tl::make_unexpected(Error(std::error_code(res, std::generic_category())));
+    return {};
 }
 
 } // namespace btu::nif

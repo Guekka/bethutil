@@ -5,6 +5,6 @@
 #include "btu/nif/mesh.hpp"
 
 namespace btu::nif {
-[[nodiscard]] auto convert(Mesh &file, bool headpart, btu::Game game) -> ResultError;
+[[nodiscard]] auto convert(Mesh file, bool headpart, btu::Game game) -> tl::expected<Mesh, Error>;
 void rename_referenced_textures(Mesh &file);
 } // namespace btu::nif
