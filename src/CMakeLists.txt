@@ -42,14 +42,11 @@ set(SOURCE_FILES
 
 option(BETHUTIL_HKX "Build hkx part" OFF)
 if(${BETHUTIL_HKX})
-  list(APPEND HEADER_FILES
-  "${INCLUDE_DIR}/btu/hkx/detail/common.hpp"
-  "${INCLUDE_DIR}/btu/hkx/anim.hpp"
-  "${INCLUDE_DIR}/btu/hkx/functions.hpp")
+  list(APPEND HEADER_FILES "${INCLUDE_DIR}/btu/hkx/detail/common.hpp"
+       "${INCLUDE_DIR}/btu/hkx/anim.hpp" "${INCLUDE_DIR}/btu/hkx/functions.hpp")
 
-  list(APPEND SOURCE_FILES
-  "${SOURCE_DIR}/hkx/anim.cpp"
-  "${SOURCE_DIR}/hkx/functions.cpp")
+  list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/anim.cpp"
+       "${SOURCE_DIR}/hkx/functions.cpp")
 endif()
 
 option(BETHUTIL_TEX "Build tex part" OFF)
