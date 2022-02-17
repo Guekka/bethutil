@@ -135,7 +135,7 @@ jobs:
       - name: (main) Test
         working-directory: ${{ github.workspace }}/bethutil/build
         run: |
-          & "$($env:SystemDrive)/Program Files/OpenCppCoverage/OpenCppCoverage.exe" -q --sources bethutil\examples --sources bethutil\src --sources bethutil\tests --cover_children --export_type cobertura -- ctest -C ${{ env.BUILD_TYPE }} -V
+          & "$($env:SystemDrive)/Program Files/OpenCppCoverage/OpenCppCoverage.exe" -q --sources bethutil\examples --sources bethutil\src --sources bethutil\tests --cover_children --export_type cobertura -- ctest -C ${{ env.BUILD_TYPE }} -V --rerun-failed --output-on-failure
 
       - name: (main) Collect code coverage
         uses: codecov/codecov-action@v2
