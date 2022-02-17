@@ -33,7 +33,7 @@ auto load(Path path) noexcept -> tl::expected<Mesh, Error>
 
     try
     {
-        const int res = m.get().Load(path);
+        const int res = m.get().Load(m.get_load_path());
         if (res != 0)
             return tl::make_unexpected(Error(std::error_code(res, std::generic_category())));
     }
