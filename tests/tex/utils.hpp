@@ -53,10 +53,7 @@ inline auto load_tex(const Path &path) -> btu::tex::Texture
 }
 
 template<typename Func>
-auto test_expected(const Path &root,
-                   const Path &filename,
-                   Func f,
-                   bool approve = true)
+auto test_expected(const Path &root, const Path &filename, Func f, bool approve = true)
 {
     auto in                    = load_tex(root / "in" / filename);
     const btu::tex::Result out = f(std::move(in));

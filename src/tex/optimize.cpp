@@ -133,9 +133,9 @@ auto Settings::get(Game game) noexcept -> const Settings &
             .use_format_whitelist = false,
             .allowed_formats      = {}, // Unknown
             .output_format        = {.uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
-                                     .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
-                                     .compressed                 = DXGI_FORMAT_BC3_UNORM,
-                                     .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
+                              .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
+                              .compressed                 = DXGI_FORMAT_BC3_UNORM,
+                              .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
             .landscape_textures   = {}, // Unknown
         };
     }();

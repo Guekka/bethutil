@@ -38,7 +38,7 @@ auto run_process(const std::vector<std::string> &args, const Path &working_dir) 
 auto convert(Anim &anim, const AnimExe &exe, btu::Game target_game) -> ResultError
 {
     const auto &exe_dir = exe.get_directory();
-    const auto args = [&]() noexcept -> std::vector<std::string> {
+    const auto args     = [&]() noexcept -> std::vector<std::string> {
         switch (target_game)
         {
             case btu::Game::TES3:
