@@ -62,6 +62,6 @@ public:
         : err_(std::move(err))
     {
     }
-    virtual auto what() const -> const char * override { return "btu::common::Exception"; }
+    virtual auto what() const noexcept -> const char * override { return "btu::common::Exception"; }
 };
 } // namespace btu::common
