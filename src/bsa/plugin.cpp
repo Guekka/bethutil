@@ -54,7 +54,7 @@ auto FilePath::full_name() const -> std::u8string
     return {name + count + suf};
 }
 
-auto FilePath::eat_digits(std::u8string &str) -> std::optional<int>
+auto FilePath::eat_digits(std::u8string &str) -> std::optional<uint32_t>
 {
     size_t first_digit = str.length() - 1;
     for (; isdigit(str[first_digit]) != 0; --first_digit)
@@ -63,10 +63,10 @@ auto FilePath::eat_digits(std::u8string &str) -> std::optional<int>
 
     if (first_digit != str.length())
     {
-        std::optional<int> ret{};
+        std::optional<uint32_t> ret{};
         try
         {
-            ret = std::stoi(btu::common::as_ascii_string(str.substr(first_digit)));
+            ret = std::stoul(btu::common::as_ascii_string(str.substr(first_digit)));
         }
         catch (const std::exception &)
         {
@@ -83,7 +83,7 @@ auto FilePath::eat_suffix(std::u8string &str, const Settings &sets) -> std::u8st
 {
     auto suffix_pos = str.rfind(suffix_separator);
 
-    if (suffix_pos == OsString::npos)
+    if (suffix_pos == std::u8string::npos)
         return {};
 
     auto suffix = str.substr(suffix_pos + suffix_separator.length());
