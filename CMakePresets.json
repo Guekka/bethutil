@@ -143,5 +143,15 @@
       "name": "ninja-linux"
     }
   ],
+   "buildPresets": [
+    {
+      "name": "ninja-windows",
+	  "configurePreset": "ninja-windows"
+    },
+	{
+      "name": "ninja-linux",
+	  "configurePreset": "ninja-linux"
+    }
+  ],
   "version": 3
 }

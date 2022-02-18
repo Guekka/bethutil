@@ -6,7 +6,6 @@
 inline auto load_nif(const Path &path) -> btu::nif::Mesh
 {
     auto res = btu::nif::load(path);
-    INFO(path);
     REQUIRE(res);
     return *res;
 }
@@ -16,7 +15,8 @@ auto test_expected(const Path &root,
                    std::function<tl::expected<btu::nif::Mesh, btu::nif::Error>(btu::nif::Mesh)> f,
                    bool approve = false)
 {
-    auto in        = load_nif(root / "in" / filename);
+    auto in_p = root / "in" / filename;
+    auto in   = load_nif(std::move(in_p));
     const auto out = f(std::move(in));
 
     REQUIRE(out);
