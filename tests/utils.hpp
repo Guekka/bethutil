@@ -34,6 +34,6 @@ struct StringMaker<tl::expected<void, E>>
 template<>
 struct StringMaker<btu::Path>
 {
-    static std::string convert(const btu::Path &in) { return in.string(); }
+    static std::string convert(const btu::Path &in) { return btu::common::as_ascii_string(in.u8string()); }
 };
 } // namespace Catch
