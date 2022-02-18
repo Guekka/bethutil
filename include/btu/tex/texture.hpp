@@ -13,9 +13,9 @@
 #include <type_traits>
 
 namespace DirectX { // NOLINT
-class Image;
+struct Image;
 class ScratchImage;
-class TexMetadata;
+struct TexMetadata;
 
 auto operator==(const ScratchImage &lhs, const ScratchImage &rhs) noexcept -> bool;
 auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool;

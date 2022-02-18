@@ -5,7 +5,7 @@
 #pragma once
 
 struct ID3D11Device;
-class IDXGIFactory1;
+struct IDXGIFactory1;
 
 #include <memory>
 #include <optional>

@@ -56,7 +56,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
         CHECK(plug->dir == "C:/AnotherSomeDir");
         CHECK(plug->name == u8"Requiem - Enhancement");
         CHECK(plug->suffix == u8"");
-        CHECK(plug->counter.value() == 1);
+        CHECK(plug->counter == 1U);
         CHECK(plug->ext == u8".bsa");
     }
     SECTION("Complex 4 (FO4)")
@@ -78,7 +78,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
         REQUIRE(plug.has_value());
         CHECK(plug->name == u8"Colt ");
         CHECK(plug->suffix == u8"");
-        CHECK(plug->counter == 6520);
+        CHECK(plug->counter == 6520U);
         CHECK(plug->ext == u8".esp");
     }
     SECTION("Complex 6 (FO4)")
@@ -89,7 +89,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
         REQUIRE(plug.has_value());
         CHECK(plug->name == u8"Colt. ");
         CHECK(plug->suffix == u8"");
-        CHECK(plug->counter == 6520);
+        CHECK(plug->counter == 6520U);
         CHECK(plug->ext == u8".esp");
     }
 }
