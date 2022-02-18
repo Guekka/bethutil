@@ -146,19 +146,17 @@ void clean_dummy_plugins(std::vector<FilePath> &plugins, const Settings &sets)
         return;
     const auto &dummy = *sets.s_dummy_plugin;
 
-    for (auto it = plugins.begin(); it != plugins.end(); ++it)
-    {
-        const auto path = it->full_path();
-        std::fstream file(path, std::ios::binary | std::ios::in | std::ios::ate);
+    auto is_dummy = [&dummy](const FilePath &f) {
+        std::fstream file(f.full_path(), std::ios::binary | std::ios::in | std::ios::ate);
 
         // It is safe to evaluate file size, as the embedded dummies are the smallest plugins possible
-        if (file && file.tellg() == static_cast<std::streamoff>(dummy.size()))
-        {
-            file.close();
-            fs::remove(path);
-            it = plugins.erase(it);
-        }
-    }
+        return file && file.tellg() == static_cast<std::streamoff>(dummy.size());
+    };
+
+    auto midpoint = std::stable_partition(plugins.begin(), plugins.end(), is_dummy);
+    std::for_each(plugins.begin(), midpoint, [](const auto &f) { fs::remove(f.full_path()); });
+
+    plugins.erase(plugins.begin(), midpoint);
 }
 
 void make_dummy_plugins(std::span<const FilePath> archives, const Settings &sets)

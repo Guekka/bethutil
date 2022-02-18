@@ -3,6 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+#include "btu/common/filesystem.hpp"
 #include "utils.hpp"
 
 TEST_CASE("Plugin names are correctly parsed", "[src]")
@@ -92,4 +93,21 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
         CHECK(plug->counter == 6520U);
         CHECK(plug->ext == u8".esp");
     }
+}
+
+TEST_CASE("clean_dummy_plugins", "[src]")
+{
+    const Path dir = "bsa_clean_dummy_plugins";
+    const Path out = dir / "out";
+
+    fs::remove_all(out);
+    fs::copy(dir / "in", out);
+
+    const auto &sets = Settings::get(btu::Game::SSE);
+
+    auto plugins = btu::bsa::list_plugins(fs::directory_iterator(out), fs::directory_iterator(), sets);
+    REQUIRE(plugins == std::vector{FilePath(out, u8"dummy_sse", u8"", u8".esp", FileTypes::Plugin)});
+    btu::bsa::clean_dummy_plugins(plugins, sets);
+    REQUIRE(plugins.empty());
+    REQUIRE(btu::common::compare_directories(out, dir / "expected"));
 }

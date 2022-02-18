@@ -28,6 +28,8 @@ public:
     std::optional<uint32_t> counter;
     FileTypes type{};
 
+    auto operator<=>(const FilePath &) const noexcept = default;
+
 private:
     static auto eat_digits(std::u8string &str) -> std::optional<uint32_t>;
     static auto eat_suffix(std::u8string &str, const Settings &sets) -> std::u8string;

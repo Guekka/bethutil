@@ -4,6 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 #pragma once
 
+#include "../utils.hpp"
 #include "btu/bsa/archive_data.hpp"
 #include "catch2/catch.hpp"
 

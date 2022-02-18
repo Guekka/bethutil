@@ -63,6 +63,7 @@ macro(acquire_test NAME)
        "${CMAKE_CURRENT_BINARY_DIR}/${NAME}")
 endmacro()
 
+acquire_test("bsa_clean_dummy_plugins")
 acquire_test("convert-hkx")
 acquire_test("decompress")
 acquire_test("make_transparent_alpha")
