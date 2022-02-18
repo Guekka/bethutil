@@ -15,8 +15,8 @@ auto test_expected(const Path &root,
                    std::function<tl::expected<btu::nif::Mesh, btu::nif::Error>(btu::nif::Mesh)> f,
                    bool approve = false)
 {
-    auto in_p = root / "in" / filename;
-    auto in   = load_nif(std::move(in_p));
+    auto in_p      = root / "in" / filename;
+    auto in        = load_nif(std::move(in_p));
     const auto out = f(std::move(in));
 
     REQUIRE(out);
