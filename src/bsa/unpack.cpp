@@ -10,19 +10,18 @@
 
 #include <fstream>
 #include <iostream>
-#include <mutex>
 
 namespace btu::bsa {
 void unpack(UnpackSettings sets)
 {
-    {
-        auto arch = read_archive(sets.file_path);
-        if (!arch)
-            return;
-        const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
-        btu::common::for_each_mt(std::move(*arch),
-                                 [root](auto &&elem) { elem.second.write(root / elem.first); });
-    }
+    auto arch = read_archive(sets.file_path);
+    if (!arch)
+        return;
+    const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
+    btu::common::for_each_mt(std::move(*arch), [root](auto &&elem) {
+        fs::create_directories((root / elem.first).parent_path());
+        elem.second.write(root / elem.first);
+    });
     if (sets.remove_arch && !fs::remove(sets.file_path))
     {
         throw std::runtime_error("BSA Extract succeeded but failed to delete the extracted BSA");

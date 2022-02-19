@@ -15,6 +15,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/archive_data.cpp"
     "${SOURCE_DIR}/bsa/pack.cpp"
     "${SOURCE_DIR}/bsa/plugin.cpp"
+    "${SOURCE_DIR}/bsa/unpack.cpp"
     "${SOURCE_DIR}/modmanager/mod_folder.cpp"
     "${SOURCE_DIR}/modmanager/mod_manager.cpp"
     "${SOURCE_DIR}/nif/functions.cpp"
@@ -64,6 +65,7 @@ macro(acquire_test NAME)
 endmacro()
 
 acquire_test("bsa_clean_dummy_plugins")
+acquire_test("bsa_unpack")
 acquire_test("convert-hkx")
 acquire_test("decompress")
 acquire_test("make_transparent_alpha")
