@@ -19,5 +19,5 @@ struct UnpackSettings
 
 void unpack(UnpackSettings sets);
 
-inline void unpack_all(const Path &dir, const Path &out, const Settings &sets);
+void unpack_all(const Path &dir, const Path &out, const Settings &sets);
 } // namespace btu::bsa
