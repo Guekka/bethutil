@@ -34,6 +34,7 @@ auto write(bool compressed, ArchiveData &&data, const Path &root) -> std::vector
         return {}; // Do not write empty archive
 
     compressed &= data.get_type() != ArchiveType::Incompressible;
+    compressed |= data.get_version() == ArchiveVersion::fo4dx; // Have to be compressed
 
     auto arch      = Archive{};
     auto ret       = std::vector<std::pair<Path, std::string>>();
