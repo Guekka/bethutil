@@ -15,18 +15,31 @@ void process_args(std::vector<std::string_view> args, const btu::Path &dir)
 {
     const auto &sets = Settings::get(btu::Game::SSE);
     const auto arg   = args.at(0);
+    const std::vector files(btu::fs::directory_iterator(dir), btu::fs::directory_iterator{});
     if (arg == "pack")
     {
         auto bsas = split(dir, sets);
         merge(bsas);
+        auto plugins            = btu::bsa::list_plugins(files.begin(), files.end(), sets);
+        const auto default_plug = btu::bsa::FilePath(dir,
+                                                     dir.filename().u8string(),
+                                                     u8"",
+                                                     u8".esp",
+                                                     btu::bsa::FileTypes::Plugin);
+        if (plugins.empty()) // Used to find BSA name
+            plugins.emplace_back(default_plug);
+
         for (auto bsa : std::move(bsas))
+        {
+            bsa.set_out_path(btu::bsa::find_archive_name(plugins, sets, bsa.get_type()).full_path());
             write(/*compressed=*/true, std::move(bsa), dir);
+        }
     }
     else if (arg == "unpack")
     {
-        std::vector files(btu::fs::directory_iterator(dir), btu::fs::directory_iterator{});
-        erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
-        for (const auto &file : files)
+        auto archives = files;
+        erase_if(archives, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
+        for (const auto &file : archives)
         {
             std::cout << "Unpacking " << file.path().string() << std::endl;
             unpack({.file_path = dir});
@@ -34,9 +47,9 @@ void process_args(std::vector<std::string_view> args, const btu::Path &dir)
     }
     else if (arg == "list")
     {
-        std::vector files(btu::fs::directory_iterator(dir), btu::fs::directory_iterator{});
-        erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
-        for (const auto &file : files)
+        auto archives = files;
+        erase_if(archives, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
+        for (const auto &file : archives)
         {
             std::cout << "Files of: " << file.path().string() << std::endl;
             auto arch = read_archive(file.path());
