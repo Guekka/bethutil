@@ -50,6 +50,7 @@ void File::decompress()
     };
 
     std::visit(visitor, file_);
+    assert(!compressed());
 }
 
 void File::compress()
@@ -61,6 +62,7 @@ void File::compress()
     };
 
     std::visit(visitor, file_);
+    assert(compressed());
 }
 
 void File::read(Path path)
