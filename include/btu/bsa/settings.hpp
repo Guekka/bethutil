@@ -127,6 +127,7 @@ struct Settings
                                      AllowedPath{u8".gfx", {u8"interface"}},
                                      AllowedPath{u8".hkc", {u8"meshes"}},
                                      AllowedPath{u8".hkt", {u8"meshes"}},
+                                     AllowedPath{u8".hkp", {u8"meshes"}},
                                      AllowedPath{u8".ilstrings", {u8"strings"}},
                                      AllowedPath{u8".ini", {u8"meshes"}},
                                      AllowedPath{u8".lip", {u8"sound"}},
