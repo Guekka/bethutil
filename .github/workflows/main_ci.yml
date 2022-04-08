@@ -98,7 +98,7 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            vcpkgCommitId: '436d98da7f6f06c8dc6bfce2801c543d7cd47ee1'
+            vcpkgCommitId: 'd72783cb3aeddfd667861caef1060e54ca6fa7a9'
 
     steps:
       - uses: actions/checkout@v2
