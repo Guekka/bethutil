@@ -123,6 +123,7 @@ jobs:
           vcpkgGitCommitId: '${{ matrix.vcpkgCommitId}}'
           # The vcpkg.json file, which will be part of cache key computation.
           vcpkgJsonGlob: 'bethutil/vcpkg.json'
+          doNotCache: true
 
       - name: vcpkg version
         run: |
