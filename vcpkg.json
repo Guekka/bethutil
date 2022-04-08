@@ -1,6 +1,7 @@
 {
   "name": "bethutil",
   "version-string": "1",
+  "builtin-baseline": "d72783cb3aeddfd667861caef1060e54ca6fa7a9",
   "dependencies": [
     "libflow",
     "nifly",
