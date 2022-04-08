@@ -124,6 +124,10 @@ jobs:
           # The vcpkg.json file, which will be part of cache key computation.
           vcpkgJsonGlob: 'bethutil/vcpkg.json'
 
+      - name: vcpkg version
+        run: |
+          vcpkg --version          
+
       - name: Setup MSVC (x64)
         uses: egor-tensin/vs-shell@v2
         with:
