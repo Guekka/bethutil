@@ -114,7 +114,7 @@ jobs:
       - uses: lukka/get-cmake@latest
       
       - name: Restore artifacts, or setup vcpkg
-        uses: lukka/run-vcpkg@v10.1
+        uses: lukka/run-vcpkg@v10
         id: runvcpkg
         with:
           # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
