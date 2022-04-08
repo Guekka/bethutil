@@ -6,7 +6,7 @@
     "nifly",
     "utf8h",
     {
-      "rsm-bsa",
+      "name": "rsm-bsa",
       "version>=": "4.0.3"
     },
     "tl-expected"
