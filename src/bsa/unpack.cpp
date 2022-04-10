@@ -20,8 +20,12 @@ void unpack(UnpackSettings sets)
             return;
         const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
         btu::common::for_each_mt(std::move(*arch), [root](auto &&elem) {
-            fs::create_directories((root / elem.first).parent_path());
-            elem.second.write(root / elem.first);
+            const auto path = root / elem.first;
+            if (!fs::exists(path)) // preserve existing loose files
+            {
+                fs::create_directories(path.parent_path());
+                elem.second.write(path);
+            }
         });
     }
     if (sets.remove_arch && !fs::remove(sets.file_path))
