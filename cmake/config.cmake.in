@@ -2,9 +2,13 @@ include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-targets.cmake")
 include(CMakeFindDependencyMacro)
 
 find_dependency("bsa")
+find_dependency("nifly")
 find_dependency("tl-expected")
 if(@BETHUTIL_TEX@)
 	find_dependency("directxtex")
+endif()
+if(@BETHUTIL_HKX@)
+	find_dependency("reproc++")
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
