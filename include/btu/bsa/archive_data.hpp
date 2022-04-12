@@ -36,6 +36,8 @@ public:
     auto begin() { return files_.begin(); }
     auto end() { return files_.end(); }
 
+    void clear();
+
     auto set_out_path(Path out_path) { out_path_ = std::move(out_path); }
     [[nodiscard]] auto get_out_path() { return out_path_; }
 

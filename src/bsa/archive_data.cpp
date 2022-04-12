@@ -28,6 +28,14 @@ auto ArchiveData::empty() const -> bool
     return size().uncompressed == 0;
 }
 
+void ArchiveData::clear()
+{
+    size_ = {};
+    type_ = ArchiveType::Standard;
+    files_.clear();
+    out_path_.clear();
+}
+
 auto ArchiveData::add_file(Path path, std::optional<Size> override) -> bool
 {
     const auto fsize = get_file_size(path, override);
