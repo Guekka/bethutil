@@ -179,7 +179,7 @@ void write_archive(Archive arch, Path path)
             libbsa::tes3::archive bsa;
             for (auto &&elem : std::move(arch))
             {
-                bsa.insert(elem.first, std::move(elem.second).template as_raw_file<libbsa::tes3::file>());
+                bsa.insert(elem.first, std::move(elem.second).as_raw_file<libbsa::tes3::file>());
             }
             bsa.write(std::move(path));
             return;
@@ -218,7 +218,7 @@ void write_archive(Archive arch, Path path)
             libbsa::fo4::archive ba2;
             for (auto &&elem : std::move(arch))
             {
-                ba2.insert(elem.first, std::move(elem.second).template as_raw_file<libbsa::fo4::file>());
+                ba2.insert(elem.first, std::move(elem.second).as_raw_file<libbsa::fo4::file>());
             }
             ba2.write(std::move(path), static_cast<libbsa::fo4::format>(version));
             return;
