@@ -15,7 +15,9 @@
 
 namespace btu::common {
 //Expects a range sorted in descending order
-template<class It, class Predicate, class Sum>
+template<class It, class Predicate, class Sum, class ValueType = typename std::iterator_traits<It>::value_type>
+requires std::bidirectional_iterator<
+    It> && std::invocable<Predicate, ValueType> && std::invocable<Sum, ValueType, ValueType>
 [[nodiscard]] inline auto merge_if(It first, It last, const Predicate &predicate, const Sum &sum) -> It
 {
     if (first == last)
@@ -61,21 +63,6 @@ template<class Container, class Predicate, class Sum>
 template<class Container, class ValueType>
 [[nodiscard]] inline auto contains(const Container &cont, const ValueType &val)
 {
-    using std::begin, std::end;
-    return find(begin(cont), end(cont), val) != end(cont);
-}
-
-template<class Container, class Predicate>
-[[nodiscard]] inline auto find_if(const Container &cont, const Predicate &pred)
-{
-    using std::begin, std::end;
-    return find_if(begin(cont), end(cont), pred);
-}
-
-template<typename Cont, typename Pred>
-void erase_if(Cont &cont, const Pred &pred)
-{
-    using std::begin, std::end;
-    cont.erase(remove_if(begin(cont), end(cont), pred), end(cont));
+    return std::ranges::find(cont, val) != end(cont);
 }
 } // namespace btu::common

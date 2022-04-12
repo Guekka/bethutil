@@ -6,6 +6,7 @@
 #pragma once
 
 #include <type_traits>
+#include <variant>
 
 namespace btu::common {
 template<class... Ts>
@@ -17,6 +18,7 @@ template<class... Ts>
 overload(Ts...) -> overload<Ts...>;
 
 template<typename E>
+requires std::is_enum_v<E>
 constexpr auto to_underlying(E e) -> std::underlying_type_t<E>
 {
     return static_cast<std::underlying_type_t<E>>(e);
@@ -27,6 +29,17 @@ using is_equiv = std::is_same<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
 
 template<typename T, typename U>
 constexpr bool is_equiv_v = is_equiv<T, U>::value;
+
+template<class T, class U>
+struct is_variant_member;
+
+template<class T, class... Ts>
+struct is_variant_member<T, std::variant<Ts...>> : std::bool_constant<(std::is_same_v<T, Ts> || ...)>
+{
+};
+
+template<class T, class... Ts>
+constexpr bool is_variant_member_v = is_variant_member<T, Ts...>::value;
 
 } // namespace btu::common
 

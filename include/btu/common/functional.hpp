@@ -162,7 +162,11 @@ struct bind_back_fn
 /// \sa `bind_back_fn`
 inline constexpr detail::bind_back_fn bind_back{};
 
+template<class Func, class Arg>
+concept invocable_l_or_r = std::invocable<Func, Arg &> || std::invocable<Func, Arg &&>;
+
 template<typename Range, typename Func>
+requires std::ranges::input_range<Range> && invocable_l_or_r<Func, std::ranges::range_value_t<Range>>
 auto for_each_mt(Range &&rng, Func &&func)
 {
     auto eptr = std::exception_ptr{};
