@@ -116,27 +116,28 @@ void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
     assert(incompressible->get_type() == ArchiveType::Incompressible);
     assert(textures->get_type() == ArchiveType::Textures);
 
-    // Merge textures into standard if possible
-    if (test_flag(MergeSettings::MergeTextures))
-    {
-        const bool size = textures->size().compressed + standard->size().compressed < standard->max_size();
-        if (size && !standard->empty())
-        {
-            *standard += *textures;
-            archives.erase(textures);
-        }
-    }
-
+    // Merge incompressible into standard if possible
     if (test_flag(MergeSettings::MergeIncompressible))
     {
         const bool size = incompressible->size().uncompressed + standard->size().uncompressed
                           < standard->max_size();
-        if (size && !standard->empty())
+        if (size)
         {
             *standard += *incompressible;
-            archives.erase(incompressible);
+            incompressible->clear(); // iterator stability, mark for destruction
         }
     }
+    // Merge textures into standard if possible
+    if (test_flag(MergeSettings::MergeTextures))
+    {
+        const bool size = textures->size().compressed + standard->size().compressed < standard->max_size();
+        if (size)
+        {
+            *standard += *textures;
+            textures->clear();
+        }
+    }
+
     // Remove potentially empty archives
     std::erase_if(archives, [](auto &arch) { return std::distance(arch.begin(), arch.end()) == 0; });
 }
