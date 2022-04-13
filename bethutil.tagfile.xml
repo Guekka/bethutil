@@ -1,0 +1,4027 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<tagfile>
+  <compound kind="file">
+    <name>index.doxy</name>
+    <filename>index_8doxy.html</filename>
+  </compound>
+  <compound kind="file">
+    <name>archive.hpp</name>
+    <filename>archive_8hpp.html</filename>
+    <includes id="archive__type_8hpp" name="archive_type.hpp" local="yes" imported="no">btu/bsa/detail/archive_type.hpp</includes>
+    <includes id="metaprogramming_8hpp" name="metaprogramming.hpp" local="yes" imported="no">btu/common/metaprogramming.hpp</includes>
+    <includes id="path_8hpp" name="path.hpp" local="yes" imported="no">btu/common/path.hpp</includes>
+    <class kind="class">btu::bsa::File</class>
+    <namespace>btu</namespace>
+    <namespace>btu::bsa</namespace>
+    <member kind="typedef">
+      <type>std::variant&lt; libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file &gt;</type>
+      <name>UnderlyingFile</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a7325b07231c3e3ac8efac98c75ff8d11</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::map&lt; std::string, File, std::less&lt;&gt; &gt;</type>
+      <name>Archive</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a0821dab5e3fa092faefc1622728d5153</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>requires</type>
+      <name>requires</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a9fd8415fd13fdeba58700e99853d4925</anchor>
+      <arglist>(Keys... keys)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>virtual_to_local_path</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>ae4192cf8b95a811a097ed692a6d30e37</anchor>
+      <arglist>(Keys &amp;&amp;...a_keys) -&gt; std::u8string</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>read_archive</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a366248e0330a6263a5348729ab55784a</anchor>
+      <arglist>(Path path) -&gt; std::optional&lt; Archive &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write_archive</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>ad2bddb5bd7ef1d5d10fa3db48e1ddcb8</anchor>
+      <arglist>(Archive arch, Path path)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>archive_data.hpp</name>
+    <filename>archive__data_8hpp.html</filename>
+    <includes id="archive__type_8hpp" name="archive_type.hpp" local="yes" imported="no">btu/bsa/detail/archive_type.hpp</includes>
+    <includes id="plugin_8hpp" name="plugin.hpp" local="yes" imported="no">btu/bsa/plugin.hpp</includes>
+    <includes id="btu_2bsa_2settings_8hpp" name="settings.hpp" local="yes" imported="no">btu/bsa/settings.hpp</includes>
+    <includes id="path_8hpp" name="path.hpp" local="yes" imported="no">btu/common/path.hpp</includes>
+    <class kind="class">btu::bsa::ArchiveData</class>
+    <class kind="struct">btu::bsa::ArchiveData::Size</class>
+    <namespace>btu</namespace>
+    <namespace>btu::bsa</namespace>
+  </compound>
+  <compound kind="file">
+    <name>c_api.h</name>
+    <filename>c__api_8h.html</filename>
+  </compound>
+  <compound kind="file">
+    <name>archive_type.hpp</name>
+    <filename>archive__type_8hpp.html</filename>
+    <namespace>btu</namespace>
+    <namespace>btu::bsa</namespace>
+    <member kind="enumeration">
+      <type></type>
+      <name>ArchiveType</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>aa9170613a5c5e212bfcc265682104d05</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="aa9170613a5c5e212bfcc265682104d05a536300d63028e7f16ba150566ecd3a5f">Textures</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="aa9170613a5c5e212bfcc265682104d05aeb6d8ae6f20283755b339c0dc273988b">Standard</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="aa9170613a5c5e212bfcc265682104d05a7d3fd181ccf56faf9e7d0ff8a217688e">Incompressible</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>ArchiveVersion</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a912a6da4521bfdd9233fd4c14a820922</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a37a98352f0e0d2f4d64e96fe334871ed">tes3</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a27069e6baf4eba0ad33686287d582c97">tes4</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a9251dddd50ef30adce51ad629526d447">fo3</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a305506069f2dda79d68e638186b83a5e">tes5</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a64192ca465194480a4621d6905dac5b7">sse</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a87caba376d6bd426a47d310a1f0926bd">fo4</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a1b196d66df9a6955dcd114291a3e4ec7">fo4dx</enumvalue>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>pack.hpp</name>
+    <filename>pack_8hpp.html</filename>
+    <includes id="archive__data_8hpp" name="archive_data.hpp" local="yes" imported="no">btu/bsa/archive_data.hpp</includes>
+    <namespace>btu</namespace>
+    <namespace>btu::bsa</namespace>
+    <member kind="typedef">
+      <type>std::function&lt; bool(const Path &amp;dir, fs::directory_entry const &amp;fileinfo)&gt;</type>
+      <name>AllowFilePred</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>aac3db12e795460c421116f8f483bfda5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>MergeSettings</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>affbcf0f8dc54c016def93a88289ff1dc</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="affbcf0f8dc54c016def93a88289ff1dcabf7b5fe749a502059d432ccaf7cb62ea">MergeTextures</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="affbcf0f8dc54c016def93a88289ff1dca1be79ca25d84563d4c6355e2bbc1f74e">MergeIncompressible</enumvalue>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>default_is_allowed_path</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a9d886065797fdeafdb8fa76c2efa46fb</anchor>
+      <arglist>(const Path &amp;dir, fs::directory_entry const &amp;fileinfo) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>BETHUTIL_MAKE_ALL_ENUM_OPERATORS</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a7b2a53d8207bacee96dd6fe0cbfdf65f</anchor>
+      <arglist>(MergeSettings)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>split</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a11fd67075d7ebb55797e2200b8cea6c6</anchor>
+      <arglist>(const Path &amp;dir, const Settings &amp;sets, const AllowFilePred &amp;allow_path_pred=default_is_allowed_path) -&gt; std::vector&lt; ArchiveData &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>merge</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a67da52892578fa72ee6e9f018438bd84</anchor>
+      <arglist>(std::vector&lt; ArchiveData &gt; &amp;archives, MergeSettings sets=MergeSettings::MergeIncompressible)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>write</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>ad93d7dae666fa4652a7d6459e272cc03</anchor>
+      <arglist>(bool compressed, ArchiveData &amp;&amp;data, const Path &amp;root) -&gt; std::vector&lt; std::pair&lt; Path, std::string &gt;&gt;</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>plugin.hpp</name>
+    <filename>plugin_8hpp.html</filename>
+    <includes id="archive__type_8hpp" name="archive_type.hpp" local="yes" imported="no">btu/bsa/detail/archive_type.hpp</includes>
+    <includes id="btu_2bsa_2settings_8hpp" name="settings.hpp" local="yes" imported="no">btu/bsa/settings.hpp</includes>
+    <class kind="class">btu::bsa::FilePath</class>
+    <namespace>btu</namespace>
+    <namespace>btu::bsa</namespace>
+    <namespace>btu::bsa::detail</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>find_archive_name</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a30ad87b4fda08aff127bcdc17e02107b</anchor>
+      <arglist>(std::span&lt; const FilePath &gt; plugins, const Settings &amp;sets, ArchiveType type) -&gt; FilePath</arglist>
+    </member>
+    <member kind="function">
+      <type>requires</type>
+      <name>requires</name>
+      <anchorfile>namespacebtu_1_1bsa_1_1detail.html</anchorfile>
+      <anchor>aaff71e348748f2ee5caf5bd28d51cd3a</anchor>
+      <arglist>(It it)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>list_helper</name>
+      <anchorfile>namespacebtu_1_1bsa_1_1detail.html</anchorfile>
+      <anchor>a55ba672450d4e3389f530ced8d435667</anchor>
+      <arglist>(It begin, It end, const Settings &amp;sets, FileTypes type) -&gt; std::vector&lt; FilePath &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>list_plugins</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>ab7777bede7d677ab881f354ad19f9ac1</anchor>
+      <arglist>(It begin, It end, const Settings &amp;sets) -&gt; std::vector&lt; FilePath &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>list_archive</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a7403fd3082eb7ffe2488f73b66b85661</anchor>
+      <arglist>(It begin, It end, const Settings &amp;sets) -&gt; std::vector&lt; FilePath &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>clean_dummy_plugins</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>abba4176045df2494c3e7d9c587f9c88a</anchor>
+      <arglist>(std::vector&lt; FilePath &gt; &amp;plugins, const Settings &amp;sets)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>make_dummy_plugins</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a644275836e669bc9241e52ce17d0074a</anchor>
+      <arglist>(std::span&lt; const FilePath &gt; archives, const Settings &amp;sets)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>transform.hpp</name>
+    <filename>transform_8hpp.html</filename>
+  </compound>
+  <compound kind="file">
+    <name>unpack.hpp</name>
+    <filename>unpack_8hpp.html</filename>
+    <includes id="btu_2bsa_2settings_8hpp" name="settings.hpp" local="yes" imported="no">btu/bsa/settings.hpp</includes>
+    <class kind="struct">btu::bsa::UnpackSettings</class>
+    <namespace>btu</namespace>
+    <namespace>btu::bsa</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>open_virtual_path</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>acd0a7028e9324fda418f57fafa00d3f6</anchor>
+      <arglist>(const Path &amp;path) -&gt; std::ofstream</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>unpack</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>ad4b64e86fdf57025cd1f2abe428b2e4c</anchor>
+      <arglist>(UnpackSettings sets)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>unpack_all</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>abdf85730b1b71f379750a267a7e90d75</anchor>
+      <arglist>(const Path &amp;dir, const Path &amp;out, const Settings &amp;sets)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>algorithms.hpp</name>
+    <filename>algorithms_8hpp.html</filename>
+    <namespace>btu</namespace>
+    <namespace>btu::common</namespace>
+    <member kind="function">
+      <type>requires std::bidirectional_iterator&lt; It &gt; &amp;&amp;std::invocable&lt; Predicate, ValueType &gt; &amp;&amp;std::invocable&lt; Sum, ValueType, ValueType &gt; auto</type>
+      <name>merge_if</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>ae7faeb418963351addc0fcd09c41f392</anchor>
+      <arglist>(It first, It last, const Predicate &amp;predicate, const Sum &amp;sum) -&gt; It</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>merge_if</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>ab77d02c9dcb2932211b897e2e854ac91</anchor>
+      <arglist>(It first, It last, Predicate &amp;&amp;predicate) -&gt; It</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>merge_if</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>afbb64e534f6ea346b560b0fed2c588a9</anchor>
+      <arglist>(Container &amp;cont, Predicate &amp;&amp;predicate)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>merge_if</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a57fff2dda5d605dccb67767073009007</anchor>
+      <arglist>(Container &amp;cont, Predicate &amp;&amp;pred, Sum &amp;&amp;sum)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>contains</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a10495be73ddfc5f9e291114a04be0d2f</anchor>
+      <arglist>(const Container &amp;cont, const ValueType &amp;val)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>error.hpp</name>
+    <filename>error_8hpp.html</filename>
+    <class kind="struct">btu::common::SourceLocation</class>
+    <class kind="struct">btu::common::Error</class>
+    <class kind="class">btu::common::Exception</class>
+    <namespace>btu</namespace>
+    <namespace>btu::common</namespace>
+    <member kind="define">
+      <type>#define</type>
+      <name>BETHUTIL_CURRENT_SOURCE_LOC</name>
+      <anchorfile>error_8hpp.html</anchorfile>
+      <anchor>aaf61323ffb8c20af6e1683fa69f99da5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator&lt;&lt;</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a320846c9c601e0ff654ec0db82416ce1</anchor>
+      <arglist>(std::ostream &amp;os, [[maybe_unused]] SourceLocation loc) -&gt; std::ostream &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator&lt;&lt;</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a37cea9c0e839bf9b7a9b55298944a68a</anchor>
+      <arglist>(std::ostream &amp;os, const Error &amp;err) -&gt; std::ostream &amp;</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>filesystem.hpp</name>
+    <filename>filesystem_8hpp.html</filename>
+    <includes id="path_8hpp" name="path.hpp" local="yes" imported="no">btu/common/path.hpp</includes>
+    <namespace>btu</namespace>
+    <namespace>btu::common</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>read_file</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a61e412427f59ec5d68479bab498aa197</anchor>
+      <arglist>(const Path &amp;a_path) -&gt; std::vector&lt; std::byte &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write_file</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>ac1d1e4bd779d0b412baed8226542b738</anchor>
+      <arglist>(const Path &amp;a_path, std::span&lt; const std::byte &gt; data)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compare_files</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a2f1c957cd614e0be458287cb64814ea4</anchor>
+      <arglist>(const Path &amp;filename1, const Path &amp;filename2) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compare_directories</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>af9c21a9e691b31ebb46e855388325667</anchor>
+      <arglist>(const Path &amp;dir1, const Path &amp;dir2) -&gt; bool</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>functional.hpp</name>
+    <filename>common_2functional_8hpp.html</filename>
+    <class kind="struct">btu::common::detail::bind_back_fn_</class>
+    <class kind="struct">btu::common::detail::bind_back_fn</class>
+    <namespace>btu</namespace>
+    <namespace>btu::common</namespace>
+    <namespace>btu::common::detail</namespace>
+    <member kind="typedef">
+      <type>bind_back_fn_&lt; std::decay_t&lt; Fn &gt;, std::decay_t&lt; Args &gt;... &gt;</type>
+      <name>bind_back_fn2</name>
+      <anchorfile>namespacebtu_1_1common_1_1detail.html</anchorfile>
+      <anchor>a9b951f82f196469678ea251b458d2404</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>requires std::ranges::input_range&lt; Range &gt; &amp;&amp;invocable_l_or_r&lt; Func, std::ranges::range_value_t&lt; Range &gt; &gt; auto</type>
+      <name>for_each_mt</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a79fce203c4b7d6e836a16f5229a47e6d</anchor>
+      <arglist>(Range &amp;&amp;rng, Func &amp;&amp;func)</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr detail::bind_back_fn</type>
+      <name>bind_back</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a4cd0799cfb94e2b507438e766a4d01d3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>concept</type>
+      <name>invocable_l_or_r</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a287e8accd4b893438bce02a8cfd91153</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>functional.hpp</name>
+    <filename>tex_2detail_2functional_8hpp.html</filename>
+  </compound>
+  <compound kind="file">
+    <name>games.hpp</name>
+    <filename>games_8hpp.html</filename>
+    <namespace>btu</namespace>
+    <member kind="enumeration">
+      <type></type>
+      <name>Game</name>
+      <anchorfile>namespacebtu.html</anchorfile>
+      <anchor>ab8b032e2cc5845ee70a3d3212f897510</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a0b60c0585ee39f3be3182a626590973f">TES3</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a1ae95fa14d6ffe3f7190f2b38c061da3">TES4</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510ada43e31b688f49ee12211d560969c091">FNV</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a0a1d07df9a43688c7128eefbe3d41b08">SLE</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a5fc53fc8197865c63285f74b1e147013">SSE</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a18d09913c8c422e9997a3170d0f00fe6">FO4</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a90589c47f06eb971d548591f23c285af">Custom</enumvalue>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>metaprogramming.hpp</name>
+    <filename>metaprogramming_8hpp.html</filename>
+    <class kind="struct">btu::common::overload</class>
+    <class kind="struct">btu::common::is_variant_member</class>
+    <class kind="struct">btu::common::is_variant_member&lt; T, std::variant&lt; Ts... &gt; &gt;</class>
+    <namespace>btu</namespace>
+    <namespace>btu::common</namespace>
+    <member kind="define">
+      <type>#define</type>
+      <name>BETHUTIL_MAKE_ENUM_OPERATOR_PAIR</name>
+      <anchorfile>metaprogramming_8hpp.html</anchorfile>
+      <anchor>ace6d46cc5ad0f93c51f403e50f77146d</anchor>
+      <arglist>(a_type, a_op)</arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>BETHUTIL_MAKE_ALL_ENUM_OPERATORS</name>
+      <anchorfile>metaprogramming_8hpp.html</anchorfile>
+      <anchor>a043a9aa5cd3f8bd06e9d5d41a16000e0</anchor>
+      <arglist>(a_type)</arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::is_same&lt; std::remove_cvref_t&lt; T &gt;, std::remove_cvref_t&lt; U &gt; &gt;</type>
+      <name>is_equiv</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>aa1110c80d1eafd273f80a9559129e13b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>overload</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a9ec2c5386e0c4c53cd9925d126d77712</anchor>
+      <arglist>(Ts...) -&gt; overload&lt; Ts... &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>requires constexpr std::is_enum_v&lt; E &gt; auto</type>
+      <name>to_underlying</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a96e55b03984782d07c6a0b2b9978ceb7</anchor>
+      <arglist>(E e) -&gt; std::underlying_type_t&lt; E &gt;</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr bool</type>
+      <name>is_equiv_v</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>af7f7c7d55e6100daba4cae2aa7042157</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr bool</type>
+      <name>is_variant_member_v</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a8d31016cf18c062508a3aa8e9bbabdb5</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>path.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/common/</path>
+    <filename>path_8hpp.html</filename>
+    <includes id="string_8hpp" name="string.hpp" local="yes" imported="no">string.hpp</includes>
+    <namespace>btu</namespace>
+    <namespace>btu::common</namespace>
+    <member kind="typedef">
+      <type>fs::path</type>
+      <name>Path</name>
+      <anchorfile>namespacebtu.html</anchorfile>
+      <anchor>af170447afcc77653a28828466b6623bd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>Path::string_type</type>
+      <name>OsString</name>
+      <anchorfile>namespacebtu.html</anchorfile>
+      <anchor>a0b7a602dc238b86998791903cf4b194e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>OsString::value_type</type>
+      <name>OsChar</name>
+      <anchorfile>namespacebtu.html</anchorfile>
+      <anchor>a223e783d465edaa59d3453545806d63e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>make_path_canonizer</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>aad713cd4c12da91c4622c6d4f66a3f6e</anchor>
+      <arglist>(std::u8string_view start)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>string.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/common/</path>
+    <filename>string_8hpp.html</filename>
+    <includes id="metaprogramming_8hpp" name="metaprogramming.hpp" local="yes" imported="no">btu/common/metaprogramming.hpp</includes>
+    <class kind="class">btu::common::UTF8Iterator</class>
+    <class kind="class">btu::common::InvalidUTF8</class>
+    <class kind="struct">btu::common::Cards</class>
+    <namespace>btu</namespace>
+    <namespace>btu::common</namespace>
+    <namespace>btu::common::detail</namespace>
+    <member kind="typedef">
+      <type>int32_t</type>
+      <name>U8Unit</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>af63c2899ca1e15f6aa94b98c7558f257</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_utf8</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a0bba54f0203d560751af304fdd31f6f4</anchor>
+      <arglist>(std::string_view str) -&gt; std::u8string_view</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_ascii</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a9e13d7d4ca5e9afedd1d669841acb45a</anchor>
+      <arglist>(std::u8string_view str) -&gt; std::string_view</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_utf8_string</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>aa9c16eb104df902439a9ebe1d6f662c4</anchor>
+      <arglist>(std::string str) -&gt; std::u8string</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_ascii_string</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a23618a0642c2a3ce0a502bf250be86f3</anchor>
+      <arglist>(std::u8string str) -&gt; std::string</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_utf8</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a4c35904a87c5e732d21aed632ff337bd</anchor>
+      <arglist>(const std::wstring &amp;str) -&gt; std::u8string</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_utf16</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a918bb9ded2898b1e3b4ccfe70ede3830</anchor>
+      <arglist>(const std::u8string &amp;str) -&gt; std::wstring</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>str_compare</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a8017b7291a77e44969f00fd37358fdd0</anchor>
+      <arglist>(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive=true) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>str_find</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a974e1cc63c86993685aa0b5ec5614901</anchor>
+      <arglist>(std::u8string_view string, std::u8string_view snippet, bool case_sensitive=true) -&gt; size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>str_contain</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>ad23bd112d871299d9ffbedc7c02197a5</anchor>
+      <arglist>(std::u8string_view string, std::u8string_view snippet, bool case_sensitive=true) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>str_match</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>af4a0d5e4ab0cb0b1e3c4275cd6a61f83</anchor>
+      <arglist>(std::u8string_view string, std::u8string_view pattern, bool case_sensitive=true, Cards cards=default_cards) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_lower</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a826b7aad4faf85b999346ff8d19cd3fe</anchor>
+      <arglist>(std::u8string_view string) -&gt; std::u8string</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>is_lower</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>aa4b64cfc59995c3419300e54d91c9532</anchor>
+      <arglist>(std::u8string_view string) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>first_codepoint</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a80c8eeac75c9aca858329e787a79866b</anchor>
+      <arglist>(std::u8string_view string) -&gt; U8Unit</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>concat_codepoint</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a579cef42371f299a202de48a39b7b304</anchor>
+      <arglist>(std::u8string &amp;string, U8Unit cp)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>make_valid</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a00f5099c820274df2dded37fc07c9bfc</anchor>
+      <arglist>(std::u8string &amp;string, char8_t replacement) noexcept -&gt; std::u8string &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr void</type>
+      <name>assert_valid_utf8</name>
+      <anchorfile>namespacebtu_1_1common_1_1detail.html</anchorfile>
+      <anchor>a9f909215171c77f399418d033f0e2d27</anchor>
+      <arglist>([[maybe_unused]] std::u8string_view str)</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr Cards</type>
+      <name>default_cards</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a3bbc4219bf316197c6f1aae17cf7ca75</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>anim.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/hkx/</path>
+    <filename>anim_8hpp.html</filename>
+    <includes id="path_8hpp" name="path.hpp" local="yes" imported="no">btu/common/path.hpp</includes>
+    <includes id="hkx_2detail_2common_8hpp" name="common.hpp" local="yes" imported="no">btu/hkx/detail/common.hpp</includes>
+    <class kind="class">btu::hkx::AnimExe</class>
+    <class kind="class">btu::hkx::Anim</class>
+    <namespace>btu</namespace>
+    <namespace>btu::hkx</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>load</name>
+      <anchorfile>namespacebtu_1_1hkx.html</anchorfile>
+      <anchor>a7c3349b3c0f25aeab978915f84ba2b24</anchor>
+      <arglist>(Path path, AnimExe exe) noexcept -&gt; tl::expected&lt; Anim, Error &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>save</name>
+      <anchorfile>namespacebtu_1_1hkx.html</anchorfile>
+      <anchor>a9e5843e0d1774efbf853221e3cea574f</anchor>
+      <arglist>(const Anim &amp;anim, const Path &amp;path) noexcept -&gt; ResultError</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>common.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/hkx/detail/</path>
+    <filename>hkx_2detail_2common_8hpp.html</filename>
+    <includes id="error__code_8hpp" name="error_code.hpp" local="yes" imported="no">btu/tex/error_code.hpp</includes>
+    <namespace>btu</namespace>
+    <namespace>btu::hkx</namespace>
+    <member kind="typedef">
+      <type>tl::expected&lt; void, Error &gt;</type>
+      <name>ResultError</name>
+      <anchorfile>namespacebtu_1_1hkx.html</anchorfile>
+      <anchor>abc7c985d620e604918ab6ed42300593d</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>common.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/nif/detail/</path>
+    <filename>nif_2detail_2common_8hpp.html</filename>
+    <includes id="error_8hpp" name="error.hpp" local="yes" imported="no">btu/common/error.hpp</includes>
+    <includes id="path_8hpp" name="path.hpp" local="yes" imported="no">btu/common/path.hpp</includes>
+    <namespace>btu</namespace>
+    <namespace>btu::nif</namespace>
+    <member kind="typedef">
+      <type>btu::common::Error</type>
+      <name>Error</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a3f855738d59e26536036bc8d0d4876de</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>tl::expected&lt; void, Error &gt;</type>
+      <name>ResultError</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>ad285a4f9385e50fa14ab7d953c91e903</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>common.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/tex/detail/</path>
+    <filename>tex_2detail_2common_8hpp.html</filename>
+    <includes id="error__code_8hpp" name="error_code.hpp" local="yes" imported="no">btu/tex/error_code.hpp</includes>
+    <namespace>btu</namespace>
+    <namespace>btu::tex</namespace>
+    <member kind="typedef">
+      <type>tl::expected&lt; Texture, Error &gt;</type>
+      <name>Result</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>af028c1ddd554ace9fcf85c743a50ae32</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>tl::expected&lt; void, Error &gt;</type>
+      <name>ResultError</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a7eaa0fa53455df06ba6ae23adf21e7cb</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>functions.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/hkx/</path>
+    <filename>hkx_2functions_8hpp.html</filename>
+    <includes id="path_8hpp" name="path.hpp" local="yes" imported="no">btu/common/path.hpp</includes>
+    <includes id="hkx_2detail_2common_8hpp" name="common.hpp" local="yes" imported="no">btu/hkx/detail/common.hpp</includes>
+    <includes id="error_8hpp" name="error.hpp" local="no" imported="no">btu/common/error.hpp</includes>
+    <includes id="games_8hpp" name="games.hpp" local="no" imported="no">btu/common/games.hpp</includes>
+    <namespace>btu</namespace>
+    <namespace>btu::hkx</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>convert</name>
+      <anchorfile>namespacebtu_1_1hkx.html</anchorfile>
+      <anchor>ad99c78e3157c0eb73b85e07e01543025</anchor>
+      <arglist>(Anim &amp;anim, const AnimExe &amp;exe, btu::Game target_game) -&gt; ResultError</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>functions.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/nif/</path>
+    <filename>nif_2functions_8hpp.html</filename>
+    <includes id="error_8hpp" name="error.hpp" local="yes" imported="no">btu/common/error.hpp</includes>
+    <includes id="games_8hpp" name="games.hpp" local="yes" imported="no">btu/common/games.hpp</includes>
+    <includes id="mesh_8hpp" name="mesh.hpp" local="yes" imported="no">btu/nif/mesh.hpp</includes>
+    <namespace>btu</namespace>
+    <namespace>btu::nif</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>convert</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a5c851f2d210e7414d14b010add2a1d91</anchor>
+      <arglist>(Mesh file, bool headpart, btu::Game game) -&gt; tl::expected&lt; Mesh, Error &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>rename_referenced_textures</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a7af52e712f09e2a4078abe1dedfec390</anchor>
+      <arglist>(Mesh &amp;file)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>functions.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/tex/</path>
+    <filename>tex_2functions_8hpp.html</filename>
+    <includes id="tex_2detail_2common_8hpp" name="common.hpp" local="yes" imported="no">btu/tex/detail/common.hpp</includes>
+    <includes id="formats__string_8hpp" name="formats_string.hpp" local="yes" imported="no">btu/tex/detail/formats_string.hpp</includes>
+    <includes id="dimension_8hpp" name="dimension.hpp" local="yes" imported="no">btu/tex/dimension.hpp</includes>
+    <includes id="texture_8hpp" name="texture.hpp" local="yes" imported="no">btu/tex/texture.hpp</includes>
+    <namespace>btu</namespace>
+    <namespace>btu::tex</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>decompress</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a596c07ddbaf7f756699b2d5644698412</anchor>
+      <arglist>(Texture &amp;&amp;file) -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>make_transparent_alpha</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a42a7ea80fe5cf427cf7c8a6f67a26900</anchor>
+      <arglist>(Texture &amp;&amp;file) -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>convert</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a1d67b827c6dd2b43b2847dde0a5b8243</anchor>
+      <arglist>(Texture &amp;&amp;file, DXGI_FORMAT format, ID3D11Device *dev) -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>optimal_mip_count</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a88583309caffff946dea632ffa126181</anchor>
+      <arglist>(Dimension dim) noexcept -&gt; size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>generate_mipmaps</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ae2bc7bbc61efcd88c08a269d80d45f2f</anchor>
+      <arglist>(Texture &amp;&amp;file) -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>resize</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ae4f8c8542060c06233ee6b8d31251029</anchor>
+      <arglist>(Texture &amp;&amp;file, Dimension dim) -&gt; Result</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>mod_folder.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/modmanager/</path>
+    <filename>mod__folder_8hpp.html</filename>
+    <includes id="archive_8hpp" name="archive.hpp" local="yes" imported="no">btu/bsa/archive.hpp</includes>
+    <includes id="path_8hpp" name="path.hpp" local="yes" imported="no">btu/common/path.hpp</includes>
+    <class kind="class">btu::modmanager::detail::ModFileDisk</class>
+    <class kind="struct">btu::modmanager::detail::ModFileArchive</class>
+    <class kind="class">btu::modmanager::ModFile</class>
+    <class kind="class">btu::modmanager::ModFolder</class>
+    <namespace>btu</namespace>
+    <namespace>btu::modmanager</namespace>
+    <namespace>btu::modmanager::detail</namespace>
+  </compound>
+  <compound kind="file">
+    <name>mod_manager.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/modmanager/</path>
+    <filename>mod__manager_8hpp.html</filename>
+    <includes id="mod__folder_8hpp" name="mod_folder.hpp" local="yes" imported="no">btu/modmanager/mod_folder.hpp</includes>
+    <class kind="class">btu::modmanager::ModsFolder</class>
+    <namespace>btu</namespace>
+    <namespace>btu::modmanager</namespace>
+    <member kind="enumeration">
+      <type></type>
+      <name>ModManager</name>
+      <anchorfile>namespacebtu_1_1modmanager.html</anchorfile>
+      <anchor>a431b02339f83ef872649193e483ad7c2</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1modmanager.html" anchor="a431b02339f83ef872649193e483ad7c2a8e11b2f987a99ed900a44aa1aa8bd3d0">Vortex</enumvalue>
+      <enumvalue file="namespacebtu_1_1modmanager.html" anchor="a431b02339f83ef872649193e483ad7c2a9d45ded384011b8e9bcd836259143741">MO2</enumvalue>
+      <enumvalue file="namespacebtu_1_1modmanager.html" anchor="a431b02339f83ef872649193e483ad7c2a7d80bb7df17a048f7c47fde135cd8092">Kortex</enumvalue>
+      <enumvalue file="namespacebtu_1_1modmanager.html" anchor="a431b02339f83ef872649193e483ad7c2a62bb7e71879e6671209a5235f551c4e5">ManualForced</enumvalue>
+      <enumvalue file="namespacebtu_1_1modmanager.html" anchor="a431b02339f83ef872649193e483ad7c2a6adf97f83acf6453d4a6a4b1070f3754">None</enumvalue>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find_manager</name>
+      <anchorfile>namespacebtu_1_1modmanager.html</anchorfile>
+      <anchor>abe686c1e196037a674997bde528e5ae7</anchor>
+      <arglist>(const Path &amp;dir) -&gt; ModManager</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr auto</type>
+      <name>k_force_process_folder</name>
+      <anchorfile>namespacebtu_1_1modmanager.html</anchorfile>
+      <anchor>a13c823db6014a0b758d1b5c33495fb81</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>mesh.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/nif/</path>
+    <filename>mesh_8hpp.html</filename>
+    <includes id="error_8hpp" name="error.hpp" local="yes" imported="no">btu/common/error.hpp</includes>
+    <includes id="path_8hpp" name="path.hpp" local="yes" imported="no">btu/common/path.hpp</includes>
+    <includes id="nif_2detail_2common_8hpp" name="common.hpp" local="yes" imported="no">btu/nif/detail/common.hpp</includes>
+    <class kind="class">btu::nif::Mesh</class>
+    <namespace>btu</namespace>
+    <namespace>btu::nif</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>load</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a45f3c2dcd02f6236fb33d65b30bf9179</anchor>
+      <arglist>(Path path) noexcept -&gt; tl::expected&lt; Mesh, Error &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>save</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a55230cc968c4cc039141f0b698fe103c</anchor>
+      <arglist>(Mesh mesh, const Path &amp;path) noexcept -&gt; ResultError</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr auto</type>
+      <name>canonize_path</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a3512d8f8fe6350395d7ceab6507ffdc7</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>optimize.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/nif/</path>
+    <filename>nif_2optimize_8hpp.html</filename>
+    <includes id="games_8hpp" name="games.hpp" local="yes" imported="no">btu/common/games.hpp</includes>
+    <includes id="nif_2detail_2common_8hpp" name="common.hpp" local="yes" imported="no">btu/nif/detail/common.hpp</includes>
+    <class kind="struct">btu::nif::Settings</class>
+    <class kind="struct">btu::nif::OptimizationSteps</class>
+    <namespace>btu</namespace>
+    <namespace>btu::nif</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>optimize</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a978b6e36240efc842f2d818ec3799acb</anchor>
+      <arglist>(Mesh file, const OptimizationSteps &amp;steps) -&gt; tl::expected&lt; Mesh, Error &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compute_optimization_steps</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>af99b4543d21eab52dc8fe299dabe6410</anchor>
+      <arglist>(const Mesh &amp;file, const Settings &amp;sets) -&gt; OptimizationSteps</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>optimize.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/tex/</path>
+    <filename>tex_2optimize_8hpp.html</filename>
+    <includes id="tex_2detail_2common_8hpp" name="common.hpp" local="yes" imported="no">btu/tex/detail/common.hpp</includes>
+    <includes id="dimension_8hpp" name="dimension.hpp" local="yes" imported="no">btu/tex/dimension.hpp</includes>
+    <includes id="formats_8hpp" name="formats.hpp" local="yes" imported="no">btu/tex/formats.hpp</includes>
+    <includes id="games_8hpp" name="games.hpp" local="no" imported="no">btu/common/games.hpp</includes>
+    <class kind="struct">btu::tex::Settings</class>
+    <class kind="struct">btu::tex::OptimizationSteps</class>
+    <namespace>btu</namespace>
+    <namespace>btu::tex</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>optimize</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ae6480d96ccc2b3221b4c856b05836e49</anchor>
+      <arglist>(Texture &amp;&amp;file, OptimizationSteps sets, ID3D11Device *dev) noexcept -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compute_optimization_steps</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ae181f96a4805e40fb4dc9ff226486b52</anchor>
+      <arglist>(const Texture &amp;file, const Settings &amp;sets) noexcept -&gt; OptimizationSteps</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>compression_device.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/tex/</path>
+    <filename>compression__device_8hpp.html</filename>
+    <class kind="class">Microsoft::WRL::ComPtr</class>
+    <class kind="class">btu::tex::CompressionDevice</class>
+    <namespace>Microsoft</namespace>
+    <namespace>Microsoft::WRL</namespace>
+    <namespace>btu</namespace>
+    <namespace>btu::tex</namespace>
+  </compound>
+  <compound kind="file">
+    <name>formats_string.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/tex/detail/</path>
+    <filename>formats__string_8hpp.html</filename>
+    <class kind="struct">btu::tex::detail::StringFormat</class>
+    <namespace>btu</namespace>
+    <namespace>btu::tex</namespace>
+    <namespace>btu::tex::detail</namespace>
+    <member kind="define">
+      <type>#define</type>
+      <name>DEFFMT</name>
+      <anchorfile>formats__string_8hpp.html</anchorfile>
+      <anchor>a6cdd68db651a13cb70aec8abac82d6fa</anchor>
+      <arglist>(fmt)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_dxgi_format</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a82fee1dca565f30eb74324f84b3dccd5</anchor>
+      <arglist>(std::u8string_view string) -&gt; DXGI_FORMAT</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_string</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a452e3440fda008bd2cb019ae4b105827</anchor>
+      <arglist>(DXGI_FORMAT format) -&gt; std::u8string_view</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr std::array</type>
+      <name>k_dxgi_formats</name>
+      <anchorfile>namespacebtu_1_1tex_1_1detail.html</anchorfile>
+      <anchor>aee18729f171f776dd8325382cb20d94d</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>dimension.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/tex/</path>
+    <filename>dimension_8hpp.html</filename>
+    <includes id="tex_2detail_2common_8hpp" name="common.hpp" local="yes" imported="no">btu/tex/detail/common.hpp</includes>
+    <includes id="formats__string_8hpp" name="formats_string.hpp" local="yes" imported="no">btu/tex/detail/formats_string.hpp</includes>
+    <class kind="struct">btu::tex::Dimension</class>
+    <class kind="struct">btu::tex::util::ResizeRatio</class>
+    <namespace>btu</namespace>
+    <namespace>btu::tex</namespace>
+    <namespace>btu::tex::util</namespace>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>is_pow2</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a5291d2313db8378a4fb3996efa32e9df</anchor>
+      <arglist>(size_t num) noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>upper_pow2</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a5e3d3d290c34522a5175e8a900852204</anchor>
+      <arglist>(size_t num) noexcept -&gt; size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>nearest_pow2</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a08eb8b0b1b74394b3bfa53dc2308cb74</anchor>
+      <arglist>(size_t num) noexcept -&gt; size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>sanitize_dimensions</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a02bf8bd08e15f9bba7652639b99bdaee</anchor>
+      <arglist>(Dimension dim, uint8_t ratio_threshold=3, uint8_t pow2_threshold=3) noexcept -&gt; Dimension</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr void</type>
+      <name>scale_fit</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a55c87a0233952293327f9a2806d28a98</anchor>
+      <arglist>(size_t &amp;number, size_t target, size_t &amp;number2)</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>compute_resize_dimension</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>afd1075a61f47c2ef14917504d93ba34b</anchor>
+      <arglist>(Dimension dim, Dimension target) noexcept -&gt; Dimension</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>compute_resize_dimension</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a3f4ec0028cb673df8b7951a9092667d7</anchor>
+      <arglist>(Dimension dim, ResizeRatio args) noexcept -&gt; Dimension</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>error_code.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/tex/</path>
+    <filename>error__code_8hpp.html</filename>
+    <includes id="error_8hpp" name="error.hpp" local="no" imported="no">btu/common/error.hpp</includes>
+    <class kind="struct">std::is_error_code_enum&lt; btu::tex::TextureErr &gt;</class>
+    <class kind="struct">btu::tex::TextureErrCategory</class>
+    <class kind="struct">std::is_error_condition_enum&lt; btu::tex::FailureSource &gt;</class>
+    <class kind="class">btu::tex::FailureSourceCategory</class>
+    <namespace>btu</namespace>
+    <namespace>btu::tex</namespace>
+    <namespace>std</namespace>
+    <member kind="enumeration">
+      <type></type>
+      <name>TextureErr</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a60e8bb1c36c568e6b5a47818c259f4b0</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a60e8bb1c36c568e6b5a47818c259f4b0a505a83f220c02df2f85c3810cd9ceb38">Success</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a60e8bb1c36c568e6b5a47818c259f4b0a88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a60e8bb1c36c568e6b5a47818c259f4b0a8b7d8393ddfcc4835eebb36815f49c00">BadInput</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a60e8bb1c36c568e6b5a47818c259f4b0a6a10b4834f9cabcc57ddbf0ee05eeb47">MemoryAllocation</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>FailureSource</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>aed398f7aafdc72c4669afd497e68ee60</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="aed398f7aafdc72c4669afd497e68ee60a9d1a862ef0d00477f2bed3a77c94a983">BadUserInput</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="aed398f7aafdc72c4669afd497e68ee60ab932b91f686c2aa588adfd9a407155ca">SystemError</enumvalue>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>make_error_code</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a414e4f1b5ee867c7ab8953454e63588d</anchor>
+      <arglist>(TextureErr e) -&gt; std::error_code</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>make_error_condition</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ac8fff66d71570c4b7e2cc05e28573a77</anchor>
+      <arglist>(FailureSource e) -&gt; std::error_condition</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>error_from_hresult</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a37ec2a4c64c9087b77289ac0c5fae3d4</anchor>
+      <arglist>(int64_t hr, std::error_code default_err=TextureErr::Unknown, SourceLocation loc=BETHUTIL_CURRENT_SOURCE_LOC) -&gt; Error</arglist>
+    </member>
+    <member kind="variable">
+      <type>const TextureErrCategory</type>
+      <name>k_texture_err_category</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a53fa4654edb32d86b890279a1a2051b5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const FailureSourceCategory</type>
+      <name>k_failure_source_category</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a58f3a9df9f2f20747ba57724ec9df388</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>formats.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/tex/</path>
+    <filename>formats_8hpp.html</filename>
+    <class kind="struct">btu::tex::BestFormatFor</class>
+    <namespace>btu</namespace>
+    <namespace>btu::tex</namespace>
+    <member kind="enumeration">
+      <type></type>
+      <name>TextureType</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a24dfd250b226b12d3aaa20a5caeada8f</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa41178642cae095a6bdb909119b4d16e8">Diffuse</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa960b44c579bc2f6818d2daaf9e4c16f0">Normal</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8faa296104f0c61a9cf39f4824d05315e12">Cube</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fac44447baeeae4f8eaa468d6abdacd98f">Bump</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa39b0044dd8789d333e7794f359406740">Specular</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fab20024ea3ba53768598d242981872153">Glow</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fac626285221f3850191ea3ce4b917779c">Parallax</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa0423447d761b57c8b427cbf52ed97cff">ModelSpaceNormal</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa18a864ad6df2d8ea8c8943c5c0e8dc47">Backlight</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa9313566fe19aca293daefe4ce37942bf">Skin</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa70478db3f0a15e1925ef0712136fe092">EnvironmentMask</enumvalue>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>guess_texture_type</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a997827cd10143f950ff10e11bd61c27f</anchor>
+      <arglist>(std::u8string_view path) noexcept -&gt; std::optional&lt; TextureType &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>guess_best_format</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a929511e614bb871fd8f8e155b14665e9</anchor>
+      <arglist>(const Texture &amp;tex, BestFormatFor formats, bool force_uncompressed=false) noexcept -&gt; DXGI_FORMAT</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>texture.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/tex/</path>
+    <filename>texture_8hpp.html</filename>
+    <includes id="path_8hpp" name="path.hpp" local="yes" imported="no">btu/common/path.hpp</includes>
+    <includes id="tex_2detail_2common_8hpp" name="common.hpp" local="yes" imported="no">btu/tex/detail/common.hpp</includes>
+    <class kind="class">btu::tex::detail::ScratchImagePimpl</class>
+    <class kind="class">btu::tex::Texture</class>
+    <namespace>DirectX</namespace>
+    <namespace>btu</namespace>
+    <namespace>btu::tex</namespace>
+    <namespace>btu::tex::detail</namespace>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator==</name>
+      <anchorfile>namespace_direct_x.html</anchorfile>
+      <anchor>a5b83ecfaaf1a2f949f27f1185b590478</anchor>
+      <arglist>(const ScratchImage &amp;lhs, const ScratchImage &amp;rhs) noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator==</name>
+      <anchorfile>namespace_direct_x.html</anchorfile>
+      <anchor>a4235554aa3874370ad325e5685039b34</anchor>
+      <arglist>(const TexMetadata &amp;lhs, const TexMetadata &amp;rhs) noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator==</name>
+      <anchorfile>namespacebtu_1_1tex_1_1detail.html</anchorfile>
+      <anchor>a2a605c57cbc1fab9c1d23261434fb9e5</anchor>
+      <arglist>(const ScratchImagePimpl &amp;lhs, const ScratchImagePimpl &amp;rhs) noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>load</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ac82ab61898eaf157bc2d88808b933692</anchor>
+      <arglist>(Path path) noexcept -&gt; tl::expected&lt; Texture, Error &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>save</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ad808cc7bdd563eb727e030b00bf3713e</anchor>
+      <arglist>(const Texture &amp;tex, Path path) noexcept -&gt; ResultError</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr size_t</type>
+      <name>k_sizeof_scratchimage</name>
+      <anchorfile>namespacebtu_1_1tex_1_1detail.html</anchorfile>
+      <anchor>aeb34d7c94a1986c73601808f52c9a03c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr size_t</type>
+      <name>k_alignof_scratchimage</name>
+      <anchorfile>namespacebtu_1_1tex_1_1detail.html</anchorfile>
+      <anchor>ab9465e26c2f0e9d12e1260a2f6a864e4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr auto</type>
+      <name>canonize_path</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a3783c7c2c4c09dc40adef5bd6165d81a</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>settings.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/</path>
+    <filename>settings_8hpp.html</filename>
+    <class kind="struct">btu::tex::Settings</class>
+    <namespace>btu</namespace>
+    <namespace>btu::tex</namespace>
+    <member kind="enumeration">
+      <type></type>
+      <name>TextureResizingMode</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a7c18132d97963ac2031d900df9734a3b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>None</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a7c18132d97963ac2031d900df9734a3babac62bac14e95b8eca319bbc1e8dad15</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ByRatio</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a7c18132d97963ac2031d900df9734a3baa1c4d2794603e525488f73cdbd156b63</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>BySize</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a7c18132d97963ac2031d900df9734a3ba56e1ea54f761805375acdfe354db9e21</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>settings.hpp</name>
+    <path>/home/runner/work/bethutil/bethutil/include/btu/bsa/</path>
+    <filename>btu_2bsa_2settings_8hpp.html</filename>
+    <includes id="archive_8hpp" name="archive.hpp" local="yes" imported="no">btu/bsa/archive.hpp</includes>
+    <includes id="algorithms_8hpp" name="algorithms.hpp" local="yes" imported="no">btu/common/algorithms.hpp</includes>
+    <includes id="games_8hpp" name="games.hpp" local="yes" imported="no">btu/common/games.hpp</includes>
+    <includes id="metaprogramming_8hpp" name="metaprogramming.hpp" local="yes" imported="no">btu/common/metaprogramming.hpp</includes>
+    <class kind="struct">btu::bsa::AllowedPath</class>
+    <class kind="struct">btu::bsa::Settings</class>
+    <namespace>btu</namespace>
+    <namespace>btu::bsa</namespace>
+    <namespace>btu::bsa::dummy</namespace>
+    <member kind="enumeration">
+      <type></type>
+      <name>FileTypes</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a8d402424047b46ac4d1a3ef0ca75f09a</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aaeb6d8ae6f20283755b339c0dc273988b">Standard</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aaa3e8ae43188ae76d38f414b2bdb0077b">Texture</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aa7d3fd181ccf56faf9e7d0ff8a217688e">Incompressible</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aa85fffe8f5074d606fa202fa5ae90d8bb">Blacklist</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aa409c1892b68cb394799262ac57f6d4f1">Plugin</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aa3c4107dba05635d12c5b7c340017b138">BSA</enumvalue>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_filetype</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a83ca3cb323d37d4bafa20c9221b2c9a7</anchor>
+      <arglist>(const Path &amp;filepath, const Path &amp;root, const Settings &amp;sets) -&gt; FileTypes</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::bsa::AllowedPath</name>
+    <filename>structbtu_1_1bsa_1_1_allowed_path.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>check</name>
+      <anchorfile>structbtu_1_1bsa_1_1_allowed_path.html</anchorfile>
+      <anchor>a2efe1170d17ae6e22e7bc763b0a57de7</anchor>
+      <arglist>(const Path &amp;filepath, const Path &amp;root) const -&gt; bool</arglist>
+    </member>
+    <member kind="variable">
+      <type>std::u8string</type>
+      <name>extension</name>
+      <anchorfile>structbtu_1_1bsa_1_1_allowed_path.html</anchorfile>
+      <anchor>a5a9004f0901bbddfd3286cee87984a11</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; std::u8string &gt;</type>
+      <name>directories</name>
+      <anchorfile>structbtu_1_1bsa_1_1_allowed_path.html</anchorfile>
+      <anchor>a4fe8281548fc8829bc7c12f0e19f0784</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static const auto</type>
+      <name>k_root</name>
+      <anchorfile>structbtu_1_1bsa_1_1_allowed_path.html</anchorfile>
+      <anchor>a6fb1797646d1c24522cfd5d140ea85ef</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::hkx::Anim</name>
+    <filename>classbtu_1_1hkx_1_1_anim.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>get</name>
+      <anchorfile>classbtu_1_1hkx_1_1_anim.html</anchorfile>
+      <anchor>a4441d6da34bf30cf2dbf9e8d341ae76e</anchor>
+      <arglist>() const noexcept -&gt; const Path &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set</name>
+      <anchorfile>classbtu_1_1hkx_1_1_anim.html</anchorfile>
+      <anchor>a9467b3fff93336f6fa7b73d883653572</anchor>
+      <arglist>(Path path) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_load_path</name>
+      <anchorfile>classbtu_1_1hkx_1_1_anim.html</anchorfile>
+      <anchor>a38919d54f76402cc4bda8acf616605d5</anchor>
+      <arglist>() const noexcept -&gt; const Path &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_load_path</name>
+      <anchorfile>classbtu_1_1hkx_1_1_anim.html</anchorfile>
+      <anchor>a6305242083d139a199b6d5c4405a134f</anchor>
+      <arglist>(Path path) noexcept</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::hkx::AnimExe</name>
+    <filename>classbtu_1_1hkx_1_1_anim_exe.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_directory</name>
+      <anchorfile>classbtu_1_1hkx_1_1_anim_exe.html</anchorfile>
+      <anchor>a96983ba64099f5c92516479a067cee2d</anchor>
+      <arglist>() const noexcept -&gt; const Path &amp;</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static auto</type>
+      <name>make</name>
+      <anchorfile>classbtu_1_1hkx_1_1_anim_exe.html</anchorfile>
+      <anchor>a6e80f7423edf4c1fae35492eb8d45e60</anchor>
+      <arglist>(Path dir) noexcept -&gt; tl::expected&lt; AnimExe, Error &gt;</arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static constexpr auto</type>
+      <name>exe64to32</name>
+      <anchorfile>classbtu_1_1hkx_1_1_anim_exe.html</anchorfile>
+      <anchor>a0bca80cd261393f97976beec6646a4d2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static constexpr auto</type>
+      <name>exe32to64</name>
+      <anchorfile>classbtu_1_1hkx_1_1_anim_exe.html</anchorfile>
+      <anchor>a8605cb1123423d3b5e3ea10a991eeefc</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::bsa::ArchiveData</name>
+    <filename>classbtu_1_1bsa_1_1_archive_data.html</filename>
+    <class kind="struct">btu::bsa::ArchiveData::Size</class>
+    <member kind="function">
+      <type></type>
+      <name>ArchiveData</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a9295fdfa170d5eba0dd8168c888eec0a</anchor>
+      <arglist>(const Settings &amp;sets, ArchiveType type)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>add_file</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a8417a4e1adc8337ab080b97ceb1a057a</anchor>
+      <arglist>(Path path, std::optional&lt; Size &gt; override=std::nullopt) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_type</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a2343f0d748b967f2fe49d5120a470c4d</anchor>
+      <arglist>() const -&gt; ArchiveType</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_version</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a19a5f565f22d3ffa38c34afcf7dd211b</anchor>
+      <arglist>() const -&gt; ArchiveVersion</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>empty</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a4f3e849f33b2b58615276444e194e6c3</anchor>
+      <arglist>() const -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a20d9b99d6e3faa4f20b104f08cd4511f</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>aae8061eeb4ca787e9739466a5b5f3fb4</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>clear</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a90294bd638e191b28a4874d04ad1a8f1</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>set_out_path</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>aed1591c323f88180a3278ade8f447706</anchor>
+      <arglist>(Path out_path)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_out_path</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a38004ea00231d1feb818391c472f859c</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a3e3d370fdcbc0328d8846f1588cec810</anchor>
+      <arglist>() const -&gt; Size</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>max_size</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>ae605e5b0842b666ce1f6bfe738cba4f2</anchor>
+      <arglist>() const -&gt; uintmax_t</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>type</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a95182e012e26eaf7499edfb1863c35a3</anchor>
+      <arglist>() const -&gt; ArchiveType</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator+=</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>aad67c66ad07dda3f914f4f3aeb08b3b2</anchor>
+      <arglist>(const ArchiveData &amp;other) -&gt; ArchiveData &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator+</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a2c7381c4751eeb1417730ec777e11f09</anchor>
+      <arglist>(ArchiveData const &amp;other) const -&gt; ArchiveData</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a3a8cd232387fffeeb009d57464496122</anchor>
+      <arglist>(const ArchiveData &amp;) const =default</arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static constexpr bool</type>
+      <name>merge_different_types</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>aed70eac4af47154253c2b927aaa04116</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static constexpr bool</type>
+      <name>separate_different_types</name>
+      <anchorfile>classbtu_1_1bsa_1_1_archive_data.html</anchorfile>
+      <anchor>a53a72b95bb095d3130d8d59e8a1becae</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::tex::BestFormatFor</name>
+    <filename>structbtu_1_1tex_1_1_best_format_for.html</filename>
+    <member kind="variable">
+      <type>DXGI_FORMAT</type>
+      <name>uncompressed</name>
+      <anchorfile>structbtu_1_1tex_1_1_best_format_for.html</anchorfile>
+      <anchor>ad9cf810ee1fb3872e900e9151cbcd205</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>DXGI_FORMAT</type>
+      <name>uncompressed_without_alpha</name>
+      <anchorfile>structbtu_1_1tex_1_1_best_format_for.html</anchorfile>
+      <anchor>ae6e237379b71498d0cab2a665f96cc94</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>DXGI_FORMAT</type>
+      <name>compressed</name>
+      <anchorfile>structbtu_1_1tex_1_1_best_format_for.html</anchorfile>
+      <anchor>a23766d8b3211bd317e828fcf46fb7590</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>DXGI_FORMAT</type>
+      <name>compressed_without_alpha</name>
+      <anchorfile>structbtu_1_1tex_1_1_best_format_for.html</anchorfile>
+      <anchor>a7cea40676c17419d35f19758d1b23cf5</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::common::detail::bind_back_fn</name>
+    <filename>structbtu_1_1common_1_1detail_1_1bind__back__fn.html</filename>
+    <member kind="function">
+      <type>constexpr bind_back_fn2&lt; Fn, Arg1, Args... &gt;</type>
+      <name>operator()</name>
+      <anchorfile>structbtu_1_1common_1_1detail_1_1bind__back__fn.html</anchorfile>
+      <anchor>a53099ec02fb989b5709e4dbc34f11a39</anchor>
+      <arglist>(Fn &amp;&amp;fn, Arg1 &amp;&amp;arg1, Args &amp;&amp;...args) const</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::common::detail::bind_back_fn_</name>
+    <filename>structbtu_1_1common_1_1detail_1_1bind__back__fn__.html</filename>
+    <templarg></templarg>
+    <templarg>Args</templarg>
+    <member kind="typedef">
+      <type>std::tuple&lt; Fn, Args... &gt;</type>
+      <name>tuple_t</name>
+      <anchorfile>structbtu_1_1common_1_1detail_1_1bind__back__fn__.html</anchorfile>
+      <anchor>a00b4a4caf2b9daac26cf59918b31b932</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr std::invoke_result_t&lt; Fn, CallArgs..., Args... &gt;</type>
+      <name>operator()</name>
+      <anchorfile>structbtu_1_1common_1_1detail_1_1bind__back__fn__.html</anchorfile>
+      <anchor>a0b3dde43289f8f128dedbb608e092db7</anchor>
+      <arglist>(CallArgs &amp;&amp;...cargs) &amp;&amp;noexcept(std::is_nothrow_invocable_v&lt; Fn, CallArgs..., Args... &gt;)</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr std::invoke_result_t&lt; Fn &amp;, CallArgs..., Args &amp;... &gt;</type>
+      <name>operator()</name>
+      <anchorfile>structbtu_1_1common_1_1detail_1_1bind__back__fn__.html</anchorfile>
+      <anchor>a2f280a6fcd66ac3edba9bb7480b5a185</anchor>
+      <arglist>(CallArgs &amp;&amp;...cargs) &amp;noexcept(std::is_nothrow_invocable_v&lt; Fn &amp;, CallArgs..., Args &amp;... &gt;)</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr std::invoke_result_t&lt; Fn const &amp;, CallArgs..., Args const &amp;... &gt;</type>
+      <name>operator()</name>
+      <anchorfile>structbtu_1_1common_1_1detail_1_1bind__back__fn__.html</anchorfile>
+      <anchor>a0e180067c09d75e9edc6e9db7f544274</anchor>
+      <arglist>(CallArgs &amp;&amp;...cargs) const &amp;noexcept(std::is_nothrow_invocable_v&lt; Fn const &amp;, CallArgs..., Args const &amp;... &gt;)</arglist>
+    </member>
+    <member kind="variable">
+      <type>tuple_t</type>
+      <name>fn_args_</name>
+      <anchorfile>structbtu_1_1common_1_1detail_1_1bind__back__fn__.html</anchorfile>
+      <anchor>a338cca62d94c7658a7c235dd2b2caeb4</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::common::Cards</name>
+    <filename>structbtu_1_1common_1_1_cards.html</filename>
+    <member kind="variable">
+      <type>U8Unit</type>
+      <name>any</name>
+      <anchorfile>structbtu_1_1common_1_1_cards.html</anchorfile>
+      <anchor>a60da3f60730fc60a9e52cc2466e4b79d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>U8Unit</type>
+      <name>any_repeat</name>
+      <anchorfile>structbtu_1_1common_1_1_cards.html</anchorfile>
+      <anchor>a6ae72ec9abe3fa121d41c6e313330c96</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>U8Unit</type>
+      <name>set_begin</name>
+      <anchorfile>structbtu_1_1common_1_1_cards.html</anchorfile>
+      <anchor>a5da42a7dfdc164fde29db9210d6af1cd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>U8Unit</type>
+      <name>set_end</name>
+      <anchorfile>structbtu_1_1common_1_1_cards.html</anchorfile>
+      <anchor>aebcc2a4733ed9f1c938af044004726bc</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::tex::CompressionDevice</name>
+    <filename>classbtu_1_1tex_1_1_compression_device.html</filename>
+    <member kind="function">
+      <type></type>
+      <name>operator bool</name>
+      <anchorfile>classbtu_1_1tex_1_1_compression_device.html</anchorfile>
+      <anchor>a3bd10e1942df83a954890d4b86b2de80</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>is_valid</name>
+      <anchorfile>classbtu_1_1tex_1_1_compression_device.html</anchorfile>
+      <anchor>ac741b79e476890d77d63e1c4136a02b9</anchor>
+      <arglist>() const -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_device</name>
+      <anchorfile>classbtu_1_1tex_1_1_compression_device.html</anchorfile>
+      <anchor>a1d47658ef5f0904a183db18596567a33</anchor>
+      <arglist>() const -&gt; ID3D11Device *</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>gpu_name</name>
+      <anchorfile>classbtu_1_1tex_1_1_compression_device.html</anchorfile>
+      <anchor>ac8a9ed9588886f0fccd48d7e6bf75a42</anchor>
+      <arglist>() const -&gt; const std::u8string &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>CompressionDevice</name>
+      <anchorfile>classbtu_1_1tex_1_1_compression_device.html</anchorfile>
+      <anchor>a3fbbd2031d3dea075f4f843b909473ed</anchor>
+      <arglist>(const CompressionDevice &amp;)=delete</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>CompressionDevice</name>
+      <anchorfile>classbtu_1_1tex_1_1_compression_device.html</anchorfile>
+      <anchor>a8eec05802372e07130f5b68c5415d659</anchor>
+      <arglist>(CompressionDevice &amp;&amp;other) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator=</name>
+      <anchorfile>classbtu_1_1tex_1_1_compression_device.html</anchorfile>
+      <anchor>abde300f935937c1719cfecb9fe3e6cb7</anchor>
+      <arglist>(const CompressionDevice &amp;) -&gt; CompressionDevice &amp;=delete</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator=</name>
+      <anchorfile>classbtu_1_1tex_1_1_compression_device.html</anchorfile>
+      <anchor>ae0610e82c57d9280c4d2d5e8c778aff5</anchor>
+      <arglist>(CompressionDevice &amp;&amp;other) noexcept -&gt; CompressionDevice &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>~CompressionDevice</name>
+      <anchorfile>classbtu_1_1tex_1_1_compression_device.html</anchorfile>
+      <anchor>a501510c60f93f328d548b7e61ef1814e</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static auto</type>
+      <name>make</name>
+      <anchorfile>classbtu_1_1tex_1_1_compression_device.html</anchorfile>
+      <anchor>adfc42e49bb3b65b1ef8e8099501f934a</anchor>
+      <arglist>(uint32_t adapter_index, bool allow_software=false) -&gt; std::optional&lt; CompressionDevice &gt;</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>Microsoft::WRL::ComPtr</name>
+    <filename>class_microsoft_1_1_w_r_l_1_1_com_ptr.html</filename>
+    <templarg></templarg>
+  </compound>
+  <compound kind="struct">
+    <name>btu::tex::Dimension</name>
+    <filename>structbtu_1_1tex_1_1_dimension.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator</name>
+      <anchorfile>structbtu_1_1tex_1_1_dimension.html</anchorfile>
+      <anchor>ad9b33838bfc38e60963f035005fcd364</anchor>
+      <arglist>(const Dimension &amp;) const noexcept=default</arglist>
+    </member>
+    <member kind="variable">
+      <type>size_t</type>
+      <name>w</name>
+      <anchorfile>structbtu_1_1tex_1_1_dimension.html</anchorfile>
+      <anchor>aaa6e3f954465f98793354298537ade32</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>size_t</type>
+      <name>h</name>
+      <anchorfile>structbtu_1_1tex_1_1_dimension.html</anchorfile>
+      <anchor>a4dbc3be9857200add5e34d1b3dfa0a7f</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::common::Error</name>
+    <filename>structbtu_1_1common_1_1_error.html</filename>
+    <base>std::error_code</base>
+    <member kind="function">
+      <type></type>
+      <name>Error</name>
+      <anchorfile>structbtu_1_1common_1_1_error.html</anchorfile>
+      <anchor>ac263f71dfc6b22c764bfff4bf6028c52</anchor>
+      <arglist>(std::error_code ec, SourceLocation l=static_cast&lt;::btu::common::SourceLocation &gt;(std::source_location::current()))</arglist>
+    </member>
+    <member kind="variable">
+      <type>SourceLocation</type>
+      <name>loc</name>
+      <anchorfile>structbtu_1_1common_1_1_error.html</anchorfile>
+      <anchor>a1696a7effa24968fc457dfd618497f8c</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::common::Exception</name>
+    <filename>classbtu_1_1common_1_1_exception.html</filename>
+    <base>std::exception</base>
+    <member kind="function">
+      <type></type>
+      <name>Exception</name>
+      <anchorfile>classbtu_1_1common_1_1_exception.html</anchorfile>
+      <anchor>a4436d43f3cf6f869cf07d09253aef661</anchor>
+      <arglist>(Error err)</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual auto</type>
+      <name>what</name>
+      <anchorfile>classbtu_1_1common_1_1_exception.html</anchorfile>
+      <anchor>ae802d8a21fc57780298a3eefc02b94c9</anchor>
+      <arglist>() const noexcept -&gt; const char *override</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::tex::FailureSourceCategory</name>
+    <filename>classbtu_1_1tex_1_1_failure_source_category.html</filename>
+    <base>std::error_category</base>
+    <member kind="function">
+      <type>auto</type>
+      <name>name</name>
+      <anchorfile>classbtu_1_1tex_1_1_failure_source_category.html</anchorfile>
+      <anchor>ae29ed0a5e2095460f614a6c2c6d20173</anchor>
+      <arglist>() const noexcept -&gt; const char *override</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>message</name>
+      <anchorfile>classbtu_1_1tex_1_1_failure_source_category.html</anchorfile>
+      <anchor>a1b57d2c49f81e4ea18e6098e01e62c5e</anchor>
+      <arglist>(int ev) const -&gt; std::string override</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>equivalent</name>
+      <anchorfile>classbtu_1_1tex_1_1_failure_source_category.html</anchorfile>
+      <anchor>a937f073fff3419140f8e8bba506f0ffc</anchor>
+      <arglist>(const std::error_code &amp;ec, int cond) const noexcept -&gt; bool override</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::bsa::File</name>
+    <filename>classbtu_1_1bsa_1_1_file.html</filename>
+    <member kind="function">
+      <type></type>
+      <name>File</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>a5de6b48086f2c47e3de6d7c7c6843707</anchor>
+      <arglist>(ArchiveVersion v)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>File</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>ab8314eff88bb7239f64aa03a7cc82201</anchor>
+      <arglist>(UnderlyingFile f, ArchiveVersion v)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compressed</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>a801151f3a67ab348a9037ab921481a41</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>decompress</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>a8ee3c34e14f12b4664278ea3622f60e9</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>compress</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>a393a904e004bd0aa9c46cc09316cea9b</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>read</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>aac291118d63a0afeb7e973ff839de45f</anchor>
+      <arglist>(Path path)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>read</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>a9d0876101b1adca80d7328eb2aa3eb18</anchor>
+      <arglist>(std::span&lt; std::byte &gt; src)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>a539cee17edecf71b6e21c000cdab75ae</anchor>
+      <arglist>(Path path) const</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>ae35d15f88575f621b5e4c2ffe22b306f</anchor>
+      <arglist>(binary_io::any_ostream &amp;dst) const</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>version</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>a314e2fe64f9e9c2e09b6d2fd12a47509</anchor>
+      <arglist>() const noexcept -&gt; ArchiveVersion</arglist>
+    </member>
+    <member kind="function">
+      <type>requires btu::common::is_variant_member_v&lt; T, UnderlyingFile &gt; auto</type>
+      <name>as_raw_file</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file.html</anchorfile>
+      <anchor>a93041cb8a77a8c9a41cc462105691e69</anchor>
+      <arglist>() &amp;&amp;</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::bsa::FilePath</name>
+    <filename>classbtu_1_1bsa_1_1_file_path.html</filename>
+    <member kind="function">
+      <type></type>
+      <name>FilePath</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>a6a6d67125a228422b14fd515b01e31ae</anchor>
+      <arglist>(Path dir, std::u8string name, std::u8string suffix, std::u8string ext, FileTypes type)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>full_path</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>a78eb9d61735ad2e5af79e7fa27c0417e</anchor>
+      <arglist>() const -&gt; Path</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>full_name</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>ac7ba40364b40c572bc8d632f56133f7e</anchor>
+      <arglist>() const -&gt; std::u8string</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>a5f089812e1d1f2153cf761fb07b83620</anchor>
+      <arglist>(const FilePath &amp;) const noexcept=default</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static auto</type>
+      <name>make</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>a2b4a168c23646d29f358165bbf204018</anchor>
+      <arglist>(const Path &amp;path, const Settings &amp;sets, FileTypes type) -&gt; std::optional&lt; FilePath &gt;</arglist>
+    </member>
+    <member kind="variable">
+      <type>Path</type>
+      <name>dir</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>a593892091f4b45700b82acdf3960641f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::u8string</type>
+      <name>name</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>ac8cdc3a3abe4516645c42c32f582d09a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::u8string</type>
+      <name>suffix</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>aacdd602659270f92bb2a11557c01a661</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::u8string</type>
+      <name>ext</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>a541a150a16d70f2e044549e88637ef1c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::optional&lt; uint32_t &gt;</type>
+      <name>counter</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>a2342cd33a662fe1bb52afd3e0607de32</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>FileTypes</type>
+      <name>type</name>
+      <anchorfile>classbtu_1_1bsa_1_1_file_path.html</anchorfile>
+      <anchor>af9c6e54afb3538d46ce585f1b02651c4</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::common::InvalidUTF8</name>
+    <filename>classbtu_1_1common_1_1_invalid_u_t_f8.html</filename>
+    <base>std::exception</base>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>what</name>
+      <anchorfile>classbtu_1_1common_1_1_invalid_u_t_f8.html</anchorfile>
+      <anchor>addb33f59ed9bd37dd69b7d630deabfd5</anchor>
+      <arglist>() const noexcept -&gt; const char *override</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>std::is_error_code_enum&lt; btu::tex::TextureErr &gt;</name>
+    <filename>structstd_1_1is__error__code__enum_3_01btu_1_1tex_1_1_texture_err_01_4.html</filename>
+    <base>std::true_type</base>
+  </compound>
+  <compound kind="struct">
+    <name>std::is_error_condition_enum&lt; btu::tex::FailureSource &gt;</name>
+    <filename>structstd_1_1is__error__condition__enum_3_01btu_1_1tex_1_1_failure_source_01_4.html</filename>
+    <base>std::true_type</base>
+  </compound>
+  <compound kind="struct">
+    <name>btu::common::is_variant_member</name>
+    <filename>structbtu_1_1common_1_1is__variant__member.html</filename>
+    <templarg></templarg>
+    <templarg></templarg>
+  </compound>
+  <compound kind="struct">
+    <name>btu::common::is_variant_member&lt; T, std::variant&lt; Ts... &gt; &gt;</name>
+    <filename>structbtu_1_1common_1_1is__variant__member_3_01_t_00_01std_1_1variant_3_01_ts_8_8_8_01_4_01_4.html</filename>
+    <templarg></templarg>
+    <templarg>Ts</templarg>
+    <base>bool_constant&lt;(std::is_same_v&lt; T, Ts &gt;||...)&gt;</base>
+  </compound>
+  <compound kind="class">
+    <name>btu::nif::Mesh</name>
+    <filename>classbtu_1_1nif_1_1_mesh.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>get</name>
+      <anchorfile>classbtu_1_1nif_1_1_mesh.html</anchorfile>
+      <anchor>a53182fff47d9e0e7691827738d7100d6</anchor>
+      <arglist>() noexcept -&gt; nifly::NifFile &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get</name>
+      <anchorfile>classbtu_1_1nif_1_1_mesh.html</anchorfile>
+      <anchor>a7d5af963185e67b9eeb97bec349e45d7</anchor>
+      <arglist>() const noexcept -&gt; const nifly::NifFile &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_load_path</name>
+      <anchorfile>classbtu_1_1nif_1_1_mesh.html</anchorfile>
+      <anchor>ad2efd6f26e0a4b58858f0e8253f22eec</anchor>
+      <arglist>() const noexcept -&gt; const Path &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_load_path</name>
+      <anchorfile>classbtu_1_1nif_1_1_mesh.html</anchorfile>
+      <anchor>a03604d50da99a10fe5364e1d817d4aab</anchor>
+      <arglist>(Path path) noexcept</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::modmanager::ModFile</name>
+    <filename>classbtu_1_1modmanager_1_1_mod_file.html</filename>
+    <member kind="typedef">
+      <type>std::variant&lt; detail::ModFileArchive, std::reference_wrapper&lt; detail::ModFileDisk &gt; &gt;</type>
+      <name>Underlying</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_file.html</anchorfile>
+      <anchor>aa97482563ce268ecb76951febb8c77b5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>ModFile</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_file.html</anchorfile>
+      <anchor>aa2cc87ef5af7a2c0130be1e47674ab78</anchor>
+      <arglist>(Underlying content)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>load</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_file.html</anchorfile>
+      <anchor>a16399073e69b1fab63f1c2646c28270e</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_relative_path</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_file.html</anchorfile>
+      <anchor>a326a73acf0bc9bf3f283ccaccbbe7ea3</anchor>
+      <arglist>() const -&gt; Path</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>read</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_file.html</anchorfile>
+      <anchor>ade3459e02e6eb4728a7fdba8b3650149</anchor>
+      <arglist>(Path path)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>read</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_file.html</anchorfile>
+      <anchor>a796b141c57a3b5c85c21fc91d79114ee</anchor>
+      <arglist>(std::span&lt; std::byte &gt; src)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_file.html</anchorfile>
+      <anchor>a30b097ebee1183bfb417a2c1598328fd</anchor>
+      <arglist>(Path path) const</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_file.html</anchorfile>
+      <anchor>abba7f41e183f78e3bb986dec6d50b473</anchor>
+      <arglist>(binary_io::any_ostream &amp;dst) const</arglist>
+    </member>
+    <member kind="function">
+      <type>const auto &amp;</type>
+      <name>get_underlying</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_file.html</anchorfile>
+      <anchor>a477f20fbab18201ec249948bdd771aaf</anchor>
+      <arglist>() const</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::modmanager::detail::ModFileArchive</name>
+    <filename>structbtu_1_1modmanager_1_1detail_1_1_mod_file_archive.html</filename>
+    <member kind="variable">
+      <type>std::string</type>
+      <name>name</name>
+      <anchorfile>structbtu_1_1modmanager_1_1detail_1_1_mod_file_archive.html</anchorfile>
+      <anchor>aa4c401e18f26667a21b15c65c2826c8b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>btu::bsa::File &amp;</type>
+      <name>file</name>
+      <anchorfile>structbtu_1_1modmanager_1_1detail_1_1_mod_file_archive.html</anchorfile>
+      <anchor>aa3c3ed2107560a87f00d5794f0ef5c2e</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::modmanager::detail::ModFileDisk</name>
+    <filename>classbtu_1_1modmanager_1_1detail_1_1_mod_file_disk.html</filename>
+    <member kind="function">
+      <type></type>
+      <name>ModFileDisk</name>
+      <anchorfile>classbtu_1_1modmanager_1_1detail_1_1_mod_file_disk.html</anchorfile>
+      <anchor>ab263ea9efc7d41d9e06078b9364415ae</anchor>
+      <arglist>(Path root, Path rel_path)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>load</name>
+      <anchorfile>classbtu_1_1modmanager_1_1detail_1_1_mod_file_disk.html</anchorfile>
+      <anchor>af18268426e91505e88cb7fa5aff077b9</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_relative_path</name>
+      <anchorfile>classbtu_1_1modmanager_1_1detail_1_1_mod_file_disk.html</anchorfile>
+      <anchor>a805526bee3367c3ec9d0f999faf9a601</anchor>
+      <arglist>() const noexcept -&gt; Path</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbtu_1_1modmanager_1_1detail_1_1_mod_file_disk.html</anchorfile>
+      <anchor>a43a151ed7fecd83f54083c444d08e5a6</anchor>
+      <arglist>() const noexcept -&gt; size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>modified</name>
+      <anchorfile>classbtu_1_1modmanager_1_1detail_1_1_mod_file_disk.html</anchorfile>
+      <anchor>a1c231b14c8b4109781aeb5353ec6c808</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>read</name>
+      <anchorfile>classbtu_1_1modmanager_1_1detail_1_1_mod_file_disk.html</anchorfile>
+      <anchor>a5734bb5399dc5aee15f49296b47a363c</anchor>
+      <arglist>(const Path &amp;path)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>read</name>
+      <anchorfile>classbtu_1_1modmanager_1_1detail_1_1_mod_file_disk.html</anchorfile>
+      <anchor>abf2eb390d9e8c04d8463cf46cafc217c</anchor>
+      <arglist>(std::span&lt; std::byte &gt; src)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write</name>
+      <anchorfile>classbtu_1_1modmanager_1_1detail_1_1_mod_file_disk.html</anchorfile>
+      <anchor>ac2ce302b36ff678a026228431bc36f60</anchor>
+      <arglist>(const Path &amp;path) const</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write</name>
+      <anchorfile>classbtu_1_1modmanager_1_1detail_1_1_mod_file_disk.html</anchorfile>
+      <anchor>af150a52e40f4b380b5fb121f774d47df</anchor>
+      <arglist>(binary_io::any_ostream &amp;dst) const</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::modmanager::ModFolder</name>
+    <filename>classbtu_1_1modmanager_1_1_mod_folder.html</filename>
+    <member kind="function">
+      <type></type>
+      <name>ModFolder</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_folder.html</anchorfile>
+      <anchor>aa221d5fce8bbfe2762461e10bb36978c</anchor>
+      <arglist>(Path directory, std::u8string archive_ext)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_folder.html</anchorfile>
+      <anchor>aa54b00bfe6d28ab7cb686c0248ee1740</anchor>
+      <arglist>() -&gt; size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_flow</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_folder.html</anchorfile>
+      <anchor>ada00f19485eb125c8caeea837ef92b11</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>reintegrate</name>
+      <anchorfile>classbtu_1_1modmanager_1_1_mod_folder.html</anchorfile>
+      <anchor>a17b949917a03580c88640ede9327acef</anchor>
+      <arglist>()</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::modmanager::ModsFolder</name>
+    <filename>classbtu_1_1modmanager_1_1_mods_folder.html</filename>
+  </compound>
+  <compound kind="struct">
+    <name>btu::tex::OptimizationSteps</name>
+    <filename>structbtu_1_1tex_1_1_optimization_steps.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator</name>
+      <anchorfile>structbtu_1_1tex_1_1_optimization_steps.html</anchorfile>
+      <anchor>ad6f0e870c08543239dbdff5157d14735</anchor>
+      <arglist>(const OptimizationSteps &amp;) const noexcept=default</arglist>
+    </member>
+    <member kind="variable">
+      <type>std::optional&lt; Dimension &gt;</type>
+      <name>resize</name>
+      <anchorfile>structbtu_1_1tex_1_1_optimization_steps.html</anchorfile>
+      <anchor>a90f9c2575d85e2bc3cb4b57a02542935</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>add_transparent_alpha</name>
+      <anchorfile>structbtu_1_1tex_1_1_optimization_steps.html</anchorfile>
+      <anchor>a1d6690afd1c9fd023a8356faabe748d9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>mipmaps</name>
+      <anchorfile>structbtu_1_1tex_1_1_optimization_steps.html</anchorfile>
+      <anchor>a96a0c5821c684b1bcd06fc412adee768</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::optional&lt; DXGI_FORMAT &gt;</type>
+      <name>format</name>
+      <anchorfile>structbtu_1_1tex_1_1_optimization_steps.html</anchorfile>
+      <anchor>aed639ce5c4f3a4c4d08c0a3856454295</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::nif::OptimizationSteps</name>
+    <filename>structbtu_1_1nif_1_1_optimization_steps.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator</name>
+      <anchorfile>structbtu_1_1nif_1_1_optimization_steps.html</anchorfile>
+      <anchor>aa928ffb7a0ab35b689c685ad13c46631</anchor>
+      <arglist>(const OptimizationSteps &amp;) const noexcept=default</arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>rename_referenced_textures</name>
+      <anchorfile>structbtu_1_1nif_1_1_optimization_steps.html</anchorfile>
+      <anchor>a6303fa50ef1caccf55f49c809812938e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::optional&lt; btu::Game &gt;</type>
+      <name>format</name>
+      <anchorfile>structbtu_1_1nif_1_1_optimization_steps.html</anchorfile>
+      <anchor>afe681616124a730cabb62c3b69a60daa</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>headpart</name>
+      <anchorfile>structbtu_1_1nif_1_1_optimization_steps.html</anchorfile>
+      <anchor>a877c3552cf49b148d000cd34febbf20e</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::common::overload</name>
+    <filename>structbtu_1_1common_1_1overload.html</filename>
+    <templarg>Ts</templarg>
+  </compound>
+  <compound kind="struct">
+    <name>btu::tex::util::ResizeRatio</name>
+    <filename>structbtu_1_1tex_1_1util_1_1_resize_ratio.html</filename>
+    <member kind="variable">
+      <type>uint8_t</type>
+      <name>ratio</name>
+      <anchorfile>structbtu_1_1tex_1_1util_1_1_resize_ratio.html</anchorfile>
+      <anchor>a4726d929ff77eeb0123f594f06987d9e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>Dimension</type>
+      <name>min</name>
+      <anchorfile>structbtu_1_1tex_1_1util_1_1_resize_ratio.html</anchorfile>
+      <anchor>ae4ce88dcfa6921197234e57b55b48e7f</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::tex::detail::ScratchImagePimpl</name>
+    <filename>classbtu_1_1tex_1_1detail_1_1_scratch_image_pimpl.html</filename>
+    <member kind="function">
+      <type></type>
+      <name>ScratchImagePimpl</name>
+      <anchorfile>classbtu_1_1tex_1_1detail_1_1_scratch_image_pimpl.html</anchorfile>
+      <anchor>a03020e7d671ab483deb5ed8393af2bcd</anchor>
+      <arglist>() noexcept(false)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>ScratchImagePimpl</name>
+      <anchorfile>classbtu_1_1tex_1_1detail_1_1_scratch_image_pimpl.html</anchorfile>
+      <anchor>adf75fa9063a60eab3669c347133b3eba</anchor>
+      <arglist>(const ScratchImagePimpl &amp;)=delete</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>ScratchImagePimpl</name>
+      <anchorfile>classbtu_1_1tex_1_1detail_1_1_scratch_image_pimpl.html</anchorfile>
+      <anchor>a45533b4db7b6f7c1f21e8a5490a60abd</anchor>
+      <arglist>(ScratchImagePimpl &amp;&amp;other) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator=</name>
+      <anchorfile>classbtu_1_1tex_1_1detail_1_1_scratch_image_pimpl.html</anchorfile>
+      <anchor>a059d36d44f745db5b1ed9525404d3b57</anchor>
+      <arglist>(const ScratchImagePimpl &amp;) -&gt; ScratchImagePimpl &amp;=delete</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator=</name>
+      <anchorfile>classbtu_1_1tex_1_1detail_1_1_scratch_image_pimpl.html</anchorfile>
+      <anchor>a0cd5ca415780e7f7dd7efbd8b584c01d</anchor>
+      <arglist>(ScratchImagePimpl &amp;&amp;other) noexcept -&gt; ScratchImagePimpl &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>~ScratchImagePimpl</name>
+      <anchorfile>classbtu_1_1tex_1_1detail_1_1_scratch_image_pimpl.html</anchorfile>
+      <anchor>ab6218ffe728f87e733dddacc9fc1e787</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get</name>
+      <anchorfile>classbtu_1_1tex_1_1detail_1_1_scratch_image_pimpl.html</anchorfile>
+      <anchor>ad8eefc363a4f4a864c027e5654f2ea8b</anchor>
+      <arglist>() &amp;noexcept -&gt; ScratchImage &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get</name>
+      <anchorfile>classbtu_1_1tex_1_1detail_1_1_scratch_image_pimpl.html</anchorfile>
+      <anchor>aee0676fbe8bb36324829e997f629ced4</anchor>
+      <arglist>() &amp;&amp;noexcept -&gt; ScratchImage</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get</name>
+      <anchorfile>classbtu_1_1tex_1_1detail_1_1_scratch_image_pimpl.html</anchorfile>
+      <anchor>a8f50ba444c8343ddb42a1606df023de6</anchor>
+      <arglist>() const &amp;noexcept -&gt; const ScratchImage &amp;</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::nif::Settings</name>
+    <filename>structbtu_1_1nif_1_1_settings.html</filename>
+    <member kind="function" static="yes">
+      <type>static auto</type>
+      <name>get</name>
+      <anchorfile>structbtu_1_1nif_1_1_settings.html</anchorfile>
+      <anchor>ad7438ace255b692b09c49cdaea5e45c1</anchor>
+      <arglist>(btu::Game game) noexcept -&gt; const Settings &amp;</arglist>
+    </member>
+    <member kind="variable">
+      <type>btu::Game</type>
+      <name>game</name>
+      <anchorfile>structbtu_1_1nif_1_1_settings.html</anchorfile>
+      <anchor>a02772d8aac64fb37ca0e5e07f834a8bf</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>rename_referenced_textures</name>
+      <anchorfile>structbtu_1_1nif_1_1_settings.html</anchorfile>
+      <anchor>ac8f14b048cd09ccc37935163e315c8ac</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::optional&lt; nifly::NiVersion &gt;</type>
+      <name>target_version</name>
+      <anchorfile>structbtu_1_1nif_1_1_settings.html</anchorfile>
+      <anchor>a54d3972f66d1e21058b9b67836e8a141</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; std::u8string &gt;</type>
+      <name>headpart_meshes</name>
+      <anchorfile>structbtu_1_1nif_1_1_settings.html</anchorfile>
+      <anchor>ac96f27014096b15db822fb3d23c8394f</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::bsa::Settings</name>
+    <filename>structbtu_1_1bsa_1_1_settings.html</filename>
+    <member kind="function" static="yes">
+      <type>static auto</type>
+      <name>get</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>a437d8967acd8a25ced342cd931823289</anchor>
+      <arglist>(Game game) -&gt; const Settings &amp;</arglist>
+    </member>
+    <member kind="variable">
+      <type>Game</type>
+      <name>game</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>a8b2bef30eb8b874b944b444fc16ee056</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uintmax_t</type>
+      <name>max_size</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>ab878b95a13b63f5c8cae440e8ccdf0fc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>ArchiveVersion</type>
+      <name>format</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>a474f4e18da4a795f5265525ab4d60b44</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::optional&lt; ArchiveVersion &gt;</type>
+      <name>texture_format</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>a1ce474ad94bd195fec6361b1e8b7c4e4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::optional&lt; std::u8string &gt;</type>
+      <name>suffix</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>a19b73ea38edc116bcb80d345e2ad1124</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::optional&lt; std::u8string &gt;</type>
+      <name>texture_suffix</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>a16bc631cff214ae7fcaedde8006494da</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::u8string</type>
+      <name>extension</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>a024fd96bdc3f09abeb24628b33ca9e9b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; std::u8string &gt;</type>
+      <name>plugin_extensions</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>adf75c178617fc91fc79e22b9888f8b37</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::optional&lt; std::vector&lt; uint8_t &gt; &gt;</type>
+      <name>s_dummy_plugin</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>ad9fa8218597e70f285c58c77cc829857</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; AllowedPath &gt;</type>
+      <name>standard_files</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>a0fff0a872314c000da9df845bf5bb97e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; AllowedPath &gt;</type>
+      <name>texture_files</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>af1df7201b2aed13f6e7a446bcbd832b0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; AllowedPath &gt;</type>
+      <name>incompressible_files</name>
+      <anchorfile>structbtu_1_1bsa_1_1_settings.html</anchorfile>
+      <anchor>ae613faa5eb8455346fb9aacccac4c1dd</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::tex::Settings</name>
+    <filename>classbtu_1_1tex_1_1_settings.html</filename>
+    <member kind="function" static="yes">
+      <type>static auto</type>
+      <name>get</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>aa577ca7442a9bf3f62956d5e6d1d24ca</anchor>
+      <arglist>(Game game) noexcept -&gt; const Settings &amp;</arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>bTexturesNecessary</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>abcfd344721e882344661b3a64731187e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>bTexturesCompress</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>ae3d936e5121de3e5b13bd6ddfabc7e02</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>bTexturesMipmaps</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>ab7ac8dd3c80ea5119ebbe4750442ea08</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>bTexturesLandscapeAlpha</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>ac304daf49085b426c79c8c8f393096f1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>bTexturesResizeMinimum</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>a0cfdc3bbc25d3cd722b308db6614d67c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>iTexturesMinimumWidth</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>aef1bfd468a5a5535486db293911737f6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>iTexturesMinimumHeight</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>ae4442718bb571c9d579ceaac128da6c4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>TextureResizingMode</type>
+      <name>eTexturesResizingMode</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>a370f33ccd36c94736d8b57d0e679b2a6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>iTexturesResizingHeight</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>a9578cad78d8945cd0b01e360791e63e7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>iTexturesResizingWidth</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>ac5e39242837bbc9772e118844ea36a2a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>DXGI_FORMAT</type>
+      <name>eTexturesFormat</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>a50641ab23c9a1b5df363cb65c7fbf394</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>bTexturesForceConvert</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>a757ee018cc8b305fab2b61943333e834</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; DXGI_FORMAT &gt;</type>
+      <name>slTextureUnwantedFormats</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>ac8a3556c088831b717e0a4a759401b41</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>btu::Game</type>
+      <name>game</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>a40fb6225c17f8e7f20ceb46340191bdb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>compress</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>af4389ef9d708e6695994379cba2d5af9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::variant&lt; std::monostate, util::ResizeRatio, Dimension &gt;</type>
+      <name>resize</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>ad8add6206769509f94641b46532e7a06</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>mipmaps</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>a320c2cacc412b057162ed374f617fc9a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>use_format_whitelist</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>a862b5c882b9d633a9dae49100da83293</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; DXGI_FORMAT &gt;</type>
+      <name>allowed_formats</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>a624b06c3f3d255d55162759534ab9a9e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>BestFormatFor</type>
+      <name>output_format</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>afff63960a1f655328fc30cd104f36883</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; std::u8string &gt;</type>
+      <name>landscape_textures</name>
+      <anchorfile>classbtu_1_1tex_1_1_settings.html</anchorfile>
+      <anchor>af061468ef90de20aac5f2f973872edf0</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::bsa::ArchiveData::Size</name>
+    <filename>structbtu_1_1bsa_1_1_archive_data_1_1_size.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator</name>
+      <anchorfile>structbtu_1_1bsa_1_1_archive_data_1_1_size.html</anchorfile>
+      <anchor>a38c5bd7bd2489afbf612cce68299e984</anchor>
+      <arglist>(const Size &amp;) const =default</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator+=</name>
+      <anchorfile>structbtu_1_1bsa_1_1_archive_data_1_1_size.html</anchorfile>
+      <anchor>ad98b95eeb8d0b5d5af4cb38591e263d9</anchor>
+      <arglist>(const Size &amp;other) -&gt; Size &amp;</arglist>
+    </member>
+    <member kind="variable">
+      <type>uintmax_t</type>
+      <name>compressed</name>
+      <anchorfile>structbtu_1_1bsa_1_1_archive_data_1_1_size.html</anchorfile>
+      <anchor>a1f58fe161fbd76e3594b7fd8d4b292a0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uintmax_t</type>
+      <name>uncompressed</name>
+      <anchorfile>structbtu_1_1bsa_1_1_archive_data_1_1_size.html</anchorfile>
+      <anchor>aecd88f2e371b7a52d0dca1956c8bb214</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::common::SourceLocation</name>
+    <filename>structbtu_1_1common_1_1_source_location.html</filename>
+  </compound>
+  <compound kind="struct">
+    <name>btu::tex::detail::StringFormat</name>
+    <filename>structbtu_1_1tex_1_1detail_1_1_string_format.html</filename>
+    <member kind="variable">
+      <type>std::u8string_view</type>
+      <name>name</name>
+      <anchorfile>structbtu_1_1tex_1_1detail_1_1_string_format.html</anchorfile>
+      <anchor>aee018949faac74f7dcd4a6525ec647f0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>DXGI_FORMAT</type>
+      <name>format</name>
+      <anchorfile>structbtu_1_1tex_1_1detail_1_1_string_format.html</anchorfile>
+      <anchor>a25d8e7b5eac5a3aafe2ede2e76b40207</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::tex::Texture</name>
+    <filename>classbtu_1_1tex_1_1_texture.html</filename>
+    <member kind="function">
+      <type>void</type>
+      <name>set</name>
+      <anchorfile>classbtu_1_1tex_1_1_texture.html</anchorfile>
+      <anchor>acdc4df55caac1a8ddf03441efaa956af</anchor>
+      <arglist>(ScratchImage &amp;&amp;tex) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get</name>
+      <anchorfile>classbtu_1_1tex_1_1_texture.html</anchorfile>
+      <anchor>a32415252f7355f984c36306d0939fed7</anchor>
+      <arglist>() noexcept -&gt; ScratchImage &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get</name>
+      <anchorfile>classbtu_1_1tex_1_1_texture.html</anchorfile>
+      <anchor>aca34726be2cda1a49cb6b4520cd755a1</anchor>
+      <arglist>() const noexcept -&gt; const ScratchImage &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_images</name>
+      <anchorfile>classbtu_1_1tex_1_1_texture.html</anchorfile>
+      <anchor>a6122fbad4b5477ffe2a2ea1ae6293cc2</anchor>
+      <arglist>() const noexcept -&gt; std::span&lt; const Image &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_dimension</name>
+      <anchorfile>classbtu_1_1tex_1_1_texture.html</anchorfile>
+      <anchor>aa20aee5ae3aa3547298aaa2a7d8ac24c</anchor>
+      <arglist>() const noexcept -&gt; Dimension</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_load_path</name>
+      <anchorfile>classbtu_1_1tex_1_1_texture.html</anchorfile>
+      <anchor>a66a8f0db63c054675c80f1bfac09e575</anchor>
+      <arglist>() const noexcept -&gt; const Path &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_load_path</name>
+      <anchorfile>classbtu_1_1tex_1_1_texture.html</anchorfile>
+      <anchor>a2be4ba55e9f3a6181788b26174da6794</anchor>
+      <arglist>(Path path) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator==</name>
+      <anchorfile>classbtu_1_1tex_1_1_texture.html</anchorfile>
+      <anchor>a4acc806b55c283a208b936739662c705</anchor>
+      <arglist>(const Texture &amp;) const noexcept -&gt; bool=default</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::tex::TextureErrCategory</name>
+    <filename>structbtu_1_1tex_1_1_texture_err_category.html</filename>
+    <base>std::error_category</base>
+    <member kind="function">
+      <type>auto</type>
+      <name>name</name>
+      <anchorfile>structbtu_1_1tex_1_1_texture_err_category.html</anchorfile>
+      <anchor>a197c2127e90c6a59350bc83383b0fa60</anchor>
+      <arglist>() const noexcept -&gt; const char *override</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>message</name>
+      <anchorfile>structbtu_1_1tex_1_1_texture_err_category.html</anchorfile>
+      <anchor>ad8c6311e31d942e834c2b978725960df</anchor>
+      <arglist>(int ev) const -&gt; std::string override</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>btu::bsa::UnpackSettings</name>
+    <filename>structbtu_1_1bsa_1_1_unpack_settings.html</filename>
+    <member kind="variable">
+      <type>const Path &amp;</type>
+      <name>file_path</name>
+      <anchorfile>structbtu_1_1bsa_1_1_unpack_settings.html</anchorfile>
+      <anchor>a317e44812ff22d5fe57c6b4fe7dd0767</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>remove_arch</name>
+      <anchorfile>structbtu_1_1bsa_1_1_unpack_settings.html</anchorfile>
+      <anchor>ab0ab549dcf3b2ea37a5c9f017c1fb892</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>overwrite_existing_files</name>
+      <anchorfile>structbtu_1_1bsa_1_1_unpack_settings.html</anchorfile>
+      <anchor>a39d17e6b6c2f4dc6c1b705812cf4e1f5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const Path *</type>
+      <name>root_opt</name>
+      <anchorfile>structbtu_1_1bsa_1_1_unpack_settings.html</anchorfile>
+      <anchor>aafbd49d1d600fefd9ff72b8bf5a0e72d</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>btu::common::UTF8Iterator</name>
+    <filename>classbtu_1_1common_1_1_u_t_f8_iterator.html</filename>
+    <member kind="typedef">
+      <type>std::input_iterator_tag</type>
+      <name>iterator_category</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>af39107fd7c7e102c9b345d591220c8e1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::ptrdiff_t</type>
+      <name>difference_type</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>a649272ffeecbcdd02e3a435e471b36c7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>U8Unit</type>
+      <name>value_type</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>a1cb6af99f1534c57860816482a8d018f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>U8Unit</type>
+      <name>pointer</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>a6d29a6511a9325c3d0353babb4bb0170</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>U8Unit</type>
+      <name>reference</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>adc9d6d3b56518a084d64ba0e20721aa1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr</type>
+      <name>UTF8Iterator</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>a16c1a8b2c7679f4448058981f5024d01</anchor>
+      <arglist>(std::u8string_view string)</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>operator*</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>a4d491483f78ba947acd46678190c7340</anchor>
+      <arglist>() const -&gt; reference</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>operator-&gt;</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>ae8447c678f55ce8be09d151eb7f0c103</anchor>
+      <arglist>() const -&gt; pointer</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>operator++</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>a204f4de6971aad1fe28586ee8146b249</anchor>
+      <arglist>() -&gt; UTF8Iterator &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>operator++</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>a09365b20e871dd11586b6c563f703ac1</anchor>
+      <arglist>(int) -&gt; UTF8Iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>operator</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>aa503ed687531faf5d466eaf4e68a0124</anchor>
+      <arglist>(const UTF8Iterator &amp;other) const -&gt; std::strong_ordering</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>operator==</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>a2740f217d8702b98e169fdc7e9da5f83</anchor>
+      <arglist>(const UTF8Iterator &amp;other) const -&gt; bool</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>constexpr static auto</type>
+      <name>end</name>
+      <anchorfile>classbtu_1_1common_1_1_u_t_f8_iterator.html</anchorfile>
+      <anchor>ad3e80e6175c5dbe8e2fb35020a498d41</anchor>
+      <arglist>(std::u8string_view string) -&gt; UTF8Iterator</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu</name>
+    <filename>namespacebtu.html</filename>
+    <namespace>btu::bsa</namespace>
+    <namespace>btu::common</namespace>
+    <namespace>btu::hkx</namespace>
+    <namespace>btu::modmanager</namespace>
+    <namespace>btu::nif</namespace>
+    <namespace>btu::tex</namespace>
+    <member kind="typedef">
+      <type>fs::path</type>
+      <name>Path</name>
+      <anchorfile>namespacebtu.html</anchorfile>
+      <anchor>af170447afcc77653a28828466b6623bd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>Path::string_type</type>
+      <name>OsString</name>
+      <anchorfile>namespacebtu.html</anchorfile>
+      <anchor>a0b7a602dc238b86998791903cf4b194e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>OsString::value_type</type>
+      <name>OsChar</name>
+      <anchorfile>namespacebtu.html</anchorfile>
+      <anchor>a223e783d465edaa59d3453545806d63e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>Game</name>
+      <anchorfile>namespacebtu.html</anchorfile>
+      <anchor>ab8b032e2cc5845ee70a3d3212f897510</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a0b60c0585ee39f3be3182a626590973f">TES3</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a1ae95fa14d6ffe3f7190f2b38c061da3">TES4</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510ada43e31b688f49ee12211d560969c091">FNV</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a0a1d07df9a43688c7128eefbe3d41b08">SLE</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a5fc53fc8197865c63285f74b1e147013">SSE</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a18d09913c8c422e9997a3170d0f00fe6">FO4</enumvalue>
+      <enumvalue file="namespacebtu.html" anchor="ab8b032e2cc5845ee70a3d3212f897510a90589c47f06eb971d548591f23c285af">Custom</enumvalue>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::bsa</name>
+    <filename>namespacebtu_1_1bsa.html</filename>
+    <namespace>btu::bsa::detail</namespace>
+    <namespace>btu::bsa::dummy</namespace>
+    <class kind="struct">btu::bsa::AllowedPath</class>
+    <class kind="class">btu::bsa::ArchiveData</class>
+    <class kind="class">btu::bsa::File</class>
+    <class kind="class">btu::bsa::FilePath</class>
+    <class kind="struct">btu::bsa::Settings</class>
+    <class kind="struct">btu::bsa::UnpackSettings</class>
+    <member kind="typedef">
+      <type>std::variant&lt; libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file &gt;</type>
+      <name>UnderlyingFile</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a7325b07231c3e3ac8efac98c75ff8d11</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::map&lt; std::string, File, std::less&lt;&gt; &gt;</type>
+      <name>Archive</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a0821dab5e3fa092faefc1622728d5153</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::function&lt; bool(const Path &amp;dir, fs::directory_entry const &amp;fileinfo)&gt;</type>
+      <name>AllowFilePred</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>aac3db12e795460c421116f8f483bfda5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>MergeSettings</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>affbcf0f8dc54c016def93a88289ff1dc</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="affbcf0f8dc54c016def93a88289ff1dcabf7b5fe749a502059d432ccaf7cb62ea">MergeTextures</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="affbcf0f8dc54c016def93a88289ff1dca1be79ca25d84563d4c6355e2bbc1f74e">MergeIncompressible</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>FileTypes</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a8d402424047b46ac4d1a3ef0ca75f09a</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aaeb6d8ae6f20283755b339c0dc273988b">Standard</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aaa3e8ae43188ae76d38f414b2bdb0077b">Texture</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aa7d3fd181ccf56faf9e7d0ff8a217688e">Incompressible</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aa85fffe8f5074d606fa202fa5ae90d8bb">Blacklist</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aa409c1892b68cb394799262ac57f6d4f1">Plugin</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a8d402424047b46ac4d1a3ef0ca75f09aa3c4107dba05635d12c5b7c340017b138">BSA</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>ArchiveType</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>aa9170613a5c5e212bfcc265682104d05</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="aa9170613a5c5e212bfcc265682104d05a536300d63028e7f16ba150566ecd3a5f">Textures</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="aa9170613a5c5e212bfcc265682104d05aeb6d8ae6f20283755b339c0dc273988b">Standard</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="aa9170613a5c5e212bfcc265682104d05a7d3fd181ccf56faf9e7d0ff8a217688e">Incompressible</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>ArchiveVersion</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a912a6da4521bfdd9233fd4c14a820922</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a37a98352f0e0d2f4d64e96fe334871ed">tes3</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a27069e6baf4eba0ad33686287d582c97">tes4</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a9251dddd50ef30adce51ad629526d447">fo3</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a305506069f2dda79d68e638186b83a5e">tes5</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a64192ca465194480a4621d6905dac5b7">sse</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a87caba376d6bd426a47d310a1f0926bd">fo4</enumvalue>
+      <enumvalue file="namespacebtu_1_1bsa.html" anchor="a912a6da4521bfdd9233fd4c14a820922a1b196d66df9a6955dcd114291a3e4ec7">fo4dx</enumvalue>
+    </member>
+    <member kind="function">
+      <type>requires</type>
+      <name>requires</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a9fd8415fd13fdeba58700e99853d4925</anchor>
+      <arglist>(Keys... keys)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>virtual_to_local_path</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>ae4192cf8b95a811a097ed692a6d30e37</anchor>
+      <arglist>(Keys &amp;&amp;...a_keys) -&gt; std::u8string</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>read_archive</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a366248e0330a6263a5348729ab55784a</anchor>
+      <arglist>(Path path) -&gt; std::optional&lt; Archive &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write_archive</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>ad2bddb5bd7ef1d5d10fa3db48e1ddcb8</anchor>
+      <arglist>(Archive arch, Path path)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>default_is_allowed_path</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a9d886065797fdeafdb8fa76c2efa46fb</anchor>
+      <arglist>(const Path &amp;dir, fs::directory_entry const &amp;fileinfo) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>BETHUTIL_MAKE_ALL_ENUM_OPERATORS</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a7b2a53d8207bacee96dd6fe0cbfdf65f</anchor>
+      <arglist>(MergeSettings)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>split</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a11fd67075d7ebb55797e2200b8cea6c6</anchor>
+      <arglist>(const Path &amp;dir, const Settings &amp;sets, const AllowFilePred &amp;allow_path_pred=default_is_allowed_path) -&gt; std::vector&lt; ArchiveData &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>merge</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a67da52892578fa72ee6e9f018438bd84</anchor>
+      <arglist>(std::vector&lt; ArchiveData &gt; &amp;archives, MergeSettings sets=MergeSettings::MergeIncompressible)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>write</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>ad93d7dae666fa4652a7d6459e272cc03</anchor>
+      <arglist>(bool compressed, ArchiveData &amp;&amp;data, const Path &amp;root) -&gt; std::vector&lt; std::pair&lt; Path, std::string &gt;&gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find_archive_name</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a30ad87b4fda08aff127bcdc17e02107b</anchor>
+      <arglist>(std::span&lt; const FilePath &gt; plugins, const Settings &amp;sets, ArchiveType type) -&gt; FilePath</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>list_plugins</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>ab7777bede7d677ab881f354ad19f9ac1</anchor>
+      <arglist>(It begin, It end, const Settings &amp;sets) -&gt; std::vector&lt; FilePath &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>list_archive</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a7403fd3082eb7ffe2488f73b66b85661</anchor>
+      <arglist>(It begin, It end, const Settings &amp;sets) -&gt; std::vector&lt; FilePath &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>clean_dummy_plugins</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>abba4176045df2494c3e7d9c587f9c88a</anchor>
+      <arglist>(std::vector&lt; FilePath &gt; &amp;plugins, const Settings &amp;sets)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>make_dummy_plugins</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a644275836e669bc9241e52ce17d0074a</anchor>
+      <arglist>(std::span&lt; const FilePath &gt; archives, const Settings &amp;sets)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>get_filetype</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>a83ca3cb323d37d4bafa20c9221b2c9a7</anchor>
+      <arglist>(const Path &amp;filepath, const Path &amp;root, const Settings &amp;sets) -&gt; FileTypes</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>open_virtual_path</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>acd0a7028e9324fda418f57fafa00d3f6</anchor>
+      <arglist>(const Path &amp;path) -&gt; std::ofstream</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>unpack</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>ad4b64e86fdf57025cd1f2abe428b2e4c</anchor>
+      <arglist>(UnpackSettings sets)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>unpack_all</name>
+      <anchorfile>namespacebtu_1_1bsa.html</anchorfile>
+      <anchor>abdf85730b1b71f379750a267a7e90d75</anchor>
+      <arglist>(const Path &amp;dir, const Path &amp;out, const Settings &amp;sets)</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::bsa::detail</name>
+    <filename>namespacebtu_1_1bsa_1_1detail.html</filename>
+    <member kind="function">
+      <type>requires</type>
+      <name>requires</name>
+      <anchorfile>namespacebtu_1_1bsa_1_1detail.html</anchorfile>
+      <anchor>aaff71e348748f2ee5caf5bd28d51cd3a</anchor>
+      <arglist>(It it)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>list_helper</name>
+      <anchorfile>namespacebtu_1_1bsa_1_1detail.html</anchorfile>
+      <anchor>a55ba672450d4e3389f530ced8d435667</anchor>
+      <arglist>(It begin, It end, const Settings &amp;sets, FileTypes type) -&gt; std::vector&lt; FilePath &gt;</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::bsa::dummy</name>
+    <filename>namespacebtu_1_1bsa_1_1dummy.html</filename>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::common</name>
+    <filename>namespacebtu_1_1common.html</filename>
+    <namespace>btu::common::detail</namespace>
+    <class kind="struct">btu::common::Cards</class>
+    <class kind="struct">btu::common::Error</class>
+    <class kind="class">btu::common::Exception</class>
+    <class kind="class">btu::common::InvalidUTF8</class>
+    <class kind="struct">btu::common::is_variant_member</class>
+    <class kind="struct">btu::common::is_variant_member&lt; T, std::variant&lt; Ts... &gt; &gt;</class>
+    <class kind="struct">btu::common::overload</class>
+    <class kind="struct">btu::common::SourceLocation</class>
+    <class kind="class">btu::common::UTF8Iterator</class>
+    <member kind="typedef">
+      <type>std::is_same&lt; std::remove_cvref_t&lt; T &gt;, std::remove_cvref_t&lt; U &gt; &gt;</type>
+      <name>is_equiv</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>aa1110c80d1eafd273f80a9559129e13b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>int32_t</type>
+      <name>U8Unit</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>af63c2899ca1e15f6aa94b98c7558f257</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>requires std::bidirectional_iterator&lt; It &gt; &amp;&amp;std::invocable&lt; Predicate, ValueType &gt; &amp;&amp;std::invocable&lt; Sum, ValueType, ValueType &gt; auto</type>
+      <name>merge_if</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>ae7faeb418963351addc0fcd09c41f392</anchor>
+      <arglist>(It first, It last, const Predicate &amp;predicate, const Sum &amp;sum) -&gt; It</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>merge_if</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>ab77d02c9dcb2932211b897e2e854ac91</anchor>
+      <arglist>(It first, It last, Predicate &amp;&amp;predicate) -&gt; It</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>merge_if</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>afbb64e534f6ea346b560b0fed2c588a9</anchor>
+      <arglist>(Container &amp;cont, Predicate &amp;&amp;predicate)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>merge_if</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a57fff2dda5d605dccb67767073009007</anchor>
+      <arglist>(Container &amp;cont, Predicate &amp;&amp;pred, Sum &amp;&amp;sum)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>contains</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a10495be73ddfc5f9e291114a04be0d2f</anchor>
+      <arglist>(const Container &amp;cont, const ValueType &amp;val)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator&lt;&lt;</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a320846c9c601e0ff654ec0db82416ce1</anchor>
+      <arglist>(std::ostream &amp;os, [[maybe_unused]] SourceLocation loc) -&gt; std::ostream &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator&lt;&lt;</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a37cea9c0e839bf9b7a9b55298944a68a</anchor>
+      <arglist>(std::ostream &amp;os, const Error &amp;err) -&gt; std::ostream &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>read_file</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a61e412427f59ec5d68479bab498aa197</anchor>
+      <arglist>(const Path &amp;a_path) -&gt; std::vector&lt; std::byte &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write_file</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>ac1d1e4bd779d0b412baed8226542b738</anchor>
+      <arglist>(const Path &amp;a_path, std::span&lt; const std::byte &gt; data)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compare_files</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a2f1c957cd614e0be458287cb64814ea4</anchor>
+      <arglist>(const Path &amp;filename1, const Path &amp;filename2) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compare_directories</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>af9c21a9e691b31ebb46e855388325667</anchor>
+      <arglist>(const Path &amp;dir1, const Path &amp;dir2) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>requires std::ranges::input_range&lt; Range &gt; &amp;&amp;invocable_l_or_r&lt; Func, std::ranges::range_value_t&lt; Range &gt; &gt; auto</type>
+      <name>for_each_mt</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a79fce203c4b7d6e836a16f5229a47e6d</anchor>
+      <arglist>(Range &amp;&amp;rng, Func &amp;&amp;func)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>overload</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a9ec2c5386e0c4c53cd9925d126d77712</anchor>
+      <arglist>(Ts...) -&gt; overload&lt; Ts... &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>requires constexpr std::is_enum_v&lt; E &gt; auto</type>
+      <name>to_underlying</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a96e55b03984782d07c6a0b2b9978ceb7</anchor>
+      <arglist>(E e) -&gt; std::underlying_type_t&lt; E &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>make_path_canonizer</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>aad713cd4c12da91c4622c6d4f66a3f6e</anchor>
+      <arglist>(std::u8string_view start)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_utf8</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a0bba54f0203d560751af304fdd31f6f4</anchor>
+      <arglist>(std::string_view str) -&gt; std::u8string_view</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_ascii</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a9e13d7d4ca5e9afedd1d669841acb45a</anchor>
+      <arglist>(std::u8string_view str) -&gt; std::string_view</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_utf8_string</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>aa9c16eb104df902439a9ebe1d6f662c4</anchor>
+      <arglist>(std::string str) -&gt; std::u8string</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_ascii_string</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a23618a0642c2a3ce0a502bf250be86f3</anchor>
+      <arglist>(std::u8string str) -&gt; std::string</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_utf8</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a4c35904a87c5e732d21aed632ff337bd</anchor>
+      <arglist>(const std::wstring &amp;str) -&gt; std::u8string</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_utf16</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a918bb9ded2898b1e3b4ccfe70ede3830</anchor>
+      <arglist>(const std::u8string &amp;str) -&gt; std::wstring</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>str_compare</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a8017b7291a77e44969f00fd37358fdd0</anchor>
+      <arglist>(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive=true) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>str_find</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a974e1cc63c86993685aa0b5ec5614901</anchor>
+      <arglist>(std::u8string_view string, std::u8string_view snippet, bool case_sensitive=true) -&gt; size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>str_contain</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>ad23bd112d871299d9ffbedc7c02197a5</anchor>
+      <arglist>(std::u8string_view string, std::u8string_view snippet, bool case_sensitive=true) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>str_match</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>af4a0d5e4ab0cb0b1e3c4275cd6a61f83</anchor>
+      <arglist>(std::u8string_view string, std::u8string_view pattern, bool case_sensitive=true, Cards cards=default_cards) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_lower</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a826b7aad4faf85b999346ff8d19cd3fe</anchor>
+      <arglist>(std::u8string_view string) -&gt; std::u8string</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>is_lower</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>aa4b64cfc59995c3419300e54d91c9532</anchor>
+      <arglist>(std::u8string_view string) -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>first_codepoint</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a80c8eeac75c9aca858329e787a79866b</anchor>
+      <arglist>(std::u8string_view string) -&gt; U8Unit</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>concat_codepoint</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a579cef42371f299a202de48a39b7b304</anchor>
+      <arglist>(std::u8string &amp;string, U8Unit cp)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>make_valid</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a00f5099c820274df2dded37fc07c9bfc</anchor>
+      <arglist>(std::u8string &amp;string, char8_t replacement) noexcept -&gt; std::u8string &amp;</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr detail::bind_back_fn</type>
+      <name>bind_back</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a4cd0799cfb94e2b507438e766a4d01d3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>concept</type>
+      <name>invocable_l_or_r</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a287e8accd4b893438bce02a8cfd91153</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr bool</type>
+      <name>is_equiv_v</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>af7f7c7d55e6100daba4cae2aa7042157</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr bool</type>
+      <name>is_variant_member_v</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a8d31016cf18c062508a3aa8e9bbabdb5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr Cards</type>
+      <name>default_cards</name>
+      <anchorfile>namespacebtu_1_1common.html</anchorfile>
+      <anchor>a3bbc4219bf316197c6f1aae17cf7ca75</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::common::detail</name>
+    <filename>namespacebtu_1_1common_1_1detail.html</filename>
+    <class kind="struct">btu::common::detail::bind_back_fn</class>
+    <class kind="struct">btu::common::detail::bind_back_fn_</class>
+    <member kind="typedef">
+      <type>bind_back_fn_&lt; std::decay_t&lt; Fn &gt;, std::decay_t&lt; Args &gt;... &gt;</type>
+      <name>bind_back_fn2</name>
+      <anchorfile>namespacebtu_1_1common_1_1detail.html</anchorfile>
+      <anchor>a9b951f82f196469678ea251b458d2404</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr void</type>
+      <name>assert_valid_utf8</name>
+      <anchorfile>namespacebtu_1_1common_1_1detail.html</anchorfile>
+      <anchor>a9f909215171c77f399418d033f0e2d27</anchor>
+      <arglist>([[maybe_unused]] std::u8string_view str)</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::hkx</name>
+    <filename>namespacebtu_1_1hkx.html</filename>
+    <class kind="class">btu::hkx::Anim</class>
+    <class kind="class">btu::hkx::AnimExe</class>
+    <member kind="typedef">
+      <type>tl::expected&lt; void, Error &gt;</type>
+      <name>ResultError</name>
+      <anchorfile>namespacebtu_1_1hkx.html</anchorfile>
+      <anchor>abc7c985d620e604918ab6ed42300593d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>load</name>
+      <anchorfile>namespacebtu_1_1hkx.html</anchorfile>
+      <anchor>a7c3349b3c0f25aeab978915f84ba2b24</anchor>
+      <arglist>(Path path, AnimExe exe) noexcept -&gt; tl::expected&lt; Anim, Error &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>save</name>
+      <anchorfile>namespacebtu_1_1hkx.html</anchorfile>
+      <anchor>a9e5843e0d1774efbf853221e3cea574f</anchor>
+      <arglist>(const Anim &amp;anim, const Path &amp;path) noexcept -&gt; ResultError</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>convert</name>
+      <anchorfile>namespacebtu_1_1hkx.html</anchorfile>
+      <anchor>ad99c78e3157c0eb73b85e07e01543025</anchor>
+      <arglist>(Anim &amp;anim, const AnimExe &amp;exe, btu::Game target_game) -&gt; ResultError</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::modmanager</name>
+    <filename>namespacebtu_1_1modmanager.html</filename>
+    <namespace>btu::modmanager::detail</namespace>
+    <class kind="class">btu::modmanager::ModFile</class>
+    <class kind="class">btu::modmanager::ModFolder</class>
+    <class kind="class">btu::modmanager::ModsFolder</class>
+    <member kind="enumeration">
+      <type></type>
+      <name>ModManager</name>
+      <anchorfile>namespacebtu_1_1modmanager.html</anchorfile>
+      <anchor>a431b02339f83ef872649193e483ad7c2</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1modmanager.html" anchor="a431b02339f83ef872649193e483ad7c2a8e11b2f987a99ed900a44aa1aa8bd3d0">Vortex</enumvalue>
+      <enumvalue file="namespacebtu_1_1modmanager.html" anchor="a431b02339f83ef872649193e483ad7c2a9d45ded384011b8e9bcd836259143741">MO2</enumvalue>
+      <enumvalue file="namespacebtu_1_1modmanager.html" anchor="a431b02339f83ef872649193e483ad7c2a7d80bb7df17a048f7c47fde135cd8092">Kortex</enumvalue>
+      <enumvalue file="namespacebtu_1_1modmanager.html" anchor="a431b02339f83ef872649193e483ad7c2a62bb7e71879e6671209a5235f551c4e5">ManualForced</enumvalue>
+      <enumvalue file="namespacebtu_1_1modmanager.html" anchor="a431b02339f83ef872649193e483ad7c2a6adf97f83acf6453d4a6a4b1070f3754">None</enumvalue>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find_manager</name>
+      <anchorfile>namespacebtu_1_1modmanager.html</anchorfile>
+      <anchor>abe686c1e196037a674997bde528e5ae7</anchor>
+      <arglist>(const Path &amp;dir) -&gt; ModManager</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr auto</type>
+      <name>k_force_process_folder</name>
+      <anchorfile>namespacebtu_1_1modmanager.html</anchorfile>
+      <anchor>a13c823db6014a0b758d1b5c33495fb81</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::modmanager::detail</name>
+    <filename>namespacebtu_1_1modmanager_1_1detail.html</filename>
+    <class kind="struct">btu::modmanager::detail::ModFileArchive</class>
+    <class kind="class">btu::modmanager::detail::ModFileDisk</class>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::nif</name>
+    <filename>namespacebtu_1_1nif.html</filename>
+    <class kind="class">btu::nif::Mesh</class>
+    <class kind="struct">btu::nif::OptimizationSteps</class>
+    <class kind="struct">btu::nif::Settings</class>
+    <member kind="typedef">
+      <type>btu::common::Error</type>
+      <name>Error</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a3f855738d59e26536036bc8d0d4876de</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>tl::expected&lt; void, Error &gt;</type>
+      <name>ResultError</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>ad285a4f9385e50fa14ab7d953c91e903</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>convert</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a5c851f2d210e7414d14b010add2a1d91</anchor>
+      <arglist>(Mesh file, bool headpart, btu::Game game) -&gt; tl::expected&lt; Mesh, Error &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>rename_referenced_textures</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a7af52e712f09e2a4078abe1dedfec390</anchor>
+      <arglist>(Mesh &amp;file)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>load</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a45f3c2dcd02f6236fb33d65b30bf9179</anchor>
+      <arglist>(Path path) noexcept -&gt; tl::expected&lt; Mesh, Error &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>save</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a55230cc968c4cc039141f0b698fe103c</anchor>
+      <arglist>(Mesh mesh, const Path &amp;path) noexcept -&gt; ResultError</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>optimize</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a978b6e36240efc842f2d818ec3799acb</anchor>
+      <arglist>(Mesh file, const OptimizationSteps &amp;steps) -&gt; tl::expected&lt; Mesh, Error &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compute_optimization_steps</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>af99b4543d21eab52dc8fe299dabe6410</anchor>
+      <arglist>(const Mesh &amp;file, const Settings &amp;sets) -&gt; OptimizationSteps</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr auto</type>
+      <name>canonize_path</name>
+      <anchorfile>namespacebtu_1_1nif.html</anchorfile>
+      <anchor>a3512d8f8fe6350395d7ceab6507ffdc7</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::tex</name>
+    <filename>namespacebtu_1_1tex.html</filename>
+    <namespace>btu::tex::detail</namespace>
+    <namespace>btu::tex::util</namespace>
+    <class kind="struct">btu::tex::BestFormatFor</class>
+    <class kind="class">btu::tex::CompressionDevice</class>
+    <class kind="struct">btu::tex::Dimension</class>
+    <class kind="class">btu::tex::FailureSourceCategory</class>
+    <class kind="struct">btu::tex::OptimizationSteps</class>
+    <class kind="struct">btu::tex::Settings</class>
+    <class kind="class">btu::tex::Texture</class>
+    <class kind="struct">btu::tex::TextureErrCategory</class>
+    <member kind="typedef">
+      <type>tl::expected&lt; Texture, Error &gt;</type>
+      <name>Result</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>af028c1ddd554ace9fcf85c743a50ae32</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>tl::expected&lt; void, Error &gt;</type>
+      <name>ResultError</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a7eaa0fa53455df06ba6ae23adf21e7cb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>TextureResizingMode</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a7c18132d97963ac2031d900df9734a3b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>None</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a7c18132d97963ac2031d900df9734a3babac62bac14e95b8eca319bbc1e8dad15</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ByRatio</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a7c18132d97963ac2031d900df9734a3baa1c4d2794603e525488f73cdbd156b63</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>BySize</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a7c18132d97963ac2031d900df9734a3ba56e1ea54f761805375acdfe354db9e21</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>TextureErr</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a60e8bb1c36c568e6b5a47818c259f4b0</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a60e8bb1c36c568e6b5a47818c259f4b0a505a83f220c02df2f85c3810cd9ceb38">Success</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a60e8bb1c36c568e6b5a47818c259f4b0a88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a60e8bb1c36c568e6b5a47818c259f4b0a8b7d8393ddfcc4835eebb36815f49c00">BadInput</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a60e8bb1c36c568e6b5a47818c259f4b0a6a10b4834f9cabcc57ddbf0ee05eeb47">MemoryAllocation</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>FailureSource</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>aed398f7aafdc72c4669afd497e68ee60</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="aed398f7aafdc72c4669afd497e68ee60a9d1a862ef0d00477f2bed3a77c94a983">BadUserInput</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="aed398f7aafdc72c4669afd497e68ee60ab932b91f686c2aa588adfd9a407155ca">SystemError</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>TextureType</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a24dfd250b226b12d3aaa20a5caeada8f</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa41178642cae095a6bdb909119b4d16e8">Diffuse</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa960b44c579bc2f6818d2daaf9e4c16f0">Normal</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8faa296104f0c61a9cf39f4824d05315e12">Cube</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fac44447baeeae4f8eaa468d6abdacd98f">Bump</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa39b0044dd8789d333e7794f359406740">Specular</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fab20024ea3ba53768598d242981872153">Glow</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fac626285221f3850191ea3ce4b917779c">Parallax</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa0423447d761b57c8b427cbf52ed97cff">ModelSpaceNormal</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa18a864ad6df2d8ea8c8943c5c0e8dc47">Backlight</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa9313566fe19aca293daefe4ce37942bf">Skin</enumvalue>
+      <enumvalue file="namespacebtu_1_1tex.html" anchor="a24dfd250b226b12d3aaa20a5caeada8fa70478db3f0a15e1925ef0712136fe092">EnvironmentMask</enumvalue>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>make_error_code</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a414e4f1b5ee867c7ab8953454e63588d</anchor>
+      <arglist>(TextureErr e) -&gt; std::error_code</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>make_error_condition</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ac8fff66d71570c4b7e2cc05e28573a77</anchor>
+      <arglist>(FailureSource e) -&gt; std::error_condition</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>error_from_hresult</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a37ec2a4c64c9087b77289ac0c5fae3d4</anchor>
+      <arglist>(int64_t hr, std::error_code default_err=TextureErr::Unknown, SourceLocation loc=BETHUTIL_CURRENT_SOURCE_LOC) -&gt; Error</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>guess_texture_type</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a997827cd10143f950ff10e11bd61c27f</anchor>
+      <arglist>(std::u8string_view path) noexcept -&gt; std::optional&lt; TextureType &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>guess_best_format</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a929511e614bb871fd8f8e155b14665e9</anchor>
+      <arglist>(const Texture &amp;tex, BestFormatFor formats, bool force_uncompressed=false) noexcept -&gt; DXGI_FORMAT</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>decompress</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a596c07ddbaf7f756699b2d5644698412</anchor>
+      <arglist>(Texture &amp;&amp;file) -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>make_transparent_alpha</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a42a7ea80fe5cf427cf7c8a6f67a26900</anchor>
+      <arglist>(Texture &amp;&amp;file) -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>convert</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a1d67b827c6dd2b43b2847dde0a5b8243</anchor>
+      <arglist>(Texture &amp;&amp;file, DXGI_FORMAT format, ID3D11Device *dev) -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>optimal_mip_count</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a88583309caffff946dea632ffa126181</anchor>
+      <arglist>(Dimension dim) noexcept -&gt; size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>generate_mipmaps</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ae2bc7bbc61efcd88c08a269d80d45f2f</anchor>
+      <arglist>(Texture &amp;&amp;file) -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>resize</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ae4f8c8542060c06233ee6b8d31251029</anchor>
+      <arglist>(Texture &amp;&amp;file, Dimension dim) -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>optimize</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ae6480d96ccc2b3221b4c856b05836e49</anchor>
+      <arglist>(Texture &amp;&amp;file, OptimizationSteps sets, ID3D11Device *dev) noexcept -&gt; Result</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compute_optimization_steps</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ae181f96a4805e40fb4dc9ff226486b52</anchor>
+      <arglist>(const Texture &amp;file, const Settings &amp;sets) noexcept -&gt; OptimizationSteps</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>load</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ac82ab61898eaf157bc2d88808b933692</anchor>
+      <arglist>(Path path) noexcept -&gt; tl::expected&lt; Texture, Error &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>save</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>ad808cc7bdd563eb727e030b00bf3713e</anchor>
+      <arglist>(const Texture &amp;tex, Path path) noexcept -&gt; ResultError</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_dxgi_format</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a82fee1dca565f30eb74324f84b3dccd5</anchor>
+      <arglist>(std::u8string_view string) -&gt; DXGI_FORMAT</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>to_string</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a452e3440fda008bd2cb019ae4b105827</anchor>
+      <arglist>(DXGI_FORMAT format) -&gt; std::u8string_view</arglist>
+    </member>
+    <member kind="variable">
+      <type>const TextureErrCategory</type>
+      <name>k_texture_err_category</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a53fa4654edb32d86b890279a1a2051b5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const FailureSourceCategory</type>
+      <name>k_failure_source_category</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a58f3a9df9f2f20747ba57724ec9df388</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr auto</type>
+      <name>canonize_path</name>
+      <anchorfile>namespacebtu_1_1tex.html</anchorfile>
+      <anchor>a3783c7c2c4c09dc40adef5bd6165d81a</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::tex::detail</name>
+    <filename>namespacebtu_1_1tex_1_1detail.html</filename>
+    <class kind="class">btu::tex::detail::ScratchImagePimpl</class>
+    <class kind="struct">btu::tex::detail::StringFormat</class>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator==</name>
+      <anchorfile>namespacebtu_1_1tex_1_1detail.html</anchorfile>
+      <anchor>a2a605c57cbc1fab9c1d23261434fb9e5</anchor>
+      <arglist>(const ScratchImagePimpl &amp;lhs, const ScratchImagePimpl &amp;rhs) noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr size_t</type>
+      <name>k_sizeof_scratchimage</name>
+      <anchorfile>namespacebtu_1_1tex_1_1detail.html</anchorfile>
+      <anchor>aeb34d7c94a1986c73601808f52c9a03c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr size_t</type>
+      <name>k_alignof_scratchimage</name>
+      <anchorfile>namespacebtu_1_1tex_1_1detail.html</anchorfile>
+      <anchor>ab9465e26c2f0e9d12e1260a2f6a864e4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr std::array</type>
+      <name>k_dxgi_formats</name>
+      <anchorfile>namespacebtu_1_1tex_1_1detail.html</anchorfile>
+      <anchor>aee18729f171f776dd8325382cb20d94d</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>btu::tex::util</name>
+    <filename>namespacebtu_1_1tex_1_1util.html</filename>
+    <class kind="struct">btu::tex::util::ResizeRatio</class>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>is_pow2</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a5291d2313db8378a4fb3996efa32e9df</anchor>
+      <arglist>(size_t num) noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>upper_pow2</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a5e3d3d290c34522a5175e8a900852204</anchor>
+      <arglist>(size_t num) noexcept -&gt; size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>nearest_pow2</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a08eb8b0b1b74394b3bfa53dc2308cb74</anchor>
+      <arglist>(size_t num) noexcept -&gt; size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>sanitize_dimensions</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a02bf8bd08e15f9bba7652639b99bdaee</anchor>
+      <arglist>(Dimension dim, uint8_t ratio_threshold=3, uint8_t pow2_threshold=3) noexcept -&gt; Dimension</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr void</type>
+      <name>scale_fit</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a55c87a0233952293327f9a2806d28a98</anchor>
+      <arglist>(size_t &amp;number, size_t target, size_t &amp;number2)</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>compute_resize_dimension</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>afd1075a61f47c2ef14917504d93ba34b</anchor>
+      <arglist>(Dimension dim, Dimension target) noexcept -&gt; Dimension</arglist>
+    </member>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>compute_resize_dimension</name>
+      <anchorfile>namespacebtu_1_1tex_1_1util.html</anchorfile>
+      <anchor>a3f4ec0028cb673df8b7951a9092667d7</anchor>
+      <arglist>(Dimension dim, ResizeRatio args) noexcept -&gt; Dimension</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>DirectX</name>
+    <filename>namespace_direct_x.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator==</name>
+      <anchorfile>namespace_direct_x.html</anchorfile>
+      <anchor>a5b83ecfaaf1a2f949f27f1185b590478</anchor>
+      <arglist>(const ScratchImage &amp;lhs, const ScratchImage &amp;rhs) noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator==</name>
+      <anchorfile>namespace_direct_x.html</anchorfile>
+      <anchor>a4235554aa3874370ad325e5685039b34</anchor>
+      <arglist>(const TexMetadata &amp;lhs, const TexMetadata &amp;rhs) noexcept -&gt; bool</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>Microsoft</name>
+    <filename>namespace_microsoft.html</filename>
+    <namespace>Microsoft::WRL</namespace>
+  </compound>
+  <compound kind="namespace">
+    <name>Microsoft::WRL</name>
+    <filename>namespace_microsoft_1_1_w_r_l.html</filename>
+    <class kind="class">Microsoft::WRL::ComPtr</class>
+  </compound>
+  <compound kind="namespace">
+    <name>std</name>
+    <filename>namespacestd.html</filename>
+    <class kind="struct">std::is_error_code_enum&lt; btu::tex::TextureErr &gt;</class>
+    <class kind="struct">std::is_error_condition_enum&lt; btu::tex::FailureSource &gt;</class>
+  </compound>
+  <compound kind="page">
+    <name>index</name>
+    <title>bethutil</title>
+    <filename>index</filename>
+  </compound>
+</tagfile>
