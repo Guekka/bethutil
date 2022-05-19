@@ -98,7 +98,7 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            vcpkgCommitId: '436d98da7f6f06c8dc6bfce2801c543d7cd47ee1'
+            vcpkgCommitId: 'd72783cb3aeddfd667861caef1060e54ca6fa7a9'
 
     steps:
       - uses: actions/checkout@v2
@@ -114,15 +114,20 @@ jobs:
       - uses: lukka/get-cmake@latest
       
       - name: Restore artifacts, or setup vcpkg
-        uses: lukka/run-vcpkg@v10.1
+        uses: lukka/run-vcpkg@v10
         id: runvcpkg
         with:
           # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
-          vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
+          vcpkgDirectory: '${{ runner.workspace }}/c/vcpkg'
           # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
           vcpkgGitCommitId: '${{ matrix.vcpkgCommitId}}'
           # The vcpkg.json file, which will be part of cache key computation.
           vcpkgJsonGlob: 'bethutil/vcpkg.json'
+          doNotCache: true
+
+      - name: vcpkg version
+        run: |
+          vcpkg --version          
 
       - name: Setup MSVC (x64)
         uses: egor-tensin/vs-shell@v2
