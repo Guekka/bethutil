@@ -1,7 +1,7 @@
 #include "btu/common/error.hpp"
 #include "btu/common/path.hpp"
 
-#include <catch2/catch.hpp>
+#include <catch.hpp>
 #include <tl/expected.hpp>
 
 #include <fstream>

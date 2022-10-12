@@ -6,7 +6,7 @@
 
 #include "../utils.hpp"
 #include "btu/bsa/archive_data.hpp"
-#include "catch2/catch.hpp"
+#include "catch.hpp"
 
 #include <sstream>
 

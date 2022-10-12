@@ -5,7 +5,7 @@
 
 #include "btu/common/filesystem.hpp"
 
-#include "catch2/catch.hpp"
+#include <catch.hpp>
 
 TEST_CASE("read_file", "[src]")
 {

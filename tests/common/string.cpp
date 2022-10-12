@@ -5,7 +5,7 @@
 
 #include "btu/common/string.hpp"
 
-#include <catch2/catch.hpp>
+#include <catch.hpp>
 
 #include <array>
 #include <iostream>
