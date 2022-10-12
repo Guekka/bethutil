@@ -5,7 +5,6 @@ set(HEADER_FILES "${INCLUDE_DIR}/bsa/utils.hpp")
 
 set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
-    "${SOURCE_DIR}/main.cpp"
     "${SOURCE_DIR}/utils.hpp"
     "${SOURCE_DIR}/common/filesystem.cpp"
     "${SOURCE_DIR}/common/functional.cpp"
@@ -50,7 +49,7 @@ target_compile_options(
 
 target_include_directories(tests PRIVATE "${INCLUDE_DIR}" "${SOURCE_DIR}")
 
-target_link_libraries(tests PRIVATE ${PROJECT_NAME} Catch2::Catch2)
+target_link_libraries(tests PRIVATE ${PROJECT_NAME} Catch2::Catch2WithMain)
 
 target_compile_options(tests
                        PUBLIC "$<$<CXX_COMPILER_ID:MSVC>:/Zc:__cplusplus>")

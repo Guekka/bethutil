@@ -5,7 +5,7 @@
 
 #include "btu/common/metaprogramming.hpp"
 
-#include <catch2/catch.hpp>
+#include <catch.hpp>
 
 TEST_CASE("is_equiv", "[src]")
 {

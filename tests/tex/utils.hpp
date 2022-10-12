@@ -10,7 +10,7 @@
 #include "btu/tex/texture.hpp"
 
 #include <btu/common/string.hpp>
-#include <catch2/catch.hpp>
+#include <catch.hpp>
 
 namespace Catch {
 template<>
