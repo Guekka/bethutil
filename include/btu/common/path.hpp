@@ -16,10 +16,21 @@ using OsString = Path::string_type;
 using OsChar   = OsString::value_type;
 
 namespace common {
+/// @brief Convert backslashes to slashes in path.
+/// @details std::fs do not consider '\' as a separator on Linux. In fact, it is a valid character in file names.
+/// But in our case, we want to treat it as a separator. Let's hope no one will use it in file names.
+template<typename CharT>
+void backslash_to_slash(std::basic_string<CharT> &path) noexcept
+{
+    std::replace(path.begin(), path.end(), CharT('\\'), CharT('/'));
+}
+
 constexpr auto make_path_canonizer(std::u8string_view start)
 {
     return [start = std::move(start)](const Path &path) noexcept -> std::u8string {
-        auto str        = btu::common::to_lower(path.generic_u8string());
+        auto str = btu::common::to_lower(path.generic_u8string());
+        backslash_to_slash(str);
+
         auto prefix_end = str.find(start);
         prefix_end      = prefix_end == std::string::npos ? 0 : prefix_end + start.size();
         return str.substr(prefix_end);
