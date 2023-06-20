@@ -1,17 +1,9 @@
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#define NODRAWTEXT
-#define NOMCX
-#define NOSERVICE
-#define NOHELP
 
-#include "btu/tex/functions.hpp"
-
-#include "btu/tex/compression_device.hpp"
-#include "btu/tex/error_code.hpp"
-
-#include <DirectXTex.h>
 #include <btu/common/metaprogramming.hpp>
+#include <btu/tex/compression_device.hpp>
+#include <btu/tex/dxtex.hpp>
+#include <btu/tex/error_code.hpp>
+#include <btu/tex/functions.hpp>
 
 #include <algorithm>
 #include <fstream>

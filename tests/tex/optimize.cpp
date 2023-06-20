@@ -9,7 +9,7 @@
 #include "btu/tex/compression_device.hpp"
 #include "btu/tex/texture.hpp"
 
-#include <DirectXTex.h>
+#include <btu/tex/dxtex.hpp>
 #include <btu/tex/optimize.hpp>
 
 #include <iostream>

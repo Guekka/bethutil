@@ -9,10 +9,10 @@
 #include "btu/tex/detail/functional.hpp"
 #include "btu/tex/functions.hpp"
 
-#include <DirectXTex.h>
 #include <btu/common/algorithms.hpp>
 #include <btu/common/functional.hpp>
 #include <btu/common/metaprogramming.hpp>
+#include <btu/tex/dxtex.hpp>
 
 namespace btu::tex {
 auto optimize(Texture &&file, OptimizationSteps sets, ID3D11Device *dev) noexcept -> Result

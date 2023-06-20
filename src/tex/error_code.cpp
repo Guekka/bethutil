@@ -1,10 +1,8 @@
 #include "btu/tex/error_code.hpp"
 
-#include <DirectXTex.h>
+#include <btu/tex/dxtex.hpp>
 
 #include <array>
-#include <iostream>
-#include <optional>
 #include <system_error>
 
 namespace btu::tex {
