@@ -82,6 +82,6 @@ acquire_test("modfolder")
 acquire_test("nif_corrupted")
 acquire_test("read_file")
 
-if("${BETHUTIL-TEX_BUILD_EXAMPLES}")
+if("${BETHUTIL_BUILD_EXAMPLES}")
   target_include_directories(tests PRIVATE "${ROOT_DIR}/examples")
 endif()
