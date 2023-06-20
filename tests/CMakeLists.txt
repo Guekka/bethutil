@@ -1,7 +1,7 @@
 set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 set(INCLUDE_DIR "${ROOT_DIR}/tests")
-set(HEADER_FILES "${INCLUDE_DIR}/bsa/utils.hpp")
+set(HEADER_FILES "${INCLUDE_DIR}/bsa/utils.hpp" "${INCLUDE_DIR}/tex/utils.hpp")
 
 set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
@@ -18,14 +18,10 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/modmanager/mod_folder.cpp"
     "${SOURCE_DIR}/modmanager/mod_manager.cpp"
     "${SOURCE_DIR}/nif/functions.cpp"
-    "${SOURCE_DIR}/nif/utils.hpp")
-
-if(${BETHUTIL_TEX})
-  list(APPEND HEADER_FILES "${INCLUDE_DIR}/tex/utils.hpp")
-
-  list(APPEND SOURCE_FILES "${SOURCE_DIR}/tex/formats.cpp"
-       "${SOURCE_DIR}/tex/functions.cpp" "${SOURCE_DIR}/tex/optimize.cpp")
-endif()
+    "${SOURCE_DIR}/nif/utils.hpp"
+    "${SOURCE_DIR}/tex/formats.cpp"
+    "${SOURCE_DIR}/tex/functions.cpp"
+    "${SOURCE_DIR}/tex/optimize.cpp")
 
 if(${BETHUTIL_HKX})
   list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/functions.cpp")
@@ -72,6 +68,7 @@ acquire_test("modfolder_reintegrate")
 acquire_test("optimize")
 acquire_test("resize")
 acquire_test("convert")
+acquire_test("convert_bc1")
 acquire_test("exe")
 acquire_test("mod_manager")
 acquire_test("nif_convert")
