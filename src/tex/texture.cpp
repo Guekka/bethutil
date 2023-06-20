@@ -43,9 +43,11 @@ static_assert(k_alignof_scratchimage == alignof(ScratchImage));
 
 void initialize_com()
 {
+#ifdef _WIN32
     const auto hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
     if (FAILED(hr))
         throw btu::common::Exception(error_from_hresult(hr));
+#endif
 }
 
 ScratchImagePimpl::ScratchImagePimpl()

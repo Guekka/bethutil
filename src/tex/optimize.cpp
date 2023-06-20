@@ -15,7 +15,8 @@
 #include <btu/tex/dxtex.hpp>
 
 namespace btu::tex {
-auto optimize(Texture &&file, OptimizationSteps sets, ID3D11Device *dev) noexcept -> Result
+auto optimize(Texture &&file, OptimizationSteps sets, const std::optional<CompressionDevice> &dev) noexcept
+    -> Result
 {
     using btu::common::bind_back;
 

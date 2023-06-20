@@ -8,12 +8,12 @@
 #include "btu/tex/detail/common.hpp"
 #include "btu/tex/dimension.hpp"
 #include "btu/tex/formats.hpp"
+#include "compression_device.hpp"
 
 #include <btu/common/games.hpp>
 
 #include <variant>
 
-struct ID3D11Device;
 namespace btu::tex {
 class Texture;
 
@@ -47,7 +47,9 @@ struct OptimizationSteps
 
 /// `dev` may be null
 /// Thread-safety : see `convert`
-[[nodiscard]] auto optimize(Texture &&file, OptimizationSteps sets, ID3D11Device *dev) noexcept -> Result;
+[[nodiscard]] auto optimize(Texture &&file,
+                            OptimizationSteps sets,
+                            const std::optional<CompressionDevice> &dev) noexcept -> Result;
 [[nodiscard]] auto compute_optimization_steps(const Texture &file, const Settings &sets) noexcept
     -> OptimizationSteps;
 } // namespace btu::tex
