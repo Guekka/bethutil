@@ -6,7 +6,6 @@
 #include "btu/tex/optimize.hpp"
 
 #include "btu/tex/compression_device.hpp"
-#include "btu/tex/detail/functional.hpp"
 #include "btu/tex/functions.hpp"
 
 #include <btu/common/algorithms.hpp>
@@ -15,24 +14,25 @@
 #include <btu/tex/dxtex.hpp>
 
 namespace btu::tex {
+
 auto optimize(Texture &&file, OptimizationSteps sets, const std::optional<CompressionDevice> &dev) noexcept
     -> Result
 {
-    using btu::common::bind_back;
-
     const auto compressed = DirectX::IsCompressed(file.get().GetMetadata().format);
     auto res              = Result{std::move(file)};
 
     if (compressed)
         res = std::move(res).and_then(decompress);
     if (sets.resize)
-        res = std::move(res).and_then(bind_back(resize, sets.resize.value()));
+        res = std::move(res).and_then(
+            [&](Texture &&tex) { return resize(std::move(tex), sets.resize.value()); });
     if (sets.add_transparent_alpha)
         res = std::move(res).and_then(make_transparent_alpha);
     if (sets.mipmaps)
         res = std::move(res).and_then(generate_mipmaps);
     if (sets.format && res && res.value().get().GetMetadata().format != sets.format)
-        res = std::move(res).and_then(bind_back(convert, sets.format.value(), dev));
+        res = std::move(res).and_then(
+            [&](Texture &&tex) { return convert(std::move(tex), sets.format.value(), dev); });
 
     return res;
 }
