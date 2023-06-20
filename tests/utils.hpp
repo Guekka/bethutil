@@ -36,4 +36,26 @@ struct StringMaker<btu::Path>
 {
     static std::string convert(const btu::Path &in) { return btu::common::as_ascii_string(in.u8string()); }
 };
+
+template<>
+struct StringMaker<std::u8string_view>
+{
+    static auto convert(const std::u8string_view &v) -> std::string
+    {
+        namespace bc = btu::common;
+        using bc::UTF8Iterator, bc::U8Unit;
+        return std::string(bc::as_ascii(v)) + " ("
+               + StringMaker<std::vector<U8Unit>>::convert(std::vector(UTF8Iterator(v), UTF8Iterator::end(v)))
+               + ")";
+    }
+};
+
+template<>
+struct StringMaker<std::u8string>
+{
+    static auto convert(const std::u8string &v) -> std::string
+    {
+        return StringMaker<std::u8string_view>::convert(v);
+    }
+};
 } // namespace Catch
