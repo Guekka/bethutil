@@ -24,13 +24,15 @@ auto operator<<(std::ostream &os, const btu::tex::OptimizationSteps &s) -> std::
 
 const auto generate_info1 = [] {
     return DirectX::TexMetadata{
-        .width     = 1024,
-        .height    = 1024,
-        .depth     = 1,
-        .arraySize = 1,
-        .mipLevels = 1,
-        .format    = DXGI_FORMAT_BC5_UNORM,
-        .dimension = DirectX::TEX_DIMENSION_TEXTURE2D,
+        .width      = 1024,
+        .height     = 1024,
+        .depth      = 1,
+        .arraySize  = 1,
+        .mipLevels  = 1,
+        .miscFlags  = 0,
+        .miscFlags2 = 0,
+        .format     = DXGI_FORMAT_BC5_UNORM,
+        .dimension  = DirectX::TEX_DIMENSION_TEXTURE2D,
     };
 };
 
