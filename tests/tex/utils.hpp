@@ -28,20 +28,6 @@ struct StringMaker<btu::tex::ScratchImage>
     static auto convert(const btu::tex::ScratchImage &) -> std::string { return "scratch_image"; }
 };
 
-template<>
-struct StringMaker<std::u8string_view>
-{
-    static auto convert(const std::u8string &s) -> std::string { return btu::common::as_ascii_string(s); }
-};
-
-template<>
-struct StringMaker<std::u8string>
-{
-    static auto convert(const std::u8string &s) -> std::string
-    {
-        return StringMaker<std::u8string_view>::convert(s);
-    }
-};
 } // namespace Catch
 
 inline auto load_tex(const Path &path) -> btu::tex::Texture

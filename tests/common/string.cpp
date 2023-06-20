@@ -13,30 +13,6 @@
 
 namespace bc = btu::common;
 
-namespace Catch {
-template<>
-struct StringMaker<std::u8string_view>
-{
-    static auto convert(const std::u8string_view &v) -> std::string
-    {
-        using bc::UTF8Iterator, bc::U8Unit;
-        return std::string(bc::as_ascii(v)) + " ("
-               + StringMaker<std::vector<U8Unit>>::convert(std::vector(UTF8Iterator(v), UTF8Iterator::end(v)))
-               + ")";
-    }
-};
-
-template<>
-struct StringMaker<std::u8string>
-{
-    static auto convert(const std::u8string &v) -> std::string
-    {
-        return StringMaker<std::u8string_view>::convert(v);
-    }
-};
-
-} // namespace Catch
-
 TEST_CASE("UTF8 Iterator", "[src]")
 {
     using bc::UTF8Iterator;
