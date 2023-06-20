@@ -469,3 +469,6 @@ MigrationBackup/
 .ionide/
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,qtcreator,qt,vs
+
+.devenv
+.direnv
