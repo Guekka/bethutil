@@ -21,16 +21,15 @@ TEST_CASE("convert", "[src]")
 {
     SECTION("With compression device")
     {
-        auto cdev = btu::tex::CompressionDevice::make(0).value();
-        auto dev  = cdev.get_device();
-        test_expected_dir(u8"convert", [dev](auto &&tex) {
+        auto dev = btu::tex::CompressionDevice::make(0);
+        test_expected_dir(u8"convert", [&dev](auto &&tex) {
             return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, dev);
         });
     }
     SECTION("Without compression device")
     {
         test_expected_dir(u8"convert2", [](auto &&tex) {
-            return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, nullptr);
+            return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, std::nullopt);
         });
     }
 }

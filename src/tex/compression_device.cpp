@@ -5,14 +5,17 @@
 
 #include "btu/tex/compression_device.hpp"
 
-#include <DirectXTex.h>
-#include <btu/common/string.hpp>
 #include <btu/tex/dxtex.hpp>
+
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
+#include <btu/common/string.hpp>
 #include <wrl/client.h>
 
 #include <array>
+#endif
 
 namespace btu::tex {
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
 template<typename Func>
 auto get_api_from_dll(const wchar_t *dll, const char *func) -> Func
 {
@@ -44,6 +47,7 @@ auto get_dxgi_factory(IDXGIFactory1 **factory) -> bool
 
     return SUCCEEDED(create(IID_PPV_ARGS(factory)));
 }
+#endif
 
 CompressionDevice::operator bool() const
 {
@@ -52,21 +56,36 @@ CompressionDevice::operator bool() const
 
 auto CompressionDevice::is_valid() const -> bool
 {
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     return static_cast<bool>(device_);
+#else
+    return false;
+#endif
 }
 
 auto CompressionDevice::get_device() const -> ID3D11Device *
 {
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     return device_->Get();
+#else
+    return nullptr;
+#endif
 }
 
 auto CompressionDevice::gpu_name() const -> const std::u8string &
 {
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     return gpu_name_;
+#else
+    static const std::u8string empty;
+    return empty;
+#endif
 }
 
-auto CompressionDevice::make(uint32_t adapter_index, bool allow_software) -> std::optional<CompressionDevice>
+auto CompressionDevice::make([[maybe_unused]] uint32_t adapter_index, [[maybe_unused]] bool allow_software)
+    -> std::optional<CompressionDevice>
 {
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     CompressionDevice ret;
     ID3D11Device **device = ret.device_->GetAddressOf();
     if (device == nullptr)
@@ -157,28 +176,36 @@ auto CompressionDevice::make(uint32_t adapter_index, bool allow_software) -> std
         return std::nullopt;
 
     return std::make_optional(std::move(ret));
+#else
+    return std::nullopt;
+#endif
 }
 
-CompressionDevice::CompressionDevice(CompressionDevice &&other) noexcept
+CompressionDevice::CompressionDevice([[maybe_unused]] CompressionDevice &&other) noexcept
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     : device_(std::move(other.device_))
     , gpu_name_(std::move(other.gpu_name_))
+#endif
 {
 }
 
-auto CompressionDevice::operator=(CompressionDevice &&other) noexcept -> CompressionDevice &
+auto CompressionDevice::operator=([[maybe_unused]] CompressionDevice &&other) noexcept -> CompressionDevice &
 {
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     if (this != &other)
     {
         device_   = std::move(other.device_);
         gpu_name_ = std::move(other.gpu_name_);
     }
+#endif
     return *this;
 }
 
 CompressionDevice::CompressionDevice()
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     : device_(std::make_unique<Microsoft::WRL::ComPtr<ID3D11Device>>())
+#endif
 {
 }
-
 CompressionDevice::~CompressionDevice() = default;
 } // namespace btu::tex

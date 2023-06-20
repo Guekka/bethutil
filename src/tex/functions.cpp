@@ -60,7 +60,7 @@ auto make_transparent_alpha(Texture &&file) -> Result
 auto convert_uncompressed(const ScratchImage &image,
                           ScratchImage &timage,
                           DXGI_FORMAT format,
-                          [[maybe_unused]] ID3D11Device *dev) -> HRESULT
+                          [[maybe_unused]] const std::optional<CompressionDevice> &) -> HRESULT
 {
     const auto *const img = image.GetImages();
     if (img == nullptr)
@@ -76,14 +76,18 @@ auto convert_uncompressed(const ScratchImage &image,
                    timage);
 }
 
-auto convert_compressed(const ScratchImage &image, ScratchImage &timage, DXGI_FORMAT format, ID3D11Device *dev)
-    -> HRESULT
+auto convert_compressed(const ScratchImage &image,
+                        ScratchImage &timage,
+                        DXGI_FORMAT format,
+                        [[maybe_unused]] const std::optional<CompressionDevice> &dev) -> HRESULT
 {
     const auto *const img = image.GetImages();
     if (img == nullptr)
         return E_INVALIDARG;
     const size_t nimg = image.GetImageCount();
 
+    // hardware impl, only works on d3d11
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     const bool bc6hbc7 = [&]() noexcept {
         switch (format)
         {
@@ -98,7 +102,7 @@ auto convert_compressed(const ScratchImage &image, ScratchImage &timage, DXGI_FO
     }();
 
     if (bc6hbc7 && dev)
-        return DirectX::Compress(dev,
+        return DirectX::Compress(dev->get_device(),
                                  img,
                                  nimg,
                                  image.GetMetadata(),
@@ -106,6 +110,7 @@ auto convert_compressed(const ScratchImage &image, ScratchImage &timage, DXGI_FO
                                  DirectX::TEX_COMPRESS_DEFAULT,
                                  DirectX::TEX_THRESHOLD_DEFAULT,
                                  timage);
+#endif
 
     return DirectX::Compress(img,
                              nimg,
@@ -116,7 +121,7 @@ auto convert_compressed(const ScratchImage &image, ScratchImage &timage, DXGI_FO
                              timage);
 }
 
-auto convert(Texture &&file, DXGI_FORMAT format, ID3D11Device *dev) -> Result
+auto convert(Texture &&file, DXGI_FORMAT format, const std::optional<CompressionDevice> &dev) -> Result
 {
     const auto &tex = file.get();
     const auto info = tex.GetMetadata();
