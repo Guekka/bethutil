@@ -1,6 +1,6 @@
 #pragma once
 
-#include <dxgiformat.h>
+#include <btu/tex/dxtex.hpp>
 
 #include <optional>
 #include <string>

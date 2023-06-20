@@ -7,6 +7,7 @@
 
 #include <DirectXTex.h>
 #include <btu/common/string.hpp>
+#include <btu/tex/dxtex.hpp>
 #include <wrl/client.h>
 
 #include <array>

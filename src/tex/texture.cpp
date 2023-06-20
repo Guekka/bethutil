@@ -3,12 +3,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-#include "btu/tex/texture.hpp"
-
-#include "btu/tex/dimension.hpp"
-
-#include <DirectXTex.h>
 #include <btu/common/string.hpp>
+#include <btu/tex/dimension.hpp>
+#include <btu/tex/dxtex.hpp>
+#include <btu/tex/texture.hpp>
 
 namespace DirectX {
 auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool
