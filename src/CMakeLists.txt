@@ -52,6 +52,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/tex/compression_device.cpp"
     "${SOURCE_DIR}/tex/formats.cpp"
     "${SOURCE_DIR}/tex/functions.cpp"
+    "${SOURCE_DIR}/tex/functions_compress_bc7.cpp"
     "${SOURCE_DIR}/tex/optimize.cpp"
     "${SOURCE_DIR}/tex/texture.cpp"
     "${SOURCE_DIR}/tex/error_code.cpp")
@@ -97,6 +98,9 @@ target_link_libraries("${PROJECT_NAME}" PRIVATE nifly)
 
 find_package(directxtex CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PUBLIC Microsoft::DirectXTex)
+
+find_package(bc7enc CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE bc7enc::bc7enc)
 
 if(${BETHUTIL_HKX})
   find_package(reproc++ CONFIG REQUIRED)

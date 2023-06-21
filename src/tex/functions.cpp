@@ -76,6 +76,12 @@ auto convert_uncompressed(const ScratchImage &image,
                    timage);
 }
 
+// The reason for this to be separated in another file is that both libraries define DXGI_FORMAT
+// So there's a conflict
+// Also, we use another library because DirectXTex BC7 CPU encoder is unbearably slow
+auto convert_bc7(const uint8_t *source, uint8_t *dest, size_t width, size_t height, size_t slicePitch)
+    -> tl::expected<void, common::Error>;
+
 auto convert_compressed(const ScratchImage &image,
                         ScratchImage &timage,
                         DXGI_FORMAT format,
@@ -86,14 +92,9 @@ auto convert_compressed(const ScratchImage &image,
         return E_INVALIDARG;
     const size_t nimg = image.GetImageCount();
 
-    // hardware impl, only works on d3d11
-#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     const bool bc6hbc7 = [&]() noexcept {
         switch (format)
         {
-            case DXGI_FORMAT_BC6H_TYPELESS:
-            case DXGI_FORMAT_BC6H_UF16:
-            case DXGI_FORMAT_BC6H_SF16:
             case DXGI_FORMAT_BC7_TYPELESS:
             case DXGI_FORMAT_BC7_UNORM:
             case DXGI_FORMAT_BC7_UNORM_SRGB: return true;
@@ -101,6 +102,8 @@ auto convert_compressed(const ScratchImage &image,
         }
     }();
 
+    // hardware impl, only works on d3d11
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     if (bc6hbc7 && dev)
         return DirectX::Compress(dev->get_device(),
                                  img,
@@ -111,16 +114,43 @@ auto convert_compressed(const ScratchImage &image,
                                  DirectX::TEX_THRESHOLD_DEFAULT,
                                  timage);
 #endif
+    // slower bc7 impl, but faster than dxtex
+    if (bc6hbc7)
+    {
+        auto metadata   = image.GetMetadata();
+        metadata.format = DXGI_FORMAT_BC7_UNORM;
+        const auto hr   = timage.Initialize(metadata);
+        if (FAILED(hr))
+            return hr;
+
+        for (size_t i = 0; i < image.GetImageCount(); ++i)
+        {
+            const auto &simg = image.GetImages()[i];
+            const auto &timg = timage.GetImages()[i];
+
+            auto res = convert_bc7(simg.pixels, timg.pixels, simg.width, simg.height, simg.slicePitch);
+            if (!res)
+                return E_FAIL;
+        }
+        return S_OK;
+    }
+
+    const auto compress_flags = [] {
+#if _OPENMP
+        return DirectX::TEX_COMPRESS_PARALLEL;
+#else
+        return DirectX::TEX_COMPRESS_DEFAULT;
+#endif
+    }();
 
     return DirectX::Compress(img,
                              nimg,
                              image.GetMetadata(),
                              format,
-                             DirectX::TEX_COMPRESS_DEFAULT,
+                             compress_flags,
                              DirectX::TEX_THRESHOLD_DEFAULT,
                              timage);
 }
-
 auto convert(Texture &&file, DXGI_FORMAT format, const std::optional<CompressionDevice> &dev) -> Result
 {
     const auto &tex = file.get();
