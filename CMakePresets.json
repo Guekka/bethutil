@@ -32,10 +32,6 @@
     },
     {
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": {
-          "type": "STRING",
-          "value": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
-        },
         "VCPKG_MANIFEST_NO_DEFAULT_FEATURES": {
           "type": "BOOL",
           "value": "ON"
@@ -45,6 +41,7 @@
           "value": "${sourceDir}/cmake/ports"
         }
       },
+      "toolchainFile": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "hidden": true,
       "name": "vcpkg"
     },
@@ -57,14 +54,6 @@
         "BETHUTIL_TEX": {
           "type": "BOOL",
           "value": "ON"
-        },
-        "CMAKE_EXE_LINKER_FLAGS_RELEASE": {
-          "type": "STRING",
-          "value": "/DEBUG:FASTLINK"
-        },
-        "CMAKE_MSVC_RUNTIME_LIBRARY": {
-          "type": "STRING",
-          "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
         },
         "VCPKG_MANIFEST_FEATURES": {
           "type": "STRING",

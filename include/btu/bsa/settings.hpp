@@ -98,24 +98,24 @@ struct Settings
         sets.plugin_extensions = {u8".esl", u8".esm", u8".esp"};
         sets.s_dummy_plugin    = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
         sets.standard_files    = {
-            AllowedPath{u8".bgem", {u8"materials"}},
-            AllowedPath{u8".bgsm", {u8"materials"}},
-            AllowedPath{u8".bto", {u8"meshes"}},
-            AllowedPath{u8".btr", {u8"meshes"}},
-            AllowedPath{u8".btt", {u8"meshes"}},
-            AllowedPath{u8".cgid", {u8"grass"}},
-            AllowedPath{u8".dlodsettings", {u8"lodsettings"}},
-            AllowedPath{u8".dtl", {u8"meshes"}}, // Unsure
-            AllowedPath{u8".egm", {u8"meshes"}}, // Unsure
-            AllowedPath{u8".jpg", {u8"root"}},
-            AllowedPath{u8".hkb", {u8"meshes"}},
-            AllowedPath{u8".hkb", {u8"meshes"}},
-            AllowedPath{u8".hkx", {u8"meshes"}},
-            AllowedPath{u8".lst", {u8"meshes"}},
-            AllowedPath{u8".nif", {u8"meshes"}},
-            AllowedPath{u8".psc", {u8"scripts", u8"source"}},
-            AllowedPath{u8".tga", {u8"textures"}},
-            AllowedPath{u8".tri", {u8"meshes"}},
+               AllowedPath{u8".bgem", {u8"materials"}},
+               AllowedPath{u8".bgsm", {u8"materials"}},
+               AllowedPath{u8".bto", {u8"meshes"}},
+               AllowedPath{u8".btr", {u8"meshes"}},
+               AllowedPath{u8".btt", {u8"meshes"}},
+               AllowedPath{u8".cgid", {u8"grass"}},
+               AllowedPath{u8".dlodsettings", {u8"lodsettings"}},
+               AllowedPath{u8".dtl", {u8"meshes"}}, // Unsure
+               AllowedPath{u8".egm", {u8"meshes"}}, // Unsure
+               AllowedPath{u8".jpg", {u8"root"}},
+               AllowedPath{u8".hkb", {u8"meshes"}},
+               AllowedPath{u8".hkb", {u8"meshes"}},
+               AllowedPath{u8".hkx", {u8"meshes"}},
+               AllowedPath{u8".lst", {u8"meshes"}},
+               AllowedPath{u8".nif", {u8"meshes"}},
+               AllowedPath{u8".psc", {u8"scripts", u8"source"}},
+               AllowedPath{u8".tga", {u8"textures"}},
+               AllowedPath{u8".tri", {u8"meshes"}},
         };
         sets.texture_files = {
             AllowedPath{u8".dds", {u8"textures", u8"interface"}},
