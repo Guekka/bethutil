@@ -66,6 +66,17 @@ inline void write_file(const Path &a_path, std::span<const std::byte> data)
         if (path1.lexically_relative(dir1) != path2.lexically_relative(dir2))
             return false;
 
+        if (beg1->is_directory() != beg2->is_directory())
+            return false;
+
+        // Skip directories, we only care about files
+        if (beg1->is_directory())
+        {
+            ++beg1;
+            ++beg2;
+            continue;
+        }
+
         if (!compare_files(path1, path2))
             return false;
 
