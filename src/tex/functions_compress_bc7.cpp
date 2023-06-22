@@ -8,7 +8,7 @@
 
 namespace btu::tex {
 
-auto convert_bc7(const uint8_t *source, uint8_t *dest, size_t width, size_t height, size_t slicePitch)
+auto convert_bc7(const uint8_t *source, uint8_t *dest, uint32_t width, uint32_t height, size_t slicePitch)
     -> tl::expected<void, common::Error>
 {
     rdo_bc::rdo_bc_params rp;

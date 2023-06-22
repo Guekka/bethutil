@@ -79,7 +79,7 @@ auto convert_uncompressed(const ScratchImage &image,
 // The reason for this to be separated in another file is that both libraries define DXGI_FORMAT
 // So there's a conflict
 // Also, we use another library because DirectXTex BC7 CPU encoder is unbearably slow
-auto convert_bc7(const uint8_t *source, uint8_t *dest, size_t width, size_t height, size_t slicePitch)
+auto convert_bc7(const uint8_t *source, uint8_t *dest, uint32_t width, uint32_t height, size_t slicePitch)
     -> tl::expected<void, common::Error>;
 
 auto convert_compressed(const ScratchImage &image,
@@ -128,7 +128,11 @@ auto convert_compressed(const ScratchImage &image,
             const auto &simg = image.GetImages()[i];
             const auto &timg = timage.GetImages()[i];
 
-            auto res = convert_bc7(simg.pixels, timg.pixels, simg.width, simg.height, simg.slicePitch);
+            auto res = convert_bc7(simg.pixels,
+                                   timg.pixels,
+                                   static_cast<uint32_t>(simg.width),
+                                   static_cast<uint32_t>(simg.height),
+                                   simg.slicePitch);
             if (!res)
                 return E_FAIL;
         }
