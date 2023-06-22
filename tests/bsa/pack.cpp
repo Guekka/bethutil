@@ -34,7 +34,5 @@ TEST_CASE("Pack", "[src]")
     };
 
     pack(btu::Game::SSE, u8"sse");
-#ifdef _MSC_VER // FO4dds does not work on Linux
     pack(btu::Game::FO4, u8"fo4");
-#endif
 }

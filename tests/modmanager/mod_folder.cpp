@@ -10,7 +10,6 @@
 
 #include <binary_io/memory_stream.hpp>
 
-#ifdef _MSC_VER // Texture BA2 only works on Windows
 TEST_CASE("ModFolder", "[src]")
 {
     const Path dir = "modfolder";
@@ -46,4 +45,3 @@ TEST_CASE("ModFolder reintegrate", "[src]")
 
     REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
 }
-#endif
