@@ -134,8 +134,13 @@ auto read_archive(Path path) -> std::optional<Archive>
         {
             libbsa::tes3::archive arch;
             arch.read(std::move(path));
-            for (auto &&elem : std::move(arch))
-                res.emplace(elem.first.name(), File(std::move(elem.second), ArchiveVersion::tes3));
+            for (auto &&[key, file] : std::move(arch))
+            {
+                auto relative_file_path = virtual_to_local_path(key);
+
+                res.emplace(common::as_ascii_string(std::move(relative_file_path)),
+                            File(std::move(file), ArchiveVersion::tes3));
+            }
             return res;
         }
         case libbsa::file_format::tes4:
@@ -158,8 +163,12 @@ auto read_archive(Path path) -> std::optional<Archive>
         {
             libbsa::fo4::archive arch;
             auto ver = arch.read(std::move(path));
-            for (auto &&elem : std::move(arch))
-                res.emplace(elem.first.name(), File(std::move(elem.second), static_cast<ArchiveVersion>(ver)));
+            for (auto &&[key, file] : std::move(arch))
+            {
+                auto relative_file_path = virtual_to_local_path(key);
+                res.emplace(common::as_ascii_string(std::move(relative_file_path)),
+                            File(std::move(file), static_cast<ArchiveVersion>(ver)));
+            }
             return res;
         }
     }
