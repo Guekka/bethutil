@@ -125,7 +125,8 @@ TEST_CASE("compute_optimization_steps", "[src]")
 
 TEST_CASE("optimize", "[src]")
 {
-    SECTION("tex1"){
+    SECTION("tex1")
+    {
         auto tex   = generate_tex(generate_info1());
         auto sets  = generate_sets1();
         auto steps = compute_optimization_steps(tex, sets);
