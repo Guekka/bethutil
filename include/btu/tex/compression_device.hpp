@@ -27,7 +27,7 @@ public:
     [[nodiscard]] auto get_device() const -> ID3D11Device *;
     [[nodiscard]] auto gpu_name() const -> const std::u8string &;
 
-    static auto make(uint32_t adapter_index, bool allow_software = false) -> std::optional<CompressionDevice>;
+    static auto make(uint32_t adapter_index, bool allow_software = true) -> std::optional<CompressionDevice>;
 
     CompressionDevice(const CompressionDevice &) = delete;
     CompressionDevice(CompressionDevice &&other) noexcept;
