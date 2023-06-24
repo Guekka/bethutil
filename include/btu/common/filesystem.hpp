@@ -55,10 +55,20 @@ inline void write_file(const Path &a_path, std::span<const std::byte> data)
 
 [[nodiscard]] inline auto compare_directories(const Path &dir1, const Path &dir2) -> bool
 {
-    auto beg1 = fs::recursive_directory_iterator(dir1);
-    auto beg2 = fs::recursive_directory_iterator(dir2);
+    // sort before comparing, as the directory iteration order is not guaranteed
+    auto files1 = std::vector(fs::recursive_directory_iterator(dir1), fs::recursive_directory_iterator{});
+    auto files2 = std::vector(fs::recursive_directory_iterator(dir2), fs::recursive_directory_iterator{});
 
-    while (beg1 != fs::recursive_directory_iterator{} && beg2 != fs::recursive_directory_iterator{})
+    if (files1.size() != files2.size())
+        return false;
+
+    std::sort(files1.begin(), files1.end());
+    std::sort(files2.begin(), files2.end());
+
+    auto beg1 = files1.begin();
+    auto beg2 = files2.begin();
+
+    while (beg1 != files1.end()) // no need to check beg2, as we already checked the size
     {
         auto path1 = beg1->path();
         auto path2 = beg2->path();
@@ -83,7 +93,7 @@ inline void write_file(const Path &a_path, std::span<const std::byte> data)
         ++beg1;
         ++beg2;
     }
-    return beg1 == fs::recursive_directory_iterator{} && beg2 == fs::recursive_directory_iterator{};
+    return beg1 == files1.end() && beg2 == files2.end();
 }
 
 } // namespace btu::common
