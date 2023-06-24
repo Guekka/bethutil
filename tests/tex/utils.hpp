@@ -28,20 +28,6 @@ struct StringMaker<btu::tex::ScratchImage>
     static auto convert(const btu::tex::ScratchImage &) -> std::string { return "scratch_image"; }
 };
 
-template<>
-struct StringMaker<std::u8string_view>
-{
-    static auto convert(const std::u8string &s) -> std::string { return btu::common::as_ascii_string(s); }
-};
-
-template<>
-struct StringMaker<std::u8string>
-{
-    static auto convert(const std::u8string &s) -> std::string
-    {
-        return StringMaker<std::u8string_view>::convert(s);
-    }
-};
 } // namespace Catch
 
 inline auto load_tex(const Path &path) -> btu::tex::Texture
@@ -52,13 +38,42 @@ inline auto load_tex(const Path &path) -> btu::tex::Texture
     return std::move(res).value();
 }
 
+/// Different encoders produce different results, so we need to compare them by hand
+/// This function compares two textures using MSE and returns true if they are almost equal
+inline auto compute_mse(const btu::tex::Texture &lhs, const btu::tex::Texture &rhs) -> float
+{
+    const auto &lhs_img = lhs.get();
+    const auto &rhs_img = rhs.get();
+
+    REQUIRE(lhs_img.GetMetadata() == rhs_img.GetMetadata());
+
+    float total_mse = 0; //  average of MSEs for each subimage
+    for (size_t i = 0; i < lhs_img.GetImageCount(); ++i)
+    {
+        const auto &lhs_sub = lhs_img.GetImages()[i];
+        const auto &rhs_sub = rhs_img.GetImages()[i];
+
+        float mse     = 0;
+        const auto hr = DirectX::ComputeMSE(lhs_sub, rhs_sub, mse, nullptr);
+        REQUIRE(SUCCEEDED(hr));
+
+        total_mse += mse;
+    }
+    total_mse /= static_cast<float>(lhs_img.GetImageCount());
+    return total_mse;
+}
+
 template<typename Func>
 auto test_expected(const Path &root, const Path &filename, Func f, bool approve = true)
 {
     auto in                    = load_tex(root / "in" / filename);
     const btu::tex::Result out = f(std::move(in));
 
-    REQUIRE(out.has_value());
+    INFO("Processing: " << filename);
+    if (!out)
+    {
+        FAIL_CHECK("Error: " << out.error());
+    }
 
     const auto expected_path = root / "expected" / filename;
     if (!fs::exists(expected_path) && approve)
@@ -71,7 +86,13 @@ auto test_expected(const Path &root, const Path &filename, Func f, bool approve 
     else
     {
         const auto expected = load_tex(expected_path);
-        CHECK(out->get() == expected.get());
+        INFO("Expected path: " << expected_path);
+
+        constexpr float k_max_mse = 0.002f; // empirically determined
+        const auto mse            = compute_mse(out.value(), expected);
+
+        INFO("MSE: " << mse);
+        CHECK(mse <= k_max_mse);
     }
 }
 

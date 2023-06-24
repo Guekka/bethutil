@@ -1,9 +1,6 @@
-#include "btu/tex/formats.hpp"
-
-#include "btu/tex/texture.hpp"
-
-#include <DirectXTex.h>
 #include <btu/common/string.hpp>
+#include <btu/tex/formats.hpp>
+#include <btu/tex/texture.hpp>
 
 namespace btu::tex {
 

@@ -10,6 +10,8 @@
       "name": "vcpkg-cmake-config",
       "host": true
     },
+    "bc7enc",
+    "directxtex",
     "libflow",
     "nifly",
     "utf8h",
@@ -17,12 +19,6 @@
     "tl-expected"
   ],
   "features": {
-    "tex": {
-      "description": "Build texture part. Windows only",
-      "dependencies": [
-        "directxtex"
-      ]
-    },
     "hkx": {
       "description": "Build hkx part. Windows only",
       "dependencies": [
