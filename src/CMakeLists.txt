@@ -23,7 +23,17 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/nif/detail/common.hpp"
     "${INCLUDE_DIR}/btu/nif/functions.hpp"
     "${INCLUDE_DIR}/btu/nif/mesh.hpp"
-    "${INCLUDE_DIR}/btu/nif/optimize.hpp")
+    "${INCLUDE_DIR}/btu/nif/optimize.hpp"
+    "${INCLUDE_DIR}/btu/tex/error_code.hpp"
+    "${INCLUDE_DIR}/btu/tex/compression_device.hpp"
+    "${INCLUDE_DIR}/btu/tex/dimension.hpp"
+    "${INCLUDE_DIR}/btu/tex/dxtex.hpp"
+    "${INCLUDE_DIR}/btu/tex/formats.hpp"
+    "${INCLUDE_DIR}/btu/tex/functions.hpp"
+    "${INCLUDE_DIR}/btu/tex/optimize.hpp"
+    "${INCLUDE_DIR}/btu/tex/texture.hpp"
+    "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
+    "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp")
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
@@ -38,7 +48,14 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/modmanager/mod_manager.cpp"
     "${SOURCE_DIR}/nif/functions.cpp"
     "${SOURCE_DIR}/nif/mesh.cpp"
-    "${SOURCE_DIR}/nif/optimize.cpp")
+    "${SOURCE_DIR}/nif/optimize.cpp"
+    "${SOURCE_DIR}/tex/compression_device.cpp"
+    "${SOURCE_DIR}/tex/formats.cpp"
+    "${SOURCE_DIR}/tex/functions.cpp"
+    "${SOURCE_DIR}/tex/functions_compress_bc7.cpp"
+    "${SOURCE_DIR}/tex/optimize.cpp"
+    "${SOURCE_DIR}/tex/texture.cpp"
+    "${SOURCE_DIR}/tex/error_code.cpp")
 
 option(BETHUTIL_HKX "Build hkx part" OFF)
 if(${BETHUTIL_HKX})
@@ -47,32 +64,6 @@ if(${BETHUTIL_HKX})
 
   list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/anim.cpp"
        "${SOURCE_DIR}/hkx/functions.cpp")
-endif()
-
-option(BETHUTIL_TEX "Build tex part" OFF)
-if(${BETHUTIL_TEX})
-  list(
-    APPEND
-    HEADER_FILES
-    "${INCLUDE_DIR}/btu/tex/error_code.hpp"
-    "${INCLUDE_DIR}/btu/tex/compression_device.hpp"
-    "${INCLUDE_DIR}/btu/tex/dimension.hpp"
-    "${INCLUDE_DIR}/btu/tex/formats.hpp"
-    "${INCLUDE_DIR}/btu/tex/functions.hpp"
-    "${INCLUDE_DIR}/btu/tex/optimize.hpp"
-    "${INCLUDE_DIR}/btu/tex/texture.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp")
-
-  list(
-    APPEND
-    SOURCE_FILES
-    "${SOURCE_DIR}/tex/compression_device.cpp"
-    "${SOURCE_DIR}/tex/formats.cpp"
-    "${SOURCE_DIR}/tex/functions.cpp"
-    "${SOURCE_DIR}/tex/optimize.cpp"
-    "${SOURCE_DIR}/tex/texture.cpp"
-    "${SOURCE_DIR}/tex/error_code.cpp")
 endif()
 
 source_group(TREE "${ROOT_DIR}" FILES ${HEADER_FILES} ${SOURCE_FILES})
@@ -105,10 +96,11 @@ target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
 find_package(nifly CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE nifly)
 
-if(${BETHUTIL_TEX})
-  find_package(directxtex CONFIG REQUIRED)
-  target_link_libraries("${PROJECT_NAME}" PRIVATE Microsoft::DirectXTex)
-endif()
+find_package(directxtex CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PUBLIC Microsoft::DirectXTex)
+
+find_package(bc7enc CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE bc7enc::bc7enc)
 
 if(${BETHUTIL_HKX})
   find_package(reproc++ CONFIG REQUIRED)

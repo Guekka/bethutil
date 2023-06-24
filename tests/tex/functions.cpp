@@ -19,18 +19,26 @@ TEST_CASE("make_transparent_alpha", "[src]")
 
 TEST_CASE("convert", "[src]")
 {
-    SECTION("With compression device")
+    SECTION("bc7")
     {
-        auto cdev = btu::tex::CompressionDevice::make(0).value();
-        auto dev  = cdev.get_device();
-        test_expected_dir(u8"convert", [dev](auto &&tex) {
-            return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, dev);
-        });
+        SECTION("With compression device")
+        {
+            auto dev = btu::tex::CompressionDevice::make(0);
+            test_expected_dir(u8"convert", [&dev](auto &&tex) {
+                return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, dev);
+            });
+        }
+        SECTION("Without compression device")
+        {
+            test_expected_dir(u8"convert2", [](auto &&tex) {
+                return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, std::nullopt);
+            });
+        }
     }
-    SECTION("Without compression device")
+    SECTION("bc1")
     {
-        test_expected_dir(u8"convert2", [](auto &&tex) {
-            return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, nullptr);
+        test_expected(u8"convert_bc1", u8"01.dds", [](auto &&tex) {
+            return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC1_UNORM, std::nullopt);
         });
     }
 }

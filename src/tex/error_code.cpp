@@ -1,10 +1,8 @@
 #include "btu/tex/error_code.hpp"
 
-#include <DirectXTex.h>
+#include <btu/tex/dxtex.hpp>
 
 #include <array>
-#include <iostream>
-#include <optional>
 #include <system_error>
 
 namespace btu::tex {
@@ -66,6 +64,8 @@ auto error_from_hresult(int64_t hr, std::error_code default_err, SourceLocation 
     };
 
     // Most important DirectXTex error codes
+    // We only have access to them on Windows
+#ifdef _WIN32
     constexpr auto known_codes = std::to_array({ERROR_ARITHMETIC_OVERFLOW,
                                                 ERROR_CANNOT_MAKE,
                                                 ERROR_FILE_TOO_LARGE,
@@ -78,6 +78,7 @@ auto error_from_hresult(int64_t hr, std::error_code default_err, SourceLocation 
     });
     if (it != known_codes.end())
         return make_error(*it);
+#endif
 
     // Didn't work. Does this code come from HRESULT_FROM_WIN32?
     constexpr auto win32_valid = 0x80070000L; // MAKE_HRESULT(SEVERITY_ERROR, FACILITY_WIN32, 0)

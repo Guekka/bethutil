@@ -8,7 +8,6 @@
 #include "btu/common/filesystem.hpp"
 #include "utils.hpp"
 
-#ifdef _MSC_VER // Textures BA2
 TEST_CASE("unpack", "[src]")
 {
     const Path dir = "bsa_unpack";
@@ -20,4 +19,3 @@ TEST_CASE("unpack", "[src]")
 
     REQUIRE(btu::common::compare_directories(dir / "out", dir / "expected"));
 }
-#endif

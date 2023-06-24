@@ -40,9 +40,11 @@ public:
 private:
     CompressionDevice();
 
+#ifdef _WIN32
     // Kinda ridiculous to have a smart pointer own another one,
     // But I don't want to leak Windows headers
     std::unique_ptr<Microsoft::WRL::ComPtr<ID3D11Device>> device_;
     std::u8string gpu_name_;
+#endif
 };
 } // namespace btu::tex
