@@ -5,35 +5,58 @@
 
 #pragma once
 
-#include "btu/common/path.hpp"
-#include "btu/hkx/detail/common.hpp"
+#include <btu/common/error.hpp>
+#include <btu/common/games.hpp>
+#include <btu/common/path.hpp>
+#include <tl/expected.hpp>
+
+#include <array>
 
 namespace btu::hkx {
+using btu::common::Error;
+
+using ResultError = tl::expected<void, Error>;
+
+namespace detail {
+class AnimExeInfo
+{
+public:
+    AnimExeInfo() = default;
+
+    AnimExeInfo(const AnimExeInfo &)                     = delete;
+    AnimExeInfo(AnimExeInfo &&)                          = delete;
+    auto operator=(const AnimExeInfo &) -> AnimExeInfo & = delete;
+    auto operator=(AnimExeInfo &&) -> AnimExeInfo      & = delete;
+
+    virtual ~AnimExeInfo() = default;
+
+    [[nodiscard]] virtual constexpr auto name() const noexcept -> std::string_view             = 0;
+    [[nodiscard]] virtual constexpr auto input_file_name() const noexcept -> std::string_view  = 0;
+    [[nodiscard]] virtual constexpr auto output_file_name() const noexcept -> std::string_view = 0;
+    [[nodiscard]] virtual constexpr auto target_game() const noexcept -> btu::Game             = 0;
+
+    [[nodiscard]] virtual auto get_full_args(const Path &exe_dir) const -> std::vector<std::string> = 0;
+};
+
+using AnimExeRef = std::reference_wrapper<const AnimExeInfo>;
+
+} // namespace detail
+
 class AnimExe
 {
-    Path dir_;
+    Path exe_dir_;
+    std::vector<detail::AnimExeRef> detected_;
+
+    AnimExe(Path exe_dir, std::vector<detail::AnimExeRef> detected) noexcept
+        : exe_dir_(std::move(exe_dir))
+        , detected_(std::move(detected))
+    {
+    }
 
 public:
-    static constexpr auto exe64to32 = "hkx64to32.exe";
-    static constexpr auto exe32to64 = "hkx32to64.exe";
+    [[nodiscard]] static auto make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>;
 
-    static auto make(Path dir) noexcept -> tl::expected<AnimExe, Error>;
-    auto get_directory() const noexcept -> const Path &;
+    [[nodiscard]] auto convert(btu::Game target_game, const Path &input, const Path &output) const
+        -> ResultError;
 };
-
-class Anim
-{
-    Path path_;
-    Path load_path_;
-
-public:
-    auto get() const noexcept -> const Path &;
-    void set(Path path) noexcept;
-
-    auto get_load_path() const noexcept -> const Path &;
-    void set_load_path(Path path) noexcept;
-};
-
-[[nodiscard]] auto load(Path path, AnimExe exe) noexcept -> tl::expected<Anim, Error>;
-[[nodiscard]] auto save(const Anim &anim, const Path &path) noexcept -> ResultError;
 } // namespace btu::hkx

@@ -24,7 +24,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/tex/optimize.cpp")
 
 if(${BETHUTIL_HKX})
-  list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/functions.cpp")
+  list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/anim.cpp")
 endif()
 
 if("${BETHUTIL_BUILD_EXAMPLES}")
