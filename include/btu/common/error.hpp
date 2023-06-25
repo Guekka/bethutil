@@ -10,42 +10,21 @@
 #include <system_error>
 
 namespace btu::common {
-#ifdef __clang__
-struct SourceLocation
+inline auto operator<<(std::ostream &os, std::source_location loc) -> std::ostream &
 {
-};
-
-#define BETHUTIL_CURRENT_SOURCE_LOC \
-    ::btu::common::SourceLocation {}
-
-#else
-struct SourceLocation : public std::source_location
-{
-};
-
-#define BETHUTIL_CURRENT_SOURCE_LOC \
-    static_cast<::btu::common::SourceLocation>(std::source_location::current())
-#endif
-
-inline auto operator<<(std::ostream &os, [[maybe_unused]] SourceLocation loc) -> std::ostream &
-{
-#ifdef __clang__
-    return os << std::string_view("source location unsupported with clang");
-#else
     return os << "file: " << loc.file_name() << "(" << loc.line() << ":" << loc.column() << ") `"
               << loc.function_name() << "`";
-#endif
 }
 
 struct Error : public std::error_code
 {
-    explicit Error(std::error_code ec, SourceLocation l = BETHUTIL_CURRENT_SOURCE_LOC)
+    explicit Error(std::error_code ec, std::source_location l = std::source_location::current())
         : std::error_code(ec)
         , loc(l)
     {
     }
 
-    SourceLocation loc;
+    std::source_location loc;
 };
 
 inline auto operator<<(std::ostream &os, const Error &err) -> std::ostream &
