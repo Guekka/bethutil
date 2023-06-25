@@ -61,7 +61,10 @@ public:
 
     [[nodiscard]] auto get_full_args(const Path &exe_dir) const -> std::vector<std::string> override
     {
-        return {(exe_dir / name()).string(), std::string(input_file_name())};
+        return {(exe_dir / name()).string(),
+                std::string(input_file_name()),
+                "-s",
+                (exe_dir / "32ref.hko").string()};
     }
 };
 static inline const auto k_exe_64to32 = Info64to32{};
