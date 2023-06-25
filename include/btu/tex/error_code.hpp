@@ -3,9 +3,10 @@
 #include <btu/common/error.hpp>
 
 #include <optional>
+#include <source_location>
 
 namespace btu::tex {
-using btu::common::Error, btu::common::SourceLocation;
+using btu::common::Error;
 
 enum class TextureErr
 {
@@ -62,6 +63,6 @@ auto make_error_condition(FailureSource e) -> std::error_condition;
 
 auto error_from_hresult(int64_t hr,
                         std::error_code default_err = TextureErr::Unknown,
-                        SourceLocation loc          = BETHUTIL_CURRENT_SOURCE_LOC) -> Error;
+                        std::source_location loc    = std::source_location::current()) -> Error;
 
 } // namespace btu::tex

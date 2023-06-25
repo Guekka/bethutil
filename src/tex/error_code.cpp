@@ -57,7 +57,7 @@ auto make_error_condition(FailureSource e) -> std::error_condition
     return {static_cast<int>(e), k_failure_source_category};
 }
 
-auto error_from_hresult(int64_t hr, std::error_code default_err, SourceLocation loc) -> Error
+auto error_from_hresult(int64_t hr, std::error_code default_err, std::source_location loc) -> Error
 {
     const auto make_error = [&](auto win32_code) {
         return Error(std::error_code(win32_code, std::system_category()), loc);

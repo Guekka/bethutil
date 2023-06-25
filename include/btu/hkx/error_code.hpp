@@ -5,7 +5,7 @@
 #include <optional>
 
 namespace btu::hkx {
-using btu::common::Error, btu::common::SourceLocation;
+using btu::common::Error;
 
 enum class AnimErr
 {
