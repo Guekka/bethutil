@@ -11,10 +11,9 @@ if(POXY_PATH)
 
   add_custom_target(
     docs
-    COMMAND "${POXY_PATH}" "${CMAKE_CURRENT_BINARY_DIR}/poxy.toml" "--mcss"
-            "${ROOT_DIR}/external/m.css"
+    COMMAND "${POXY_PATH}" "${CMAKE_CURRENT_BINARY_DIR}/poxy.toml"
     VERBATIM
     SOURCES "${DOCS_DIR}/poxy.toml.in")
 else()
-  message(WARNING "failed to find poxy: docs will not be built")
+  message(STATUS "failed to find poxy: docs will not be built")
 endif()
