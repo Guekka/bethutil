@@ -3,14 +3,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-#include "btu/common/string.hpp"
-#include "tl/expected.hpp"
-
+#include <btu/common/filesystem.hpp>
+#include <btu/common/string.hpp>
 #include <btu/hkx/anim.hpp>
 #include <btu/hkx/error_code.hpp>
 #include <flow.hpp>
 #include <reproc++/reproc.hpp>
 #include <reproc++/run.hpp>
+#include <tl/expected.hpp>
 
 #include <atomic>
 #include <filesystem>
@@ -34,6 +34,12 @@ public:
         return "OUTFILE64.hkx";
     }
     [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override { return btu::Game::SSE; }
+
+    [[nodiscard]] auto get_required_files([[maybe_unused]] const Path &exe_dir) const noexcept
+        -> std::vector<Path> override
+    {
+        return {};
+    }
 
     [[nodiscard]] auto get_full_args(const Path &exe_dir) const -> std::vector<std::string> override
     {
@@ -59,12 +65,14 @@ public:
     }
     [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override { return btu::Game::SLE; }
 
+    [[nodiscard]] auto get_required_files(const Path &exe_dir) const noexcept -> std::vector<Path> override
+    {
+        return {exe_dir / "filters", exe_dir / "hctFilterManager.dll", exe_dir / "32ref.hko"};
+    }
+
     [[nodiscard]] auto get_full_args(const Path &exe_dir) const -> std::vector<std::string> override
     {
-        return {(exe_dir / name()).string(),
-                std::string(input_file_name()),
-                "-s",
-                (exe_dir / "32ref.hko").string()};
+        return {(exe_dir / name()).string(), std::string(input_file_name()), "-s", "32ref.hko"s};
     }
 };
 static inline const auto k_exe_64to32 = Info64to32{};
@@ -141,10 +149,12 @@ struct ReprocOptions : public reproc::options
     return options;
 }
 
-[[nodiscard]] auto copy_file_to_input(const Path &input,
-                                      const Path &working_dir,
-                                      const detail::AnimExeRef exe_info) -> ResultError
+[[nodiscard]] auto prepare_input_folder(const Path &input,
+                                        const Path &working_dir,
+                                        const Path &exe_dir,
+                                        const detail::AnimExeRef exe_info) -> ResultError
 {
+    // copy input file
     const auto input_path = working_dir / exe_info.get().input_file_name();
 
     auto ec = std::error_code{};
@@ -155,6 +165,21 @@ struct ReprocOptions : public reproc::options
     fs::copy(input, input_path, ec);
     if (ec)
         return tl::make_unexpected(Error(ec));
+
+    // hardlink required files
+    for (const auto &req_file : exe_info.get().get_required_files(exe_dir))
+    {
+        const auto target = working_dir / fs::relative(req_file, exe_dir);
+        const auto res = common::hard_link(req_file, target);
+        if (!res.has_value())
+        {
+            const auto err = res.error();
+            if (err == std::errc::file_exists)
+                continue; // already there, not a problem
+            // unknown error
+            return tl::make_unexpected(Error(err));
+        }
+    }
 
     return {};
 }
@@ -189,7 +214,7 @@ auto AnimExe::convert(btu::Game target_game, const Path &input, const Path &outp
     if (!exe)
         return tl::make_unexpected(exe.error());
 
-    const auto copy = copy_file_to_input(input, *working_dir, *exe);
+    const auto copy = prepare_input_folder(input, *working_dir, exe_dir_, *exe);
     if (!copy)
         return tl::make_unexpected(copy.error());
 

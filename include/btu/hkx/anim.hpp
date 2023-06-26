@@ -35,6 +35,8 @@ public:
     [[nodiscard]] virtual constexpr auto output_file_name() const noexcept -> std::string_view = 0;
     [[nodiscard]] virtual constexpr auto target_game() const noexcept -> btu::Game             = 0;
 
+    [[nodiscard]] virtual auto get_required_files(const Path &exe_dir) const noexcept
+        -> std::vector<Path>                                                                        = 0;
     [[nodiscard]] virtual auto get_full_args(const Path &exe_dir) const -> std::vector<std::string> = 0;
 };
 
