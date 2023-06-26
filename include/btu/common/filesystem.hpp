@@ -101,7 +101,14 @@ inline void hard_link(const Path &from, const Path &to)
     // simple case
     if (!fs::is_directory(from))
     {
-        fs::create_hard_link(from, to);
+        auto ec = std::error_code{};
+        fs::create_hard_link(from, to, ec);
+
+        if (ec)
+        {
+            // we have to make a copy, unfortunately
+            fs::copy(from, to);
+        }
         return;
     }
 
