@@ -96,4 +96,19 @@ inline void write_file(const Path &a_path, std::span<const std::byte> data)
     return beg1 == files1.end() && beg2 == files2.end();
 }
 
+inline void hard_link(const Path &from, const Path &to)
+{
+    // simple case
+    if (!fs::is_directory(from))
+    {
+        fs::create_hard_link(from, to);
+        return;
+    }
+
+    // we cannot hard link directories on Windows, so we create a directory and hardlink files inside
+    fs::create_directories(to);
+    for (const auto &e : fs::recursive_directory_iterator(from))
+        hard_link(e.path(), to / fs::relative(e.path(), from));
+}
+
 } // namespace btu::common
