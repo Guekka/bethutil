@@ -1,6 +1,6 @@
 name: Apply Formatting
 
-on: [ push, pull_request, pull_request_target ]
+on: [ push, pull_request, pull_request_target, workflow_dispatch ]
 
 jobs:
   clang-format:
