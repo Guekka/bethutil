@@ -50,9 +50,6 @@ public:
 
     auto operator<=>(const ArchiveData &) const = default;
 
-    static constexpr bool merge_different_types    = true;
-    static constexpr bool separate_different_types = false;
-
 private:
     [[nodiscard]] static auto get_file_size(const Path &path, std::optional<Size> override) -> Size;
 

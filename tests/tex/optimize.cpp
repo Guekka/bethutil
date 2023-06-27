@@ -3,14 +3,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-#include "btu/tex/optimize.hpp"
-
 #include "./utils.hpp"
-#include "btu/tex/compression_device.hpp"
-#include "btu/tex/texture.hpp"
 
+#include <btu/tex/compression_device.hpp>
 #include <btu/tex/dxtex.hpp>
 #include <btu/tex/optimize.hpp>
+#include <btu/tex/texture.hpp>
 
 #include <iostream>
 
@@ -22,7 +20,7 @@ auto operator<<(std::ostream &os, const btu::tex::OptimizationSteps &s) -> std::
               << ";mips: " << s.mipmaps << "; resize x:" << dim.w << " y:" << dim.h;
 }
 
-const auto generate_info1 = [] {
+constexpr auto info1 = [] {
     return DirectX::TexMetadata{
         .width      = 1024,
         .height     = 1024,
@@ -34,18 +32,19 @@ const auto generate_info1 = [] {
         .format     = DXGI_FORMAT_BC5_UNORM,
         .dimension  = DirectX::TEX_DIMENSION_TEXTURE2D,
     };
-};
+}();
 
-const auto generate_tex = [](const auto &info) {
+auto generate_tex(const DirectX::TexMetadata &info) -> btu::tex::Texture
+{
     auto image = DirectX::ScratchImage{};
     image.Initialize(info);
     auto tex = btu::tex::Texture{};
     tex.set(std::move(image));
 
     return tex;
-};
+}
 
-const auto generate_sets1 = [] {
+const auto sets1 = []() noexcept {
     auto sets                 = btu::tex::Settings::get(btu::Game::SSE);
     sets.use_format_whitelist = true;
     sets.allowed_formats      = {DXGI_FORMAT_BC7_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM};
@@ -53,15 +52,15 @@ const auto generate_sets1 = [] {
     sets.mipmaps              = true;
     sets.resize               = btu::tex::util::ResizeRatio{.ratio = 7, .min = {256, 256}};
     return sets;
-};
+}();
 
-const auto generate_info2 = [] {
-    auto info   = generate_info1();
+constexpr auto info2 = [] {
+    auto info   = info1;
     info.format = DXGI_FORMAT_R8G8B8A8_UNORM;
     return info;
-};
+}();
 
-const auto generate_sets2 = [] {
+const auto sets2 = [] {
     auto sets                 = btu::tex::Settings::get(btu::Game::SSE);
     sets.use_format_whitelist = false;
     sets.compress             = false;
@@ -69,11 +68,12 @@ const auto generate_sets2 = [] {
     sets.resize               = std::monostate{};
     sets.landscape_textures   = {u8"landscape/file.dds"};
     return sets;
-};
+}();
 
-const auto generate_tex2 = [] {
+auto generate_tex2() -> btu::tex::Texture
+{
     auto tex = DirectX::ScratchImage{};
-    tex.Initialize(generate_info2());
+    tex.Initialize(info2);
 
     // We create a texture with opaque alpha
     constexpr auto transform = [](DirectX::XMVECTOR *out_pixels,
@@ -99,7 +99,7 @@ const auto generate_tex2 = [] {
     file.set(std::move(timage));
     file.set_load_path(u8"textures/landscape/file.dds");
     return file;
-};
+}
 
 using btu::tex::compute_optimization_steps, btu::tex::optimize;
 
@@ -107,8 +107,8 @@ TEST_CASE("compute_optimization_steps", "[src]")
 {
     SECTION("tex1")
     {
-        auto tex = generate_tex(generate_info1());
-        auto res = compute_optimization_steps(tex, generate_sets1());
+        auto tex = generate_tex(info1);
+        auto res = compute_optimization_steps(tex, sets1);
         CHECK(res.resize == btu::tex::Dimension{256, 256});
         CHECK(res.add_transparent_alpha == false);
         CHECK(res.mipmaps == true);
@@ -117,7 +117,7 @@ TEST_CASE("compute_optimization_steps", "[src]")
     SECTION("tex2")
     {
         auto tex = generate_tex2();
-        auto res = compute_optimization_steps(tex, generate_sets2());
+        auto res = compute_optimization_steps(tex, sets2);
         CHECK(res.resize == std::nullopt);
         CHECK(res.add_transparent_alpha == true);
         CHECK(res.mipmaps == false);
@@ -129,9 +129,8 @@ TEST_CASE("optimize", "[src]")
 {
     SECTION("tex1")
     {
-        auto tex   = generate_tex(generate_info1());
-        auto sets  = generate_sets1();
-        auto steps = compute_optimization_steps(tex, sets);
+        auto tex   = generate_tex(info1);
+        auto steps = compute_optimization_steps(tex, sets1);
         auto dev   = btu::tex::CompressionDevice::make(0);
         auto res   = optimize(std::move(tex), steps, dev);
         REQUIRE(res.has_value());
@@ -149,8 +148,7 @@ TEST_CASE("optimize", "[src]")
     SECTION("tex2")
     {
         auto tex   = generate_tex2();
-        auto sets  = generate_sets2();
-        auto steps = compute_optimization_steps(tex, sets);
+        auto steps = compute_optimization_steps(tex, sets2);
         auto dev   = btu::tex::CompressionDevice::make(0);
         auto res   = optimize(std::move(tex), steps, dev);
         REQUIRE(res.has_value());
@@ -169,12 +167,12 @@ TEST_CASE("optimize", "[src]")
     }
     SECTION("expected_dir")
     {
-        auto sets   = generate_sets1();
+        auto sets   = sets1;
         sets.resize = btu::tex::Dimension{128, 128};
         test_expected_dir(u8"optimize", [&](auto &&f) {
             thread_local auto dev                   = btu::tex::CompressionDevice::make(0);
             const btu::tex::OptimizationSteps steps = btu::tex::compute_optimization_steps(f, sets);
-            return btu::tex::optimize(std::move(f), steps, dev);
+            return btu::tex::optimize(std::forward<decltype(f)>(f), steps, dev);
         });
     }
 }

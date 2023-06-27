@@ -45,8 +45,8 @@ inline void write_file(const Path &a_path, std::span<const std::byte> data)
     file1.seekg(0); //rewind
     file2.seekg(0); //rewind
 
-    std::istreambuf_iterator<char> begin1(file1);
-    std::istreambuf_iterator<char> begin2(file2);
+    const std::istreambuf_iterator<char> begin1(file1);
+    const std::istreambuf_iterator<char> begin2(file2);
 
     return std::equal(begin1,
                       std::istreambuf_iterator<char>(),

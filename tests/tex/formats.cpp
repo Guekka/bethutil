@@ -23,7 +23,7 @@ TEST_CASE("guess_texture_type", "[src]")
         // Unknown underscore
         CHECK(guess_texture_type(u8"some_name.dds") == std::nullopt);
 
-        // Case insensitive
+        // Case-insensitive
         CHECK(guess_texture_type(u8"some_name_n.dds") == TextureType::Normal);
         CHECK(guess_texture_type(u8"some_name_N.dds") == TextureType::Normal);
 

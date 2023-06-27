@@ -11,10 +11,7 @@
 
 namespace btu::bsa {
 template<class... Keys>
-requires requires(Keys... keys)
-{
-    (std::string(keys.name()), ...);
-}
+    requires requires(Keys... keys) { (std::string(keys.name()), ...); }
 [[nodiscard]] auto virtual_to_local_path(Keys &&...a_keys) -> std::u8string
 {
     std::u8string local;
@@ -38,7 +35,7 @@ using UnderlyingFile = std::variant<libbsa::tes3::file, libbsa::tes4::file, libb
 class File final
 {
 public:
-    File(ArchiveVersion v);
+    explicit File(ArchiveVersion v);
     File(UnderlyingFile f, ArchiveVersion v);
 
     [[nodiscard]] auto compressed() const noexcept -> bool;
@@ -54,8 +51,11 @@ public:
     [[nodiscard]] auto version() const noexcept -> ArchiveVersion;
 
     template<typename T>
-    requires btu::common::is_variant_member_v<T, UnderlyingFile>
-    [[nodiscard]] auto as_raw_file() && { return std::get<T>(std::move(file_)); }
+        requires btu::common::is_variant_member_v<T, UnderlyingFile>
+    [[nodiscard]] auto as_raw_file() &&
+    {
+        return std::get<T>(std::move(file_));
+    }
 
 private:
     UnderlyingFile file_;

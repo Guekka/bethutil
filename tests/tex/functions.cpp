@@ -25,20 +25,22 @@ TEST_CASE("convert", "[src]")
         {
             auto dev = btu::tex::CompressionDevice::make(0);
             test_expected_dir(u8"convert", [&dev](auto &&tex) {
-                return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, dev);
+                return btu::tex::convert(std::forward<decltype(tex)>(tex), DXGI_FORMAT_BC7_UNORM, dev);
             });
         }
         SECTION("Without compression device")
         {
             test_expected_dir(u8"convert2", [](auto &&tex) {
-                return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC7_UNORM, std::nullopt);
+                return btu::tex::convert(std::forward<decltype(tex)>(tex),
+                                         DXGI_FORMAT_BC7_UNORM,
+                                         std::nullopt);
             });
         }
     }
     SECTION("bc1")
     {
         test_expected(u8"convert_bc1", u8"01.dds", [](auto &&tex) {
-            return btu::tex::convert(std::move(tex), DXGI_FORMAT_BC1_UNORM, std::nullopt);
+            return btu::tex::convert(std::forward<decltype(tex)>(tex), DXGI_FORMAT_BC1_UNORM, std::nullopt);
         });
     }
 }
@@ -52,7 +54,7 @@ TEST_CASE("resize", "[src]")
     test_expected_dir(u8"resize", [](auto &&tex) {
         const auto args = btu::tex::util::ResizeRatio{3, {200, 200}};
         const auto dim  = btu::tex::util::compute_resize_dimension(tex.get_dimension(), args);
-        return btu::tex::resize(std::move(tex), dim);
+        return btu::tex::resize(std::forward<decltype(tex)>(tex), dim);
     });
 }
 TEST_CASE("optimal_mip_count", "[src]")
@@ -112,7 +114,9 @@ TEST_CASE("nearest_pow2", "[src]")
 TEST_CASE("scale_fit", "[src]")
 {
     using btu::tex::util::scale_fit;
-    size_t x = 10, y = 20, tx = 2;
+    size_t x  = 10;
+    size_t y  = 20;
+    size_t tx = 2;
     scale_fit(x, tx, y);
     CHECK(x == 2);
     CHECK(y == 4);

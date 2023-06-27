@@ -14,7 +14,7 @@ File::File(ArchiveVersion v)
         switch (v)
         {
             case btu::bsa::ArchiveVersion::tes3: return libbsa::tes3::file{};
-            case btu::bsa::ArchiveVersion::tes4: [[fallthrough]];
+            case btu::bsa::ArchiveVersion::tes4:
             case btu::bsa::ArchiveVersion::tes5: [[fallthrough]];
             case btu::bsa::ArchiveVersion::sse: return libbsa::tes4::file{};
             case btu::bsa::ArchiveVersion::fo4: [[fallthrough]];
@@ -26,7 +26,7 @@ File::File(ArchiveVersion v)
 
 File::File(UnderlyingFile f, ArchiveVersion v)
     : file_(std::move(f))
-    , ver_(std::move(v))
+    , ver_(v)
 {
 }
 
@@ -45,7 +45,7 @@ void File::decompress()
 {
     const auto visitor = btu::common::overload{
         [&](libbsa::tes3::file &) {},
-        [&, this](libbsa::tes4::file &f) { f.decompress(static_cast<libbsa::tes4::version>(ver_)); },
+        [this](libbsa::tes4::file &f) { f.decompress(static_cast<libbsa::tes4::version>(ver_)); },
         [](libbsa::fo4::file &f) { flow::for_each(f, [](auto &c) { c.decompress(); }); },
     };
 
@@ -57,7 +57,7 @@ void File::compress()
 {
     const auto visitor = btu::common::overload{
         [&](libbsa::tes3::file &) {},
-        [&, this](libbsa::tes4::file &f) { f.compress(static_cast<libbsa::tes4::version>(ver_)); },
+        [this](libbsa::tes4::file &f) { f.compress(static_cast<libbsa::tes4::version>(ver_)); },
         [](libbsa::fo4::file &f) { flow::for_each(f, [](auto &c) { c.compress(); }); },
     };
 
@@ -69,10 +69,12 @@ void File::read(Path path)
 {
     const auto visitor = btu::common::overload{
         [&](libbsa::tes3::file &f) { f.read(std::move(path)); },
-        [&, this](libbsa::tes4::file &f) {
+        [&path, this](libbsa::tes4::file &f) {
             f.read(std::move(path), static_cast<libbsa::tes4::version>(ver_));
         },
-        [&, this](libbsa::fo4::file &f) { f.read(std::move(path), static_cast<libbsa::fo4::format>(ver_)); },
+        [&path, this](libbsa::fo4::file &f) {
+            f.read(std::move(path), static_cast<libbsa::fo4::format>(ver_));
+        },
     };
 
     std::visit(visitor, file_);
@@ -82,8 +84,8 @@ void File::read(std::span<std::byte> src)
 {
     const auto visitor = btu::common::overload{
         [&](libbsa::tes3::file &f) { f.read(src); },
-        [&, this](libbsa::tes4::file &f) { f.read(src, static_cast<libbsa::tes4::version>(ver_)); },
-        [&, this](libbsa::fo4::file &f) { f.read(src, static_cast<libbsa::fo4::format>(ver_)); },
+        [&src, this](libbsa::tes4::file &f) { f.read(src, static_cast<libbsa::tes4::version>(ver_)); },
+        [&src, this](libbsa::fo4::file &f) { f.read(src, static_cast<libbsa::fo4::format>(ver_)); },
     };
 
     std::visit(visitor, file_);
@@ -93,10 +95,10 @@ void File::write(Path path) const
 {
     const auto visitor = btu::common::overload{
         [&](const libbsa::tes3::file &f) { f.write(std::move(path)); },
-        [&, this](const libbsa::tes4::file &f) {
+        [&path, this](const libbsa::tes4::file &f) {
             f.write(std::move(path), static_cast<libbsa::tes4::version>(ver_));
         },
-        [&, this](const libbsa::fo4::file &f) {
+        [&path, this](const libbsa::fo4::file &f) {
             f.write(std::move(path), static_cast<libbsa::fo4::format>(ver_));
         },
     };
@@ -108,8 +110,8 @@ void File::write(binary_io::any_ostream &os) const
 {
     const auto visitor = btu::common::overload{
         [&](const libbsa::tes3::file &f) { f.write(os); },
-        [&, this](const libbsa::tes4::file &f) { f.write(os, static_cast<libbsa::tes4::version>(ver_)); },
-        [&, this](const libbsa::fo4::file &f) { f.write(os, static_cast<libbsa::fo4::format>(ver_)); },
+        [&os, this](const libbsa::tes4::file &f) { f.write(os, static_cast<libbsa::tes4::version>(ver_)); },
+        [&os, this](const libbsa::fo4::file &f) { f.write(os, static_cast<libbsa::fo4::format>(ver_)); },
     };
 
     std::visit(visitor, file_);
@@ -153,8 +155,7 @@ auto read_archive(Path path) -> std::optional<Archive>
                 {
                     const auto u8str = virtual_to_local_path(dir.first, file.first);
                     const auto str   = btu::common::as_ascii_string(u8str);
-                    res.emplace(std::move(str),
-                                File(std::move(file.second), static_cast<ArchiveVersion>(ver)));
+                    res.emplace(str, File(std::move(file.second), static_cast<ArchiveVersion>(ver)));
                 }
             }
             return res;
@@ -193,7 +194,7 @@ void write_archive(Archive arch, Path path)
             bsa.write(std::move(path));
             return;
         }
-        case btu::bsa::ArchiveVersion::tes4: [[fallthrough]];
+        case btu::bsa::ArchiveVersion::tes4:
         case btu::bsa::ArchiveVersion::tes5: [[fallthrough]];
         case btu::bsa::ArchiveVersion::sse:
         {

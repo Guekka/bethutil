@@ -7,6 +7,7 @@
 #include <btu/tex/dxtex.hpp>
 
 #include <array>
+#include <ranges>
 #include <string>
 
 //Used to convert enum to string and vice versa
@@ -111,20 +112,10 @@ constexpr std::array k_dxgi_formats = std::to_array<StringFormat>({
 #undef DEFMTT //cleanup
 } // namespace detail
 
-inline auto to_dxgi_format(std::u8string_view string) -> DXGI_FORMAT
-{
-    const auto it = std::find_if(detail::k_dxgi_formats.cbegin(),
-                                 detail::k_dxgi_formats.cend(),
-                                 [&](auto &&f) { return f.name == string; });
-
-    return it != detail::k_dxgi_formats.cend() ? it->format : DXGI_FORMAT_UNKNOWN;
-}
-
 inline auto to_string(DXGI_FORMAT format) -> std::u8string_view
 {
-    const auto it = std::find_if(detail::k_dxgi_formats.cbegin(),
-                                 detail::k_dxgi_formats.cend(),
-                                 [&](auto &&f) { return f.format == format; });
+    const auto *it = std::ranges::find_if(detail::k_dxgi_formats,
+                                          [&](auto &&f) { return f.format == format; });
 
     return it != detail::k_dxgi_formats.cend() ? it->name : u8"DXGI_FORMAT_UNKNOWN";
 }

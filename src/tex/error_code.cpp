@@ -2,7 +2,6 @@
 
 #include <btu/tex/dxtex.hpp>
 
-#include <array>
 #include <system_error>
 
 namespace btu::tex {

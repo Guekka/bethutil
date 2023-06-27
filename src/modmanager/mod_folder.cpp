@@ -8,8 +8,6 @@
 #include "btu/bsa/archive.hpp"
 #include "btu/common/filesystem.hpp"
 
-#include <binary_io/file_stream.hpp>
-
 namespace btu::modmanager {
 detail::ModFileDisk::ModFileDisk(Path root, Path rel_path)
     : relative_path_(std::move(rel_path))
@@ -28,12 +26,12 @@ auto detail::ModFileDisk::get_relative_path() const noexcept -> Path
     return relative_path_;
 }
 
-size_t detail::ModFileDisk::size() const noexcept
+auto detail::ModFileDisk::size() const noexcept -> size_t
 {
     return content_.size();
 }
 
-bool detail::ModFileDisk::modified() const noexcept
+auto detail::ModFileDisk::modified() const noexcept -> bool
 {
     return modified_;
 }
@@ -67,7 +65,7 @@ ModFile::ModFile(Underlying content)
 
 void ModFile::load()
 {
-    if (auto f = std::get_if<std::reference_wrapper<detail::ModFileDisk>>(&file_))
+    if (auto *f = std::get_if<std::reference_wrapper<detail::ModFileDisk>>(&file_))
         f->get().load();
 }
 
@@ -85,7 +83,7 @@ void ModFile::read(Path path)
 {
     auto visitor = btu::common::overload{
         [&](detail::ModFileArchive &f) { f.file.read(std::move(path)); },
-        [&](detail::ModFileDisk &f) { f.read(std::move(path)); },
+        [&](detail::ModFileDisk &f) { f.read(path); },
     };
 
     return std::visit(visitor, file_);
@@ -101,11 +99,11 @@ void ModFile::read(std::span<std::byte> src)
     return std::visit(visitor, file_);
 }
 
-void ModFile::write(Path path) const
+void ModFile::write(const Path &path) const
 {
     auto visitor = btu::common::overload{
-        [path](const detail::ModFileArchive &f) { f.file.write(std::move(path)); },
-        [path](const detail::ModFileDisk &f) { f.write(std::move(path)); },
+        [&path](const detail::ModFileArchive &f) { f.file.write(path); },
+        [&path](const detail::ModFileDisk &f) { f.write(path); },
     };
 
     return std::visit(visitor, file_);
@@ -121,9 +119,9 @@ void ModFile::write(binary_io::any_ostream &dst) const
     return std::visit(visitor, file_);
 }
 
-ModFolder::ModFolder(Path directory, std::u8string archive_ext)
+ModFolder::ModFolder(Path directory, std::u8string_view archive_ext)
     : dir_(std::move(directory))
-    , archive_ext_(btu::common::to_lower(std::move(archive_ext)))
+    , archive_ext_(btu::common::to_lower(archive_ext))
 {
     //Typical amount of medium mod
     archives_.reserve(4);
@@ -137,11 +135,11 @@ ModFolder::ModFolder(Path directory, std::u8string archive_ext)
     flow::from(fs::recursive_directory_iterator(dir_))
         .filter([](auto &&e) { return e.is_regular_file(); })
         .map([](auto &&e) { return e.path(); })
-        .for_each([&](auto &&path) {
+        .for_each([&is_arch, this](auto &&path) {
             if (is_arch(path))
             {
                 if (auto arch = btu::bsa::read_archive(path))
-                    archives_.emplace_back(Archive{std::move(path), *std::move(arch)});
+                    archives_.emplace_back(Archive{std::forward<decltype(path)>(path), *std::move(arch)});
             }
             else
             {
@@ -164,7 +162,7 @@ void ModFolder::reintegrate()
 {
     for (const auto &arch : archives_)
         bsa::write_archive(arch.arch, arch.path);
-    flow::from(loose_files_).filter(&detail::ModFileDisk::modified).for_each([&](auto &&f) {
+    flow::from(loose_files_).filter(&detail::ModFileDisk::modified).for_each([this](auto &&f) {
         f.write(dir_ / f.get_relative_path());
     });
 }

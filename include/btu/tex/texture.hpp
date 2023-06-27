@@ -45,9 +45,9 @@ public:
 
     ~ScratchImagePimpl();
 
-    auto get() &noexcept -> ScratchImage &;
-    auto get() &&noexcept -> ScratchImage;
-    auto get() const &noexcept -> const ScratchImage &;
+    [[nodiscard]] auto get() & noexcept -> ScratchImage &;
+    [[nodiscard]] auto get() && noexcept -> ScratchImage;
+    [[nodiscard]] auto get() const & noexcept -> const ScratchImage &;
 
 private:
     std::aligned_storage_t<k_sizeof_scratchimage, k_alignof_scratchimage> storage_;
@@ -63,17 +63,17 @@ class Texture
 public:
     void set(ScratchImage &&tex) noexcept;
 
-    auto get() noexcept -> ScratchImage &;
-    auto get() const noexcept -> const ScratchImage &;
+    [[nodiscard]] auto get() noexcept -> ScratchImage &;
+    [[nodiscard]] auto get() const noexcept -> const ScratchImage &;
 
-    auto get_images() const noexcept -> std::span<const Image>;
+    [[nodiscard]] auto get_images() const noexcept -> std::span<const Image>;
 
-    auto get_dimension() const noexcept -> Dimension;
+    [[nodiscard]] auto get_dimension() const noexcept -> Dimension;
 
-    auto get_load_path() const noexcept -> const Path &;
+    [[nodiscard]] auto get_load_path() const noexcept -> const Path &;
     void set_load_path(Path path) noexcept;
 
-    auto operator==(const Texture &) const noexcept -> bool = default;
+    [[nodiscard]] auto operator==(const Texture &) const noexcept -> bool = default;
 
 private:
     Path load_path_;
@@ -81,6 +81,6 @@ private:
 };
 
 [[nodiscard]] auto load(Path path) noexcept -> tl::expected<Texture, Error>;
-[[nodiscard]] auto save(const Texture &tex, Path path) noexcept -> ResultError;
+[[nodiscard]] auto save(const Texture &tex, const Path &path) noexcept -> ResultError;
 
 } // namespace btu::tex
