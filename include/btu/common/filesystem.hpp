@@ -22,7 +22,8 @@ namespace btu::common {
 
     std::ifstream in{a_path, std::ios_base::in | std::ios_base::binary};
     in.exceptions(std::ios_base::failbit);
-    in.read(reinterpret_cast<char *>(data.data()), static_cast<std::streamsize>(data.size())); // NOLINT
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    in.read(reinterpret_cast<char *>(data.data()), static_cast<std::streamsize>(data.size()));
 
     return data;
 }
@@ -31,8 +32,8 @@ inline void write_file(const Path &a_path, std::span<const std::byte> data)
 {
     std::ofstream out{a_path, std::ios_base::binary};
     out.exceptions(std::ios_base::failbit);
-    out.write(reinterpret_cast<const char *>(data.data()), // NOLINT
-              static_cast<std::streamsize>(data.size()));
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    out.write(reinterpret_cast<const char *>(data.data()), static_cast<std::streamsize>(data.size()));
 }
 
 [[nodiscard]] inline auto compare_files(const Path &filename1, const Path &filename2) -> bool
