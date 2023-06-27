@@ -22,12 +22,12 @@ namespace common {
 template<typename CharT>
 void backslash_to_slash(std::basic_string<CharT> &path) noexcept
 {
-    std::replace(path.begin(), path.end(), CharT('\\'), CharT('/'));
+    std::replace(path.begin(), path.end(), static_cast<CharT>('\\'), static_cast<CharT>('/'));
 }
 
 constexpr auto make_path_canonizer(std::u8string_view start)
 {
-    return [start = std::move(start)](const Path &path) noexcept -> std::u8string {
+    return [start](const Path &path) noexcept -> std::u8string {
         auto str = btu::common::to_lower(path.generic_u8string());
         backslash_to_slash(str);
 

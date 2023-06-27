@@ -15,9 +15,9 @@ class Mesh
 
 public:
     auto get() noexcept -> nifly::NifFile &;
-    auto get() const noexcept -> const nifly::NifFile &;
+    [[nodiscard]] auto get() const noexcept -> const nifly::NifFile &;
 
-    auto get_load_path() const noexcept -> const Path &;
+    [[nodiscard]] auto get_load_path() const noexcept -> const Path &;
     void set_load_path(Path path) noexcept;
 };
 

@@ -53,14 +53,14 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
 
 [[nodiscard]] auto is_bad_cubemap(const TexMetadata &info) noexcept -> bool
 {
-    const bool isCubemap    = info.IsCubemap();
+    const bool is_cubemap   = info.IsCubemap();
     const bool uncompressed = !DirectX::IsCompressed(info.format);
 
-    const bool opaqueAlpha = info.GetAlphaMode() == DirectX::TEX_ALPHA_MODE::TEX_ALPHA_MODE_OPAQUE;
-    const bool noAlpha     = !DirectX::HasAlpha(info.format);
-    const bool badAlpha    = opaqueAlpha || noAlpha;
+    const bool opaque_alpha = info.GetAlphaMode() == DirectX::TEX_ALPHA_MODE::TEX_ALPHA_MODE_OPAQUE;
+    const bool no_alpha     = !DirectX::HasAlpha(info.format);
+    const bool bad_alpha    = opaque_alpha || no_alpha;
 
-    return isCubemap && uncompressed && badAlpha;
+    return is_cubemap && uncompressed && bad_alpha;
 }
 
 [[nodiscard]] auto can_be_compressed(const TexMetadata &info) noexcept -> bool
@@ -178,11 +178,11 @@ auto Settings::get(Game game) noexcept -> const Settings &
                 sets.compress             = true;
                 sets.use_format_whitelist = true;
                 sets.allowed_formats      = {
-                         DXGI_FORMAT_BC7_UNORM,
-                         DXGI_FORMAT_BC5_UNORM,
-                         DXGI_FORMAT_BC3_UNORM,
-                         DXGI_FORMAT_BC1_UNORM,
-                         DXGI_FORMAT_R8G8B8A8_UNORM,
+                    DXGI_FORMAT_BC7_UNORM,
+                    DXGI_FORMAT_BC5_UNORM,
+                    DXGI_FORMAT_BC3_UNORM,
+                    DXGI_FORMAT_BC1_UNORM,
+                    DXGI_FORMAT_R8G8B8A8_UNORM,
                 };
                 sets.output_format.compressed = DXGI_FORMAT_BC7_UNORM;
                 sets.game                     = btu::Game::SSE;

@@ -10,7 +10,6 @@
 
 #include <btu/common/algorithms.hpp>
 #include <btu/common/functional.hpp>
-#include <flow.hpp>
 
 #include <deque>
 #include <execution>
@@ -50,7 +49,7 @@ auto write(bool compressed, ArchiveData &&data, const Path &root) -> std::vector
                 file.compress();
 
             auto path = btu::common::as_ascii_string(fpath.lexically_relative(root).u8string());
-            std::lock_guard lock(mut);
+            const std::lock_guard lock(mut);
             arch.emplace(std::move(path), std::move(file));
         }
         catch (const std::exception &e)

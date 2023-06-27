@@ -30,7 +30,7 @@ TEST_CASE("Pack", "[src]")
         REQUIRE(errs.empty());
 
         REQUIRE(btu::common::compare_files(out, dir / (u8"expected_"s + name + sets.extension)));
-        fs::remove(out);
+        btu::fs::remove(out);
     };
 
     pack(btu::Game::SSE, u8"sse");

@@ -21,7 +21,6 @@ enum class TextureType
     Diffuse,
     Normal,
     Cube,
-    Bump,
     Specular,
     Glow,
     Parallax,

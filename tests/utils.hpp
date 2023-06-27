@@ -7,7 +7,6 @@
 #include <fstream>
 
 using btu::Path;
-namespace fs = btu::fs;
 using namespace std::literals;
 
 namespace Catch {
@@ -34,7 +33,10 @@ struct StringMaker<tl::expected<void, E>>
 template<>
 struct StringMaker<btu::Path>
 {
-    static std::string convert(const btu::Path &in) { return btu::common::as_ascii_string(in.u8string()); }
+    static auto convert(const btu::Path &in) -> std::string
+    {
+        return btu::common::as_ascii_string(in.u8string());
+    }
 };
 
 template<>

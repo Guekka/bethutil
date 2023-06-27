@@ -11,6 +11,7 @@
 
 #include <btu/common/string.hpp>
 #include <catch.hpp>
+#include <flow.hpp>
 
 namespace Catch {
 template<>
@@ -25,7 +26,7 @@ struct StringMaker<btu::tex::Dimension>
 template<>
 struct StringMaker<btu::tex::ScratchImage>
 {
-    static auto convert(const btu::tex::ScratchImage &) -> std::string { return "scratch_image"; }
+    static auto convert(const btu::tex::ScratchImage & /*unused*/) -> std::string { return "scratch_image"; }
 };
 
 } // namespace Catch
@@ -42,16 +43,14 @@ inline auto load_tex(const Path &path) -> btu::tex::Texture
 /// This function compares two textures using MSE and returns true if they are almost equal
 inline auto compute_mse(const btu::tex::Texture &lhs, const btu::tex::Texture &rhs) -> float
 {
-    const auto &lhs_img = lhs.get();
-    const auto &rhs_img = rhs.get();
-
-    REQUIRE(lhs_img.GetMetadata() == rhs_img.GetMetadata());
+    REQUIRE(lhs.get().GetMetadata() == rhs.get().GetMetadata());
+    const size_t img_count = lhs.get().GetImageCount();
 
     float total_mse = 0; //  average of MSEs for each subimage
-    for (size_t i = 0; i < lhs_img.GetImageCount(); ++i)
+    for (size_t i = 0; i < img_count; ++i)
     {
-        const auto &lhs_sub = lhs_img.GetImages()[i];
-        const auto &rhs_sub = rhs_img.GetImages()[i];
+        const auto &lhs_sub = lhs.get_images()[i];
+        const auto &rhs_sub = rhs.get_images()[i];
 
         float mse     = 0;
         const auto hr = DirectX::ComputeMSE(lhs_sub, rhs_sub, mse, nullptr);
@@ -59,7 +58,7 @@ inline auto compute_mse(const btu::tex::Texture &lhs, const btu::tex::Texture &r
 
         total_mse += mse;
     }
-    total_mse /= static_cast<float>(lhs_img.GetImageCount());
+    total_mse /= static_cast<float>(img_count);
     return total_mse;
 }
 
@@ -76,9 +75,9 @@ auto test_expected(const Path &root, const Path &filename, Func f, bool approve 
     }
 
     const auto expected_path = root / "expected" / filename;
-    if (!fs::exists(expected_path) && approve)
+    if (!btu::fs::exists(expected_path) && approve)
     {
-        fs::create_directories(expected_path.parent_path());
+        btu::fs::create_directories(expected_path.parent_path());
         const auto res = btu::tex::save(out.value(), expected_path);
         CHECK(res.has_value());
         FAIL_CHECK("Expected file not found:" + expected_path.string());
@@ -100,7 +99,7 @@ template<typename Func>
 void test_expected_dir(const Path &root, const Func &f)
 {
     const auto in_dir = root / "in";
-    for (const auto &file : fs::recursive_directory_iterator(in_dir))
+    for (const auto &file : btu::fs::recursive_directory_iterator(in_dir))
         if (file.is_regular_file())
             test_expected(root, file.path().lexically_relative(in_dir), f);
 }

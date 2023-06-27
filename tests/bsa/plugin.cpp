@@ -6,6 +6,8 @@
 #include "btu/common/filesystem.hpp"
 #include "utils.hpp"
 
+using namespace btu::bsa;
+
 TEST_CASE("Plugin names are correctly parsed", "[src]")
 {
     SECTION("Simple (SSE)")
@@ -17,7 +19,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
         REQUIRE(plug.has_value());
         CHECK(plug->dir == "C:/SomeDir");
         CHECK(plug->name == u8"Requiem");
-        CHECK(plug->suffix == u8"");
+        CHECK(plug->suffix.empty());
         CHECK(plug->ext == u8".esp");
     }
     SECTION("Complex (SSE)")
@@ -56,7 +58,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
         REQUIRE(plug.has_value());
         CHECK(plug->dir == "C:/AnotherSomeDir");
         CHECK(plug->name == u8"Requiem - Enhancement");
-        CHECK(plug->suffix == u8"");
+        CHECK(plug->suffix.empty());
         CHECK(plug->counter == 1U);
         CHECK(plug->ext == u8".bsa");
     }
@@ -67,7 +69,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
 
         REQUIRE(plug.has_value());
         CHECK(plug->name == u8"Mk. II - Frag");
-        CHECK(plug->suffix == u8"");
+        CHECK(plug->suffix.empty());
         CHECK_FALSE(plug->counter.has_value());
         CHECK(plug->ext == u8".esp");
     }
@@ -78,7 +80,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
 
         REQUIRE(plug.has_value());
         CHECK(plug->name == u8"Colt ");
-        CHECK(plug->suffix == u8"");
+        CHECK(plug->suffix.empty());
         CHECK(plug->counter == 6520U);
         CHECK(plug->ext == u8".esp");
     }
@@ -89,7 +91,7 @@ TEST_CASE("Plugin names are correctly parsed", "[src]")
 
         REQUIRE(plug.has_value());
         CHECK(plug->name == u8"Colt. ");
-        CHECK(plug->suffix == u8"");
+        CHECK(plug->suffix.empty());
         CHECK(plug->counter == 6520U);
         CHECK(plug->ext == u8".esp");
     }
@@ -100,12 +102,14 @@ TEST_CASE("clean_dummy_plugins", "[src]")
     const Path dir = "bsa_clean_dummy_plugins";
     const Path out = dir / "out";
 
-    fs::remove_all(out);
-    fs::copy(dir / "in", out);
+    btu::fs::remove_all(out);
+    btu::fs::copy(dir / "in", out);
 
     const auto &sets = Settings::get(btu::Game::SSE);
 
-    auto plugins = btu::bsa::list_plugins(fs::directory_iterator(out), fs::directory_iterator(), sets);
+    auto plugins = btu::bsa::list_plugins(btu::fs::directory_iterator(out),
+                                          btu::fs::directory_iterator(),
+                                          sets);
     REQUIRE(plugins == std::vector{FilePath(out, u8"dummy_sse", u8"", u8".esp", FileTypes::Plugin)});
     btu::bsa::clean_dummy_plugins(plugins, sets);
     REQUIRE(plugins.empty());

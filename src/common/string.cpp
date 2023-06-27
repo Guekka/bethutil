@@ -28,17 +28,17 @@ auto as_ascii(std::u8string_view str) -> std::string_view
 namespace detail {
 // utility wrapper to adapt locale-bound facets for wstring/wbuffer convert
 template<class Facet>
-struct deletable_facet : Facet
+struct DeletableFacet : Facet
 {
     template<class... Args>
-    deletable_facet(Args &&...args)
+    explicit DeletableFacet(Args &&...args)
         : Facet(std::forward<Args>(args)...)
     {
     }
-    ~deletable_facet() {}
+    ~DeletableFacet() override = default;
 };
 
-thread_local std::wstring_convert<deletable_facet<std::codecvt<wchar_t, char, std::mbstate_t>>, wchar_t>
+thread_local std::wstring_convert<DeletableFacet<std::codecvt<wchar_t, char, std::mbstate_t>>, wchar_t>
     converter{};
 } // namespace detail
 

@@ -51,12 +51,14 @@ void initialize_com()
 }
 
 ScratchImagePimpl::ScratchImagePimpl()
+    : storage_{}
 {
     new (&storage_) ScratchImage();
     initialize_com();
 }
 
 ScratchImagePimpl::ScratchImagePimpl(ScratchImagePimpl &&other) noexcept
+    : storage_{}
 {
     new (&storage_) ScratchImage(std::move(other).get());
     initialize_com();
@@ -73,19 +75,23 @@ ScratchImagePimpl::~ScratchImagePimpl()
     get().~ScratchImage();
 }
 
-auto ScratchImagePimpl::get() &noexcept -> ScratchImage &
+auto ScratchImagePimpl::get() & noexcept -> ScratchImage &
 {
-    return *std::launder(reinterpret_cast<ScratchImage *>(&storage_));
+    return *std::launder(
+        reinterpret_cast<ScratchImage *>(&storage_)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 }
 
-auto ScratchImagePimpl::get() &&noexcept -> ScratchImage
+auto ScratchImagePimpl::get() && noexcept -> ScratchImage
 {
-    return std::move(*std::launder(reinterpret_cast<ScratchImage *>(&storage_)));
+    return std::move(*std::launder(
+        reinterpret_cast<ScratchImage *>(&storage_))); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 }
 
-auto ScratchImagePimpl::get() const &noexcept -> const ScratchImage &
+auto ScratchImagePimpl::get() const & noexcept -> const ScratchImage &
 {
-    return *std::launder(reinterpret_cast<const ScratchImage *>(&storage_));
+    return *std::launder(
+        reinterpret_cast<const ScratchImage *>( // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+            &storage_));
 }
 
 auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noexcept -> bool
@@ -112,9 +118,9 @@ auto Texture::get() const noexcept -> const ScratchImage &
 
 auto Texture::get_images() const noexcept -> std::span<const Image>
 {
-    const auto begin = get().GetImages();
-    const auto end   = begin + get().GetImageCount(); // NOLINT
-    return std::span(begin, end);
+    const auto *begin = get().GetImages();
+    const auto *end   = begin + get().GetImageCount(); // NOLINT
+    return {begin, end};
 }
 
 auto Texture::get_dimension() const noexcept -> Dimension
@@ -133,7 +139,7 @@ void Texture::set_load_path(Path path) noexcept
     load_path_ = std::move(path);
 }
 
-tl::expected<Texture, Error> load(Path path) noexcept
+auto load(Path path) noexcept -> tl::expected<Texture, Error>
 {
     Texture tex;
     tex.set_load_path(std::move(path));
@@ -154,7 +160,7 @@ tl::expected<Texture, Error> load(Path path) noexcept
     return tex;
 }
 
-ResultError save(const Texture &tex, Path path) noexcept
+auto save(const Texture &tex, const Path &path) noexcept -> ResultError
 {
     const auto res = DirectX::SaveToDDSFile(tex.get().GetImages(),
                                             tex.get().GetImageCount(),

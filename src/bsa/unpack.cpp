@@ -8,7 +8,6 @@
 #include "btu/bsa/archive.hpp"
 #include "btu/common/functional.hpp"
 
-#include <fstream>
 #include <iostream>
 
 namespace btu::bsa {
@@ -18,10 +17,10 @@ void unpack(UnpackSettings sets)
         auto arch = read_archive(sets.file_path);
         if (!arch)
             return;
-        const auto &root = sets.root_opt ? *sets.root_opt : sets.file_path.parent_path();
-        btu::common::for_each_mt(std::move(*arch), [root](auto &&elem) {
+        const auto &root = sets.root_opt != nullptr ? *sets.root_opt : sets.file_path.parent_path();
+        btu::common::for_each_mt(std::move(*arch), [root, &sets](auto &&elem) {
             const auto path = root / elem.first;
-            if (!fs::exists(path)) // preserve existing loose files
+            if (sets.overwrite_existing_files || !fs::exists(path)) // preserve existing loose files
             {
                 fs::create_directories(path.parent_path());
                 elem.second.write(path);

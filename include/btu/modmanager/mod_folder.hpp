@@ -21,7 +21,7 @@ public:
 
     void load();
 
-    auto get_relative_path() const noexcept -> Path;
+    [[nodiscard]] auto get_relative_path() const noexcept -> Path;
     [[nodiscard]] auto size() const noexcept -> size_t;
 
     [[nodiscard]] auto modified() const noexcept -> bool;
@@ -53,19 +53,17 @@ class ModFile
 public:
     using Underlying = std::variant<detail::ModFileArchive, std::reference_wrapper<detail::ModFileDisk>>;
 
-    ModFile(Underlying content);
+    explicit ModFile(Underlying content);
 
     void load();
 
-    auto get_relative_path() const -> Path;
+    [[nodiscard]] auto get_relative_path() const -> Path;
 
     void read(Path path);
     void read(std::span<std::byte> src);
 
-    void write(Path path) const;
+    void write(const Path &path) const;
     void write(binary_io::any_ostream &dst) const;
-
-    const auto &get_underlying() const { return file_; }
 
 private:
     Underlying file_;
@@ -80,7 +78,7 @@ class ModFolder
     };
 
 public:
-    explicit ModFolder(Path directory, std::u8string archive_ext);
+    explicit ModFolder(Path directory, std::u8string_view archive_ext);
 
     [[nodiscard]] auto size() -> size_t;
 

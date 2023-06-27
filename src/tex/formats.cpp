@@ -50,9 +50,9 @@ auto guess_best_format(const Texture &tex, BestFormatFor formats, bool force_unc
     const bool alpha      = DirectX::IsCompressed(tex.get().GetMetadata().format);
     if (compressed && alpha)
         return formats.compressed;
-    if (compressed && !alpha)
+    if (compressed)
         return formats.compressed_without_alpha;
-    if (!compressed && !alpha)
+    if (!alpha)
         return formats.uncompressed_without_alpha;
 
     return formats.uncompressed;

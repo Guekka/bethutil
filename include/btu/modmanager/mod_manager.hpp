@@ -13,7 +13,6 @@ enum class ModManager
 {
     Vortex,
     MO2,
-    Kortex,
     ManualForced,
     None
 };
@@ -21,6 +20,7 @@ auto find_manager(const Path &dir) -> ModManager;
 
 class ModsFolder
 {
+public:
     ModsFolder(Path root, std::u8string archive_ext);
 
     [[nodiscard]] auto to_flow()

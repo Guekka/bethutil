@@ -27,11 +27,11 @@ auto convert(Mesh file, bool headpart, btu::Game game) -> tl::expected<Mesh, Err
     auto target_ver = get_niversion(game);
     if (!target_ver)
         return tl::make_unexpected(Error(std::error_code(1, std::generic_category())));
-    nifly::OptOptions optOptions{.targetVersion  = *std::move(target_ver),
-                                 .headParts      = headpart,
-                                 .removeParallax = false};
+    nifly::OptOptions opt_options{.targetVersion  = *std::move(target_ver),
+                                  .headParts      = headpart,
+                                  .removeParallax = false};
 
-    file.get().OptimizeFor(optOptions);
+    file.get().OptimizeFor(opt_options);
     return file;
 }
 

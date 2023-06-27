@@ -39,7 +39,7 @@ struct OptimizationSteps
 {
     std::optional<Dimension> resize;
     bool add_transparent_alpha = false;
-    bool mipmaps;
+    bool mipmaps               = false;
     std::optional<DXGI_FORMAT> format;
 
     auto operator<=>(const OptimizationSteps &) const noexcept = default;

@@ -6,7 +6,6 @@
 #include <btu/tex/functions.hpp>
 
 #include <algorithm>
-#include <fstream>
 
 namespace btu::tex {
 auto decompress(Texture &&file) -> Result
@@ -60,7 +59,7 @@ auto make_transparent_alpha(Texture &&file) -> Result
 auto convert_uncompressed(const ScratchImage &image,
                           ScratchImage &timage,
                           DXGI_FORMAT format,
-                          [[maybe_unused]] const std::optional<CompressionDevice> &) -> HRESULT
+                          [[maybe_unused]] const std::optional<CompressionDevice> &dummy) -> HRESULT
 {
     const auto *const img = image.GetImages();
     if (img == nullptr)
@@ -79,7 +78,7 @@ auto convert_uncompressed(const ScratchImage &image,
 // The reason for this to be separated in another file is that both libraries define DXGI_FORMAT
 // So there's a conflict
 // Also, we use another library because DirectXTex BC7 CPU encoder is unbearably slow
-auto convert_bc7(const uint8_t *source, uint8_t *dest, uint32_t width, uint32_t height, size_t slicePitch)
+auto convert_bc7(const uint8_t *source, uint8_t *dest, uint32_t width, uint32_t height, size_t slice_pitch)
     -> tl::expected<void, common::Error>;
 
 auto convert_compressed(const ScratchImage &image,
@@ -125,8 +124,8 @@ auto convert_compressed(const ScratchImage &image,
 
         for (size_t i = 0; i < image.GetImageCount(); ++i)
         {
-            const auto &simg = image.GetImages()[i];
-            const auto &timg = timage.GetImages()[i];
+            const auto &simg = image.GetImages()[i]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            const auto &timg = timage.GetImages()[i]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
             auto res = convert_bc7(simg.pixels,
                                    timg.pixels,
@@ -238,7 +237,7 @@ auto resize(Texture &&file, Dimension dim) -> Result
     DirectX::ScratchImage timage;
 
     // DirectX::Resize is dumb. If WIC is used, it will convert the image to
-    // R32G32B32A32 It works for small image.. But will, for example, allocate
+    // R32G32B32A32 It works for small images... But will, for example, allocate
     // 1gb for a 8k picture. So disable WIC
     const auto filter = DirectX::TEX_FILTER_SEPARATE_ALPHA | DirectX::TEX_FILTER_FORCE_NON_WIC;
     const auto hr = DirectX::Resize(tex.GetImages(), tex.GetImageCount(), info, dim.w, dim.h, filter, timage);

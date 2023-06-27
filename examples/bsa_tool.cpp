@@ -11,10 +11,21 @@
 
 using namespace btu::bsa;
 
-void process_args(std::vector<std::string_view> args, const btu::Path &dir)
+auto process_args(std::vector<std::string_view> args) -> int
 {
+    auto dir = btu::fs::current_path();
+    if (args.size() == 2)
+    {
+        dir = args[1];
+    }
+    else if (args.size() != 1)
+    {
+        std::cerr << "Bad usage";
+        return 1;
+    }
+
     const auto &sets = Settings::get(btu::Game::SSE);
-    const auto arg   = args.at(0);
+    const auto arg   = args[0];
     const std::vector files(btu::fs::directory_iterator(dir), btu::fs::directory_iterator{});
     if (arg == "pack")
     {
@@ -63,26 +74,17 @@ void process_args(std::vector<std::string_view> args, const btu::Path &dir)
     {
         std::cout << "Unknown arg: " << arg;
     }
+
+    return 0;
 }
 
 auto main(int argc, char *argv[]) -> int
 {
-    btu::Path dir = btu::fs::current_path();
-    if (argc == 3)
-    {
-        dir = argv[2];
-    }
-    else if (argc != 2)
-    {
-        std::cerr << "Bad usage";
-        return 1;
-    }
-
     auto start = std::chrono::high_resolution_clock::now();
     try
     {
         const auto args = std::vector<std::string_view>(argv + 1, argv + argc);
-        process_args(args, dir);
+        process_args(args);
     }
     catch (std::exception const &e)
     {
