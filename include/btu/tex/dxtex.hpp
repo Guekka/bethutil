@@ -9,7 +9,7 @@
 // clang-format off: order matters
 
 // Prevent Windows.h from being included by DirectXTex.h
-#define COM_NO_WINDOWS_H // NOLINT(cppcoreguidelines-macro-usage)
+#define COM_NO_WINDOWS_H    // NOLINT(cppcoreguidelines-macro-usage)
 #define PAL_STDCPP_COMPAT 1 // NOLINT(cppcoreguidelines-macro-usage)
 
 #include <DirectXTex.h>

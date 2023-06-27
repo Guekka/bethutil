@@ -23,7 +23,7 @@ auto compute_optimization_steps(const Mesh &file, const Settings &sets) -> Optim
 
     // We only convert SSE and LE
     std::optional<btu::Game> format{};
-    
+
     const bool sse = sets.game == btu::Game::SSE && !file.get().IsSSECompatible();
     const bool sle = sets.game == btu::Game::SLE;
     if (sse || sle)
