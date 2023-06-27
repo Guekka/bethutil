@@ -36,8 +36,9 @@ auto make_transparent_alpha(Texture &&file) -> Result
                                   const size_t width,
                                   [[maybe_unused]] size_t) {
         const auto transparent = DirectX::XMVectorSet(0, 0, 0, 0);
-        const auto end         = in_pixels + width; // NOLINT
-        std::transform(in_pixels, end, out_pixels, [&](auto &&pix) {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        const auto *end = in_pixels + width;
+        std::transform(in_pixels, end, out_pixels, [&](auto pix) {
             return XMVectorSelect(transparent, pix, DirectX::g_XMSelect1110);
         });
     };

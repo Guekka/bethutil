@@ -175,7 +175,9 @@ void make_dummy_plugins(std::span<const FilePath> archives, const Settings &sets
         std::ofstream dummy(mut_bsa.full_path(), std::ios::out | std::ios::binary);
 
         const auto dummy_bytes = *sets.s_dummy_plugin;
-        dummy.write(reinterpret_cast<const char *>(dummy_bytes.data()), dummy_bytes.size()); // NOLINT
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        dummy.write(reinterpret_cast<const char *>(dummy_bytes.data()),
+                    static_cast<std::streamsize>(dummy_bytes.size()));
     }
 }
 

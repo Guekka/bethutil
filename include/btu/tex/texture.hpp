@@ -12,7 +12,7 @@
 #include <span>
 #include <type_traits>
 
-namespace DirectX { // NOLINT
+namespace DirectX {
 struct Image;
 class ScratchImage;
 struct TexMetadata;
@@ -24,7 +24,7 @@ auto operator==(const TexMetadata &lhs, const TexMetadata &rhs) noexcept -> bool
 namespace btu::tex {
 using DirectX::Image;
 using DirectX::ScratchImage;
-using DirectX::TexMetadata; // NOLINT Not actually unused
+using DirectX::TexMetadata;
 
 struct Dimension;
 

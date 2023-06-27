@@ -11,7 +11,7 @@ struct IDXGIFactory1;
 #include <optional>
 #include <string>
 
-namespace Microsoft::WRL { // NOLINT
+namespace Microsoft::WRL {
 template<typename>
 class ComPtr;
 } // namespace Microsoft::WRL
