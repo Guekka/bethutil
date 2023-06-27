@@ -36,84 +36,35 @@ auto operator==(const ScratchImage &lhs, const ScratchImage &rhs) noexcept -> bo
 }
 } // namespace DirectX
 
-namespace btu::tex {
-namespace detail {
-static_assert(k_sizeof_scratchimage == sizeof(ScratchImage));
-static_assert(k_alignof_scratchimage == alignof(ScratchImage));
-
 void initialize_com()
 {
 #ifdef _WIN32
     const auto hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
     if (FAILED(hr))
-        throw btu::common::Exception(error_from_hresult(hr));
+        throw btu::common::Exception(btu::tex::error_from_hresult(hr));
 #endif
 }
 
-ScratchImagePimpl::ScratchImagePimpl()
-    : storage_{}
-{
-    new (&storage_) ScratchImage();
-    initialize_com();
+namespace btu::tex {
+Texture::Texture() {
+    static std::once_flag wic_initialized;
+    std::call_once(wic_initialized, initialize_com);
 }
 
-ScratchImagePimpl::ScratchImagePimpl(ScratchImagePimpl &&other) noexcept
-    : storage_{}
-{
-    new (&storage_) ScratchImage(std::move(other).get());
-    initialize_com();
-}
-
-auto ScratchImagePimpl::operator=(ScratchImagePimpl &&other) noexcept -> ScratchImagePimpl &
-{
-    get() = std::move(other).get();
-    return *this;
-}
-
-ScratchImagePimpl::~ScratchImagePimpl()
-{
-    get().~ScratchImage();
-}
-
-auto ScratchImagePimpl::get() & noexcept -> ScratchImage &
-{
-    return *std::launder(
-        reinterpret_cast<ScratchImage *>(&storage_)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-}
-
-auto ScratchImagePimpl::get() && noexcept -> ScratchImage
-{
-    return std::move(*std::launder(
-        reinterpret_cast<ScratchImage *>(&storage_))); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-}
-
-auto ScratchImagePimpl::get() const & noexcept -> const ScratchImage &
-{
-    return *std::launder(
-        reinterpret_cast<const ScratchImage *>( // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-            &storage_));
-}
-
-auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noexcept -> bool
-{
-    return lhs.get() == rhs.get();
-}
-
-} // namespace detail
 
 void Texture::set(DirectX::ScratchImage &&tex) noexcept
 {
-    tex_.get() = std::move(tex);
+    tex_ = std::move(tex);
 }
 
 auto Texture::get() noexcept -> ScratchImage &
 {
-    return tex_.get();
+    return tex_;
 }
 
 auto Texture::get() const noexcept -> const ScratchImage &
 {
-    return tex_.get();
+    return tex_;
 }
 
 auto Texture::get_images() const noexcept -> std::span<const Image>
