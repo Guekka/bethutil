@@ -23,7 +23,8 @@ auto get_api_from_dll(const wchar_t *dll, const char *func) -> Func
     if (h_mod_dll == nullptr)
         return nullptr;
 
-    auto ptr = reinterpret_cast<Func>(GetProcAddress(h_mod_dll, func)); // NOLINT
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    auto ptr = reinterpret_cast<Func>(GetProcAddress(h_mod_dll, func));
     return ptr;
 }
 
@@ -123,7 +124,7 @@ auto CompressionDevice::make([[maybe_unused]] uint32_t adapter_index, [[maybe_un
     if (FAILED(p_adapter->GetDesc1(&desc)))
         return std::nullopt;
 
-    if (((desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0U) && !allow_software) // NOLINT
+    if (((desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0U) && !allow_software)
     {
         return std::nullopt;
     }

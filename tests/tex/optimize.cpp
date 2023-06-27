@@ -81,8 +81,8 @@ auto generate_tex2() -> btu::tex::Texture
                                   const size_t width,
                                   [[maybe_unused]] size_t) {
         const auto color = DirectX::XMVectorSet(1, 1, 1, 1);
-        const auto end   = out_pixels + width; // NOLINT
-        std::fill(out_pixels, end, color);
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        std::fill_n(out_pixels, width, color);
     };
 
     DirectX::ScratchImage timage;

@@ -31,8 +31,11 @@ auto operator==(const ScratchImage &lhs, const ScratchImage &rhs) noexcept -> bo
     if (!first)
         return false;
 
-    const auto end = lhs.GetPixels() + lhs.GetPixelsSize(); // NOLINT
-    return std::equal(lhs.GetPixels(), end, rhs.GetPixels());
+    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    auto *lhs_end = lhs.GetPixels() + lhs.GetPixelsSize();
+    auto *rhs_end = rhs.GetPixels() + rhs.GetPixelsSize();
+    // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    return std::equal(lhs.GetPixels(), lhs_end, rhs.GetPixels(), rhs_end);
 }
 } // namespace DirectX
 
@@ -55,7 +58,8 @@ auto Texture::get() const noexcept -> const ScratchImage &
 auto Texture::get_images() const noexcept -> std::span<const Image>
 {
     const auto *begin = get().GetImages();
-    const auto *end   = begin + get().GetImageCount(); // NOLINT
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    const auto *end = begin + get().GetImageCount();
     return {begin, end};
 }
 
