@@ -8,17 +8,10 @@
 
 // clang-format off: order matters
 
-// Prevent Windows.h from being included by DirectXTex.h
-#define COM_NO_WINDOWS_H    // NOLINT(cppcoreguidelines-macro-usage)
 #define PAL_STDCPP_COMPAT 1 // NOLINT(cppcoreguidelines-macro-usage)
 
 #include <DirectXTex.h>
 #include <btu/tex/detail/windows.hpp>
-
-// check if windows.h was included
-#if defined(_INC_WINDOWS) || defined(_WINDOWS_)
-#error "Windows.h was included by DirectXTex.h"
-#endif
 
 #undef __valid
 // clang-format on
