@@ -99,7 +99,7 @@ namespace detail {
 constexpr void assert_valid_utf8([[maybe_unused]] std::u8string_view str)
 {
 #ifndef NDEBUG
-    if (auto *err = utf8nvalid(str.data(), str.size()))
+    if (utf8nvalid(str.data(), str.size()) != nullptr)
         throw InvalidUTF8{};
 #endif
 }
@@ -140,11 +140,6 @@ constexpr auto UTF8Iterator::operator++() -> UTF8Iterator &
     return *this;
 }
 
-constexpr auto UTF8Iterator::operator==(const UTF8Iterator &other) const -> bool
-{
-    return (*this <=> other) == 0;
-}
-
 constexpr auto UTF8Iterator::operator<=>(const UTF8Iterator &other) const -> std::strong_ordering
 {
     if (idx_ != other.idx_)
@@ -161,6 +156,10 @@ constexpr auto UTF8Iterator::operator++(int) -> UTF8Iterator
     auto copy = *this;
     ++*this;
     return copy;
+}
+constexpr auto UTF8Iterator::operator==(const UTF8Iterator &other) const -> bool
+{
+    return (*this <=> other) == std::strong_ordering::equal;
 }
 
 static_assert(sizeof(std::string_view::value_type) == sizeof(std::u8string_view::value_type)
@@ -212,8 +211,8 @@ constexpr auto is_lower(std::u8string_view string) -> bool
     return std::all_of(UTF8Iterator(string), UTF8Iterator::end(string), utf8islower);
 }
 
-constexpr auto str_match(std::u8string_view string,
-                         std::u8string_view pattern,
+constexpr auto str_match(std::u8string_view string,  // NOLINT(readability-function-cognitive-complexity)
+                         std::u8string_view pattern, // Some functions just have to be complex
                          bool case_sensitive,
                          Cards cards) -> bool
 {

@@ -2,8 +2,11 @@
 
 #include <btu/tex/dxtex.hpp>
 
-#include <array>
 #include <system_error>
+
+#ifdef _WIN32
+#include <array> // only used on windows
+#endif
 
 namespace btu::tex {
 auto TextureErrCategory::name() const noexcept -> const char *

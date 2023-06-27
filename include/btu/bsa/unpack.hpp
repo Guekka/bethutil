@@ -7,7 +7,6 @@
 #include "btu/bsa/settings.hpp"
 
 namespace btu::bsa {
-[[nodiscard]] auto open_virtual_path(const Path &path) -> std::ofstream;
 
 struct UnpackSettings
 {

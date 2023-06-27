@@ -3,8 +3,10 @@ Checks: >-
   *,
   -altera-*,
   -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-avoid-magic-numbers,
   -fuchsia-*,
   fuchsia-multiple-inheritance,
+  -google-build-using-namespace,
   -google-readability-braces-around-statements,
   -google-readability-todo,
   -hicpp-braces-around-statements,
@@ -13,6 +15,8 @@ Checks: >-
   -llvmlibc-*,
   -misc-non-private-member-variables-in-classes,
   -readability-braces-around-statements,
+  -readability-identifier-length,
+  -readability-magic-numbers,
   -readability-uppercase-literal-suffix
 WarningsAsErrors: ''
 CheckOptions:

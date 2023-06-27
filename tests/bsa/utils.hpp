@@ -10,13 +10,12 @@
 
 #include <sstream>
 
-using namespace btu::bsa;
 namespace Catch {
 
 template<>
-struct StringMaker<ArchiveData>
+struct StringMaker<btu::bsa::ArchiveData>
 {
-    static std::string convert(const ArchiveData &in)
+    static auto convert(const btu::bsa::ArchiveData &in) -> std::string
     {
         std::stringstream os;
         os << "ArchiveData{"

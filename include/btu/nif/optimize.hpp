@@ -14,6 +14,7 @@ class Mesh;
 
 struct Settings
 {
+    // FIXME: implement this
     [[nodiscard]] static auto get(btu::Game game) noexcept -> const Settings &;
 
     btu::Game game;
@@ -25,7 +26,7 @@ struct Settings
 
 struct OptimizationSteps
 {
-    bool rename_referenced_textures;
+    bool rename_referenced_textures = true;
     std::optional<btu::Game> format;
     bool headpart = false;
 
