@@ -211,8 +211,9 @@ constexpr auto is_lower(std::u8string_view string) -> bool
     return std::all_of(UTF8Iterator(string), UTF8Iterator::end(string), utf8islower);
 }
 
-constexpr auto str_match(std::u8string_view string,  // NOLINT(readability-function-cognitive-complexity)
-                         std::u8string_view pattern, // Some functions just have to be complex
+// NOLINTNEXTLINE(readability-function-cognitive-complexity): some things are just complex
+constexpr auto str_match(std::u8string_view string,
+                         std::u8string_view pattern,
                          bool case_sensitive,
                          Cards cards) -> bool
 {
