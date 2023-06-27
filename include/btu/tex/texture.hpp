@@ -28,34 +28,6 @@ using DirectX::TexMetadata; // NOLINT Not actually unused
 
 struct Dimension;
 
-namespace detail {
-constexpr size_t k_sizeof_scratchimage  = 88;
-constexpr size_t k_alignof_scratchimage = 8;
-
-class ScratchImagePimpl
-{
-public:
-    ScratchImagePimpl() noexcept(false);
-
-    ScratchImagePimpl(const ScratchImagePimpl &) = delete;
-    ScratchImagePimpl(ScratchImagePimpl &&other) noexcept;
-
-    auto operator=(const ScratchImagePimpl &) -> ScratchImagePimpl & = delete;
-    auto operator=(ScratchImagePimpl &&other) noexcept -> ScratchImagePimpl &;
-
-    ~ScratchImagePimpl();
-
-    [[nodiscard]] auto get() & noexcept -> ScratchImage &;
-    [[nodiscard]] auto get() && noexcept -> ScratchImage;
-    [[nodiscard]] auto get() const & noexcept -> const ScratchImage &;
-
-private:
-    std::aligned_storage_t<k_sizeof_scratchimage, k_alignof_scratchimage> storage_;
-};
-
-auto operator==(const ScratchImagePimpl &lhs, const ScratchImagePimpl &rhs) noexcept -> bool;
-} // namespace detail
-
 [[maybe_unused]] constexpr auto canonize_path = btu::common::make_path_canonizer(u8"textures/");
 
 class Texture
@@ -77,7 +49,7 @@ public:
 
 private:
     Path load_path_;
-    detail::ScratchImagePimpl tex_;
+    ScratchImage tex_;
 };
 
 [[nodiscard]] auto load(Path path) noexcept -> tl::expected<Texture, Error>;
