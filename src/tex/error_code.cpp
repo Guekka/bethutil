@@ -76,9 +76,7 @@ auto error_from_hresult(int64_t hr, std::error_code default_err, std::source_loc
                                                 ERROR_INVALID_DATA,
                                                 ERROR_NOT_SUPPORTED});
 
-    const auto it = std::find_if(known_codes.begin(), known_codes.end(), [&](auto err) {
-        return HRESULT_FROM_WIN32(err) == hr;
-    });
+    const auto it = std::ranges::find_if(known_codes, [&](auto err) { return HRESULT_FROM_WIN32(err) == hr; });
     if (it != known_codes.end())
         return make_error(*it);
 #endif
