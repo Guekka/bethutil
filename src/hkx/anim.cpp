@@ -124,7 +124,7 @@ auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
 [[nodiscard]] auto find_appropriate_exe(const std::vector<detail::AnimExeRef> &detected,
                                         btu::Game target_game) -> tl::expected<detail::AnimExeRef, Error>
 {
-    const auto it = std::find_if(detected.begin(), detected.end(), [target_game](auto info) {
+    const auto it = std::ranges::find_if(detected, [target_game](auto info) {
         return info.get().target_game() == target_game;
     });
 

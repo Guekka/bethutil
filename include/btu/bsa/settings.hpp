@@ -237,12 +237,11 @@ struct Settings
     const auto ext = btu::common::to_lower(filepath.extension().u8string());
     auto check     = [ext, &filepath, &root](const auto &vec) {
         using std::cbegin, std::cend;
-        auto it = std::find_if(cbegin(vec),
-                               cend(vec),
-                               btu::common::overload{[&](const AllowedPath &p) {
-                                                         return p.check(filepath, root);
-                                                     },
-                                                     [&](const auto &p) { return p == ext; }});
+        auto it = std::ranges::find_if(vec,
+                                       btu::common::overload{[&](const AllowedPath &p) {
+                                                                 return p.check(filepath, root);
+                                                             },
+                                                             [&](const auto &p) { return p == ext; }});
         return it != cend(vec);
     };
 
