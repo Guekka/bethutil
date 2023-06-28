@@ -114,9 +114,9 @@ TEST_CASE("nearest_pow2", "[src]")
 TEST_CASE("scale_fit", "[src]")
 {
     using btu::tex::util::scale_fit;
-    size_t x  = 10;
-    size_t y  = 20;
-    size_t tx = 2;
+    size_t x        = 10;
+    size_t y        = 20;
+    const size_t tx = 2;
     scale_fit(x, tx, y);
     CHECK(x == 2);
     CHECK(y == 4);

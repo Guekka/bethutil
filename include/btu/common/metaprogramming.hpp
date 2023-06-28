@@ -43,6 +43,7 @@ constexpr bool is_variant_member_v = is_variant_member<T, Ts...>::value;
 
 } // namespace btu::common
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage): we need it to generate code
 #define BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, a_op)                                           \
     [[nodiscard]] constexpr auto operator a_op(a_type a_lhs, a_type a_rhs) noexcept->a_type      \
     {                                                                                            \
@@ -55,6 +56,7 @@ constexpr bool is_variant_member_v = is_variant_member<T, Ts...>::value;
         return a_lhs = a_lhs a_op a_rhs;                                                         \
     }
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage): we need it to generate code
 #define BETHUTIL_MAKE_ALL_ENUM_OPERATORS(a_type)                                         \
     static_assert(std::is_enum_v<a_type>, "\'" #a_type "\' is not an enum");             \
                                                                                          \

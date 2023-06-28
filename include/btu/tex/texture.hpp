@@ -12,7 +12,7 @@
 #include <span>
 #include <type_traits>
 
-namespace DirectX {
+namespace DirectX { // NOLINT(readability-identifier-naming)
 struct Image;
 class ScratchImage;
 struct TexMetadata;

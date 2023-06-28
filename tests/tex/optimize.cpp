@@ -44,7 +44,7 @@ auto generate_tex(const DirectX::TexMetadata &info) -> btu::tex::Texture
     return tex;
 }
 
-const auto sets1 = []() noexcept {
+const auto k_sets1 = []() noexcept {
     auto sets                 = btu::tex::Settings::get(btu::Game::SSE);
     sets.use_format_whitelist = true;
     sets.allowed_formats      = {DXGI_FORMAT_BC7_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM};
@@ -60,7 +60,7 @@ constexpr auto info2 = [] {
     return info;
 }();
 
-const auto sets2 = [] {
+const auto k_sets2 = [] {
     auto sets                 = btu::tex::Settings::get(btu::Game::SSE);
     sets.use_format_whitelist = false;
     sets.compress             = false;
@@ -108,7 +108,7 @@ TEST_CASE("compute_optimization_steps", "[src]")
     SECTION("tex1")
     {
         auto tex = generate_tex(info1);
-        auto res = compute_optimization_steps(tex, sets1);
+        auto res = compute_optimization_steps(tex, k_sets1);
         CHECK(res.resize == btu::tex::Dimension{256, 256});
         CHECK(res.add_transparent_alpha == false);
         CHECK(res.mipmaps == true);
@@ -117,7 +117,7 @@ TEST_CASE("compute_optimization_steps", "[src]")
     SECTION("tex2")
     {
         auto tex = generate_tex2();
-        auto res = compute_optimization_steps(tex, sets2);
+        auto res = compute_optimization_steps(tex, k_sets2);
         CHECK(res.resize == std::nullopt);
         CHECK(res.add_transparent_alpha == true);
         CHECK(res.mipmaps == false);
@@ -130,7 +130,7 @@ TEST_CASE("optimize", "[src]")
     SECTION("tex1")
     {
         auto tex   = generate_tex(info1);
-        auto steps = compute_optimization_steps(tex, sets1);
+        auto steps = compute_optimization_steps(tex, k_sets1);
         auto dev   = btu::tex::CompressionDevice::make(0);
         auto res   = optimize(std::move(tex), steps, dev);
         REQUIRE(res.has_value());
@@ -148,7 +148,7 @@ TEST_CASE("optimize", "[src]")
     SECTION("tex2")
     {
         auto tex   = generate_tex2();
-        auto steps = compute_optimization_steps(tex, sets2);
+        auto steps = compute_optimization_steps(tex, k_sets2);
         auto dev   = btu::tex::CompressionDevice::make(0);
         auto res   = optimize(std::move(tex), steps, dev);
         REQUIRE(res.has_value());
@@ -167,7 +167,7 @@ TEST_CASE("optimize", "[src]")
     }
     SECTION("expected_dir")
     {
-        auto sets   = sets1;
+        auto sets   = k_sets1;
         sets.resize = btu::tex::Dimension{128, 128};
         test_expected_dir(u8"optimize", [&](auto &&f) {
             thread_local auto dev                   = btu::tex::CompressionDevice::make(0);

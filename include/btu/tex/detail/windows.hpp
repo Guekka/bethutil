@@ -2,6 +2,10 @@
 /// Removes as much as possible from the global namespace
 
 // NOLINTBEGIN(CppCoreGuidelines-macro-usage)
+// NOLINTBEGIN(clang-diagnostic-unused-macros)
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedMacroInspection"
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -45,7 +49,10 @@
 #define NODEFERWINDOWPOS
 #define NOMCX
 
-//NOLINTEND(CppCoreGuidelines-macro-usage)
+// NOLINTEND(CppCoreGuidelines-macro-usage)
+// NOLINTEND(clang-diagnostic-unused-macros)
+
+#pragma clang diagnostic pop
 
 #ifdef _WIN32
 #include <Windows.h>

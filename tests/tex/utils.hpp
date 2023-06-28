@@ -87,7 +87,7 @@ auto test_expected(const Path &root, const Path &filename, Func f, bool approve 
         const auto expected = load_tex(expected_path);
         INFO("Expected path: " << expected_path);
 
-        constexpr float k_max_mse = 0.002f; // empirically determined
+        constexpr float k_max_mse = 0.002F; // empirically determined
         const auto mse            = compute_mse(out.value(), expected);
 
         INFO("MSE: " << mse);
