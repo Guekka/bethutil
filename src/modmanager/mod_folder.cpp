@@ -93,7 +93,7 @@ void ModFile::read(std::span<std::byte> src)
 {
     auto visitor = btu::common::overload{
         [src](detail::ModFileArchive &f) { f.file.read(src); },
-        [src](detail::ModFileDisk &f) { f.read(src); }, // TODO
+        [src](detail::ModFileDisk &f) { f.read(src); },
     };
 
     return std::visit(visitor, file_);
