@@ -5,14 +5,13 @@
 
 #pragma once
 
-#include <btu/common/path.hpp>
 #include <btu/common/error.hpp>
+#include <btu/common/path.hpp>
+#include <tl/expected.hpp>
 
 #include <fstream>
 #include <span>
 #include <vector>
-
-#include <tl/expected.hpp>
 
 namespace btu::common {
 [[nodiscard]] inline auto read_file(const Path &a_path) -> std::vector<std::byte>

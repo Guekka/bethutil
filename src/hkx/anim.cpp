@@ -170,7 +170,7 @@ struct ReprocOptions : public reproc::options
     for (const auto &req_file : exe_info.get().get_required_files(exe_dir))
     {
         const auto target = working_dir / fs::relative(req_file, exe_dir);
-        const auto res = common::hard_link(req_file, target);
+        const auto res    = common::hard_link(req_file, target);
         if (!res.has_value())
         {
             const auto err = res.error();
