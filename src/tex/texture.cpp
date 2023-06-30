@@ -51,11 +51,11 @@ void initialize_com()
 }
 
 namespace btu::tex {
-Texture::Texture() {
+Texture::Texture()
+{
     static std::once_flag wic_initialized;
     std::call_once(wic_initialized, initialize_com);
 }
-
 
 void Texture::set(DirectX::ScratchImage &&tex) noexcept
 {
