@@ -71,6 +71,12 @@ constexpr auto str_find(std::u8string_view string, std::u8string_view snippet, b
     -> size_t;
 constexpr auto str_contain(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true)
     -> bool;
+[[nodiscard]] constexpr auto str_starts_with(std::u8string_view string,
+                                             std::u8string_view snippet,
+                                             bool case_sensitive = true) -> bool;
+
+/* Returns a string_view of the string without leading and trailing whitespace, including null */
+[[nodiscard]] constexpr auto str_trim(std::u8string_view string) noexcept -> std::u8string_view;
 
 struct Cards
 {
@@ -197,6 +203,29 @@ constexpr auto str_find(std::u8string_view string, std::u8string_view snippet, b
 constexpr auto str_contain(std::u8string_view string, std::u8string_view snippet, bool case_sensitive) -> bool
 {
     return str_find(string, snippet, case_sensitive) != std::string::npos;
+}
+
+constexpr auto str_starts_with(std::u8string_view string, std::u8string_view snippet, bool case_sensitive)
+    -> bool
+{
+    const auto string_with_prefix_len = string.substr(0, snippet.size());
+    return str_compare(string_with_prefix_len, snippet, case_sensitive);
+}
+
+constexpr auto str_trim(std::u8string_view in) noexcept -> std::u8string_view
+{
+    if (in.empty())
+        return in;
+
+    auto pred = [](char8_t c) { return isspace(c) || c == u8'\0'; };
+
+    auto begin = std::find_if_not(in.begin(), in.end(), pred);
+    auto end   = std::find_if_not(in.rbegin(), in.rend(), pred).base();
+
+    if (begin >= end)
+        return std::u8string_view{};
+
+    return std::u8string_view(&*begin, end - begin);
 }
 
 constexpr auto first_codepoint(std::u8string_view string) -> U8Unit
