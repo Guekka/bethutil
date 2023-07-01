@@ -2,6 +2,7 @@
 # Reasoning for disabled checks:
 # - altera: Altera are FPGA chips, not relevant for us
 # - cppcoreguidelines-avoid-magic-numbers: We try to avoid magic numbers, but sometimes it's just easier to read
+# - cppcoreguidelines-pro-type-reinterpret-cast: We use reinterpret_cast for type punning
 # - fuchsia: Fuchsia is a Google OS with its own coding style
 # - google-build-using-namespace: using namespace is fine in .cpp files, especially for unit tests
 # - google-readability-braces-around-statements: We don't want braces around single line if statements
@@ -17,6 +18,7 @@ Checks: >-
   *,
   -altera-*,
   -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
   -fuchsia-*,
   fuchsia-multiple-inheritance, 
   -google-build-using-namespace,

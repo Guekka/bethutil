@@ -23,7 +23,6 @@ auto get_api_from_dll(const wchar_t *dll, const char *func) -> Func
     if (h_mod_dll == nullptr)
         return nullptr;
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     auto ptr = reinterpret_cast<Func>(GetProcAddress(h_mod_dll, func));
     return ptr;
 }
