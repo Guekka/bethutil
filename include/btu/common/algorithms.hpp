@@ -12,6 +12,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <vector>
 
 namespace btu::common {
 //Expects a range sorted in descending order
@@ -65,4 +66,12 @@ template<class Container, class ValueType>
 {
     return std::ranges::find(cont, val) != end(cont);
 }
+
+template<class ValueType>
+inline void remove_duplicates(std::vector<ValueType> &cont)
+{
+    std::sort(begin(cont), end(cont));
+    cont.erase(std::unique(begin(cont), end(cont)), end(cont));
+}
+
 } // namespace btu::common
