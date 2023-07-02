@@ -31,9 +31,11 @@ constexpr auto make_path_canonizer(std::u8string_view start)
         auto str = btu::common::to_lower(path.generic_u8string());
         backslash_to_slash(str);
 
-        auto prefix_end = str.find(start);
+        auto trimmed = str_trim(str);
+
+        auto prefix_end = trimmed.find(start);
         prefix_end      = prefix_end == std::string::npos ? 0 : prefix_end + start.size();
-        return str.substr(prefix_end);
+        return std::u8string(trimmed.substr(prefix_end));
     };
 }
 } // namespace common
