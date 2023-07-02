@@ -197,3 +197,35 @@ TEST_CASE("make_valid", "[src]")
         CHECK(make_valid(in, '_') == expect);
     }
 }
+
+TEST_CASE("starts_with", "[src]")
+{
+    using btu::common::str_starts_with;
+
+    CHECK(str_starts_with(u8"abc", u8"ab"));
+    CHECK(str_starts_with(u8"abc", u8"abc"));
+    CHECK(str_starts_with(u8"abc", u8""));
+
+    CHECK_FALSE(str_starts_with(u8"abc", u8"abcd"));
+    CHECK_FALSE(str_starts_with(u8"abc", u8"bc"));
+
+    CHECK(str_starts_with(u8"ᔔabc", u8"ᔔa"));
+}
+
+TEST_CASE("trim", "[src]")
+{
+    using btu::common::str_trim;
+
+    CHECK(str_trim(u8"  abc  ") == u8"abc");
+    CHECK(str_trim(u8"abc  ") == u8"abc");
+    CHECK(str_trim(u8"abc") == u8"abc");
+    CHECK(str_trim(u8"").empty());
+    CHECK(str_trim(u8"  \t  ").empty());
+    CHECK(str_trim(u8"  \t  abc  \t  ") == u8"abc");
+    CHECK(str_trim(u8"\nabc\n") == u8"abc");
+
+    // For creating a string with null character, we need to use an array
+    const auto null_str      = std::to_array<char8_t>({'\0', 'a', 'b', 'c', '\0'});
+    const auto null_str_view = std::u8string_view(null_str.data(), null_str.size());
+    CHECK(str_trim(null_str_view) == u8"abc");
+}
