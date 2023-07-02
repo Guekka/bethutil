@@ -7,25 +7,21 @@
 namespace btu::common {
 auto as_utf8_string(std::string str) -> std::u8string
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     return {reinterpret_cast<const char8_t *>(str.data()), str.size()};
 }
 
 auto as_ascii_string(std::u8string str) -> std::string
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     return {reinterpret_cast<const char *>(str.data()), str.size()};
 }
 
 auto as_utf8(std::string_view str) -> std::u8string_view
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     return {reinterpret_cast<const char8_t *>(str.data()), str.size()};
 }
 
 auto as_ascii(std::u8string_view str) -> std::string_view
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     return {reinterpret_cast<const char *>(str.data()), str.size()};
 }
 

@@ -70,3 +70,7 @@ constexpr bool is_variant_member_v = is_variant_member<T, Ts...>::value;
     BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, |)                                          \
     BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, <<)                                         \
     BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, >>)
+
+// See https://www.foonathan.net/2020/09/move-forward/
+#define BTU_FWD(...) static_cast<decltype(__VA_ARGS__) &&>(__VA_ARGS__)
+#define BTU_MOV(...) static_cast<std::remove_reference_t<decltype(__VA_ARGS__)> &&>(__VA_ARGS__)
