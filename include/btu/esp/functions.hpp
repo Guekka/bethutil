@@ -84,10 +84,12 @@ constexpr auto k_group_tx00 = GroupType{"TX00"};
 
 } // namespace detail
 
-[[nodiscard]] auto list_headparts(const Path &input) noexcept -> tl::expected<std::vector<Path>, Error>;
-[[nodiscard]] auto list_headparts(std::fstream file) noexcept -> tl::expected<std::vector<Path>, Error>;
+[[nodiscard]] auto list_headparts(const Path &input) noexcept
+    -> tl::expected<std::vector<std::u8string>, Error>;
+[[nodiscard]] auto list_headparts(std::fstream file) noexcept
+    -> tl::expected<std::vector<std::u8string>, Error>;
 [[nodiscard]] auto list_landscape_textures(const Path &input) noexcept
-    -> tl::expected<std::vector<Path>, Error>;
+    -> tl::expected<std::vector<std::u8string>, Error>;
 [[nodiscard]] auto list_landscape_textures(std::fstream file) noexcept
-    -> tl::expected<std::vector<Path>, Error>;
+    -> tl::expected<std::vector<std::u8string>, Error>;
 } // namespace btu::esp
