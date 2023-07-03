@@ -30,12 +30,14 @@ File::File(UnderlyingFile f, ArchiveVersion v)
 {
 }
 
-auto File::compressed() const noexcept -> bool
+auto File::compressed() const noexcept -> Compression
 {
     constexpr auto visitor = btu::common::overload{
-        [](const libbsa::tes3::file &) { return false; },
-        [](const libbsa::tes4::file &f) { return f.compressed(); },
-        [](const libbsa::fo4::file &f) { return flow::any(f, &libbsa::fo4::chunk::compressed); },
+        [](const libbsa::tes3::file &) { return Compression::No; },
+        [](const libbsa::tes4::file &f) { return f.compressed() ? Compression::Yes : Compression::No; },
+        [](const libbsa::fo4::file &f) {
+            return flow::any(f, &libbsa::fo4::chunk::compressed) ? Compression::Yes : Compression::No;
+        },
     };
 
     return std::visit(visitor, file_);
@@ -50,7 +52,7 @@ void File::decompress()
     };
 
     std::visit(visitor, file_);
-    assert(!compressed());
+    assert(compressed() == Compression::No);
 }
 
 void File::compress()
@@ -62,7 +64,7 @@ void File::compress()
     };
 
     std::visit(visitor, file_);
-    assert(compressed());
+    assert(compressed() == Compression::Yes);
 }
 
 void File::read(Path path)
@@ -212,7 +214,7 @@ void write_archive(Archive arch, Path path)
                     return bsa[key];
                 }();
 
-                if (elem.second.compressed())
+                if (elem.second.compressed() == Compression::Yes)
                     flags |= libbsa::tes4::archive_flag::compressed;
 
                 d->insert(elem_path.filename().lexically_normal().generic_string(),

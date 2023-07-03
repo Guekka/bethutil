@@ -22,13 +22,13 @@ auto get_niversion(btu::Game game) -> std::optional<nifly::NiVersion>
     return std::nullopt;
 }
 
-auto convert(Mesh file, bool headpart, btu::Game game) -> tl::expected<Mesh, Error>
+auto convert(Mesh file, HeadpartStatus headpart, btu::Game game) -> tl::expected<Mesh, Error>
 {
     auto target_ver = get_niversion(game);
     if (!target_ver)
         return tl::make_unexpected(Error(std::error_code(1, std::generic_category())));
     nifly::OptOptions opt_options{.targetVersion  = *std::move(target_ver),
-                                  .headParts      = headpart,
+                                  .headParts      = headpart == HeadpartStatus::Yes,
                                   .removeParallax = false};
 
     file.get().OptimizeFor(opt_options);
@@ -42,7 +42,7 @@ void rename_referenced_textures(Mesh &file)
         .filter([](auto &tex) { return tex.get().size() >= 4; }) // Enough for ".tga"
         .for_each([&](auto &tex) {
             auto ext = btu::common::as_utf8(tex.get()).substr(tex.get().size() - 4);
-            if (btu::common::str_compare(ext, u8".tga", false))
+            if (btu::common::str_compare(ext, u8".tga", common::CaseSensitive::No))
                 tex.get().replace(tex.get().size() - 4, 4, ".dds");
         });
 }

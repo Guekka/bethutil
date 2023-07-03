@@ -26,7 +26,7 @@ auto split(const Path &dir,
 void merge(std::vector<ArchiveData> &archives, MergeSettings sets = MergeSettings::MergeIncompressible);
 
 /// Returns the list of files which failed to pack
-auto write(bool compressed, ArchiveData &&data, const Path &root)
+auto write(Compression compressed, ArchiveData &&data, const Path &root)
     -> std::vector<std::pair<Path, std::string>>;
 
 } // namespace btu::bsa

@@ -62,8 +62,14 @@ inline auto compute_mse(const btu::tex::Texture &lhs, const btu::tex::Texture &r
     return total_mse;
 }
 
+enum class Approve
+{
+    Yes,
+    No,
+};
+
 template<typename Func>
-auto test_expected(const Path &root, const Path &filename, Func f, bool approve = true)
+auto test_expected(const Path &root, const Path &filename, Func f, Approve approve = Approve::No)
 {
     auto in                    = load_tex(root / "in" / filename);
     const btu::tex::Result out = f(std::move(in));
@@ -75,7 +81,7 @@ auto test_expected(const Path &root, const Path &filename, Func f, bool approve 
     }
 
     const auto expected_path = root / "expected" / filename;
-    if (!btu::fs::exists(expected_path) && approve)
+    if (!btu::fs::exists(expected_path) && approve == Approve::Yes)
     {
         btu::fs::create_directories(expected_path.parent_path());
         const auto res = btu::tex::save(out.value(), expected_path);

@@ -110,7 +110,7 @@ TEST_CASE("compute_optimization_steps", "[src]")
         auto tex = generate_tex(info1);
         auto res = compute_optimization_steps(tex, k_sets1);
         CHECK(res.resize == btu::tex::Dimension{256, 256});
-        CHECK(res.add_transparent_alpha == false);
+        CHECK_FALSE(res.add_transparent_alpha);
         CHECK(res.mipmaps == true);
         CHECK(res.format == DXGI_FORMAT_BC7_UNORM);
     }
@@ -120,7 +120,7 @@ TEST_CASE("compute_optimization_steps", "[src]")
         auto res = compute_optimization_steps(tex, k_sets2);
         CHECK(res.resize == std::nullopt);
         CHECK(res.add_transparent_alpha == true);
-        CHECK(res.mipmaps == false);
+        CHECK_FALSE(res.mipmaps);
         CHECK(res.format == std::nullopt);
     }
 }

@@ -25,7 +25,7 @@ struct OptimizationSteps
 {
     bool rename_referenced_textures = true;
     std::optional<btu::Game> format;
-    bool headpart = false;
+    HeadpartStatus headpart = HeadpartStatus::No;
 
     auto operator<=>(const OptimizationSteps &) const noexcept = default;
 };

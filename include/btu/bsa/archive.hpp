@@ -10,6 +10,12 @@
 #include <variant>
 
 namespace btu::bsa {
+enum class Compression
+{
+    Yes,
+    No,
+};
+
 template<class... Keys>
 requires requires(Keys... keys)
 {
@@ -41,7 +47,7 @@ public:
     explicit File(ArchiveVersion v);
     File(UnderlyingFile f, ArchiveVersion v);
 
-    [[nodiscard]] auto compressed() const noexcept -> bool;
+    [[nodiscard]] auto compressed() const noexcept -> Compression;
     void decompress();
     void compress();
 
