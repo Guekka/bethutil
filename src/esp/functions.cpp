@@ -33,17 +33,17 @@ void read_field_plugin_header(std::fstream &file, detail::PluginFieldHeader &plu
     file.read(reinterpret_cast<char *>(&plugin_field_header), sizeof plugin_field_header);
 }
 
-auto list_headparts(const Path &input) noexcept -> tl::expected<std::vector<Path>, Error>
+auto list_headparts(const Path &input) noexcept -> tl::expected<std::vector<std::u8string>, Error>
 {
     return load_file(input).and_then([](auto &&file) { return list_headparts(BTU_FWD(file)); });
 }
 
-auto list_headparts(std::fstream file) noexcept -> tl::expected<std::vector<Path>, Error>
+auto list_headparts(std::fstream file) noexcept -> tl::expected<std::vector<std::u8string>, Error>
 {
     detail::PluginRecordHeader header{};
     detail::PluginFieldHeader plugin_field_header{};
 
-    auto headparts = std::vector<Path>{};
+    auto headparts = std::vector<std::u8string>{};
     headparts.reserve(500); // unlikely to have more than 500 headparts
 
     read_headers(file, header);
@@ -98,12 +98,12 @@ auto list_headparts(std::fstream file) noexcept -> tl::expected<std::vector<Path
     return headparts;
 }
 
-auto list_landscape_textures(const Path &input) noexcept -> tl::expected<std::vector<Path>, Error>
+auto list_landscape_textures(const Path &input) noexcept -> tl::expected<std::vector<std::u8string>, Error>
 {
     return load_file(input).and_then([](auto &&file) { return list_landscape_textures(BTU_FWD(file)); });
 }
 
-auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::vector<Path>, Error>
+auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::vector<std::u8string>, Error>
 {
     detail::PluginRecordHeader header{};
     detail::PluginFieldHeader plugin_field_header{};
@@ -116,7 +116,7 @@ auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::ve
     file.seekg(header.record.data_size, std::ios::cur);
 
     std::vector<uint32_t> tnam_form_ids;
-    std::map<uint32_t, Path> txst_textures;
+    std::map<uint32_t, std::u8string> txst_textures;
 
     //Reading all groups
     while (read_headers(file, header) && file)
@@ -173,7 +173,7 @@ auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::ve
     }
 
     // go over landscape texture set FormIDs and find matching diffuse textures
-    auto ret = std::vector<Path>{};
+    auto ret = std::vector<std::u8string>{};
     ret.reserve(tnam_form_ids.size());
     for (auto form_id : tnam_form_ids)
     {
