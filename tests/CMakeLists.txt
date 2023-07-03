@@ -18,6 +18,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/modmanager/mod_folder.cpp"
     "${SOURCE_DIR}/modmanager/mod_manager.cpp"
     "${SOURCE_DIR}/nif/functions.cpp"
+    "${SOURCE_DIR}/nif/optimize.cpp"
     "${SOURCE_DIR}/nif/utils.hpp"
     "${SOURCE_DIR}/tex/formats.cpp"
     "${SOURCE_DIR}/tex/functions.cpp"
@@ -67,6 +68,7 @@ acquire_test("esp")
 acquire_test("make_transparent_alpha")
 acquire_test("modfolder_reintegrate")
 acquire_test("optimize")
+acquire_test("nif_optimize")
 acquire_test("resize")
 acquire_test("convert")
 acquire_test("convert_bc1")

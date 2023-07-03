@@ -125,7 +125,7 @@ TEST_CASE("compute_optimization_steps", "[src]")
     }
 }
 
-TEST_CASE("optimize", "[src]")
+TEST_CASE("tex_optimize", "[src]")
 {
     SECTION("tex1")
     {
