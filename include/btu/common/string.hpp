@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cctype>
 #include <codecvt>
+#include <ranges>
 #include <string>
 
 namespace btu::common {
@@ -233,8 +234,8 @@ constexpr auto str_trim(std::u8string_view in) noexcept -> std::u8string_view
 
     auto pred = [](char8_t c) { return isspace(c) || c == u8'\0'; };
 
-    auto begin = std::find_if_not(in.begin(), in.end(), pred);
-    auto end   = std::find_if_not(in.rbegin(), in.rend(), pred).base();
+    auto begin = std::ranges::find_if_not(in, pred);
+    auto end   = std::ranges::find_if_not(in | std::views::reverse, pred).base();
 
     if (begin >= end)
         return std::u8string_view{};

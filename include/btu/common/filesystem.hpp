@@ -63,8 +63,8 @@ inline void write_file(const Path &a_path, std::span<const std::byte> data)
     if (files1.size() != files2.size())
         return false;
 
-    std::sort(files1.begin(), files1.end());
-    std::sort(files2.begin(), files2.end());
+    std::ranges::sort(files1);
+    std::ranges::sort(files2);
 
     auto beg1 = files1.begin();
     auto beg2 = files2.begin();

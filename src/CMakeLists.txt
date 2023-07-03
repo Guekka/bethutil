@@ -12,7 +12,6 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/common/string.hpp"
     "${INCLUDE_DIR}/btu/bsa/pack.hpp"
     "${INCLUDE_DIR}/btu/bsa/unpack.hpp"
-    "${INCLUDE_DIR}/btu/bsa/transform.hpp"
     "${INCLUDE_DIR}/btu/bsa/archive.hpp"
     "${INCLUDE_DIR}/btu/bsa/archive_data.hpp"
     "${INCLUDE_DIR}/btu/bsa/settings.hpp"

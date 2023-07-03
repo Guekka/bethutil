@@ -22,7 +22,7 @@ namespace common {
 template<typename CharT>
 void backslash_to_slash(std::basic_string<CharT> &path) noexcept
 {
-    std::replace(path.begin(), path.end(), static_cast<CharT>('\\'), static_cast<CharT>('/'));
+    std::ranges::replace(path, static_cast<CharT>('\\'), static_cast<CharT>('/'));
 }
 
 constexpr auto make_path_canonizer(std::u8string_view start)

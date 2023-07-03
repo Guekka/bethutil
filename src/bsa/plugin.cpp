@@ -153,10 +153,11 @@ void clean_dummy_plugins(std::vector<FilePath> &plugins, const Settings &sets)
         return file && file.tellg() == static_cast<std::streamoff>(dummy.size());
     };
 
-    auto midpoint = std::stable_partition(plugins.begin(), plugins.end(), is_dummy);
-    std::for_each(plugins.begin(), midpoint, [](const auto &f) { fs::remove(f.full_path()); });
+    auto dummies = std::ranges::stable_partition(plugins, std::not_fn(is_dummy));
 
-    plugins.erase(plugins.begin(), midpoint);
+    std::ranges::for_each(dummies, [](const auto &f) { fs::remove(f.full_path()); });
+    // remove dummy plugins from plugins
+    plugins.erase(dummies.begin(), dummies.end());
 }
 
 void make_dummy_plugins(std::span<const FilePath> archives, const Settings &sets)
