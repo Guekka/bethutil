@@ -3,6 +3,8 @@
 #include "btu/nif/functions.hpp"
 #include "btu/nif/mesh.hpp"
 
+#pragma once
+
 inline auto load_nif(const Path &path) -> btu::nif::Mesh
 {
     auto res = btu::nif::load(path);
@@ -10,10 +12,10 @@ inline auto load_nif(const Path &path) -> btu::nif::Mesh
     return *res;
 }
 
-auto test_expected(const Path &root,
-                   const Path &filename,
-                   const std::function<tl::expected<btu::nif::Mesh, btu::nif::Error>(btu::nif::Mesh)> &f,
-                   bool approve = false)
+inline auto test_expected(const Path &root,
+                          const Path &filename,
+                          const std::function<tl::expected<btu::nif::Mesh, btu::nif::Error>(btu::nif::Mesh)> &f,
+                          bool approve = false)
 {
     auto in_p      = root / "in" / filename;
     auto in        = load_nif(in_p);
