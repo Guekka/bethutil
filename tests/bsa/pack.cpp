@@ -26,7 +26,7 @@ TEST_CASE("Pack", "[src]")
         auto arch                = archs.back();
         const auto out           = find_archive_name(plugins, sets, arch.get_type()).full_path();
         arch.set_out_path(out);
-        auto errs = write(true, std::move(arch), dir);
+        auto errs = write(Compression::Yes, std::move(arch), dir);
         REQUIRE(errs.empty());
 
         REQUIRE(btu::common::compare_files(out, dir / (u8"expected_"s + name + sets.extension)));

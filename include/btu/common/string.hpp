@@ -56,6 +56,12 @@ public:
     }
 };
 
+enum class CaseSensitive
+{
+    Yes,
+    No
+};
+
 auto as_utf8(std::string_view str) -> std::u8string_view;
 auto as_ascii(std::u8string_view str) -> std::string_view;
 
@@ -65,15 +71,19 @@ auto as_ascii_string(std::u8string str) -> std::string;
 auto to_utf8(const std::wstring &str) -> std::u8string;
 auto to_utf16(const std::u8string &str) -> std::wstring;
 
-constexpr auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive = true)
-    -> bool;
-constexpr auto str_find(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true)
-    -> size_t;
-constexpr auto str_contain(std::u8string_view string, std::u8string_view snippet, bool case_sensitive = true)
-    -> bool;
+constexpr auto str_compare(std::u8string_view lhs,
+                           std::u8string_view rhs,
+                           CaseSensitive case_sensitive = CaseSensitive::Yes) -> bool;
+
+constexpr auto str_find(std::u8string_view string,
+                        std::u8string_view snippet,
+                        CaseSensitive case_sensitive = CaseSensitive::Yes) -> size_t;
+constexpr auto str_contain(std::u8string_view string,
+                           std::u8string_view snippet,
+                           CaseSensitive case_sensitive = CaseSensitive::Yes) -> bool;
 [[nodiscard]] constexpr auto str_starts_with(std::u8string_view string,
                                              std::u8string_view snippet,
-                                             bool case_sensitive = true) -> bool;
+                                             CaseSensitive case_sensitive = CaseSensitive::Yes) -> bool;
 
 /* Returns a string_view of the string without leading and trailing whitespace, including null */
 [[nodiscard]] constexpr auto str_trim(std::u8string_view string) noexcept -> std::u8string_view;
@@ -90,8 +100,8 @@ constexpr Cards default_cards{u8'?', u8'*', u8'[', u8']'};
 
 constexpr auto str_match(std::u8string_view string,
                          std::u8string_view pattern,
-                         bool case_sensitive = true,
-                         Cards cards         = default_cards) -> bool;
+                         CaseSensitive case_sensitive = CaseSensitive::Yes,
+                         Cards cards                  = default_cards) -> bool;
 
 auto to_lower(std::u8string_view string) -> std::u8string;
 constexpr auto is_lower(std::u8string_view string) -> bool;
@@ -172,7 +182,8 @@ static_assert(sizeof(std::string_view::value_type) == sizeof(std::u8string_view:
                   && sizeof(std::string::value_type) == sizeof(std::u8string::value_type),
               "btu::common string assumption violated");
 
-constexpr auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool case_sensitive) -> bool
+constexpr auto str_compare(std::u8string_view lhs, std::u8string_view rhs, CaseSensitive case_sensitive)
+    -> bool
 {
     if (lhs.size() != rhs.size())
         return false;
@@ -180,18 +191,19 @@ constexpr auto str_compare(std::u8string_view lhs, std::u8string_view rhs, bool 
     detail::assert_valid_utf8(lhs);
     detail::assert_valid_utf8(rhs);
 
-    auto f = case_sensitive ? utf8ncmp : utf8ncasecmp;
+    auto f = case_sensitive == CaseSensitive::Yes ? utf8ncmp : utf8ncasecmp;
     return f(lhs.data(), rhs.data(), lhs.size()) == 0;
 }
 
-constexpr auto str_find(std::u8string_view string, std::u8string_view snippet, bool case_sensitive) -> size_t
+constexpr auto str_find(std::u8string_view string, std::u8string_view snippet, CaseSensitive case_sensitive)
+    -> size_t
 {
     detail::assert_valid_utf8(string);
     detail::assert_valid_utf8(snippet);
 
     using std::cbegin, std::cend;
 
-    auto f    = case_sensitive ? utf8str : utf8casestr;
+    auto f    = case_sensitive == CaseSensitive::Yes ? utf8str : utf8casestr;
     auto *ptr = f(string.data(), snippet.data());
 
     if (ptr == nullptr)
@@ -200,13 +212,15 @@ constexpr auto str_find(std::u8string_view string, std::u8string_view snippet, b
     return ptr - string.data();
 }
 
-constexpr auto str_contain(std::u8string_view string, std::u8string_view snippet, bool case_sensitive) -> bool
+constexpr auto str_contain(std::u8string_view string, std::u8string_view snippet, CaseSensitive case_sensitive)
+    -> bool
 {
     return str_find(string, snippet, case_sensitive) != std::string::npos;
 }
 
-constexpr auto str_starts_with(std::u8string_view string, std::u8string_view snippet, bool case_sensitive)
-    -> bool
+constexpr auto str_starts_with(std::u8string_view string,
+                               std::u8string_view snippet,
+                               CaseSensitive case_sensitive) -> bool
 {
     const auto string_with_prefix_len = string.substr(0, snippet.size());
     return str_compare(string_with_prefix_len, snippet, case_sensitive);
@@ -243,7 +257,7 @@ constexpr auto is_lower(std::u8string_view string) -> bool
 // NOLINTNEXTLINE(readability-function-cognitive-complexity): some things are just complex
 constexpr auto str_match(std::u8string_view string,
                          std::u8string_view pattern,
-                         bool case_sensitive,
+                         CaseSensitive case_sensitive,
                          Cards cards) -> bool
 {
     // Empty pattern can only match with empty sting
@@ -267,8 +281,8 @@ constexpr auto str_match(std::u8string_view string,
         U8Unit current_str = -1;
         if (pat_it != pat_end)
         {
-            current_pat = case_sensitive ? *pat_it : utf8lwrcodepoint(*pat_it);
-            current_str = case_sensitive ? *str_it : utf8lwrcodepoint(*str_it);
+            current_pat = case_sensitive == CaseSensitive::Yes ? *pat_it : utf8lwrcodepoint(*pat_it);
+            current_str = case_sensitive == CaseSensitive::Yes ? *str_it : utf8lwrcodepoint(*str_it);
         }
         if (pat_it != pat_end && current_pat == cards.set_begin)
         {
@@ -328,7 +342,7 @@ constexpr auto str_match(std::u8string_view string,
     }
     while (pat_it != pat_end)
     {
-        const U8Unit cur = case_sensitive ? *pat_it : utf8lwrcodepoint(*pat_it);
+        const U8Unit cur = case_sensitive == CaseSensitive::Yes ? *pat_it : utf8lwrcodepoint(*pat_it);
         if (cur == cards.any_repeat)
             ++pat_it;
         else

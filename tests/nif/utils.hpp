@@ -12,10 +12,16 @@ inline auto load_nif(const Path &path) -> btu::nif::Mesh
     return *res;
 }
 
+enum class Approve
+{
+    Yes,
+    No,
+};
+
 inline auto test_expected(const Path &root,
                           const Path &filename,
                           const std::function<tl::expected<btu::nif::Mesh, btu::nif::Error>(btu::nif::Mesh)> &f,
-                          bool approve = false)
+                          Approve approve = Approve::No)
 {
     auto in_p      = root / "in" / filename;
     auto in        = load_nif(in_p);
@@ -24,7 +30,7 @@ inline auto test_expected(const Path &root,
     REQUIRE(out);
 
     const auto expected_path = root / "expected" / filename;
-    if (!std::filesystem::exists(expected_path) && approve)
+    if (!std::filesystem::exists(expected_path) && approve == Approve::Yes)
     {
         std::filesystem::create_directories(expected_path.parent_path());
         CHECK(btu::nif::save(out.value(), expected_path));

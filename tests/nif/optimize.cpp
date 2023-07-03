@@ -12,7 +12,7 @@ TEST_CASE("nif_optimize", "[src]")
 
         REQUIRE(opt_steps.rename_referenced_textures);
         REQUIRE(opt_steps.format == btu::Game::SSE);
-        REQUIRE(opt_steps.headpart == false);
+        REQUIRE(opt_steps.headpart == btu::nif::HeadpartStatus::No);
 
         return btu::nif::optimize(BTU_FWD(mesh), opt_steps);
     };
@@ -27,5 +27,5 @@ TEST_CASE("detect headpart", "[src]")
     const auto opt_sets = btu::nif::Settings::get(btu::Game::SSE);
     mesh.set_load_path(opt_sets.headpart_meshes[0]);
 
-    REQUIRE(btu::nif::compute_optimization_steps(mesh, opt_sets).headpart);
+    REQUIRE(btu::nif::compute_optimization_steps(mesh, opt_sets).headpart == btu::nif::HeadpartStatus::Yes);
 }

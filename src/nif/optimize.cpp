@@ -33,7 +33,7 @@ auto compute_optimization_steps(const Mesh &file, const Settings &sets) -> Optim
     return OptimizationSteps{
         .rename_referenced_textures = sets.rename_referenced_textures,
         .format                     = format,
-        .headpart                   = is_headpart,
+        .headpart                   = is_headpart ? HeadpartStatus::Yes : HeadpartStatus::No,
     };
 }
 

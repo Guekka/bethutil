@@ -217,7 +217,7 @@ struct Settings
 [[nodiscard]] inline auto AllowedPath::check(const Path &filepath, const Path &root) const -> bool
 {
     const auto ext = filepath.extension().u8string();
-    if (!common::str_compare(extension, ext, /*case_sensitive=*/false))
+    if (!common::str_compare(extension, ext, common::CaseSensitive::No))
         return false;
 
     const auto &relative = filepath.lexically_relative(root);

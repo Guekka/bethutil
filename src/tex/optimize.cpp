@@ -86,9 +86,10 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
         return std::nullopt;
 
     if (!sets.compress && bad) // No need to compress but texture is not good
-        return guess_best_format(file, sets.output_format, true);
+        return guess_best_format(file, sets.output_format, AllowCompressed::No);
 
-    return guess_best_format(file, sets.output_format, !can_be_compressed(info));
+    const auto allow_compressed = can_be_compressed(info) ? AllowCompressed::Yes : AllowCompressed::No;
+    return guess_best_format(file, sets.output_format, allow_compressed);
 }
 
 auto compute_optimization_steps(const Texture &file, const Settings &sets) noexcept -> OptimizationSteps

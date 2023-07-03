@@ -47,10 +47,12 @@ TEST_CASE("str_compare", "[src]")
     SECTION("Basic ASCII")
     {
         STATIC_REQUIRE_FALSE(str_compare(u8"A", u8"a"));
-        CHECK(str_compare(u8"A", u8"a", false)); // could be constexpr but msvc doesn't want it
+        CHECK(str_compare(u8"A",
+                          u8"a",
+                          btu::common::CaseSensitive::No)); // could be constexpr but msvc doesn't want it
 
         STATIC_REQUIRE_FALSE(str_compare(u8"somepath/c/x/d!", u8"somepath/C/X/D!"));
-        CHECK(str_compare(u8"somepath/c/x/d!", u8"somepath/C/X/D!", false));
+        CHECK(str_compare(u8"somepath/c/x/d!", u8"somepath/C/X/D!", btu::common::CaseSensitive::No));
     }
 }
 
@@ -60,7 +62,7 @@ TEST_CASE("str_find", "[src]")
 
     STATIC_REQUIRE(str_find(u8"abcdÀ👒<f¹øì►", u8"à👒") == std::string::npos);
     STATIC_REQUIRE(str_find(u8"abcdÀ👒<f¹øì►", u8"À👒") == 4);
-    STATIC_REQUIRE(str_find(u8"abcdÀ👒<f¹øì►", u8"à👒", false) == 4);
+    STATIC_REQUIRE(str_find(u8"abcdÀ👒<f¹øì►", u8"à👒", btu::common::CaseSensitive::No) == 4);
 }
 
 TEST_CASE("str_contain", "[src]")
@@ -68,7 +70,7 @@ TEST_CASE("str_contain", "[src]")
     using bc::str_contain;
 
     STATIC_REQUIRE_FALSE(str_contain(u8"abcdÀ👒<f¹øì►", u8"à👒"));
-    STATIC_REQUIRE(str_contain(u8"abcdÀ👒<f¹øì►", u8"à👒", false));
+    STATIC_REQUIRE(str_contain(u8"abcdÀ👒<f¹øì►", u8"à👒", btu::common::CaseSensitive::No));
 }
 
 TEST_CASE("to_lower", "[src]")
@@ -152,7 +154,7 @@ TEST_CASE("str_match", "[src]")
     SECTION("Case sensitivity", "[src]")
     {
         STATIC_REQUIRE(str_match(u8"geEksforgeeks", u8"ge?ks*"));
-        STATIC_REQUIRE(str_match(u8"ABCD", u8"*c*d", false));
+        STATIC_REQUIRE(str_match(u8"ABCD", u8"*c*d", btu::common::CaseSensitive::No));
 
         STATIC_REQUIRE_FALSE(str_match(u8"geeks", u8"G*ks"));
     }
@@ -165,7 +167,7 @@ TEST_CASE("str_match", "[src]")
     {
         constexpr auto path = u8"E:/Documents/SomeData/SomeFolder/file.dds";
         STATIC_REQUIRE(str_match(path, u8"*.dds"));
-        STATIC_REQUIRE(str_match(path, u8"e:/*", false));
+        STATIC_REQUIRE(str_match(path, u8"e:/*", btu::common::CaseSensitive::No));
         STATIC_REQUIRE(str_match(path, u8"E:/*/SomeFolder/*.*"));
 
         STATIC_REQUIRE_FALSE(str_match(path, u8"E:/*/SomeFolder/*.bsa"));

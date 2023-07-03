@@ -27,13 +27,16 @@ auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinf
     return !is_dir && !is_root;
 }
 
-auto write(bool compressed, ArchiveData &&data, const Path &root) -> std::vector<std::pair<Path, std::string>>
+auto write(Compression compressed, ArchiveData &&data, const Path &root)
+    -> std::vector<std::pair<Path, std::string>>
 {
     if (std::distance(data.begin(), data.end()) == 0)
         return {}; // Do not write empty archive
 
-    compressed &= data.get_type() != ArchiveType::Incompressible;
-    compressed |= data.get_version() == ArchiveVersion::fo4dx; // Have to be compressed
+    if (data.get_type() == ArchiveType::Incompressible)
+        compressed = Compression::No;
+    if (data.get_version() == ArchiveVersion::fo4dx)
+        compressed = Compression::Yes; // fo4dx has to be compressed
 
     auto arch      = Archive{};
     auto ret       = std::vector<std::pair<Path, std::string>>();
@@ -45,7 +48,7 @@ auto write(bool compressed, ArchiveData &&data, const Path &root) -> std::vector
         {
             auto file = File(ver);
             file.read(fpath);
-            if (compressed)
+            if (compressed == Compression::Yes)
                 file.compress();
 
             auto path = btu::common::as_ascii_string(fpath.lexically_relative(root).u8string());
