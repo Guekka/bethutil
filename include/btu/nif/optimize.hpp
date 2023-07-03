@@ -14,14 +14,11 @@ class Mesh;
 
 struct Settings
 {
-    // FIXME: implement this
     [[nodiscard]] static auto get(btu::Game game) noexcept -> const Settings &;
 
     btu::Game game;
-
-    bool rename_referenced_textures;
-    std::optional<nifly::NiVersion> target_version;
-    std::vector<std::u8string> headpart_meshes; // This will be filled by the user, no need to fill it now
+    bool rename_referenced_textures            = false;
+    std::vector<std::u8string> headpart_meshes = {};
 };
 
 struct OptimizationSteps

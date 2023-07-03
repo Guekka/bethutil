@@ -9,23 +9,23 @@ TEST_CASE("list_headparts", "[src]")
     REQUIRE(res->size() == 52);
 
     // no need to check all of them, hopefully this is enough
-    CHECK(res->at(00) == Path("actors/character/character assets/eyesfemale.nif"));
-    CHECK(res->at(10) == Path("actors/character/character assets/hair/femaleredguardhair02.nif"));
-    CHECK(res->at(20) == Path("actors/character/ranaline/character assets/childmaskrightside.nif"));
-    CHECK(res->at(30) == Path("actors/character/ranaline/hair/children/female02.nif"));
-    CHECK(res->at(40) == Path("actors/character/ranaline/hair/children/male03.nif"));
-    CHECK(res->at(50) == Path("actors/character/ranaline/hair/hairginko04.nif"));
+    CHECK(res->at(00) == u8"actors/character/character assets/eyesfemale.nif");
+    CHECK(res->at(10) == u8"actors/character/character assets/hair/femaleredguardhair02.nif");
+    CHECK(res->at(20) == u8"actors/character/ranaline/character assets/childmaskrightside.nif");
+    CHECK(res->at(30) == u8"actors/character/ranaline/hair/children/female02.nif");
+    CHECK(res->at(40) == u8"actors/character/ranaline/hair/children/male03.nif");
+    CHECK(res->at(50) == u8"actors/character/ranaline/hair/hairginko04.nif");
 }
 
 TEST_CASE("list_landscape_textures", "[src]")
 {
     const auto res = btu::esp::list_landscape_textures("esp/landscape.esp");
     REQUIRE(res);
-    const auto expected = std::vector<Path>{
-        "dlc01/landscape/glowingforestdirt01.dds",
-        "dlc01/landscape/soulcairnbones01.dds",
-        "dlc01/landscape/soulcairndirt01.dds",
-        "dlc01/landscape/winterforestleaves02.dds",
+    const auto expected = std::vector<std::u8string>{
+        u8"dlc01/landscape/glowingforestdirt01.dds",
+        u8"dlc01/landscape/soulcairnbones01.dds",
+        u8"dlc01/landscape/soulcairndirt01.dds",
+        u8"dlc01/landscape/winterforestleaves02.dds",
     };
     CHECK(*res == expected);
 }
