@@ -30,7 +30,7 @@ auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinf
 auto write(Compression compressed, ArchiveData &&data, const Path &root)
     -> std::vector<std::pair<Path, std::string>>
 {
-    if (std::distance(data.begin(), data.end()) == 0)
+    if (std::ranges::distance(data) == 0)
         return {}; // Do not write empty archive
 
     if (data.get_type() == ArchiveType::Incompressible)
@@ -141,7 +141,7 @@ void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
     }
 
     // Remove potentially empty archives
-    std::erase_if(archives, [](auto &arch) { return std::distance(arch.begin(), arch.end()) == 0; });
+    std::erase_if(archives, [](auto &arch) { return std::ranges::distance(arch) == 0; });
 }
 
 } // namespace btu::bsa

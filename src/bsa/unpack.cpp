@@ -37,7 +37,7 @@ void unpack_all(const Path &dir, const Path &out, const Settings &sets)
 {
     std::vector files(fs::directory_iterator(dir), fs::directory_iterator{});
     erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
-    std::for_each(files.begin(), files.end(), [&out](const auto &file) {
+    std::ranges::for_each(files, [&out](const auto &file) {
         btu::bsa::unpack(UnpackSettings{.file_path = file.path(), .root_opt = &out});
     });
 }

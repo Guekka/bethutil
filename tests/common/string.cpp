@@ -26,7 +26,7 @@ TEST_CASE("UTF8 Iterator", "[src]")
 
         const auto string = std::reduce(data.begin(), data.end(), std::u8string{});
         std::vector<bc::U8Unit> codepoints{};
-        std::transform(data.begin(), data.end(), std::back_inserter(codepoints), [](auto &&str) {
+        std::ranges::transform(data, std::back_inserter(codepoints), [](auto &&str) {
             return bc::first_codepoint(str);
         });
 
