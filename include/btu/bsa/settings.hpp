@@ -63,7 +63,7 @@ struct Settings
 {
     Game game{};
 
-    std::uintmax_t max_size{};
+    uint64_t max_size{};
 
     ArchiveVersion format{};
     std::optional<ArchiveVersion> texture_format;

@@ -11,21 +11,12 @@ using AllowFilePred = std::function<bool(const Path &dir, fs::directory_entry co
 
 auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinfo) -> bool;
 
-enum class MergeFlags : std::uint8_t
-{
-    None          = 0U,
-    MergeTextures = 1U,
-};
+auto prepare_archive(const Path &dir,
+                     const Settings &sets,
+                     const AllowFilePred &allow_path_pred = default_is_allowed_path)
+    -> std::vector<ArchiveData>;
 
-BETHUTIL_MAKE_ALL_ENUM_OPERATORS(MergeFlags);
-
-auto split(const Path &dir,
-           const Settings &sets,
-           const AllowFilePred &allow_path_pred = default_is_allowed_path) -> std::vector<ArchiveData>;
-
-void merge(std::vector<ArchiveData> &archives, MergeFlags flags = MergeFlags::None);
-
-/// Returns the list of files which failed to pack
+/// \return the list of files which failed to pack
 auto write(Path filepath, Compression compressed, ArchiveData &&data)
     -> std::vector<std::pair<Path, std::string>>;
 

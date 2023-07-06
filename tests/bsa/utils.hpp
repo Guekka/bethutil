@@ -19,7 +19,7 @@ struct StringMaker<btu::bsa::ArchiveData>
     {
         std::stringstream os;
         os << "ArchiveData{"
-           << "size:{" << in.size().compressed << ", " << in.size().uncompressed
+           << "size: " << in.size() << ", "
            << "max_size: " << in.max_size() << "type: " << btu::common::to_underlying(in.type());
         return os.str();
     }

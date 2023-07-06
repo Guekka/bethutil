@@ -18,9 +18,7 @@ TEST_CASE("Pack", "[src]")
         using namespace btu::bsa;
 
         const auto sets = Settings::get(game);
-        auto archs      = split(dir / "input", sets);
-        REQUIRE(archs.size() == 1);
-        merge(archs);
+        auto archs      = prepare_archive(dir / "input", sets);
         REQUIRE(archs.size() == 1);
 
         auto out  = dir / "output" / (name + sets.extension);

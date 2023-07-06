@@ -18,28 +18,17 @@ class ArchiveData
 public:
     ArchiveData(const Settings &sets, ArchiveType type, Path root_dir);
 
-    struct Size
-    {
-        uintmax_t compressed;
-        uintmax_t uncompressed;
-
-        auto operator<=>(const Size &) const = default;
-        auto operator+=(const Size &other) -> Size &;
-    };
-
-    auto add_file(const Path &absolute_path, std::optional<Size> override = std::nullopt) -> bool;
+    auto add_file(const Path &absolute_path, std::optional<uint64_t> override = std::nullopt) -> bool;
 
     [[nodiscard]] auto get_type() const -> ArchiveType { return type_; }
     [[nodiscard]] auto get_version() const -> ArchiveVersion { return version_; }
     [[nodiscard]] auto empty() const -> bool;
 
-    auto begin() { return files_.begin(); }
-    auto end() { return files_.end(); }
+    [[nodiscard]] auto begin() noexcept { return files_.begin(); }
+    [[nodiscard]] auto end() noexcept { return files_.end(); }
 
-    void clear();
-
-    [[nodiscard]] auto size() const -> Size { return size_; }
-    [[nodiscard]] auto max_size() const -> uintmax_t { return max_size_; }
+    [[nodiscard]] auto size() const -> uint64_t { return size_; }
+    [[nodiscard]] auto max_size() const -> uint64_t { return max_size_; }
     [[nodiscard]] auto type() const -> ArchiveType { return type_; }
 
     auto operator+=(const ArchiveData &other) -> ArchiveData &;
@@ -50,11 +39,9 @@ public:
     [[nodiscard]] auto get_root_path() const noexcept -> Path;
 
 private:
-    [[nodiscard]] static auto get_file_size(const Path &path, std::optional<Size> override) -> Size;
-
-    Size size_{};
-    uintmax_t max_size_ = UINT64_MAX;
-    ArchiveType type_   = ArchiveType::Standard;
+    uint64_t size_{};
+    uint64_t max_size_ = UINT64_MAX;
+    ArchiveType type_  = ArchiveType::Standard;
     ArchiveVersion version_{};
 
     Path root_dir_;

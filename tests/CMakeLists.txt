@@ -10,7 +10,6 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/common/functional.cpp"
     "${SOURCE_DIR}/common/metaprogramming.cpp"
     "${SOURCE_DIR}/common/string.cpp"
-    "${SOURCE_DIR}/bsa/archive_data.cpp"
     "${SOURCE_DIR}/bsa/pack.cpp"
     "${SOURCE_DIR}/bsa/plugin.cpp"
     "${SOURCE_DIR}/bsa/unpack.cpp"

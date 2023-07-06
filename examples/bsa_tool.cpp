@@ -29,8 +29,7 @@ auto process_args(std::vector<std::string_view> args) -> int
     const std::vector files(btu::fs::directory_iterator(dir), btu::fs::directory_iterator{});
     if (arg == "pack")
     {
-        auto bsas = split(dir, sets);
-        merge(bsas);
+        auto bsas               = prepare_archive(dir, sets);
         auto plugins            = btu::bsa::list_plugins(files.begin(), files.end(), sets);
         const auto default_plug = btu::bsa::FilePath(dir,
                                                      dir.filename().u8string(),
