@@ -46,7 +46,7 @@ auto File::compressed() const noexcept -> Compression
 void File::decompress()
 {
     const auto visitor = btu::common::overload{
-        [&](libbsa::tes3::file &) {},
+        [](libbsa::tes3::file &) {},
         [this](libbsa::tes4::file &f) { f.decompress(static_cast<libbsa::tes4::version>(ver_)); },
         [](libbsa::fo4::file &f) { flow::for_each(f, [](auto &c) { c.decompress(); }); },
     };
@@ -58,7 +58,7 @@ void File::decompress()
 void File::compress()
 {
     const auto visitor = btu::common::overload{
-        [&](libbsa::tes3::file &) {},
+        [](libbsa::tes3::file &) {},
         [this](libbsa::tes4::file &f) { f.compress(static_cast<libbsa::tes4::version>(ver_)); },
         [](libbsa::fo4::file &f) { flow::for_each(f, [](auto &c) { c.compress(); }); },
     };
@@ -70,7 +70,7 @@ void File::compress()
 void File::read(Path path)
 {
     const auto visitor = btu::common::overload{
-        [&](libbsa::tes3::file &f) { f.read(std::move(path)); },
+        [&path](libbsa::tes3::file &f) { f.read(std::move(path)); },
         [&path, this](libbsa::tes4::file &f) {
             f.read(std::move(path), static_cast<libbsa::tes4::version>(ver_));
         },
@@ -183,6 +183,8 @@ void write_archive(Archive arch, Path path)
     if (arch.empty())
         return;
 
+    fs::create_directories(path.parent_path());
+
     auto version = arch.begin()->second.version();
     switch (version)
     {
@@ -201,8 +203,6 @@ void write_archive(Archive arch, Path path)
         case btu::bsa::ArchiveVersion::sse:
         {
             libbsa::tes4::archive bsa;
-            auto flags = libbsa::tes4::archive_flag::directory_strings
-                         | libbsa::tes4::archive_flag::file_strings;
 
             for (auto &&elem : std::move(arch))
             {
@@ -214,13 +214,13 @@ void write_archive(Archive arch, Path path)
                     return bsa[key];
                 }();
 
-                if (elem.second.compressed() == Compression::Yes)
-                    flags |= libbsa::tes4::archive_flag::compressed;
-
                 d->insert(elem_path.filename().lexically_normal().generic_string(),
                           std::move(elem.second).as_raw_file<libbsa::tes4::file>());
             }
-            bsa.archive_flags(flags);
+
+            bsa.archive_flags(libbsa::tes4::archive_flag::directory_strings
+                              | libbsa::tes4::archive_flag::file_strings);
+
             bsa.write(std::move(path), static_cast<libbsa::tes4::version>(version));
             return;
         }

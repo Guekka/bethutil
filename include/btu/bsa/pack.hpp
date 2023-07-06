@@ -11,22 +11,22 @@ using AllowFilePred = std::function<bool(const Path &dir, fs::directory_entry co
 
 auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinfo) -> bool;
 
-enum class MergeSettings : std::uint8_t
+enum class MergeFlags : std::uint8_t
 {
-    MergeTextures       = 1U,
-    MergeIncompressible = 1U << 1U,
+    None          = 0U,
+    MergeTextures = 1U,
 };
 
-BETHUTIL_MAKE_ALL_ENUM_OPERATORS(MergeSettings);
+BETHUTIL_MAKE_ALL_ENUM_OPERATORS(MergeFlags);
 
 auto split(const Path &dir,
            const Settings &sets,
            const AllowFilePred &allow_path_pred = default_is_allowed_path) -> std::vector<ArchiveData>;
 
-void merge(std::vector<ArchiveData> &archives, MergeSettings sets = MergeSettings::MergeIncompressible);
+void merge(std::vector<ArchiveData> &archives, MergeFlags flags = MergeFlags::None);
 
 /// Returns the list of files which failed to pack
-auto write(Compression compressed, ArchiveData &&data, const Path &root)
+auto write(Path filepath, Compression compressed, ArchiveData &&data)
     -> std::vector<std::pair<Path, std::string>>;
 
 } // namespace btu::bsa
