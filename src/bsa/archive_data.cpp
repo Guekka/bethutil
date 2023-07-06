@@ -17,29 +17,23 @@ ArchiveData::ArchiveData(const Settings &sets, ArchiveType type, Path root_dir)
 {
 }
 
-auto ArchiveData::Size::operator+=(const Size &other) -> ArchiveData::Size &
-{
-    compressed += other.compressed;
-    uncompressed += other.uncompressed;
-    return *this;
-}
-
 auto ArchiveData::empty() const -> bool
 {
-    return size().uncompressed == 0;
+    return files_.empty();
 }
 
-void ArchiveData::clear()
+auto get_file_size(const Path &path, std::optional<uint64_t> override) -> uint64_t
 {
-    size_ = {};
-    type_ = ArchiveType::Standard;
-    files_.clear();
+    if (override.has_value())
+        return override.value();
+
+    return fs::file_size(path);
 }
 
-auto ArchiveData::add_file(const Path &absolute_path, std::optional<Size> override) -> bool
+auto ArchiveData::add_file(const Path &absolute_path, std::optional<uint64_t> override) -> bool
 {
     const auto fsize = get_file_size(absolute_path, override);
-    if (size_.compressed + fsize.compressed > max_size_)
+    if (size_ + fsize > max_size_)
         return false;
 
     files_.emplace_back(fs::relative(absolute_path, root_dir_));
@@ -50,7 +44,7 @@ auto ArchiveData::add_file(const Path &absolute_path, std::optional<Size> overri
 
 auto ArchiveData::operator+=(const ArchiveData &other) -> ArchiveData &
 {
-    if (size().compressed + other.size().compressed > max_size_)
+    if (size_ + other.size_ > max_size_)
         throw std::runtime_error("Cannot merge ArchiveData with file size over max size");
 
     size_ += other.size_;
@@ -67,16 +61,6 @@ auto ArchiveData::operator+(ArchiveData const &other) const -> ArchiveData
     ArchiveData copy = *this;
     copy += other;
     return copy;
-}
-
-auto ArchiveData::get_file_size(const Path &path, std::optional<Size> override) -> ArchiveData::Size
-{
-    if (override.has_value())
-        return override.value();
-
-    Size ret{};
-    ret.compressed = ret.uncompressed = fs::file_size(path);
-    return ret;
 }
 
 auto ArchiveData::get_root_path() const noexcept -> Path
