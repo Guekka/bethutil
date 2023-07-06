@@ -43,29 +43,51 @@ auto Settings::get(btu::Game game) noexcept -> const Settings &
 {
     switch (game)
     {
-        case Game::TES3: static const auto tes3_sets = Settings{.game = game}; return tes3_sets;
-        case Game::TES4: static const auto tes4_sets = Settings{.game = game}; return tes4_sets;
-        case Game::FNV: static const auto fnv_sets = Settings{.game = game}; return fnv_sets;
+        case Game::TES3:
+        {
+            static const auto tes3_sets = Settings{.game = game};
+            return tes3_sets;
+        }
+        case Game::TES4:
+        {
+            static const auto tes4_sets = Settings{.game = game};
+            return tes4_sets;
+        }
+        case Game::FNV:
+        {
+            static const auto fnv_sets = Settings{.game = game};
+            return fnv_sets;
+        }
         case Game::SLE:
+        {
             static const auto sle_sets = Settings{
                 .game            = game,
                 .headpart_meshes = skyrim_headpart_meshes(),
             };
             return sle_sets;
+        }
         case Game::SSE:
+        {
             static const auto sse_sets = Settings{
                 .game                       = game,
                 .rename_referenced_textures = true,
                 .headpart_meshes            = skyrim_headpart_meshes(),
             };
             return sse_sets;
+        }
         case Game::FO4:
+        {
             static const auto fo4_sets = Settings{
                 .game                       = game,
                 .rename_referenced_textures = true,
             };
             return fo4_sets;
-        case Game::Custom: static const auto custom_sets = Settings{.game = game}; return custom_sets;
+        }
+        case Game::Custom:
+        {
+            static const auto custom_sets = Settings{.game = game};
+            return custom_sets;
+        }
     }
 
     static const auto default_sets = Settings{.game = game};
