@@ -27,49 +27,45 @@ auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinf
     return !is_dir && !is_root;
 }
 
-auto write(Compression compressed, ArchiveData &&data, const Path &root)
+auto write(Path filepath, Compression compressed, ArchiveData &&data)
     -> std::vector<std::pair<Path, std::string>>
 {
-    if (std::ranges::distance(data) == 0)
+    if (data.empty())
         return {}; // Do not write empty archive
 
-    if (data.get_type() == ArchiveType::Incompressible)
-        compressed = Compression::No;
     if (data.get_version() == ArchiveVersion::fo4dx)
         compressed = Compression::Yes; // fo4dx has to be compressed
 
     auto arch      = Archive{};
     auto ret       = std::vector<std::pair<Path, std::string>>();
+    auto root_path = data.get_root_path();
     const auto ver = data.get_version();
-    auto out_path  = data.get_out_path();
     std::mutex mut;
-    btu::common::for_each_mt(std::move(data), [&](Path &&fpath) {
+    btu::common::for_each_mt(std::move(data), [&](Path &&relative_path) {
         try
         {
             auto file = File(ver);
-            file.read(fpath);
+            file.read(root_path / relative_path);
             if (compressed == Compression::Yes)
                 file.compress();
 
-            auto path = btu::common::as_ascii_string(fpath.lexically_relative(root).u8string());
             const std::lock_guard lock(mut);
-            arch.emplace(std::move(path), std::move(file));
+            arch.emplace(std::move(relative_path).string(), std::move(file));
         }
         catch (const std::exception &e)
         {
-            ret.emplace_back(fpath, e.what());
+            ret.emplace_back(relative_path, e.what());
         }
     });
-    write_archive(std::move(arch), std::move(out_path));
+    write_archive(std::move(arch), std::move(filepath));
     return ret;
 }
 
 auto split(const Path &dir, const Settings &sets, const AllowFilePred &allow_path_pred)
     -> std::vector<ArchiveData>
 {
-    auto standard       = ArchiveData(sets, ArchiveType::Standard);
-    auto incompressible = ArchiveData(sets, ArchiveType::Incompressible);
-    auto textures       = ArchiveData(sets, ArchiveType::Textures);
+    auto standard = ArchiveData(sets, ArchiveType::Standard, dir);
+    auto textures = ArchiveData(sets, ArchiveType::Textures, dir);
 
     std::vector<ArchiveData> res;
 
@@ -82,8 +78,9 @@ auto split(const Path &dir, const Settings &sets, const AllowFilePred &allow_pat
         if (ft != FileTypes::Standard && ft != FileTypes::Texture && ft != FileTypes::Incompressible)
             continue;
 
-        auto *p_bsa = ft == FileTypes::Texture ? &textures : &standard;
-        p_bsa       = ft == FileTypes::Incompressible ? &incompressible : p_bsa;
+        auto *p_bsa = &standard; // everything except textures goes to standard
+        if (ft == FileTypes::Texture)
+            p_bsa = &textures;
 
         //adding files and sizes to list
         if (!p_bsa->add_file(p.path()))
@@ -92,48 +89,38 @@ auto split(const Path &dir, const Settings &sets, const AllowFilePred &allow_pat
             res.emplace_back(std::move(*p_bsa));
 
             // Get a new one and add the file that did not make it
-            *p_bsa = ArchiveData(sets, p_bsa->get_type());
+            *p_bsa = ArchiveData(sets, p_bsa->get_type(), dir);
             p_bsa->add_file(p.path());
         }
     }
 
     // Add BSAs that are not full
-    res.insert(res.end(), {std::move(standard), std::move(incompressible), std::move(textures)});
+    if (!standard.empty())
+        res.emplace_back(std::move(standard));
+    if (!textures.empty())
+        res.emplace_back(std::move(textures));
     return res;
 }
 
-void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
+void merge(std::vector<ArchiveData> &archives, MergeFlags flags)
 {
-    const auto test_flag = [&](MergeSettings flag) {
-        return (btu::common::to_underlying(sets) & btu::common::to_underlying(flag)) != 0;
-    };
-    // We have at most one underful BSA per type, so we only consider the last three BSAs
+    const auto test_flag = [&](MergeFlags flag) { return btu::common::to_underlying(flags & flag) != 0; };
 
-    auto standard       = archives.end() - 3;
-    auto incompressible = archives.end() - 2;
-    auto textures       = archives.end() - 1;
+    // We have at most one underfull BSA per type, so we only consider the last two BSAs
+    if (archives.size() < 2)
+        return; // Nothing to merge
 
-    // Preconditions
-    assert(standard->get_type() == ArchiveType::Standard);
-    assert(incompressible->get_type() == ArchiveType::Incompressible);
-    assert(textures->get_type() == ArchiveType::Textures);
+    auto standard = archives.end() - 2;
+    auto textures = archives.end() - 1;
 
-    // Merge incompressible into standard if possible
-    if (test_flag(MergeSettings::MergeIncompressible))
-    {
-        const bool size = incompressible->size().uncompressed + standard->size().uncompressed
-                          < standard->max_size();
-        if (size)
-        {
-            *standard += *incompressible;
-            incompressible->clear(); // iterator stability, mark for destruction
-        }
-    }
+    if (standard->get_type() != ArchiveType::Standard || textures->get_type() != ArchiveType::Textures)
+        return; // Nothing to merge: at least one of them is already full
+
     // Merge textures into standard if possible
-    if (test_flag(MergeSettings::MergeTextures))
+    if (test_flag(MergeFlags::MergeTextures))
     {
-        const bool size = textures->size().compressed + standard->size().compressed < standard->max_size();
-        if (size)
+        const bool it_fits = textures->size().compressed + standard->size().compressed < standard->max_size();
+        if (it_fits)
         {
             *standard += *textures;
             textures->clear();
@@ -141,7 +128,7 @@ void merge(std::vector<ArchiveData> &archives, MergeSettings sets)
     }
 
     // Remove potentially empty archives
-    std::erase_if(archives, [](auto &arch) { return std::ranges::distance(arch) == 0; });
+    std::erase_if(archives, [](const auto &arch) { return arch.empty(); });
 }
 
 } // namespace btu::bsa

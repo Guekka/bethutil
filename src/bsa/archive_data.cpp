@@ -9,10 +9,11 @@
 #include "btu/common/algorithms.hpp"
 
 namespace btu::bsa {
-ArchiveData::ArchiveData(const Settings &sets, ArchiveType type)
+ArchiveData::ArchiveData(const Settings &sets, ArchiveType type, Path root_dir)
     : max_size_(sets.max_size)
     , type_(type)
     , version_(type == ArchiveType::Textures ? sets.texture_format.value_or(sets.format) : sets.format)
+    , root_dir_(std::move(root_dir))
 {
 }
 
@@ -33,16 +34,15 @@ void ArchiveData::clear()
     size_ = {};
     type_ = ArchiveType::Standard;
     files_.clear();
-    out_path_.clear();
 }
 
-auto ArchiveData::add_file(Path path, std::optional<Size> override) -> bool
+auto ArchiveData::add_file(const Path &absolute_path, std::optional<Size> override) -> bool
 {
-    const auto fsize = get_file_size(path, override);
+    const auto fsize = get_file_size(absolute_path, override);
     if (size_.compressed + fsize.compressed > max_size_)
         return false;
 
-    files_.emplace_back(std::move(path));
+    files_.emplace_back(fs::relative(absolute_path, root_dir_));
     size_ += fsize;
 
     return true;
@@ -57,9 +57,7 @@ auto ArchiveData::operator+=(const ArchiveData &other) -> ArchiveData &
 
     files_.insert(files_.end(), other.files_.begin(), other.files_.end());
 
-    if (type_ == ArchiveType::Incompressible || other.type_ == ArchiveType::Incompressible)
-        type_ = ArchiveType::Incompressible;
-    else if (type_ != other.type_)
+    if (type_ != other.type_)
         type_ = ArchiveType::Standard;
     return *this;
 }
@@ -79,6 +77,11 @@ auto ArchiveData::get_file_size(const Path &path, std::optional<Size> override) 
     Size ret{};
     ret.compressed = ret.uncompressed = fs::file_size(path);
     return ret;
+}
+
+auto ArchiveData::get_root_path() const noexcept -> Path
+{
+    return root_dir_;
 }
 
 } // namespace btu::bsa

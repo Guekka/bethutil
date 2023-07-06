@@ -16,7 +16,7 @@ auto make_arch(uintmax_t max, uintmax_t size, ArchiveType type, uint32_t file_co
 {
     auto sets     = Settings::get(btu::Game::SSE);
     sets.max_size = max;
-    auto arch     = ArchiveData(sets, type);
+    auto arch     = ArchiveData(sets, type, btu::fs::current_path());
 
     REQUIRE(arch.add_file("", ArchiveData::Size{size, size}));
     for (uint32_t i = 1; i < file_count; ++i)
@@ -29,7 +29,6 @@ TEST_CASE("Full archives are not merged", "[src]")
 {
     auto input = std::vector{
         make_arch(1'000, 500, ArchiveType::Standard),
-        make_arch(1'000, 600, ArchiveType::Incompressible),
         make_arch(1'000, 700, ArchiveType::Textures),
     };
 
@@ -44,34 +43,19 @@ TEST_CASE("Testing merge settings", "[src]")
 {
     auto input = std::vector{
         make_arch(1'000, 1, ArchiveType::Standard),
-        make_arch(1'000, 2, ArchiveType::Incompressible),
         make_arch(1'000, 4, ArchiveType::Textures),
     };
 
-    auto do_test = [&input](MergeSettings sets, auto expected) {
+    auto do_test = [&input](MergeFlags sets, auto expected) {
         merge(input, sets);
         CHECK(input == expected);
     };
 
-    SECTION("MergeBoth")
-    {
-        const auto expected = std::vector{make_arch(1'000, 7, ArchiveType::Incompressible, 3)};
-        do_test(MergeSettings::MergeIncompressible | MergeSettings::MergeTextures, expected);
-    }
     SECTION("MergeTextures")
     {
         const auto expected = std::vector{
             make_arch(1'000, 5, ArchiveType::Standard, 2),
-            make_arch(1'000, 2, ArchiveType::Incompressible),
         };
-        do_test(MergeSettings::MergeTextures, expected);
-    }
-    SECTION("MergeIncompressible")
-    {
-        const auto expected = std::vector{
-            make_arch(1'000, 3, ArchiveType::Incompressible, 2),
-            make_arch(1'000, 4, ArchiveType::Textures),
-        };
-        do_test(MergeSettings::MergeIncompressible, expected);
+        do_test(MergeFlags::MergeTextures, expected);
     }
 }
