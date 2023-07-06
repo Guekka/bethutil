@@ -12,7 +12,6 @@ enum class ArchiveType
 {
     Textures,
     Standard,
-    Incompressible
 };
 
 enum class ArchiveVersion : std::uint32_t

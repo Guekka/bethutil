@@ -6,33 +6,37 @@
 #include "btu/bsa/pack.hpp"
 
 #include "../utils.hpp"
-#include "btu/bsa/plugin.hpp"
 #include "btu/common/filesystem.hpp"
 
 #include <iostream>
 
 TEST_CASE("Pack", "[src]")
 {
-    auto pack = [](auto game, auto name) {
+    const Path dir = "pack";
+    btu::fs::remove_all(dir / "output");
+    auto pack = [&dir](auto game, auto name) {
         using namespace btu::bsa;
-        const Path dir  = "pack";
+
         const auto sets = Settings::get(game);
-        auto archs      = split(dir, sets);
-        REQUIRE(archs.size() == 3);
+        auto archs      = split(dir / "input", sets);
+        REQUIRE(archs.size() == 1);
         merge(archs);
         REQUIRE(archs.size() == 1);
 
-        const std::array plugins = {FilePath(dir, u8"plug", u8"", u8"esp", FileTypes::Plugin)};
-        auto arch                = archs.back();
-        const auto out           = find_archive_name(plugins, sets, arch.get_type()).full_path();
-        arch.set_out_path(out);
-        auto errs = write(Compression::Yes, std::move(arch), dir);
-        REQUIRE(errs.empty());
+        auto out  = dir / "output" / (name + sets.extension);
+        auto errs = write(out, Compression::Yes, std::move(archs.back()));
 
-        REQUIRE(btu::common::compare_files(out, dir / (u8"expected_"s + name + sets.extension)));
-        btu::fs::remove(out);
+        if (!errs.empty())
+        {
+            std::cerr << "Errors while packing " << btu::common::as_ascii(name) << ":\n";
+            for (const auto &[file, err] : errs)
+                std::cerr << file << ": " << err << '\n';
+            FAIL();
+        }
     };
 
     pack(btu::Game::SSE, u8"sse");
     pack(btu::Game::FO4, u8"fo4");
+
+    CHECK(btu::common::compare_directories(dir / "output", dir / "expected"));
 }

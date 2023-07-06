@@ -42,8 +42,9 @@ auto process_args(std::vector<std::string_view> args) -> int
 
         for (auto bsa : std::move(bsas))
         {
-            bsa.set_out_path(btu::bsa::find_archive_name(plugins, sets, bsa.get_type()).full_path());
-            write(Compression::Yes, std::move(bsa), dir);
+            write(btu::bsa::find_archive_name(plugins, sets, bsa.get_type()).full_path(),
+                  Compression::Yes,
+                  std::move(bsa));
         }
     }
     else if (arg == "unpack")

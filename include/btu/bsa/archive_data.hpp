@@ -16,7 +16,7 @@ namespace btu::bsa {
 class ArchiveData
 {
 public:
-    ArchiveData(const Settings &sets, ArchiveType type);
+    ArchiveData(const Settings &sets, ArchiveType type, Path root_dir);
 
     struct Size
     {
@@ -27,7 +27,7 @@ public:
         auto operator+=(const Size &other) -> Size &;
     };
 
-    auto add_file(Path path, std::optional<Size> override = std::nullopt) -> bool;
+    auto add_file(const Path &absolute_path, std::optional<Size> override = std::nullopt) -> bool;
 
     [[nodiscard]] auto get_type() const -> ArchiveType { return type_; }
     [[nodiscard]] auto get_version() const -> ArchiveVersion { return version_; }
@@ -38,9 +38,6 @@ public:
 
     void clear();
 
-    auto set_out_path(Path out_path) { out_path_ = std::move(out_path); }
-    [[nodiscard]] auto get_out_path() { return out_path_; }
-
     [[nodiscard]] auto size() const -> Size { return size_; }
     [[nodiscard]] auto max_size() const -> uintmax_t { return max_size_; }
     [[nodiscard]] auto type() const -> ArchiveType { return type_; }
@@ -50,6 +47,8 @@ public:
 
     auto operator<=>(const ArchiveData &) const = default;
 
+    [[nodiscard]] auto get_root_path() const noexcept -> Path;
+
 private:
     [[nodiscard]] static auto get_file_size(const Path &path, std::optional<Size> override) -> Size;
 
@@ -57,7 +56,8 @@ private:
     uintmax_t max_size_ = UINT64_MAX;
     ArchiveType type_   = ArchiveType::Standard;
     ArchiveVersion version_{};
+
+    Path root_dir_;
     std::vector<Path> files_;
-    Path out_path_;
 };
 } // namespace btu::bsa
