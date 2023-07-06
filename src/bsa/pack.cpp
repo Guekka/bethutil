@@ -10,6 +10,7 @@
 
 #include <btu/common/algorithms.hpp>
 #include <btu/common/functional.hpp>
+#include <flow.hpp>
 
 #include <deque>
 #include <execution>
@@ -19,12 +20,12 @@
 namespace btu::bsa {
 auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinfo) -> bool
 {
-    bool const is_dir = fileinfo.is_directory();
+    bool const is_regular = fs::is_regular_file(fileinfo);
 
     //Removing files at the root directory, those cannot be packed
-    bool const is_root = fileinfo.path().parent_path() == dir;
+    bool const is_at_root = fileinfo.path().parent_path() == dir;
 
-    return !is_dir && !is_root;
+    return is_regular && !is_at_root;
 }
 
 auto write(Path filepath, Compression compressed, ArchiveData &&data)
@@ -61,74 +62,88 @@ auto write(Path filepath, Compression compressed, ArchiveData &&data)
     return ret;
 }
 
-auto split(const Path &dir, const Settings &sets, const AllowFilePred &allow_path_pred)
-    -> std::vector<ArchiveData>
+struct PackableFile
 {
-    auto standard = ArchiveData(sets, ArchiveType::Standard, dir);
-    auto textures = ArchiveData(sets, ArchiveType::Textures, dir);
+    Path absolute_path;
+    uint64_t size;
+};
 
-    std::vector<ArchiveData> res;
+[[nodiscard]] auto list_packable_files(const Path &dir,
+                                       const Settings &sets,
+                                       const AllowFilePred &allow_path_pred) -> std::vector<PackableFile>
+{
+    constexpr std::array<FileTypes, 3> allowed_types = {FileTypes::Standard,
+                                                        FileTypes::Texture,
+                                                        FileTypes::Incompressible};
 
-    for (const auto &p : fs::recursive_directory_iterator(dir))
-    {
-        if (!allow_path_pred(dir, p))
-            continue;
-
-        const auto ft = get_filetype(p.path(), dir, sets);
-        if (ft != FileTypes::Standard && ft != FileTypes::Texture && ft != FileTypes::Incompressible)
-            continue;
-
-        auto *p_bsa = &standard; // everything except textures goes to standard
-        if (ft == FileTypes::Texture)
-            p_bsa = &textures;
-
-        //adding files and sizes to list
-        if (!p_bsa->add_file(p.path()))
-        {
-            // BSA full, write it
-            res.emplace_back(std::move(*p_bsa));
-
-            // Get a new one and add the file that did not make it
-            *p_bsa = ArchiveData(sets, p_bsa->get_type(), dir);
-            p_bsa->add_file(p.path());
-        }
-    }
-
-    // Add BSAs that are not full
-    if (!standard.empty())
-        res.emplace_back(std::move(standard));
-    if (!textures.empty())
-        res.emplace_back(std::move(textures));
-    return res;
+    return flow::from(fs::recursive_directory_iterator(dir))
+        .filter([&](const auto &p) { return allow_path_pred(dir, p); })
+        .filter([&](const auto &p) {
+            return btu::common::contains(allowed_types, get_filetype(p.path(), dir, sets));
+        })
+        .map([&](const auto &p) {
+            return PackableFile{p.path(), fs::file_size(p.path())};
+        })
+        .to_vector();
 }
 
-void merge(std::vector<ArchiveData> &archives, MergeFlags flags)
+template<std::ranges::range R>
+requires std::is_same_v<std::ranges::range_value_t<R>, PackableFile>
+[[nodiscard]] auto do_pack(const R &packable_files, const Path &dir, const Settings &sets, ArchiveType type)
+    -> std::vector<ArchiveData>
 {
-    const auto test_flag = [&](MergeFlags flag) { return btu::common::to_underlying(flags & flag) != 0; };
-
-    // We have at most one underfull BSA per type, so we only consider the last two BSAs
-    if (archives.size() < 2)
-        return; // Nothing to merge
-
-    auto standard = archives.end() - 2;
-    auto textures = archives.end() - 1;
-
-    if (standard->get_type() != ArchiveType::Standard || textures->get_type() != ArchiveType::Textures)
-        return; // Nothing to merge: at least one of them is already full
-
-    // Merge textures into standard if possible
-    if (test_flag(MergeFlags::MergeTextures))
+    auto ret = std::vector<ArchiveData>{};
+    for (auto &&file : packable_files)
     {
-        const bool it_fits = textures->size().compressed + standard->size().compressed < standard->max_size();
-        if (it_fits)
+        bool added = false;
+        // try to add to existing archive
+        for (auto &archive : ret)
         {
-            *standard += *textures;
-            textures->clear();
+            if (archive.add_file(file.absolute_path, file.size))
+            {
+                added = true;
+                break;
+            }
         }
-    }
+        if (added)
+            continue;
 
-    // Remove potentially empty archives
-    std::erase_if(archives, [](const auto &arch) { return arch.empty(); });
+        // if we couldn't add to any existing archive, create a new one
+        ret.emplace_back(sets, type, dir);
+        ret.back().add_file(file.absolute_path, file.size);
+    }
+    return ret;
+}
+
+auto prepare_archive(const Path &dir, const Settings &sets, const AllowFilePred &allow_path_pred)
+    -> std::vector<ArchiveData>
+{
+    auto packable_files = list_packable_files(dir, sets, allow_path_pred);
+    // sort by size, largest first
+    std::ranges::sort(packable_files, {}, &PackableFile::size);
+    std::ranges::reverse(packable_files);
+    // now we have the largest files first, we can start packing them. There are two cases:
+    // games with separate texture archives and games with one archive for everything
+
+    auto ret = std::vector<ArchiveData>{};
+
+    // if we have separate texture archives, we can pack textures separately
+    if (sets.texture_format.has_value())
+    {
+        // put textures at the end of the list
+        auto textures = std::ranges::stable_partition(packable_files, [&](const auto &file) {
+            return get_filetype(file.absolute_path, dir, sets) != FileTypes::Texture;
+        });
+
+        ret = do_pack(textures, dir, sets, ArchiveType::Textures);
+
+        // remove textures from packable_files
+        packable_files.erase(textures.begin(), textures.end());
+    }
+    auto standard = do_pack(packable_files, dir, sets, ArchiveType::Standard);
+    ret.insert(ret.end(), standard.begin(), standard.end());
+
+    return ret;
 }
 
 } // namespace btu::bsa
