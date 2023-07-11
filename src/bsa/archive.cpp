@@ -43,6 +43,17 @@ auto File::compressed() const noexcept -> Compression
     return std::visit(visitor, file_);
 }
 
+auto File::size() const noexcept -> size_t
+{
+    constexpr auto visitor = btu::common::overload{
+        [](const libbsa::tes3::file &f) { return f.size(); },
+        [](const libbsa::tes4::file &f) { return f.size(); },
+        [](const libbsa::fo4::file &f) { return flow::from(f).map(&libbsa::fo4::chunk::size).sum(); },
+    };
+
+    return std::visit(visitor, file_);
+}
+
 void File::decompress()
 {
     const auto visitor = btu::common::overload{

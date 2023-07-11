@@ -14,6 +14,8 @@ enum class ArchiveType
     Standard,
 };
 
+// Maps to rsm-bsa values. Enforced by static_assert in source file.
+// We avoid including rsm-bsa in public headers.
 enum class ArchiveVersion : std::uint32_t
 {
     tes3  = 1,

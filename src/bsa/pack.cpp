@@ -13,135 +13,189 @@
 #include <flow.hpp>
 
 #include <deque>
-#include <execution>
-#include <fstream>
 #include <functional>
+#include <mutex>
 
 namespace btu::bsa {
-auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinfo) -> bool
+auto get_allow_file_pred(const PackSettings &sets) -> AllowFilePred
 {
-    bool const is_regular = fs::is_regular_file(fileinfo);
+    // this part is required, these files would break the archive if packed
+    auto is_legal_path = [](const Path &root_dir, const fs::directory_entry &fileinfo) -> bool {
+        const bool is_regular = fs::is_regular_file(fileinfo);
 
-    //Removing files at the root directory, those cannot be packed
-    bool const is_at_root = fileinfo.path().parent_path() == dir;
+        //Removing files at the root directory, those cannot be packed
+        const bool is_at_root = fs::equivalent(fileinfo.path().parent_path(), root_dir);
 
-    return is_regular && !is_at_root;
+        return is_regular && !is_at_root;
+    };
+
+    // now we add the user predicate
+    return [legal = BTU_MOV(is_legal_path),
+            sets  = BTU_MOV(sets)](const Path &root_dir, const fs::directory_entry &fileinfo) -> bool {
+        const bool user_allowed = !sets.allow_file_pred || (*sets.allow_file_pred)(root_dir, fileinfo);
+
+        return legal(root_dir, fileinfo) && user_allowed;
+    };
 }
 
-auto write(Path filepath, Compression compressed, ArchiveData &&data)
-    -> std::vector<std::pair<Path, std::string>>
+struct PackGroup
 {
-    if (data.empty())
-        return {}; // Do not write empty archive
-
-    if (data.get_version() == ArchiveVersion::fo4dx)
-        compressed = Compression::Yes; // fo4dx has to be compressed
-
-    auto arch      = Archive{};
-    auto ret       = std::vector<std::pair<Path, std::string>>();
-    auto root_path = data.get_root_path();
-    const auto ver = data.get_version();
-    std::mutex mut;
-    btu::common::for_each_mt(std::move(data), [&](Path &&relative_path) {
-        try
-        {
-            auto file = File(ver);
-            file.read(root_path / relative_path);
-            if (compressed == Compression::Yes)
-                file.compress();
-
-            const std::lock_guard lock(mut);
-            arch.emplace(std::move(relative_path).string(), std::move(file));
-        }
-        catch (const std::exception &e)
-        {
-            ret.emplace_back(relative_path, e.what());
-        }
-    });
-    write_archive(std::move(arch), std::move(filepath));
-    return ret;
-}
-
-struct PackableFile
-{
-    Path absolute_path;
-    uint64_t size;
+    std::vector<Path> standard;
+    std::vector<Path> texture;
 };
 
+/// \brief List all files in the directory which can be packed, sorted by size (largest first)
 [[nodiscard]] auto list_packable_files(const Path &dir,
                                        const Settings &sets,
-                                       const AllowFilePred &allow_path_pred) -> std::vector<PackableFile>
+                                       const AllowFilePred &allow_path_pred) noexcept -> PackGroup
 {
     constexpr std::array<FileTypes, 3> allowed_types = {FileTypes::Standard,
                                                         FileTypes::Texture,
                                                         FileTypes::Incompressible};
 
-    return flow::from(fs::recursive_directory_iterator(dir))
-        .filter([&](const auto &p) { return allow_path_pred(dir, p); })
-        .filter([&](const auto &p) {
-            return btu::common::contains(allowed_types, get_filetype(p.path(), dir, sets));
-        })
-        .map([&](const auto &p) {
-            return PackableFile{p.path(), fs::file_size(p.path())};
-        })
-        .to_vector();
+    auto packable_files = flow::from(fs::recursive_directory_iterator(dir))
+                              .filter([&](const auto &p) { return allow_path_pred(dir, p); })
+                              .filter([&](const auto &p) {
+                                  return btu::common::contains(allowed_types,
+                                                               get_filetype(p.path(), dir, sets));
+                              })
+                              .map([](const auto &p) { return p.path(); })
+                              .to_vector();
+
+    // sort by size, largest first
+    std::ranges::sort(packable_files, [](const auto &lhs, const auto &rhs) {
+        return fs::file_size(lhs) > fs::file_size(rhs);
+    });
+
+    // if we have separate texture archives, partition textures and standard files
+    if (sets.texture_version.has_value())
+    {
+        // put textures at the end of the list
+        auto [textures_start, _] = std::ranges::stable_partition(packable_files, [&](const auto &file) {
+            return get_filetype(file, dir, sets) != FileTypes::Texture;
+        });
+
+        return {.standard = std::vector<Path>(packable_files.begin(), textures_start),
+                .texture  = std::vector<Path>(textures_start, packable_files.end())};
+    }
+
+    return {.standard = BTU_MOV(packable_files), .texture = {}};
 }
 
-template<std::ranges::range R>
-requires std::is_same_v<std::ranges::range_value_t<R>, PackableFile>
-[[nodiscard]] auto do_pack(const R &packable_files, const Path &dir, const Settings &sets, ArchiveType type)
-    -> std::vector<ArchiveData>
+[[nodiscard]] auto prepare_file(const Path &file_path, const PackSettings &sets, ArchiveType type) -> File
 {
-    auto ret = std::vector<ArchiveData>{};
-    for (auto &&file : packable_files)
-    {
-        bool added = false;
-        // try to add to existing archive
-        for (auto &archive : ret)
+    auto file = [type, &sets] {
+        switch (type)
         {
-            if (archive.add_file(file.absolute_path, file.size))
+            case ArchiveType::Textures:
             {
-                added = true;
-                break;
+                assert(sets.game_settings.texture_version.has_value());
+                return File{sets.game_settings.texture_version.value()};
+            }
+            case ArchiveType::Standard:
+            {
+                return File{sets.game_settings.version};
             }
         }
-        if (added)
-            continue;
+        libbsa::detail::declare_unreachable();
+    }();
+    file.read(file_path);
 
-        // if we couldn't add to any existing archive, create a new one
-        ret.emplace_back(sets, type, dir);
-        ret.back().add_file(file.absolute_path, file.size);
+    const bool fo4dx = file.version() == ArchiveVersion::fo4dx;
+    if (sets.compress == Compression::Yes || fo4dx) // fo4dx is always compressed
+        file.compress();
+    return file;
+}
+
+[[nodiscard]] auto archive_size(const Archive &arch) noexcept -> size_t
+{
+    return flow::from(arch).map([](const auto &pair) { return pair.second.size(); }).sum();
+}
+
+[[nodiscard]] auto file_fits(const Archive &arch, const File &file, const Settings &sets) noexcept -> bool
+{
+    const auto size = archive_size(arch);
+    return size + file.size() <= sets.max_size;
+}
+
+[[nodiscard]] auto do_write(Archive arch, const PackSettings &settings, ArchiveType type)
+{
+    auto filepath = settings.output_dir / settings.archive_name_gen(type);
+
+    write_archive(BTU_MOV(arch), BTU_MOV(filepath));
+}
+
+[[nodiscard]] auto do_pack(std::vector<Path> files, const PackSettings &settings, ArchiveType type) noexcept
+    -> std::vector<std::pair<Path, std::exception_ptr>>
+{
+    auto arch = Archive{};
+    auto ret  = std::vector<std::pair<Path, std::exception_ptr>>{};
+
+    std::mutex mut;
+    btu::common::for_each_mt(BTU_MOV(files), [&settings, &mut, &arch, type, &ret](Path &&absolute_path) {
+        try
+        {
+            auto file = prepare_file(absolute_path, settings, type);
+
+            std::unique_lock lock(mut);
+            if (file_fits(arch, file, settings.game_settings))
+            {
+                arch.emplace(fs::relative(absolute_path, settings.input_dir).string(), BTU_MOV(file));
+                return;
+            }
+
+            // if we are here, the file does not fit into the archive
+            // we need to write the archive and start a new one
+            // to avoid locking the mutex for too long, we prepare the new archive first
+            auto full_arch = BTU_MOV(arch);
+
+            arch = Archive{};
+            arch.emplace(fs::relative(absolute_path, settings.input_dir).string(), BTU_MOV(file));
+
+            assert(archive_size(arch) <= settings.game_settings.max_size);
+
+            // it is now safe to unlock the mutex, the full archive is not shared with other threads
+            lock.unlock();
+
+            do_write(BTU_MOV(full_arch), settings, type);
+        }
+        catch (const std::exception &e)
+        {
+            const std::unique_lock lock(mut);
+            ret.emplace_back(BTU_MOV(absolute_path), std::make_exception_ptr(e));
+        }
+    });
+
+    // write the last archive
+    try
+    {
+        if (!arch.empty())
+            do_write(BTU_MOV(arch), settings, type);
     }
+    catch (const std::exception &e)
+    {
+        ret.emplace_back(settings.archive_name_gen(type), std::make_exception_ptr(e));
+    }
+
     return ret;
 }
 
-auto prepare_archive(const Path &dir, const Settings &sets, const AllowFilePred &allow_path_pred)
-    -> std::vector<ArchiveData>
+auto pack(const PackSettings &settings) noexcept -> std::vector<std::pair<Path, std::exception_ptr>>
 {
-    auto packable_files = list_packable_files(dir, sets, allow_path_pred);
-    // sort by size, largest first
-    std::ranges::sort(packable_files, {}, &PackableFile::size);
-    std::ranges::reverse(packable_files);
-    // now we have the largest files first, we can start packing them. There are two cases:
-    // games with separate texture archives and games with one archive for everything
+    auto files = list_packable_files(settings.input_dir,
+                                     settings.game_settings,
+                                     get_allow_file_pred(settings));
 
-    auto ret = std::vector<ArchiveData>{};
+    auto ret = std::vector<std::pair<Path, std::exception_ptr>>{};
 
-    // if we have separate texture archives, we can pack textures separately
-    if (sets.texture_format.has_value())
+    if (!files.standard.empty())
+        ret = do_pack(BTU_MOV(files.standard), settings, ArchiveType::Standard);
+
+    if (!files.texture.empty())
     {
-        // put textures at the end of the list
-        auto textures = std::ranges::stable_partition(packable_files, [&](const auto &file) {
-            return get_filetype(file.absolute_path, dir, sets) != FileTypes::Texture;
-        });
-
-        ret = do_pack(textures, dir, sets, ArchiveType::Textures);
-
-        // remove textures from packable_files
-        packable_files.erase(textures.begin(), textures.end());
+        auto errs = do_pack(BTU_MOV(files.texture), settings, ArchiveType::Textures);
+        ret.insert(ret.end(), std::make_move_iterator(errs.begin()), std::make_move_iterator(errs.end()));
     }
-    auto standard = do_pack(packable_files, dir, sets, ArchiveType::Standard);
-    ret.insert(ret.end(), standard.begin(), standard.end());
 
     return ret;
 }

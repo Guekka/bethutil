@@ -65,8 +65,8 @@ struct Settings
 
     uint64_t max_size{};
 
-    ArchiveVersion format{};
-    std::optional<ArchiveVersion> texture_format;
+    ArchiveVersion version{};
+    std::optional<ArchiveVersion> texture_version;
 
     std::optional<std::u8string> suffix;
     std::optional<std::u8string> texture_suffix;
@@ -91,8 +91,8 @@ struct Settings
         Settings sets;
         sets.game              = Game::SSE;
         sets.max_size          = 2000ULL * megabyte;
-        sets.format            = ArchiveVersion::sse;
-        sets.texture_format    = ArchiveVersion::sse;
+        sets.version           = ArchiveVersion::sse;
+        sets.texture_version   = ArchiveVersion::sse;
         sets.texture_suffix    = u8"Textures";
         sets.extension         = u8".bsa";
         sets.plugin_extensions = {u8".esl", u8".esm", u8".esp"};
@@ -153,8 +153,8 @@ struct Settings
             static const Settings sets_tes4 = [=] {
                 Settings s          = default_sets;
                 s.game              = Game::TES4;
-                s.format            = ArchiveVersion::tes4;
-                s.texture_format    = std::nullopt;
+                s.version           = ArchiveVersion::tes4;
+                s.texture_version   = std::nullopt;
                 s.texture_suffix    = std::nullopt;
                 s.plugin_extensions = {u8".esm", u8".esp"};
                 s.s_dummy_plugin    = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
@@ -167,8 +167,8 @@ struct Settings
             static const Settings sets_fnv = [=] {
                 Settings s          = default_sets;
                 s.game              = Game::FNV;
-                s.format            = ArchiveVersion::tes5;
-                s.texture_format    = std::nullopt;
+                s.version           = ArchiveVersion::tes5;
+                s.texture_version   = std::nullopt;
                 s.texture_suffix    = std::nullopt;
                 s.plugin_extensions = {u8".esm", u8".esp"};
                 s.s_dummy_plugin    = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
@@ -181,8 +181,8 @@ struct Settings
             static const Settings sets_sle = [=] {
                 Settings s          = default_sets;
                 s.game              = Game::SLE;
-                s.format            = ArchiveVersion::tes5;
-                s.texture_format    = std::nullopt;
+                s.version           = ArchiveVersion::tes5;
+                s.texture_version   = std::nullopt;
                 s.suffix            = {};
                 s.texture_suffix    = std::nullopt;
                 s.plugin_extensions = {u8".esm", u8".esp"};
@@ -195,14 +195,14 @@ struct Settings
         case Game::FO4:
         {
             static const Settings sets_fo4 = [=] {
-                Settings s       = default_sets;
-                s.game           = Game::FO4;
-                s.format         = ArchiveVersion::fo4;
-                s.texture_format = ArchiveVersion::fo4dx;
-                s.max_size       = 4000ULL * megabyte;
-                s.extension      = u8".ba2";
-                s.suffix         = u8"Main";
-                s.texture_files  = {AllowedPath{u8".dds", {u8"textures", u8"interface"}}};
+                Settings s        = default_sets;
+                s.game            = Game::FO4;
+                s.version         = ArchiveVersion::fo4;
+                s.texture_version = ArchiveVersion::fo4dx;
+                s.max_size        = 4000ULL * megabyte;
+                s.extension       = u8".ba2";
+                s.suffix          = u8"Main";
+                s.texture_files   = {AllowedPath{u8".dds", {u8"textures", u8"interface"}}};
                 s.standard_files.emplace_back(AllowedPath{u8".png", {u8"textures"}});
                 s.standard_files.emplace_back(AllowedPath{u8".uvd", {u8"vis"}});
                 s.s_dummy_plugin = std::vector(std::begin(dummy::fo4), std::end(dummy::fo4));
