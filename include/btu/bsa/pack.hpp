@@ -4,20 +4,29 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 #pragma once
 
-#include "btu/bsa/archive_data.hpp"
+#include <btu/bsa/settings.hpp>
+
+#include <functional>
 
 namespace btu::bsa {
-using AllowFilePred = std::function<bool(const Path &dir, fs::directory_entry const &fileinfo)>;
+using AllowFilePred  = std::function<bool(const Path &dir, fs::directory_entry const &file_info)>;
+using ArchiveNameGen = std::function<std::u8string(ArchiveType)>;
 
-auto default_is_allowed_path(const Path &dir, fs::directory_entry const &fileinfo) -> bool;
+struct PackSettings
+{
+    Path input_dir;
+    Path output_dir;
 
-auto prepare_archive(const Path &dir,
-                     const Settings &sets,
-                     const AllowFilePred &allow_path_pred = default_is_allowed_path)
-    -> std::vector<ArchiveData>;
+    Settings game_settings;
+
+    Compression compress = Compression::Yes;
+
+    ArchiveNameGen archive_name_gen;
+    std::optional<AllowFilePred> allow_file_pred = std::nullopt;
+};
 
 /// \return the list of files which failed to pack
-auto write(Path filepath, Compression compressed, ArchiveData &&data)
-    -> std::vector<std::pair<Path, std::string>>;
+[[nodiscard]] auto pack(const PackSettings &settings) noexcept
+    -> std::vector<std::pair<Path, std::exception_ptr>>;
 
 } // namespace btu::bsa
