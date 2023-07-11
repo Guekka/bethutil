@@ -17,11 +17,8 @@ enum class Compression
 };
 
 template<class... Keys>
-requires requires(Keys... keys)
-{
-    (std::string(keys.name()), ...);
-}
-[[nodiscard]] auto virtual_to_local_path(Keys &&...a_keys) -> std::u8string
+    requires requires(Keys... keys) { (std::string(keys.name()), ...); }
+[[nodiscard]] auto virtual_to_local_path(Keys &&...a_keys) noexcept -> std::u8string
 {
     std::u8string local;
     ((local += btu::common::as_utf8(a_keys.name()), local += u8'/'), ...);
@@ -58,10 +55,14 @@ public:
     void write(binary_io::any_ostream &dst) const;
 
     [[nodiscard]] auto version() const noexcept -> ArchiveVersion;
+    [[nodiscard]] auto size() const noexcept -> size_t;
 
     template<typename T>
-    requires btu::common::is_variant_member_v<T, UnderlyingFile>
-    [[nodiscard]] auto as_raw_file() && { return std::get<T>(std::move(file_)); }
+        requires btu::common::is_variant_member_v<T, UnderlyingFile>
+    [[nodiscard]] auto as_raw_file() &&
+    {
+        return std::get<T>(std::move(file_));
+    }
 
 private:
     UnderlyingFile file_;

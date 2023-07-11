@@ -5,23 +5,11 @@
 #pragma once
 
 #include "../utils.hpp"
-#include "btu/bsa/archive_data.hpp"
 #include "catch.hpp"
+
+#include <btu/bsa/pack.hpp>
+#include <btu/bsa/plugin.hpp>
+#include <btu/bsa/unpack.hpp>
 
 #include <sstream>
 
-namespace Catch {
-
-template<>
-struct StringMaker<btu::bsa::ArchiveData>
-{
-    static auto convert(const btu::bsa::ArchiveData &in) -> std::string
-    {
-        std::stringstream os;
-        os << "ArchiveData{"
-           << "size: " << in.size() << ", "
-           << "max_size: " << in.max_size() << "type: " << btu::common::to_underlying(in.type());
-        return os.str();
-    }
-};
-} // namespace Catch
