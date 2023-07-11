@@ -6,10 +6,10 @@
 #include "btu/bsa/pack.hpp"
 #include "btu/bsa/unpack.hpp"
 
+#include <btu/bsa/plugin.hpp>
+
 #include <iostream>
 #include <string_view>
-
-using namespace btu::bsa;
 
 auto process_args(std::vector<std::string_view> args) -> int
 {
@@ -24,12 +24,11 @@ auto process_args(std::vector<std::string_view> args) -> int
         return 1;
     }
 
-    const auto &sets = Settings::get(btu::Game::SSE);
+    const auto &sets = btu::bsa::Settings::get(btu::Game::SSE);
     const auto arg   = args[0];
     const std::vector files(btu::fs::directory_iterator(dir), btu::fs::directory_iterator{});
     if (arg == "pack")
     {
-        auto bsas               = prepare_archive(dir, sets);
         auto plugins            = btu::bsa::list_plugins(files.begin(), files.end(), sets);
         const auto default_plug = btu::bsa::FilePath(dir,
                                                      dir.filename().u8string(),
@@ -39,11 +38,32 @@ auto process_args(std::vector<std::string_view> args) -> int
         if (plugins.empty()) // Used to find BSA name
             plugins.emplace_back(default_plug);
 
-        for (auto bsa : std::move(bsas))
+        auto errs = btu::bsa::pack(btu::bsa::PackSettings{
+            .input_dir     = dir,
+            .output_dir    = dir,
+            .game_settings = sets,
+            .compress      = btu::bsa::Compression::Yes,
+            .archive_name_gen =
+                [&plugins, &sets](btu::bsa::ArchiveType type) {
+                    return btu::bsa::find_archive_name(plugins, sets, type).full_name();
+                },
+        });
+
+        if (!errs.empty())
         {
-            write(btu::bsa::find_archive_name(plugins, sets, bsa.get_type()).full_path(),
-                  Compression::Yes,
-                  std::move(bsa));
+            std::cerr << "Errors while packing:\n";
+            for (const auto &[file, exc] : errs)
+            {
+                try
+                {
+                    std::rethrow_exception(exc);
+                }
+                catch (const std::exception &e)
+                {
+                    std::cerr << file.string() << ": " << e.what() << '\n';
+                }
+            }
+            return 1;
         }
     }
     else if (arg == "unpack")
@@ -53,7 +73,7 @@ auto process_args(std::vector<std::string_view> args) -> int
         for (const auto &file : archives)
         {
             std::cout << "Unpacking " << file.path().string() << std::endl;
-            unpack({.file_path = dir});
+            btu::bsa::unpack({.file_path = dir});
         }
     }
     else if (arg == "list")
@@ -63,7 +83,7 @@ auto process_args(std::vector<std::string_view> args) -> int
         for (const auto &file : archives)
         {
             std::cout << "Files of: " << file.path().string() << std::endl;
-            auto arch = read_archive(file.path());
+            auto arch = btu::bsa::read_archive(file.path());
             if (!arch)
                 continue;
             for (auto &&elem : std::move(*arch))
