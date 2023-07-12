@@ -13,4 +13,10 @@
 namespace btu::nif {
 using Error       = btu::common::Error;
 using ResultError = tl::expected<void, Error>;
+
+enum class HeadpartStatus
+{
+    Yes,
+    No,
+};
 } // namespace btu::nif
