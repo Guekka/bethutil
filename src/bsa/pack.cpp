@@ -101,8 +101,10 @@ struct PackGroup
     }();
     file.read(file_path);
 
-    const bool fo4dx = file.version() == ArchiveVersion::fo4dx;
-    if (sets.compress == Compression::Yes || fo4dx) // fo4dx is always compressed
+    const bool fo4dx        = file.version() == ArchiveVersion::fo4dx;
+    const bool compressible = get_filetype(file_path, sets.input_dir, sets.game_settings)
+                              != FileTypes::Incompressible;
+    if ((sets.compress == Compression::Yes && compressible) || fo4dx) // fo4dx is always compressed
         file.compress();
     return file;
 }

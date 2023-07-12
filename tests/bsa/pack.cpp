@@ -22,11 +22,15 @@ TEST_CASE("Pack", "[src]")
         const auto sets = Settings::get(game);
 
         auto errs = pack(PackSettings{
-            .input_dir        = dir / "input",
-            .output_dir       = dir / "output",
-            .game_settings    = sets,
-            .compress         = Compression::Yes,
-            .archive_name_gen = [name, &sets](ArchiveType) { return name + sets.extension; },
+            .input_dir     = dir / "input",
+            .output_dir    = dir / "output",
+            .game_settings = sets,
+            .compress      = Compression::Yes,
+            .archive_name_gen =
+                [name, &sets](ArchiveType type) {
+                    return std::u8string(name)
+                           + (type == ArchiveType::Textures ? u8" - Textures" : u8" - Main") + sets.extension;
+                },
         });
 
         if (!errs.empty())
