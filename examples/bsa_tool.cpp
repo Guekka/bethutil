@@ -73,7 +73,7 @@ auto process_args(std::vector<std::string_view> args) -> int
         for (const auto &file : archives)
         {
             std::cout << "Unpacking " << file.path().string() << std::endl;
-            btu::bsa::unpack({.file_path = dir});
+            btu::bsa::unpack({.file_path = file});
         }
     }
     else if (arg == "list")
@@ -87,7 +87,11 @@ auto process_args(std::vector<std::string_view> args) -> int
             if (!arch)
                 continue;
             for (auto &&elem : std::move(*arch))
-                std::cout << elem.first + '\n';
+            {
+                std::cout << elem.first << "  " << elem.second.size() << " bytes - Compressed: "
+                          << (elem.second.compressed() == btu::bsa::Compression::Yes ? "Yes" : "No")
+                          << std::endl;
+            }
         }
     }
     else
