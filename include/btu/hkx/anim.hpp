@@ -46,19 +46,24 @@ using AnimExeRef = std::reference_wrapper<const AnimExeInfo>;
 
 class AnimExe
 {
-    Path exe_dir_;
-    std::vector<detail::AnimExeRef> detected_;
-
-    AnimExe(Path exe_dir, std::vector<detail::AnimExeRef> detected) noexcept
-        : exe_dir_(std::move(exe_dir))
-        , detected_(std::move(detected))
-    {
-    }
-
 public:
     [[nodiscard]] static auto make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>;
 
     [[nodiscard]] auto convert(btu::Game target_game, const Path &input, const Path &output) const
         -> ResultError;
+
+    [[nodiscard]] auto convert(btu::Game target_game, std::span<std::byte> input) const
+        -> tl::expected<std::vector<std::byte>, Error>;
+
+private:
+    Path exe_dir_;
+    std::vector<detail::AnimExeRef> detected_;
+
+    using CopyInput = std::function<ResultError(const Path &input_path)>;
+
+    [[nodiscard]] auto convert_impl(btu::Game target_game, const CopyInput &copy_input) const noexcept
+        -> tl::expected<Path, Error>;
+
+    AnimExe(Path exe_dir, std::vector<detail::AnimExeRef> detected) noexcept;
 };
 } // namespace btu::hkx

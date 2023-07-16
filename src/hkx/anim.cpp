@@ -149,24 +149,11 @@ struct ReprocOptions : public reproc::options
     return options;
 }
 
-[[nodiscard]] auto prepare_input_folder(const Path &input,
-                                        const Path &working_dir,
+/// hardlink all required files from exe_dir to working_dir
+[[nodiscard]] auto prepare_input_folder(const Path &working_dir,
                                         const Path &exe_dir,
                                         const detail::AnimExeRef exe_info) -> ResultError
 {
-    // copy input file
-    const auto input_path = working_dir / exe_info.get().input_file_name();
-
-    auto ec = std::error_code{};
-    fs::remove(input_path, ec); // leftover from previous runs
-    if (ec)
-        return tl::make_unexpected(Error(ec));
-
-    fs::copy(input, input_path, ec);
-    if (ec)
-        return tl::make_unexpected(Error(ec));
-
-    // hardlink required files
     for (const auto &req_file : exe_info.get().get_required_files(exe_dir))
     {
         const auto target = working_dir / fs::relative(req_file, exe_dir);
@@ -184,12 +171,25 @@ struct ReprocOptions : public reproc::options
     return {};
 }
 
-[[nodiscard]] auto move_output_to_file(const Path &working_dir,
-                                       const detail::AnimExeRef exe_info,
-                                       const Path &output) -> ResultError
+/// copy input file to working_dir
+[[nodiscard]] auto copy_input_file(const Path &input, const Path &input_path) -> ResultError
 {
-    const auto output_path = working_dir / exe_info.get().output_file_name();
+    // copy input file
 
+    auto ec = std::error_code{};
+    fs::remove(input_path, ec); // leftover from previous runs
+    if (ec)
+        return tl::make_unexpected(Error(ec));
+
+    fs::copy(input, input_path, ec);
+    if (ec)
+        return tl::make_unexpected(Error(ec));
+
+    return {};
+}
+
+[[nodiscard]] auto move_output_to_file(const Path &output_path, const Path &output) -> ResultError
+{
     auto ec = std::error_code{};
 
     fs::remove(output, ec);
@@ -203,7 +203,27 @@ struct ReprocOptions : public reproc::options
     return {};
 }
 
-auto AnimExe::convert(btu::Game target_game, const Path &input, const Path &output) const -> ResultError
+[[nodiscard]] auto move_output_to_memory(const Path &output_path)
+    -> tl::expected<std::vector<std::byte>, Error>
+{
+    auto ret = common::read_file(output_path);
+
+    auto ec = std::error_code{};
+    fs::remove(output_path, ec);
+    if (ec)
+        return tl::make_unexpected(Error(ec));
+
+    return ret;
+}
+
+AnimExe::AnimExe(Path exe_dir, std::vector<detail::AnimExeRef> detected) noexcept
+    : exe_dir_(std::move(exe_dir))
+    , detected_(std::move(detected))
+{
+}
+
+auto AnimExe::convert_impl(btu::Game target_game, const CopyInput &copy_input) const noexcept
+    -> tl::expected<Path, Error>
 {
     const auto working_dir = make_working_dir();
     auto options           = working_dir.map(make_reproc_options);
@@ -214,7 +234,12 @@ auto AnimExe::convert(btu::Game target_game, const Path &input, const Path &outp
     if (!exe)
         return tl::make_unexpected(exe.error());
 
-    const auto copy = prepare_input_folder(input, *working_dir, exe_dir_, *exe);
+    const auto prep = prepare_input_folder(*working_dir, exe_dir_, *exe);
+    if (!prep)
+        return tl::make_unexpected(prep.error());
+
+    const auto input_path = *working_dir / exe->get().input_file_name();
+    const auto copy       = copy_input(input_path);
     if (!copy)
         return tl::make_unexpected(copy.error());
 
@@ -224,7 +249,25 @@ auto AnimExe::convert(btu::Game target_game, const Path &input, const Path &outp
         .and_then([](int result) noexcept -> ResultError {
             return result == 0 ? ResultError{} : tl::make_unexpected(Error(AnimErr::ExeFailed));
         })
-        .and_then([&]() noexcept -> ResultError { return move_output_to_file(*working_dir, *exe, output); });
+        .map([&] { return *working_dir / exe->get().output_file_name(); });
+}
+
+auto AnimExe::convert(btu::Game target_game, const Path &input, const Path &output) const -> ResultError
+{
+    return convert_impl(target_game,
+                        [&](const Path &input_path) { return copy_input_file(input, input_path); })
+        .and_then([&](const Path &output_path) { return move_output_to_file(output_path, output); });
+}
+
+auto AnimExe::convert(btu::Game target_game, std::span<std::byte> input) const
+    -> tl::expected<std::vector<std::byte>, Error>
+{
+    return convert_impl(target_game,
+                        [&](const Path &input_path) -> ResultError {
+                            common::write_file(input_path, input);
+                            return {};
+                        })
+        .and_then(move_output_to_memory);
 }
 
 } // namespace btu::hkx
