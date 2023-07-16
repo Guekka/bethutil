@@ -13,90 +13,43 @@
 #include <variant>
 
 namespace btu::modmanager {
-namespace detail {
-class ModFileDisk final
-{
-public:
-    ModFileDisk(Path root, Path rel_path);
-
-    void load();
-
-    [[nodiscard]] auto get_relative_path() const noexcept -> Path;
-    [[nodiscard]] auto size() const noexcept -> size_t;
-
-    [[nodiscard]] auto modified() const noexcept -> bool;
-
-    void read(const Path &path);
-    void read(std::span<std::byte> src);
-
-    void write(const Path &path) const;
-    void write(binary_io::any_ostream &dst) const;
-
-private:
-    std::vector<std::byte> content_;
-    Path relative_path_;
-    Path root_;
-
-    bool modified_{};
-};
-
-struct ModFileArchive
-{
-    std::string name;
-    btu::bsa::File &file;
-};
-
-} // namespace detail
-
-class ModFile
-{
-public:
-    using Underlying = std::variant<detail::ModFileArchive, std::reference_wrapper<detail::ModFileDisk>>;
-
-    explicit ModFile(Underlying content);
-
-    void load();
-
-    [[nodiscard]] auto get_relative_path() const -> Path;
-
-    void read(Path path);
-    void read(std::span<std::byte> src);
-
-    void write(const Path &path) const;
-    void write(binary_io::any_ostream &dst) const;
-
-private:
-    Underlying file_;
-};
-
 class ModFolder
 {
-    struct Archive
+public:
+    struct ModFile
     {
-        Path path;
-        btu::bsa::Archive arch;
+        Path relative_path;
+        std::vector<std::byte> content;
     };
 
-public:
-    explicit ModFolder(Path directory, std::u8string_view archive_ext);
+    explicit ModFolder(Path directory, std::u8string archive_ext);
 
-    [[nodiscard]] auto size() -> size_t;
+    /// Get the size of the folder, including files in archives.
+    /// Utility function, equivalent to iterate() and counting the files.
+    [[nodiscard]] auto size() const -> size_t;
 
-    [[nodiscard]] auto to_flow()
-    {
-        return flow::map(archives_, &Archive::arch)
-            .flatten()
-            .map([](auto &pair) {
-                return ModFile(detail::ModFileArchive{pair.first, pair.second});
-            })
-            .chain(flow::map(loose_files_, [](auto &f) { return ModFile(std::ref(f)); }));
-    }
+    using Transformer = std::function<std::optional<std::vector<std::byte>>(ModFile)>;
+    /// Transform all files in the folder, including files in archives.
+    /// Multithreaded.
+    /// \arg transformer Function that takes a file content and returns a new content. If the function returns
+    /// std::nullopt, the file is not changed.
+    /// \note For optimal performance, it is recommended to return std::nullopt for files that do not need to be changed.
+    void transform(Transformer &&transformer);
 
-    void reintegrate();
+    /// Iterate over all files in the folder, including files in archives.
+    /// Multithreaded.
+    void iterate(const std::function<void(ModFile)> &visitor) const;
+
+    /// Iterate over all files in the folder, including archives.
+    /// Multithreaded.
+    void iterate(const std::function<void(Path relative_path)> &loose,
+                 const std::function<void(const Path &archive_path, bsa::Archive &&archive)> &archive) const;
 
 private:
-    std::vector<Archive> archives_;
-    std::vector<detail::ModFileDisk> loose_files_;
+    // This function is used to implement transform() and one of the iterate() functions.
+    // The reason for it to be private is that while it is `const`, it is not `const` semantically: it modifies the
+    // folder
+    void transform_impl(Transformer &&transformer) const;
 
     Path dir_;
     std::u8string archive_ext_;
