@@ -55,6 +55,10 @@ private:
 };
 
 [[nodiscard]] auto load(Path path) noexcept -> tl::expected<Texture, Error>;
+[[nodiscard]] auto load(Path relative_path, std::span<std::byte> data) noexcept
+    -> tl::expected<Texture, Error>;
+
 [[nodiscard]] auto save(const Texture &tex, const Path &path) noexcept -> ResultError;
+[[nodiscard]] auto save(const Texture &tex) noexcept -> tl::expected<std::vector<std::byte>, Error>;
 
 } // namespace btu::tex
