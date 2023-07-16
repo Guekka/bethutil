@@ -7,30 +7,6 @@
 
 #include <flow.hpp>
 
-/*
-std::optional<QString> GeneralSettings::isValid() const
-{
-      const ModManager managedBy = findManager(inputDir);
-
-    if (eMode() == SeveralMods && managedBy == ModManager::None)
-    {
-        return tr("'Several mods' mode is enabled, but this path does not seem to be handled by a mod "
-                  "manager.\n If you are sure you want to process this folder, please create a file "
-                  "named '%1' in this folder. This is a necessary evil to ensure safety for your mods.\n"
-                  "Path: '%2'")
-            .arg(forceProcessFolder, sInputPath());
-    }
-
-    const bool isSingleModReady = managedBy == ModManager::None || managedBy == ModManager::ManualForced;
-    if (eMode() == SingleMod && !isSingleModReady)
-    {
-        return tr("'Single mod' mode is enabled, but this path seems to be handled by a mod manager. "
-                  "Path: '%1'")
-            .arg(sInputPath());
-    }
-}
-*/
-
 namespace btu::modmanager {
 auto find_manager(const Path &dir) -> ModManager
 {
@@ -53,7 +29,7 @@ auto find_manager(const Path &dir) -> ModManager
     if (mo2)
         return ModManager::MO2;
 
-    //Kortex not yet handled
+    // Kortex not yet handled
 
     return ModManager::None;
 }
