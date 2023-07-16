@@ -26,7 +26,7 @@
           inherit inputs pkgs;
           modules = [
             {
-              packages = [pkgs.cmake pkgs.ninja pkgs.pkg-config pkgs.gcc vcpkg];
+              packages = [pkgs.cmake pkgs.ninja pkgs.pkg-config pkgs.gcc vcpkg pkgs.libgccjit];
 
               enterShell = ''
                 export VCPKG_INSTALLATION_ROOT=$(vcpkg --root-for-nix-usage)
