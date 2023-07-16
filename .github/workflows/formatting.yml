@@ -1,6 +1,9 @@
 name: Apply Formatting
 
-on: [ push, pull_request, pull_request_target, workflow_dispatch ]
+on:
+  push:
+    branches-ignore:
+      - main
 
 jobs:
   clang-format:
@@ -20,4 +23,4 @@ jobs:
         
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: apply formatting
+        commit_message: "style: apply formatting"
