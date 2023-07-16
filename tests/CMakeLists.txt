@@ -80,6 +80,7 @@ acquire_test("generate_mipmaps")
 acquire_test("modfolder")
 acquire_test("nif_corrupted")
 acquire_test("read_file")
+acquire_test("nif_memory_io")
 
 if("${BETHUTIL_BUILD_EXAMPLES}")
   target_include_directories(tests PRIVATE "${ROOT_DIR}/examples")

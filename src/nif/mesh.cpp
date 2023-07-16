@@ -5,6 +5,8 @@
 
 #include "btu/nif/mesh.hpp"
 
+#include <fstream>
+
 namespace btu::nif {
 auto Mesh::get() noexcept -> nifly::NifFile &
 {
@@ -45,12 +47,65 @@ auto load(Path path) noexcept -> tl::expected<Mesh, Error>
     return m;
 }
 
+/// istringstream without copying
+struct OneShotReadBuf : public std::streambuf
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    OneShotReadBuf(char *s, std::size_t n) { setg(s, s, s + n); }
+};
+
+auto load(Path relative_path, std::span<std::byte> data) noexcept -> tl::expected<Mesh, Error>
+{
+    Mesh m;
+    m.set_load_path(std::move(relative_path));
+
+    try
+    {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        auto buf = OneShotReadBuf(reinterpret_cast<char *>(data.data()), data.size());
+        auto in  = std::istream(&buf);
+
+        auto res = m.get().Load(in);
+
+        if (res != 0)
+            return tl::make_unexpected(Error(std::error_code(res, std::generic_category())));
+
+        return m;
+    }
+    catch (const std::exception &)
+    {
+        return tl::make_unexpected(Error(std::error_code(1, std::generic_category())));
+    }
+}
+
 auto save(Mesh mesh, const Path &path) noexcept -> ResultError
 {
     const int res = mesh.get().Save(path);
     if (res != 0)
         return tl::make_unexpected(Error(std::error_code(res, std::generic_category())));
     return {};
+}
+
+auto save(Mesh mesh) noexcept -> tl::expected<std::vector<std::byte>, Error>
+{
+    auto buf = std::ostringstream{};
+    try
+    {
+        const int res = mesh.get().Save(buf);
+        if (res != 0)
+            return tl::make_unexpected(Error(std::error_code(res, std::generic_category())));
+    }
+    catch (const std::exception &)
+    {
+        return tl::make_unexpected(Error(std::error_code(1, std::generic_category())));
+    }
+    auto str = std::move(buf).str();
+    // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
+    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    return std::vector<std::byte>(reinterpret_cast<std::byte *>(str.data()),
+                                  reinterpret_cast<std::byte *>(str.data() + str.size()));
+    // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
 }
 
 } // namespace btu::nif

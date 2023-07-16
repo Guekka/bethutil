@@ -24,6 +24,9 @@ public:
 [[maybe_unused]] constexpr auto canonize_path = common::make_path_canonizer(u8"meshes/");
 
 [[nodiscard]] auto load(Path path) noexcept -> tl::expected<Mesh, Error>;
+[[nodiscard]] auto load(Path relative_path, std::span<std::byte> data) noexcept -> tl::expected<Mesh, Error>;
+
 [[nodiscard]] auto save(Mesh mesh, const Path &path) noexcept -> ResultError;
+[[nodiscard]] auto save(Mesh mesh) noexcept -> tl::expected<std::vector<std::byte>, Error>;
 
 } // namespace btu::nif

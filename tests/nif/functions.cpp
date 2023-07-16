@@ -23,3 +23,30 @@ TEST_CASE("nif convert", "[src]")
     test_expected(dir, "crashing.nif", tester);
     test_expected(dir, u8"i18nほん.nif", tester);
 }
+
+TEST_CASE("Nif Memory IO", "[src]")
+{
+    const Path dir  = "nif_memory_io";
+    const Path file = dir / "in" / "crashing.nif";
+
+    // load
+    auto data    = btu::common::read_file(file);
+    auto mem_nif = btu::nif::load(file, data);
+    auto fs_nif  = btu::nif::load(file);
+
+    REQUIRE(mem_nif.has_value());
+    REQUIRE(fs_nif.has_value());
+
+    // save
+    auto mem_data = btu::nif::save(mem_nif.value());
+    REQUIRE(mem_data.has_value());
+
+    auto out = dir / "out" / "crashing.nif";
+    btu::fs::create_directories(out.parent_path());
+
+    REQUIRE(btu::nif::save(mem_nif.value(), out));
+
+    auto fs_data = btu::common::read_file(out);
+
+    REQUIRE(*mem_data == fs_data);
+}
