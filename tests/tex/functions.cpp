@@ -3,9 +3,37 @@
 #include "./utils.hpp"
 #include "btu/tex/compression_device.hpp"
 
+#include <btu/common/filesystem.hpp>
+
 #include <filesystem>
 
 using btu::tex::Dimension, btu::tex::Texture;
+
+TEST_CASE("Tex Memory IO", "[src]")
+{
+    const auto dir  = Path{"tex_memory_io"};
+    const auto file = dir / "in" / u8"tex.dds";
+
+    // load
+    auto data    = btu::common::read_file(file);
+    auto mem_tex = btu::tex::load(file, data);
+    auto fs_tex  = btu::tex::load(file);
+
+    REQUIRE(*mem_tex == *fs_tex);
+
+    // save
+    auto mem_data = btu::tex::save(mem_tex.value());
+    REQUIRE(mem_data.has_value());
+
+    auto out = dir / "out" / u8"tex.dds";
+    btu::fs::create_directories(out.parent_path());
+
+    REQUIRE(btu::tex::save(mem_tex.value(), out));
+
+    auto fs_data = btu::common::read_file(out);
+
+    REQUIRE(*mem_data == fs_data);
+}
 
 TEST_CASE("decompress", "[src]")
 {
