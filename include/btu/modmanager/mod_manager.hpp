@@ -25,7 +25,7 @@ public:
 
     [[nodiscard]] auto to_flow()
     {
-        return flow::from(folders_).flat_map([this](auto &&f) { return ModFolder(f, archive_ext_); });
+        return flow::from(folders_).map([this](auto &&f) { return ModFolder(f, archive_ext_); });
     }
 
 private:
