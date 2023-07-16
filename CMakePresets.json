@@ -41,7 +41,7 @@
           "value": "${sourceDir}/cmake/ports"
         }
       },
-      "toolchainFile": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "hidden": true,
       "name": "vcpkg"
     },
