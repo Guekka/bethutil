@@ -117,6 +117,31 @@ auto load(Path path) noexcept -> tl::expected<Texture, Error>
     return tex;
 }
 
+auto load(Path relative_path, std::span<std::byte> data) noexcept -> tl::expected<Texture, Error>
+{
+    Texture tex;
+    tex.set_load_path(std::move(relative_path));
+
+    DirectX::TexMetadata info{};
+    const auto hr = DirectX::LoadFromDDSMemory(data.data(),
+                                               data.size(),
+                                               DirectX::DDS_FLAGS_NONE,
+                                               &info,
+                                               tex.get());
+    if (FAILED(hr))
+    {
+        // Maybe it's a TGA then?
+        const auto hr2 = DirectX::LoadFromTGAMemory(data.data(),
+                                                    data.size(),
+                                                    DirectX::TGA_FLAGS_NONE,
+                                                    &info,
+                                                    tex.get());
+        if (FAILED(hr2))
+            return tl::make_unexpected(error_from_hresult(hr)); // preserve original error
+    }
+    return tex;
+}
+
 auto save(const Texture &tex, const Path &path) noexcept -> ResultError
 {
     const auto res = DirectX::SaveToDDSFile(tex.get().GetImages(),
@@ -127,6 +152,23 @@ auto save(const Texture &tex, const Path &path) noexcept -> ResultError
     if (FAILED(res))
         return tl::make_unexpected(error_from_hresult(res));
     return {};
+}
+
+auto save(const Texture &tex) noexcept -> tl::expected<std::vector<std::byte>, Error>
+{
+    auto blob      = DirectX::Blob{};
+    const auto res = DirectX::SaveToDDSMemory(tex.get().GetImages(),
+                                              tex.get().GetImageCount(),
+                                              tex.get().GetMetadata(),
+                                              DirectX::DDS_FLAGS_NONE,
+                                              blob);
+    if (FAILED(res))
+        return tl::make_unexpected(error_from_hresult(res));
+
+    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    return std::vector<std::byte>(static_cast<std::byte *>(blob.GetBufferPointer()),
+                                  static_cast<std::byte *>(blob.GetBufferPointer()) + blob.GetBufferSize());
+    // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 } // namespace btu::tex
