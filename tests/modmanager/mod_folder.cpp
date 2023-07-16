@@ -16,14 +16,14 @@ TEST_CASE("ModFolder", "[src]")
     btu::fs::remove_all(dir / "output");
 
     auto mf = btu::modmanager::ModFolder(dir / "input", u8".ba2");
-    flow::from(mf).for_each([&](auto &&f) {
-        const auto out = dir / "output" / f.get_relative_path();
+    mf.iterate([&](btu::modmanager::ModFolder::ModFile &&f) {
+        const auto out = dir / "output" / f.relative_path;
         btu::fs::create_directories(out.parent_path());
-        f.load();
-        f.write(out);
+        btu::common::write_file(out, f.content);
     });
     REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
 }
+
 TEST_CASE("ModFolder reintegrate", "[src]")
 {
     const Path dir = "modfolder_reintegrate";
@@ -33,15 +33,17 @@ TEST_CASE("ModFolder reintegrate", "[src]")
 
     auto mf = btu::modmanager::ModFolder(dir / "output", u8".ba2");
     // Change one byte in each file
-    flow::from(mf).for_each([&](auto &&f) {
-        f.load();
-        binary_io::any_ostream buffer{binary_io::memory_ostream{}};
-        f.write(buffer);
-        auto &data  = buffer.get<binary_io::memory_ostream>().rdbuf();
-        data.back() = std::byte{'0'}; // Change one byte
-        f.read(data);
+    mf.transform([](btu::modmanager::ModFolder::ModFile &&f) {
+        f.content.back() = std::byte{'0'}; // Change one byte
+        return std::make_optional(std::move(f.content));
     });
-    mf.reintegrate();
 
     REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
+}
+
+TEST_CASE("ModFolder size", "[src]")
+{
+    const Path dir = "modfolder";
+    auto mf        = btu::modmanager::ModFolder(dir / "input", u8".ba2");
+    REQUIRE(mf.size() == 4);
 }
