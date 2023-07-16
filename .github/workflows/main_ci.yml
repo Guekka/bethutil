@@ -1,7 +1,7 @@
 name: Main CI
 
 on:
-  push:
+  pull_request:
     branches: [ main ]
     paths:
       - '**/*.cpp'
@@ -12,8 +12,7 @@ on:
       - '**/vcpkg.json'
       - '.github/workflows/main_ci.yml'
       - 'codecov.yml'
-  pull_request:
-    branches: [ main ]
+
   workflow_dispatch:
 
 env:
@@ -40,21 +39,6 @@ jobs:
         with:
           version: ${{ matrix.version }}
 
-      - name: Setup vcpkg
-        run: |
-          mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          cd $VCPKG_INSTALLATION_ROOT
-          ./bootstrap-vcpkg.sh
-          ./vcpkg --version > ${{ github.workspace }}/vcpkg-version.txt
-
-      - name: Cache vcpkg
-        uses: actions/cache@v2
-        env:
-          cache-name: vcpkg-cache
-        with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('bethutil/**/vcpkg.json', 'vcpkg-version.txt') }}
-
       - name: Setup Environment
         run: |
           echo "GCOV=gcov-${{ matrix.version }}" >> $GITHUB_ENV
@@ -65,6 +49,11 @@ jobs:
 
           sudo apt install liblz4-dev zlib1g-dev -y
           sudo pip install gcovr
+
+      - uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: f6a5d4e8eb7476b8d7fc12a56dff300c1c986131
+          vcpkgJsonGlob: ${{ github.workspace }}/bethutil/vcpkg.json
 
       - name: Configure & Build
         working-directory: ${{ github.workspace }}/bethutil
@@ -102,26 +91,23 @@ jobs:
           choco pack
           choco install opencppcoverage -s . -y
 
-      - name: Setup vcpkg
-        run: |
-          mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          cd $env:VCPKG_INSTALLATION_ROOT
-          ./bootstrap-vcpkg.bat
-          ./vcpkg --version > ${{ github.workspace }}/vcpkg-version.txt
-
-      - name: Cache vcpkg
-        uses: actions/cache@v2
+      - name: Cache OpenCPPCoverage
+        uses: actions/cache@v3
         env:
-          cache-name: vcpkg-cache
+          cache-name: opencppcoverage-cache
         with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('bethutil/**/vcpkg.json', 'vcpkg-version.txt') }}
-
+          path: ${{ env.SystemDrive }}/Program Files/OpenCppCoverage/*
+          key: ${{ runner.os }}-opencppcoverage-${{ env.cache-name }}-${{ hashFiles('${{ github.workspace }}/bethutil/scripts/opencppcoverage/opencppcoverage.nuspec') }}
 
       - name: Setup MSVC (x64)
         uses: egor-tensin/vs-shell@v2
         with:
           arch: x64
+
+      - uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: f6a5d4e8eb7476b8d7fc12a56dff300c1c986131
+          vcpkgJsonGlob: ${{ github.workspace }}/bethutil/vcpkg.json
 
       - name: (main) Configure & Build
         working-directory: ${{ github.workspace }}/bethutil
