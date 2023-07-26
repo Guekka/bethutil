@@ -109,14 +109,7 @@ endif()
 set_target_properties("${PROJECT_NAME}" PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties("${PROJECT_NAME}" PROPERTIES LINKER_LANGUAGE CXX)
 
-# See https://github.com/microsoft/STL/issues/1814#issuecomment-914784312
-if(MSVC
-   AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.29.30129
-   AND CMAKE_VERSION VERSION_GREATER 3.20.3)
-  target_compile_features("${PROJECT_NAME}" PUBLIC cxx_std_23)
-else()
-  target_compile_features("${PROJECT_NAME}" PUBLIC cxx_std_20)
-endif()
+target_compile_features("${PROJECT_NAME}" PUBLIC cxx_std_20)
 
 target_compile_definitions(
   "${PROJECT_NAME}" PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
