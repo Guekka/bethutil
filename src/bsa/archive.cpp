@@ -4,6 +4,7 @@
 #include <btu/common/functional.hpp>
 #include <flow.hpp>
 
+#include <filesystem>
 #include <fstream>
 
 namespace btu::bsa {
@@ -189,7 +190,45 @@ auto read_archive(Path path) -> std::optional<Archive>
     libbsa::detail::declare_unreachable();
 }
 
-void write_archive(Archive arch, Path path)
+/**
+ * Write data to a file at a specified path using a provided write function.
+ *
+ * @tparam Archive The data type to be written.
+ * @tparam WriteFunc The type of the function to use for writing.
+ *
+ * @param arch The data to be written (rvalue reference).
+ * @param write_func The function or callable object to use for writing.
+ * @param path The path of the file to be written.
+ */
+template<typename Archive, typename WriteFunc>
+void do_write(Archive &&arch, WriteFunc &&write_func, fs::path path) requires
+    std::is_rvalue_reference_v<decltype(arch)> && std::is_invocable_v<WriteFunc, Archive, fs::path>
+{
+    auto write_and_check = [&](fs::path p) {
+        std::forward<WriteFunc>(write_func)(BTU_MOV(arch), p);
+        if (!fs::exists(p))
+        {
+            throw std::runtime_error("Failed to write archive to " + p.string());
+        }
+    };
+
+    // On Windows, we cannot remove the file while it is memory mapped
+    // So we need to release the memory mapping first
+    // That's why we have to move the archive to the lambda
+    if (fs::exists(path))
+    {
+        auto tmp_path = path.parent_path() / (path.filename().u8string() + u8".tmp");
+        write_and_check(tmp_path);
+        fs::remove(path);
+        fs::rename(tmp_path, path);
+    }
+    else
+    {
+        write_and_check(path);
+    }
+}
+
+void write_archive(Archive &&arch, Path path)
 {
     if (arch.empty())
         return;
@@ -206,7 +245,8 @@ void write_archive(Archive arch, Path path)
             {
                 bsa.insert(elem.first, std::move(elem.second).as_raw_file<libbsa::tes3::file>());
             }
-            bsa.write(std::move(path));
+            do_write(
+                BTU_MOV(bsa), [](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path)); }, BTU_MOV(path));
             return;
         }
         case btu::bsa::ArchiveVersion::tes4:
@@ -232,7 +272,12 @@ void write_archive(Archive arch, Path path)
             bsa.archive_flags(libbsa::tes4::archive_flag::directory_strings
                               | libbsa::tes4::archive_flag::file_strings);
 
-            bsa.write(std::move(path), static_cast<libbsa::tes4::version>(version));
+            do_write(
+                BTU_MOV(bsa),
+                [version](auto &&bsa, auto &&path) {
+                    bsa.write(BTU_FWD(path), static_cast<libbsa::tes4::version>(version));
+                },
+                BTU_MOV(path));
             return;
         }
         case btu::bsa::ArchiveVersion::fo4: [[fallthrough]];
@@ -243,11 +288,25 @@ void write_archive(Archive arch, Path path)
             {
                 ba2.insert(elem.first, std::move(elem.second).as_raw_file<libbsa::fo4::file>());
             }
-            ba2.write(std::move(path), static_cast<libbsa::fo4::format>(version));
+            do_write(
+                BTU_MOV(ba2),
+                [version](auto &&ba2, auto &&path) {
+                    ba2.write(BTU_FWD(path), static_cast<libbsa::fo4::format>(version));
+                },
+                BTU_MOV(path));
+
             return;
         }
     }
     libbsa::detail::declare_unreachable();
+}
+
+void test()
+{
+    std::string str = "Hello, world!\n";
+    std::vector<std::string> messages;
+    messages.emplace_back(BTU_MOV(str));
+    std::cout << str;
 }
 
 } // namespace btu::bsa
