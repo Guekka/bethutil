@@ -15,8 +15,8 @@
 auto operator<<(std::ostream &os, const btu::tex::OptimizationSteps &s) -> std::ostream &
 {
     const auto dim = s.resize.value_or(btu::tex::Dimension{});
-    return os << "add_trans_alpha: " << s.add_transparent_alpha << ";format: "
-              << btu::common::as_ascii(btu::tex::to_string(s.format.value_or(DXGI_FORMAT_UNKNOWN))) << ""
+    return os << "add_trans_alpha: " << s.add_transparent_alpha
+              << ";format: " << btu::common::as_ascii(btu::tex::to_string(s.best_format)) << ""
               << ";mips: " << s.mipmaps << "; resize x:" << dim.w << " y:" << dim.h;
 }
 
@@ -112,7 +112,8 @@ TEST_CASE("compute_optimization_steps", "[src]")
         CHECK(res.resize == btu::tex::Dimension{256, 256});
         CHECK_FALSE(res.add_transparent_alpha);
         CHECK(res.mipmaps == true);
-        CHECK(res.format == DXGI_FORMAT_BC7_UNORM);
+        CHECK(res.best_format == DXGI_FORMAT_BC7_UNORM);
+        CHECK(res.convert == true);
     }
     SECTION("tex2")
     {
@@ -121,7 +122,8 @@ TEST_CASE("compute_optimization_steps", "[src]")
         CHECK(res.resize == std::nullopt);
         CHECK(res.add_transparent_alpha == true);
         CHECK_FALSE(res.mipmaps);
-        CHECK(res.format == std::nullopt);
+        CHECK(res.best_format == DXGI_FORMAT_R8G8B8A8_UNORM);
+        CHECK(res.convert == false);
     }
 }
 
