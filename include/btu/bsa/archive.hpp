@@ -72,5 +72,5 @@ private:
 using Archive = std::map<std::string, File, std::less<>>;
 
 auto read_archive(Path path) -> std::optional<Archive>;
-void write_archive(Archive arch, Path path);
+void write_archive(Archive &&arch, Path path);
 } // namespace btu::bsa
