@@ -30,9 +30,12 @@ auto optimize(Texture &&file, OptimizationSteps sets, const std::optional<Compre
         res = std::move(res).and_then(make_transparent_alpha);
     if (sets.mipmaps)
         res = std::move(res).and_then(generate_mipmaps);
-    if (sets.format && res && res.value().get().GetMetadata().format != sets.format)
+
+    // We have uncompressed the texture. If it was compressed, it's best to convert it to a better format
+    const auto cur_format_is_same_as_best = res && res->get().GetMetadata().format == sets.best_format;
+    if ((sets.convert || compressed) && !cur_format_is_same_as_best)
         res = std::move(res).and_then(
-            [&](Texture &&tex) { return convert(std::move(tex), sets.format.value(), dev); });
+            [&](Texture &&tex) { return convert(std::move(tex), sets.best_format, dev); });
 
     return res;
 }
@@ -71,8 +74,7 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
     return !too_small && pow2;
 }
 
-[[nodiscard]] auto compute_output_format(const Texture &file, const Settings &sets) noexcept
-    -> std::optional<DXGI_FORMAT>
+[[nodiscard]] auto conversion_required(const Texture &file, const Settings &sets) noexcept -> bool
 {
     const auto &info = file.get().GetMetadata();
 
@@ -80,13 +82,14 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
                                   && !btu::common::contains(sets.allowed_formats, info.format);
 
     const bool is_bad_cube = is_bad_cubemap(info);
+    const bool bad         = forbidden_format || is_bad_cube;
 
-    const bool bad = forbidden_format || is_bad_cube;
-    if (!bad && !sets.compress) // All good, no need to change anything
-        return std::nullopt;
+    return bad || sets.compress;
+}
 
-    if (!sets.compress && bad) // No need to compress but texture is not good
-        return guess_best_format(file, sets.output_format, AllowCompressed::No);
+[[nodiscard]] auto best_output_format(const Texture &file, const Settings &sets) noexcept -> DXGI_FORMAT
+{
+    const auto &info = file.get().GetMetadata();
 
     const auto allow_compressed = can_be_compressed(info) ? AllowCompressed::Yes : AllowCompressed::No;
     return guess_best_format(file, sets.output_format, allow_compressed);
@@ -99,7 +102,8 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
 
     auto res = OptimizationSteps{};
 
-    res.format = compute_output_format(file, sets);
+    res.best_format = best_output_format(file, sets);
+    res.convert     = conversion_required(file, sets);
 
     const auto dim                            = Dimension{info.width, info.height};
     const std::optional<Dimension> target_dim = std::visit(
@@ -179,11 +183,11 @@ auto Settings::get(Game game) noexcept -> const Settings &
                 sets.compress             = true;
                 sets.use_format_whitelist = true;
                 sets.allowed_formats      = {
-                         DXGI_FORMAT_BC7_UNORM,
-                         DXGI_FORMAT_BC5_UNORM,
-                         DXGI_FORMAT_BC3_UNORM,
-                         DXGI_FORMAT_BC1_UNORM,
-                         DXGI_FORMAT_R8G8B8A8_UNORM,
+                    DXGI_FORMAT_BC7_UNORM,
+                    DXGI_FORMAT_BC5_UNORM,
+                    DXGI_FORMAT_BC3_UNORM,
+                    DXGI_FORMAT_BC1_UNORM,
+                    DXGI_FORMAT_R8G8B8A8_UNORM,
                 };
                 sets.output_format.compressed = DXGI_FORMAT_BC7_UNORM;
                 sets.game                     = btu::Game::SSE;
