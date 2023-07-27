@@ -183,11 +183,11 @@ auto Settings::get(Game game) noexcept -> const Settings &
                 sets.compress             = true;
                 sets.use_format_whitelist = true;
                 sets.allowed_formats      = {
-                    DXGI_FORMAT_BC7_UNORM,
-                    DXGI_FORMAT_BC5_UNORM,
-                    DXGI_FORMAT_BC3_UNORM,
-                    DXGI_FORMAT_BC1_UNORM,
-                    DXGI_FORMAT_R8G8B8A8_UNORM,
+                         DXGI_FORMAT_BC7_UNORM,
+                         DXGI_FORMAT_BC5_UNORM,
+                         DXGI_FORMAT_BC3_UNORM,
+                         DXGI_FORMAT_BC1_UNORM,
+                         DXGI_FORMAT_R8G8B8A8_UNORM,
                 };
                 sets.output_format.compressed = DXGI_FORMAT_BC7_UNORM;
                 sets.game                     = btu::Game::SSE;
