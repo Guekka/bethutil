@@ -78,14 +78,14 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer) const
         [&transformer](const Path &archive_path, bsa::Archive &&archive) {
             bool any_file_changed = false;
 
-            for (auto &&[relative_path, file] : archive)
+            for (auto &[relative_path, file] : archive)
             {
                 auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
                 file.write(buffer);
 
                 auto &file_data = buffer.get<binary_io::memory_ostream>().rdbuf();
 
-                auto transformed = transformer({relative_path, file_data});
+                auto transformed = transformer({relative_path, BTU_MOV(file_data)});
 
                 if (transformed)
                 {

@@ -24,7 +24,7 @@ TEST_CASE("ModFolder", "[src]")
     REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
 }
 
-TEST_CASE("ModFolder reintegrate", "[src]")
+TEST_CASE("ModFolder transform", "[src]")
 {
     const Path dir = "modfolder_reintegrate";
     // operate on copy
