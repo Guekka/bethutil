@@ -61,6 +61,7 @@ endmacro()
 
 acquire_test("bsa_clean_dummy_plugins")
 acquire_test("bsa_unpack")
+acquire_test("bsa_load_save")
 acquire_test("convert-hkx")
 acquire_test("decompress")
 acquire_test("esp")
