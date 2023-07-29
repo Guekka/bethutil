@@ -15,7 +15,7 @@ TEST_CASE("ModFolder", "[src]")
     const Path dir = "modfolder";
     btu::fs::remove_all(dir / "output");
 
-    auto mf = btu::modmanager::ModFolder(dir / "input", u8".ba2");
+    auto mf = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
     mf.iterate([&](btu::modmanager::ModFolder::ModFile &&f) {
         const auto out = dir / "output" / f.relative_path;
         btu::fs::create_directories(out.parent_path());
@@ -31,7 +31,7 @@ TEST_CASE("ModFolder transform", "[src]")
     btu::fs::remove_all(dir / "output");
     btu::fs::copy(dir / "input", dir / "output");
 
-    auto mf = btu::modmanager::ModFolder(dir / "output", u8".ba2");
+    auto mf = btu::modmanager::ModFolder(dir / "output", btu::bsa::Settings::get(btu::Game::SSE));
     // Change one byte in each file
     mf.transform([](btu::modmanager::ModFolder::ModFile &&f) {
         f.content.back() = std::byte{'0'}; // Change one byte
@@ -44,6 +44,6 @@ TEST_CASE("ModFolder transform", "[src]")
 TEST_CASE("ModFolder size", "[src]")
 {
     const Path dir = "modfolder";
-    auto mf        = btu::modmanager::ModFolder(dir / "input", u8".ba2");
+    auto mf        = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
     REQUIRE(mf.size() == 4);
 }

@@ -5,10 +5,9 @@
 
 #pragma once
 
-#include "btu/bsa/archive.hpp"
-#include "btu/common/path.hpp"
-
-#include <flow.hpp>
+#include <btu/bsa/archive.hpp>
+#include <btu/bsa/settings.hpp>
+#include <btu/common/path.hpp>
 
 #include <variant>
 
@@ -22,7 +21,7 @@ public:
         std::vector<std::byte> content;
     };
 
-    explicit ModFolder(Path directory, std::u8string archive_ext);
+    explicit ModFolder(Path directory, btu::bsa::Settings bsa_settings);
 
     /// Get the size of the folder, including files in archives.
     /// Utility function, equivalent to iterate() and counting the files.
@@ -52,6 +51,6 @@ private:
     void transform_impl(Transformer &&transformer) const;
 
     Path dir_;
-    std::u8string archive_ext_;
+    btu::bsa::Settings bsa_settings_;
 };
 } // namespace btu::modmanager
