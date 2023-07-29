@@ -6,6 +6,8 @@
 
 #include "btu/modmanager/mod_folder.hpp"
 
+#include <flow.hpp>
+
 namespace btu::modmanager {
 [[maybe_unused]] constexpr auto k_force_process_folder = "ForceProcess.cao";
 
@@ -21,16 +23,16 @@ auto find_manager(const Path &dir) -> ModManager;
 class ModsFolder
 {
 public:
-    ModsFolder(Path root, std::u8string archive_ext);
+    ModsFolder(Path root, btu::bsa::Settings bsa_settings);
 
     [[nodiscard]] auto to_flow()
     {
-        return flow::from(folders_).map([this](auto &&f) { return ModFolder(f, archive_ext_); });
+        return flow::from(folders_).map([this](auto &&f) { return ModFolder(f, bsa_settings_); });
     }
 
 private:
     Path root_;
+    btu::bsa::Settings bsa_settings_;
     std::vector<Path> folders_;
-    std::u8string archive_ext_;
 };
 } // namespace btu::modmanager

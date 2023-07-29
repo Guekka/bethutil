@@ -49,6 +49,11 @@ enum class FileTypes
     BSA
 };
 
+static constexpr auto k_bsa_ext = u8".bsa";
+static constexpr auto k_ba2_ext = u8".ba2";
+
+static constexpr auto k_archive_extensions = std::to_array<std::u8string_view>({k_bsa_ext, k_ba2_ext});
+
 struct AllowedPath
 {
     static const inline auto k_root = std::u8string(u8"root");
