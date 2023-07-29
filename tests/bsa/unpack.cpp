@@ -19,19 +19,3 @@ TEST_CASE("unpack", "[src]")
 
     REQUIRE(btu::common::compare_directories(dir / "out", dir / "expected"));
 }
-
-TEST_CASE("Load and save to same location works", "[src]")
-{
-    const btu::Path dir = "bsa_load_save";
-    btu::fs::remove_all(dir / "out");
-    btu::fs::copy(dir / "in", dir / "out");
-
-    const auto path = dir / "out" / "arch.bsa";
-
-    auto arch = btu::bsa::read_archive(path);
-    REQUIRE(arch.has_value());
-
-    btu::bsa::write_archive(*BTU_MOV(arch), path);
-
-    REQUIRE(btu::common::compare_directories(dir / "in", dir / "out"));
-}

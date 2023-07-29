@@ -1,5 +1,6 @@
 #include "btu/bsa/archive.hpp"
 
+#include <binary_io/memory_stream.hpp>
 #include <btu/common/filesystem.hpp>
 #include <btu/common/functional.hpp>
 #include <flow.hpp>
@@ -302,4 +303,41 @@ void write_archive(Archive &&arch, Path path)
     libbsa::detail::declare_unreachable();
 }
 
+auto archive_version(const Archive &arch) noexcept -> std::optional<ArchiveVersion>
+{
+    if (arch.empty())
+        return std::nullopt;
+
+    const auto format = arch.begin()->second.version();
+
+    // Check that all files have the same format
+    assert(std::ranges::all_of(arch, [format](auto &&elem) { return elem.second.version() == format; }));
+
+    return format;
+}
+
+void set_archive_version(Archive &arch, ArchiveVersion version) noexcept
+{
+    if (arch.empty() || archive_version(arch) == version)
+        return;
+
+    std::ranges::for_each(arch, [version](auto &path_file) {
+        auto res_file = bsa::File(version);
+        auto buffer   = binary_io::any_ostream{binary_io::memory_ostream{}};
+
+        path_file.second.write(buffer);
+        res_file.read(buffer.get<binary_io::memory_ostream>().rdbuf());
+
+        path_file.second = BTU_MOV(res_file);
+    });
+}
+
+auto archive_type(const Archive &arch) noexcept -> std::optional<ArchiveType>
+{
+    auto version = archive_version(arch);
+    if (!version)
+        return std::nullopt;
+
+    return type_from_version(*version);
+}
 } // namespace btu::bsa
