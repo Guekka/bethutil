@@ -78,4 +78,7 @@ void write_archive(Archive &&arch, Path path);
 void set_archive_version(Archive &arch, ArchiveVersion version) noexcept;
 
 [[nodiscard]] auto archive_type(const Archive &arch) noexcept -> std::optional<ArchiveType>;
+
+[[nodiscard]] auto archive_size(const Archive &arch) noexcept -> size_t;
+
 } // namespace btu::bsa
