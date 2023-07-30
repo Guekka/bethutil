@@ -340,4 +340,9 @@ auto archive_type(const Archive &arch) noexcept -> std::optional<ArchiveType>
 
     return type_from_version(*version);
 }
+
+auto archive_size(const Archive &arch) noexcept -> size_t
+{
+    return flow::from(arch).map([](const auto &pair) { return pair.second.size(); }).sum();
+}
 } // namespace btu::bsa

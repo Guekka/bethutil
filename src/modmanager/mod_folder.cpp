@@ -26,7 +26,7 @@ void ModFolder::iterate(
     const std::function<void(Path relative_path)> &loose,
     const std::function<void(const Path &archive_path, bsa::Archive &&archive)> &archive) const
 {
-    auto is_arch = [this](const Path &file_name) {
+    auto is_arch = [](const Path &file_name) {
         auto ext = btu::common::to_lower(file_name.extension().u8string());
         return btu::common::contains(btu::bsa::k_archive_extensions, ext);
     };
@@ -55,17 +55,21 @@ auto ModFolder::size() const -> size_t
     return size;
 }
 
-void ModFolder::iterate(const std::function<void(ModFile)> &visitor) const
+void ModFolder::iterate(const std::function<void(ModFile)> &visitor,
+                        ArchiveTooLargeHandler &&archive_too_large_handler) const
 {
-    transform_impl([&visitor](ModFile file) {
-        visitor(std::move(file));
-        return std::nullopt;
-    });
+    transform_impl(
+        [&visitor](ModFile file) {
+            visitor(std::move(file));
+            return std::nullopt;
+        },
+        std::move(archive_too_large_handler));
 }
 
-void ModFolder::transform(ModFolder::Transformer &&transformer)
+void ModFolder::transform(ModFolder::Transformer &&transformer,
+                          ArchiveTooLargeHandler &&archive_too_large_handler)
 {
-    transform_impl(std::move(transformer));
+    transform_impl(std::move(transformer), std::move(archive_too_large_handler));
 }
 
 /**
@@ -111,7 +115,8 @@ void ModFolder::transform(ModFolder::Transformer &&transformer)
     return target;
 }
 
-void ModFolder::transform_impl(ModFolder::Transformer &&transformer) const
+void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
+                               ArchiveTooLargeHandler &&archive_too_large_handler) const
 {
     iterate(
         [this, &transformer](const Path &relative_path) {
@@ -120,7 +125,17 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer) const
             if (transformed)
                 common::write_file(dir_ / relative_path, *transformed);
         },
-        [&transformer, this](const Path &archive_path, bsa::Archive &&archive) {
+        [&transformer, this, &archive_too_large_handler](const Path &archive_path, bsa::Archive &&archive) {
+            // Check if the archive is too large and the caller wants to skip it
+            auto check_archive_and_skip = [&](ArchiveTooLargeState state) {
+                if (bsa::archive_size(archive) > bsa_settings_.max_size)
+                    return archive_too_large_handler(archive_path, state) == ArchiveTooLargeAction::Skip;
+                return false;
+            };
+
+            if (check_archive_and_skip(ArchiveTooLargeState::BeforeProcessing))
+                return;
+
             bool any_file_changed = false;
 
             for (auto &[relative_path, file] : archive)
@@ -142,6 +157,9 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer) const
             const auto target_version = guess_target_archive_version(archive, bsa_settings_);
             if (target_version)
                 bsa::set_archive_version(archive, *target_version);
+
+            if (check_archive_and_skip(ArchiveTooLargeState::AfterProcessing))
+                return;
 
             if (any_file_changed || target_version)
                 write_archive(std::move(archive), archive_path);
