@@ -109,11 +109,6 @@ struct PackGroup
     return file;
 }
 
-[[nodiscard]] auto archive_size(const Archive &arch) noexcept -> size_t
-{
-    return flow::from(arch).map([](const auto &pair) { return pair.second.size(); }).sum();
-}
-
 [[nodiscard]] auto file_fits(const Archive &arch, const File &file, const Settings &sets) noexcept -> bool
 {
     const auto size = archive_size(arch);

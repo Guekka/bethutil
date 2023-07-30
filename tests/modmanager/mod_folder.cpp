@@ -10,17 +10,26 @@
 
 #include <binary_io/memory_stream.hpp>
 
+auto archive_too_large_handler(const btu::Path & /*unused*/,
+                               const btu::modmanager::ModFolder::ArchiveTooLargeState & /*unused*/)
+{
+    FAIL("Archive too large, should not happen in tests");
+    return btu::modmanager::ModFolder::ArchiveTooLargeAction::Skip;
+}
+
 TEST_CASE("ModFolder", "[src]")
 {
     const Path dir = "modfolder";
     btu::fs::remove_all(dir / "output");
 
     auto mf = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
-    mf.iterate([&](btu::modmanager::ModFolder::ModFile &&f) {
-        const auto out = dir / "output" / f.relative_path;
-        btu::fs::create_directories(out.parent_path());
-        btu::common::write_file(out, f.content);
-    });
+    mf.iterate(
+        [&](btu::modmanager::ModFolder::ModFile &&f) {
+            const auto out = dir / "output" / f.relative_path;
+            btu::fs::create_directories(out.parent_path());
+            btu::common::write_file(out, f.content);
+        },
+        archive_too_large_handler);
     REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
 }
 
@@ -33,10 +42,12 @@ TEST_CASE("ModFolder transform", "[src]")
 
     auto mf = btu::modmanager::ModFolder(dir / "output", btu::bsa::Settings::get(btu::Game::SSE));
     // Change one byte in each file
-    mf.transform([](btu::modmanager::ModFolder::ModFile &&f) {
-        f.content.back() = std::byte{'0'}; // Change one byte
-        return std::make_optional(std::move(f.content));
-    });
+    mf.transform(
+        [](btu::modmanager::ModFolder::ModFile &&f) {
+            f.content.back() = std::byte{'0'}; // Change one byte
+            return std::make_optional(std::move(f.content));
+        },
+        archive_too_large_handler);
 
     REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
 }
@@ -46,4 +57,24 @@ TEST_CASE("ModFolder size", "[src]")
     const Path dir = "modfolder";
     auto mf        = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
     REQUIRE(mf.size() == 4);
+}
+
+TEST_CASE("Iterate mod folder with archive too big")
+{
+    const Path dir = "modfolder";
+    auto sets      = btu::bsa::Settings::get(btu::Game::FO4);
+    sets.max_size  = 1;
+
+    bool called = false;
+
+    auto mf = btu::modmanager::ModFolder(dir / "input", sets);
+    mf.iterate([](const btu::modmanager::ModFolder::ModFile & /*unused*/) {},
+               [&](const btu::Path & /*unused*/,
+                   const btu::modmanager::ModFolder::ArchiveTooLargeState &state) {
+                   CHECK(state == btu::modmanager::ModFolder::ArchiveTooLargeState::BeforeProcessing);
+                   called = true;
+                   return btu::modmanager::ModFolder::ArchiveTooLargeAction::Skip;
+               });
+
+    REQUIRE(called);
 }
