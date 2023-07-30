@@ -74,6 +74,12 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
     return !too_small && pow2;
 }
 
+[[nodiscard]] auto is_tga(const Texture &file) noexcept -> bool
+{
+    const auto ext = file.get_load_path().extension();
+    return btu::common::str_compare(ext.u8string(), u8".tga", btu::common::CaseSensitive::No);
+}
+
 [[nodiscard]] auto conversion_required(const Texture &file, const Settings &sets) noexcept -> bool
 {
     const auto &info = file.get().GetMetadata();
@@ -84,7 +90,7 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
     const bool is_bad_cube = is_bad_cubemap(info);
     const bool bad         = forbidden_format || is_bad_cube;
 
-    return bad || sets.compress;
+    return bad || sets.compress || is_tga(file);
 }
 
 [[nodiscard]] auto best_output_format(const Texture &file, const Settings &sets) noexcept -> DXGI_FORMAT
