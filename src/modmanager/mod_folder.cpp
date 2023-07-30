@@ -12,6 +12,7 @@
 #include <flow.hpp>
 
 #include <atomic>
+#include <execution>
 #include <utility>
 
 namespace btu::modmanager {
@@ -31,19 +32,26 @@ void ModFolder::iterate(
         return btu::common::contains(btu::bsa::k_archive_extensions, ext);
     };
 
-    flow::from(fs::recursive_directory_iterator(dir_))
-        .filter([](auto &&e) { return e.is_regular_file(); })
-        .map([](auto &&e) { return e.path(); })
-        .for_each([&is_arch, this, &archive, &loose](auto &&path) {
-            if (!is_arch(path)) [[likely]]
-            {
-                loose(path.lexically_relative(dir_));
-                return;
-            }
+    auto files =
 
-            if (auto arch = btu::bsa::read_archive(path))
-                archive(path, std::move(*arch));
-        });
+        flow::from(fs::recursive_directory_iterator(dir_))
+            .filter([](auto &&e) { return e.is_regular_file(); })
+            .map([](auto &&e) { return e.path(); })
+            .to_vector();
+
+    std::for_each(std::execution::par,
+                  files.begin(),
+                  files.end(),
+                  [&is_arch, this, &archive, &loose](auto &&path) {
+                      if (!is_arch(path)) [[likely]]
+                      {
+                          loose(path.lexically_relative(dir_));
+                          return;
+                      }
+
+                      if (auto arch = btu::bsa::read_archive(path))
+                          archive(path, std::move(*arch));
+                  });
 }
 
 auto ModFolder::size() const -> size_t
