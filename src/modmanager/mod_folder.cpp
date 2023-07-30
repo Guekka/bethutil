@@ -170,7 +170,18 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
                 return;
 
             if (any_file_changed || target_version)
-                write_archive(std::move(archive), archive_path);
+            {
+                // Change the extension of the archive if needed
+                auto path = archive_path;
+                if (path.extension() != bsa_settings_.extension)
+                    path.replace_extension(bsa_settings_.extension);
+
+                write_archive(std::move(archive), path);
+
+                // Remove the old archive if the new one has a different name
+                if (path != archive_path)
+                    fs::remove(archive_path);
+            }
         });
 }
 
