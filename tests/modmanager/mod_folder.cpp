@@ -35,7 +35,7 @@ TEST_CASE("ModFolder", "[src]")
 
 TEST_CASE("ModFolder transform", "[src]")
 {
-    const Path dir = "modfolder_reintegrate";
+    const Path dir = "modfolder_transform";
     // operate on copy
     btu::fs::remove_all(dir / "output");
     btu::fs::copy(dir / "input", dir / "output");
