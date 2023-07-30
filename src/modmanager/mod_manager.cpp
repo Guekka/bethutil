@@ -34,13 +34,13 @@ auto find_manager(const Path &dir) -> ModManager
     return ModManager::None;
 }
 
-ModsFolder::ModsFolder(Path root, std::u8string archive_ext)
+ModsFolder::ModsFolder(Path root, btu::bsa::Settings bsa_settings)
     : root_(std::move(root))
+    , bsa_settings_(std::move(bsa_settings))
     , folders_(flow::from(fs::directory_iterator(root_))
                    .filter([](auto &&e) { return e.is_directory(); })
                    .map([](auto &&e) { return FLOW_FWD(e).path(); })
                    .to_vector())
-    , archive_ext_(std::move(archive_ext))
 {
 }
 

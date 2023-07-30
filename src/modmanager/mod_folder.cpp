@@ -9,39 +9,49 @@
 #include "btu/common/filesystem.hpp"
 
 #include <binary_io/memory_stream.hpp>
+#include <flow.hpp>
 
 #include <atomic>
+#include <execution>
 #include <utility>
 
 namespace btu::modmanager {
 
-ModFolder::ModFolder(Path directory, std::u8string archive_ext)
+ModFolder::ModFolder(Path directory, btu::bsa::Settings bsa_settings)
     : dir_(std::move(directory))
-    , archive_ext_(std::move(archive_ext))
+    , bsa_settings_(BTU_MOV(bsa_settings))
 {
 }
+
 void ModFolder::iterate(
     const std::function<void(Path relative_path)> &loose,
     const std::function<void(const Path &archive_path, bsa::Archive &&archive)> &archive) const
 {
-    auto is_arch = [this](const Path &file_name) {
+    auto is_arch = [](const Path &file_name) {
         auto ext = btu::common::to_lower(file_name.extension().u8string());
-        return ext == archive_ext_;
+        return btu::common::contains(btu::bsa::k_archive_extensions, ext);
     };
 
-    flow::from(fs::recursive_directory_iterator(dir_))
-        .filter([](auto &&e) { return e.is_regular_file(); })
-        .map([](auto &&e) { return e.path(); })
-        .for_each([&is_arch, this, &archive, &loose](auto &&path) {
-            if (!is_arch(path)) [[likely]]
-            {
-                loose(path.lexically_relative(dir_));
-                return;
-            }
+    auto files =
 
-            if (auto arch = btu::bsa::read_archive(path))
-                archive(path, std::move(*arch));
-        });
+        flow::from(fs::recursive_directory_iterator(dir_))
+            .filter([](auto &&e) { return e.is_regular_file(); })
+            .map([](auto &&e) { return e.path(); })
+            .to_vector();
+
+    std::for_each(std::execution::par,
+                  files.begin(),
+                  files.end(),
+                  [&is_arch, this, &archive, &loose](auto &&path) {
+                      if (!is_arch(path)) [[likely]]
+                      {
+                          loose(path.lexically_relative(dir_));
+                          return;
+                      }
+
+                      if (auto arch = btu::bsa::read_archive(path))
+                          archive(path, std::move(*arch));
+                  });
 }
 
 auto ModFolder::size() const -> size_t
@@ -53,20 +63,68 @@ auto ModFolder::size() const -> size_t
     return size;
 }
 
-void ModFolder::iterate(const std::function<void(ModFile)> &visitor) const
+void ModFolder::iterate(const std::function<void(ModFile)> &visitor,
+                        ArchiveTooLargeHandler &&archive_too_large_handler) const
 {
-    transform_impl([&visitor](ModFile file) {
-        visitor(std::move(file));
+    transform_impl(
+        [&visitor](ModFile file) {
+            visitor(std::move(file));
+            return std::nullopt;
+        },
+        std::move(archive_too_large_handler));
+}
+
+void ModFolder::transform(ModFolder::Transformer &&transformer,
+                          ArchiveTooLargeHandler &&archive_too_large_handler)
+{
+    transform_impl(std::move(transformer), std::move(archive_too_large_handler));
+}
+
+/**
+ * \brief Guesses the target archive version of the given archive based on the provided settings.
+ *
+ * \param archive The archive to guess the target version for.
+ * \param bsa_settings The settings to be used for guessing the version.
+ *
+ * \return An optional `bsa::ArchiveVersion` indicating the guessed target version
+ *         or `std::nullopt` if the target version could not be determined. This can also happen if the
+ *         target version is the same as the current version.
+ *
+ * \note This function does not throw any exceptions.
+ *
+ * \see bsa::Archive
+ * \see bsa::Settings
+ */
+[[nodiscard]] auto guess_target_archive_version(const bsa::Archive &archive,
+                                                const bsa::Settings bsa_settings) noexcept
+    -> std::optional<bsa::ArchiveVersion>
+{
+    auto version = archive_version(archive);
+    if (!version)
         return std::nullopt;
-    });
+
+    auto type = archive_type(archive);
+    if (!type)
+        return std::nullopt;
+
+    auto target = [type, &bsa_settings]() -> std::optional<bsa::ArchiveVersion> {
+        switch (*type)
+        {
+            case bsa::ArchiveType::Textures:
+                return bsa_settings.texture_version.value_or(bsa_settings.version);
+            case bsa::ArchiveType::Standard: return bsa_settings.version;
+        }
+        return std::nullopt;
+    }();
+
+    if (target == *version)
+        return std::nullopt;
+
+    return target;
 }
 
-void ModFolder::transform(ModFolder::Transformer &&transformer)
-{
-    transform_impl(std::move(transformer));
-}
-
-void ModFolder::transform_impl(ModFolder::Transformer &&transformer) const
+void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
+                               ArchiveTooLargeHandler &&archive_too_large_handler) const
 {
     iterate(
         [this, &transformer](const Path &relative_path) {
@@ -75,7 +133,17 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer) const
             if (transformed)
                 common::write_file(dir_ / relative_path, *transformed);
         },
-        [&transformer](const Path &archive_path, bsa::Archive &&archive) {
+        [&transformer, this, &archive_too_large_handler](const Path &archive_path, bsa::Archive &&archive) {
+            // Check if the archive is too large and the caller wants to skip it
+            auto check_archive_and_skip = [&](ArchiveTooLargeState state) {
+                if (bsa::archive_size(archive) > bsa_settings_.max_size)
+                    return archive_too_large_handler(archive_path, state) == ArchiveTooLargeAction::Skip;
+                return false;
+            };
+
+            if (check_archive_and_skip(ArchiveTooLargeState::BeforeProcessing))
+                return;
+
             bool any_file_changed = false;
 
             for (auto &[relative_path, file] : archive)
@@ -94,7 +162,14 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer) const
                 }
             }
 
-            if (any_file_changed)
+            const auto target_version = guess_target_archive_version(archive, bsa_settings_);
+            if (target_version)
+                bsa::set_archive_version(archive, *target_version);
+
+            if (check_archive_and_skip(ArchiveTooLargeState::AfterProcessing))
+                return;
+
+            if (any_file_changed || target_version)
                 write_archive(std::move(archive), archive_path);
         });
 }

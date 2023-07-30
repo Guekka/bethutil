@@ -73,4 +73,12 @@ using Archive = std::map<std::string, File, std::less<>>;
 
 auto read_archive(Path path) -> std::optional<Archive>;
 void write_archive(Archive &&arch, Path path);
+
+[[nodiscard]] auto archive_version(const Archive &arch) noexcept -> std::optional<ArchiveVersion>;
+void set_archive_version(Archive &arch, ArchiveVersion version) noexcept;
+
+[[nodiscard]] auto archive_type(const Archive &arch) noexcept -> std::optional<ArchiveType>;
+
+[[nodiscard]] auto archive_size(const Archive &arch) noexcept -> size_t;
+
 } // namespace btu::bsa
