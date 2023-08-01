@@ -19,7 +19,10 @@
 #pragma once
 #include <exception>
 #include <execution>
+#include <functional>
+#include <iostream>
 #include <iterator>
+#include <optional>
 #include <tuple>
 #include <utility>
 
@@ -196,4 +199,32 @@ auto for_each_mt(Range &&rng, Func &&func)
     if (eptr)
         std::rethrow_exception(eptr);
 }
+
+template<typename T>
+class Lazy
+{
+    std::function<T()> func_;
+    mutable std::optional<T> value_;
+
+public:
+    explicit Lazy(std::function<T()> func)
+        : func_(std::move(func))
+    {
+    }
+
+    auto operator*() const -> T &
+    {
+        if (!value_)
+            value_ = std::move(func_)();
+        return *value_;
+    }
+
+    auto operator->() const -> T *
+    {
+        if (!value_)
+            value_ = std::move(func_)();
+        return &*value_;
+    }
+};
+
 } // namespace btu::common
