@@ -114,6 +114,11 @@ target_compile_features("${PROJECT_NAME}" PUBLIC cxx_std_20)
 target_compile_definitions(
   "${PROJECT_NAME}" PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
 
+target_compile_definitions(
+  "${PROJECT_NAME}" PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+                            _GLIBCXX_PARALLEL) # required for parallel STL
+                                               # algorithms on GCC
+
 target_compile_options(
   "${PROJECT_NAME}"
   PRIVATE "$<$<CXX_COMPILER_ID:AppleClang,Clang,GNU>:-fvisibility=hidden>"
