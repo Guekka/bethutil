@@ -33,15 +33,4 @@ auto find_manager(const Path &dir) -> ModManager
 
     return ModManager::None;
 }
-
-ModsFolder::ModsFolder(Path root, btu::bsa::Settings bsa_settings)
-    : root_(std::move(root))
-    , bsa_settings_(std::move(bsa_settings))
-    , folders_(flux::from_range(fs::directory_iterator(root_))
-                   .filter([](auto &&e) { return e.is_directory(); })
-                   .map([](auto &&e) { return FLUX_FWD(e).path(); })
-                   .to<std::vector>())
-{
-}
-
 } // namespace btu::modmanager
