@@ -9,10 +9,10 @@
 #include "btu/common/filesystem.hpp"
 
 #include <binary_io/memory_stream.hpp>
+#include <btu/common/functional.hpp>
 #include <flow.hpp>
 
 #include <atomic>
-#include <execution>
 #include <utility>
 
 namespace btu::modmanager {
@@ -39,19 +39,16 @@ void ModFolder::iterate(
             .map([](auto &&e) { return e.path(); })
             .to_vector();
 
-    std::for_each(std::execution::par,
-                  files.begin(),
-                  files.end(),
-                  [&is_arch, this, &archive, &loose](auto &&path) {
-                      if (!is_arch(path)) [[likely]]
-                      {
-                          loose(path.lexically_relative(dir_));
-                          return;
-                      }
+    btu::common::for_each_mt(files, [&is_arch, this, &archive, &loose](auto &&path) {
+        if (!is_arch(path)) [[likely]]
+        {
+            loose(path.lexically_relative(dir_));
+            return;
+        }
 
-                      if (auto arch = btu::bsa::read_archive(path))
-                          archive(path, std::move(*arch));
-                  });
+        if (auto arch = btu::bsa::read_archive(path))
+            archive(path, std::move(*arch));
+    });
 }
 
 auto ModFolder::size() const -> size_t
@@ -146,8 +143,9 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
 
             bool any_file_changed = false;
 
-            for (auto &[relative_path, file] : archive)
-            {
+            btu::common::for_each_mt(archive, [&](auto &pair) {
+                auto &[relative_path, file] = pair;
+
                 auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
                 file.write(buffer);
 
@@ -160,7 +158,7 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
                     file.read(*transformed);
                     any_file_changed = true;
                 }
-            }
+            });
 
             const auto target_version = guess_target_archive_version(archive, bsa_settings_);
             if (target_version)
