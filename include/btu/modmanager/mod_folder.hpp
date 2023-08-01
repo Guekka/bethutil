@@ -7,6 +7,7 @@
 
 #include <btu/bsa/archive.hpp>
 #include <btu/bsa/settings.hpp>
+#include <btu/common/functional.hpp>
 #include <btu/common/path.hpp>
 
 #include <variant>
@@ -18,7 +19,7 @@ public:
     struct ModFile
     {
         Path relative_path;
-        std::vector<std::byte> content;
+        common::Lazy<std::vector<std::byte>> content;
     };
 
     explicit ModFolder(Path directory, btu::bsa::Settings bsa_settings);

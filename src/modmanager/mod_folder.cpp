@@ -125,7 +125,9 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
 {
     iterate(
         [this, &transformer](const Path &relative_path) {
-            auto file_data   = common::read_file(dir_ / relative_path);
+            auto file_data = common::Lazy<std::vector<std::byte>>(
+                [&relative_path, this]() { return common::read_file(dir_ / relative_path); });
+
             auto transformed = transformer({relative_path, file_data});
             if (transformed)
                 common::write_file(dir_ / relative_path, *transformed);
@@ -143,16 +145,16 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
 
             bool any_file_changed = false;
 
-            btu::common::for_each_mt(archive, [&](auto &pair) {
+            common::for_each_mt(archive, [&](auto &pair) {
                 auto &[relative_path, file] = pair;
 
-                auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
-                file.write(buffer);
-
-                auto &file_data = buffer.get<binary_io::memory_ostream>().rdbuf();
+                auto file_data = common::Lazy<std::vector<std::byte>>([&pair]() {
+                    auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
+                    pair.second.write(buffer);
+                    return buffer.get<binary_io::memory_ostream>().rdbuf();
+                });
 
                 auto transformed = transformer({relative_path, BTU_MOV(file_data)});
-
                 if (transformed)
                 {
                     file.read(*transformed);
