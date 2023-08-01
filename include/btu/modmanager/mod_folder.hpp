@@ -61,6 +61,9 @@ public:
     void iterate(const std::function<void(Path relative_path)> &loose,
                  const std::function<void(const Path &archive_path, bsa::Archive &&archive)> &archive) const;
 
+    [[nodiscard]] auto name() const noexcept -> std::u8string { return dir_.filename().u8string(); }
+    [[nodiscard]] auto path() const noexcept -> const Path & { return dir_; }
+
 private:
     // This function is used to implement transform() and one of the iterate() functions.
     // The reason for it to be private is that while it is `const`, it is not `const` semantically: it modifies the
