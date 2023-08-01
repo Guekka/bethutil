@@ -6,7 +6,7 @@
 
 #include "btu/modmanager/mod_folder.hpp"
 
-#include <flow.hpp>
+#include <flux.hpp>
 
 namespace btu::modmanager {
 [[maybe_unused]] constexpr auto k_force_process_folder = "ForceProcess.cao";
@@ -24,11 +24,6 @@ class ModsFolder
 {
 public:
     ModsFolder(Path root, btu::bsa::Settings bsa_settings);
-
-    [[nodiscard]] auto to_flow()
-    {
-        return flow::from(folders_).map([this](auto &&f) { return ModFolder(f, bsa_settings_); });
-    }
 
 private:
     Path root_;

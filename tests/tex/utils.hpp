@@ -11,7 +11,7 @@
 
 #include <btu/common/string.hpp>
 #include <catch.hpp>
-#include <flow.hpp>
+#include <flux.hpp>
 
 namespace Catch {
 template<>

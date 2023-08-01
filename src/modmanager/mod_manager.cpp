@@ -5,7 +5,7 @@
 
 #include "btu/modmanager/mod_manager.hpp"
 
-#include <flow.hpp>
+#include <flux.hpp>
 
 namespace btu::modmanager {
 auto find_manager(const Path &dir) -> ModManager
@@ -21,8 +21,8 @@ auto find_manager(const Path &dir) -> ModManager
         return ModManager::Vortex;
 
     /* MO2 */
-    //Checking 10 dirs should be enough. One of them should be enough actually, but...better be safe
-    const bool mo2 = flow::from(fs::directory_iterator(dir))
+    // Checking 10 dirs should be enough. One of them should be enough actually, but...better be safe
+    const bool mo2 = flux::from_range(fs::directory_iterator(dir))
                          .filter([](auto &&entry) { return entry.is_directory(); })
                          .take(10)
                          .any([](auto &&dir) { return fs::exists(dir.path() / "meta.ini"); });
@@ -37,10 +37,10 @@ auto find_manager(const Path &dir) -> ModManager
 ModsFolder::ModsFolder(Path root, btu::bsa::Settings bsa_settings)
     : root_(std::move(root))
     , bsa_settings_(std::move(bsa_settings))
-    , folders_(flow::from(fs::directory_iterator(root_))
+    , folders_(flux::from_range(fs::directory_iterator(root_))
                    .filter([](auto &&e) { return e.is_directory(); })
-                   .map([](auto &&e) { return FLOW_FWD(e).path(); })
-                   .to_vector())
+                   .map([](auto &&e) { return FLUX_FWD(e).path(); })
+                   .to<std::vector>())
 {
 }
 

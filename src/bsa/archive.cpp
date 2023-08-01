@@ -3,7 +3,7 @@
 #include <binary_io/memory_stream.hpp>
 #include <btu/common/filesystem.hpp>
 #include <btu/common/functional.hpp>
-#include <flow.hpp>
+#include <flux.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -38,7 +38,7 @@ auto File::compressed() const noexcept -> Compression
         [](const libbsa::tes3::file &) { return Compression::No; },
         [](const libbsa::tes4::file &f) { return f.compressed() ? Compression::Yes : Compression::No; },
         [](const libbsa::fo4::file &f) {
-            return flow::any(f, &libbsa::fo4::chunk::compressed) ? Compression::Yes : Compression::No;
+            return flux::any(f, &libbsa::fo4::chunk::compressed) ? Compression::Yes : Compression::No;
         },
     };
 
@@ -50,7 +50,7 @@ auto File::size() const noexcept -> size_t
     constexpr auto visitor = btu::common::overload{
         [](const libbsa::tes3::file &f) { return f.size(); },
         [](const libbsa::tes4::file &f) { return f.size(); },
-        [](const libbsa::fo4::file &f) { return flow::from(f).map(&libbsa::fo4::chunk::size).sum(); },
+        [](const libbsa::fo4::file &f) { return flux::ref(f).map(&libbsa::fo4::chunk::size).sum(); },
     };
 
     return std::visit(visitor, file_);
@@ -61,7 +61,7 @@ void File::decompress()
     const auto visitor = btu::common::overload{
         [](libbsa::tes3::file &) {},
         [this](libbsa::tes4::file &f) { f.decompress(static_cast<libbsa::tes4::version>(ver_)); },
-        [](libbsa::fo4::file &f) { flow::for_each(f, [](auto &c) { c.decompress(); }); },
+        [](libbsa::fo4::file &f) { flux::for_each(f, [](auto &c) { c.decompress(); }); },
     };
 
     std::visit(visitor, file_);
@@ -73,7 +73,7 @@ void File::compress()
     const auto visitor = btu::common::overload{
         [](libbsa::tes3::file &) {},
         [this](libbsa::tes4::file &f) { f.compress(static_cast<libbsa::tes4::version>(ver_)); },
-        [](libbsa::fo4::file &f) { flow::for_each(f, [](auto &c) { c.compress(); }); },
+        [](libbsa::fo4::file &f) { flux::for_each(f, [](auto &c) { c.compress(); }); },
     };
 
     std::visit(visitor, file_);
@@ -343,6 +343,6 @@ auto archive_type(const Archive &arch) noexcept -> std::optional<ArchiveType>
 
 auto archive_size(const Archive &arch) noexcept -> size_t
 {
-    return flow::from(arch).map([](const auto &pair) { return pair.second.size(); }).sum();
+    return flux::from_range(arch).map([](const auto &pair) { return pair.second.size(); }).sum();
 }
 } // namespace btu::bsa

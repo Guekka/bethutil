@@ -2,7 +2,7 @@
 
 #include "btu/common/string.hpp"
 
-#include <flow.hpp>
+#include <flux.hpp>
 #include <nifly/NifFile.hpp>
 
 namespace btu::nif {
@@ -37,8 +37,9 @@ auto convert(Mesh file, HeadpartStatus headpart, btu::Game game) -> tl::expected
 
 void rename_referenced_textures(Mesh &file)
 {
-    flow::from(file.get().GetShapes())
-        .flat_map([&](auto *s) { return file.get().GetTexturePathRefs(s); })
+    flux::from(file.get().GetShapes())
+        .map([&](auto *s) { return file.get().GetTexturePathRefs(s); })
+        .flatten()
         .filter([](auto &tex) { return tex.get().size() >= 4; }) // Enough for ".tga"
         .for_each([&](auto &tex) {
             auto ext = btu::common::as_utf8(tex.get()).substr(tex.get().size() - 4);

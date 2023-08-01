@@ -82,12 +82,8 @@ target_include_directories(
 find_package(bsa CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE bsa::bsa)
 
-find_path(LIBFLOW_INCLUDE_DIRS "flow.hpp")
-target_include_directories("${PROJECT_NAME}" SYSTEM
-                           PRIVATE ${LIBFLOW_INCLUDE_DIRS})
-# Necessary for libflow
-target_compile_definitions("${PROJECT_NAME}"
-                           PUBLIC _SILENCE_CLANG_COROUTINE_MESSAGE)
+find_path(FLUX_INCLUDE_DIRS "flux.hpp")
+target_include_directories("${PROJECT_NAME}" PRIVATE ${FLUX_INCLUDE_DIRS})
 
 find_package(tl-expected CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
