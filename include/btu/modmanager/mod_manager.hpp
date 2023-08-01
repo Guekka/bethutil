@@ -20,14 +20,4 @@ enum class ModManager
 };
 auto find_manager(const Path &dir) -> ModManager;
 
-class ModsFolder
-{
-public:
-    ModsFolder(Path root, btu::bsa::Settings bsa_settings);
-
-private:
-    Path root_;
-    btu::bsa::Settings bsa_settings_;
-    std::vector<Path> folders_;
-};
 } // namespace btu::modmanager
