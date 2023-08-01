@@ -10,7 +10,7 @@
 
 #include <btu/common/algorithms.hpp>
 #include <btu/common/functional.hpp>
-#include <flow.hpp>
+#include <flux.hpp>
 
 #include <deque>
 #include <functional>
@@ -53,14 +53,14 @@ struct PackGroup
                                                         FileTypes::Texture,
                                                         FileTypes::Incompressible};
 
-    auto packable_files = flow::from(fs::recursive_directory_iterator(dir))
+    auto packable_files = flux::from_range(fs::recursive_directory_iterator(dir))
                               .filter([&](const auto &p) { return allow_path_pred(dir, p); })
                               .filter([&](const auto &p) {
                                   return btu::common::contains(allowed_types,
                                                                get_filetype(p.path(), dir, sets));
                               })
                               .map([](const auto &p) { return p.path(); })
-                              .to_vector();
+                              .to<std::vector>();
 
     // sort by size, largest first
     std::ranges::sort(packable_files, [](const auto &lhs, const auto &rhs) {

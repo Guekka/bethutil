@@ -7,7 +7,7 @@
 #include <btu/common/string.hpp>
 #include <btu/hkx/anim.hpp>
 #include <btu/hkx/error_code.hpp>
-#include <flow.hpp>
+#include <flux.hpp>
 #include <reproc++/reproc.hpp>
 #include <reproc++/run.hpp>
 #include <tl/expected.hpp>
@@ -82,11 +82,11 @@ static inline const auto k_exe_list = std::to_array<detail::AnimExeRef>(
 
 auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
 {
-    auto detected = flow::from(k_exe_list)
+    auto detected = flux::from(k_exe_list)
                         .filter([&exe_dir](auto info) noexcept {
                             return fs::exists(exe_dir / info.get().name());
                         })
-                        .to_vector();
+                        .to<std::vector>();
 
     if (detected.empty())
         return tl::make_unexpected(Error(AnimErr::NoExeFound));

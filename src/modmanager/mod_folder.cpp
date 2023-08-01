@@ -10,7 +10,7 @@
 
 #include <binary_io/memory_stream.hpp>
 #include <btu/common/functional.hpp>
-#include <flow.hpp>
+#include <flux.hpp>
 
 #include <atomic>
 #include <utility>
@@ -34,10 +34,10 @@ void ModFolder::iterate(
 
     auto files =
 
-        flow::from(fs::recursive_directory_iterator(dir_))
+        flux::from_range(fs::recursive_directory_iterator(dir_))
             .filter([](auto &&e) { return e.is_regular_file(); })
             .map([](auto &&e) { return e.path(); })
-            .to_vector();
+            .to<std::vector>();
 
     btu::common::for_each_mt(files, [&is_arch, this, &archive, &loose](auto &&path) {
         if (!is_arch(path)) [[likely]]
