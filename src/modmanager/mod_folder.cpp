@@ -46,7 +46,7 @@ void ModFolder::iterate(
             return;
         }
 
-        if (auto arch = btu::bsa::read_archive(path))
+        if (auto arch = bsa::Archive::read(path))
             archive(path, std::move(*arch));
     });
 }
@@ -96,16 +96,11 @@ void ModFolder::transform(ModFolder::Transformer &&transformer,
                                                 const bsa::Settings bsa_settings) noexcept
     -> std::optional<bsa::ArchiveVersion>
 {
-    auto version = archive_version(archive);
-    if (!version)
-        return std::nullopt;
-
-    auto type = archive_type(archive);
-    if (!type)
-        return std::nullopt;
+    auto version = archive.version();
+    auto type    = archive.type();
 
     auto target = [type, &bsa_settings]() -> std::optional<bsa::ArchiveVersion> {
-        switch (*type)
+        switch (type)
         {
             case bsa::ArchiveType::Textures:
                 return bsa_settings.texture_version.value_or(bsa_settings.version);
@@ -114,7 +109,7 @@ void ModFolder::transform(ModFolder::Transformer &&transformer,
         return std::nullopt;
     }();
 
-    if (target == *version)
+    if (target == version)
         return std::nullopt;
 
     return target;
@@ -135,7 +130,7 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
         [&transformer, this, &archive_too_large_handler](const Path &archive_path, bsa::Archive &&archive) {
             // Check if the archive is too large and the caller wants to skip it
             auto check_archive_and_skip = [&](ArchiveTooLargeState state) {
-                if (bsa::archive_size(archive) > bsa_settings_.max_size)
+                if (archive.file_size() > bsa_settings_.max_size)
                     return archive_too_large_handler(archive_path, state) == ArchiveTooLargeAction::Skip;
                 return false;
             };
@@ -145,7 +140,7 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
 
             bool any_file_changed = false;
 
-            common::for_each_mt(archive, [&](auto &pair) {
+            common::for_each_mt(archive, [transformer, &any_file_changed](auto &pair) {
                 auto &[relative_path, file] = pair;
 
                 auto file_data = common::Lazy<std::vector<std::byte>>([&pair]() {
@@ -164,7 +159,7 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
 
             const auto target_version = guess_target_archive_version(archive, bsa_settings_);
             if (target_version)
-                bsa::set_archive_version(archive, *target_version);
+                archive.set_version(*target_version);
 
             if (check_archive_and_skip(ArchiveTooLargeState::AfterProcessing))
                 return;
@@ -176,7 +171,7 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
                 if (path.extension() != bsa_settings_.extension)
                     path.replace_extension(bsa_settings_.extension);
 
-                write_archive(std::move(archive), path);
+                std::move(archive).write(path);
 
                 // Remove the old archive if the new one has a different name
                 if (path != archive_path)

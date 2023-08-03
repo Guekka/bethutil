@@ -65,20 +65,49 @@ public:
     [[nodiscard]] auto as_raw_file() && { return std::get<T>(std::move(file_)); }
 
 private:
-    UnderlyingFile file_;
     ArchiveVersion ver_;
+    UnderlyingFile file_;
 };
 
-using Archive = std::map<std::string, File, std::less<>>;
+class Archive final
+{
+    std::map<std::string, File> files_;
 
-auto read_archive(Path path) -> std::optional<Archive>;
-void write_archive(Archive &&arch, Path path);
+public:
+    Archive(ArchiveVersion ver, ArchiveType type);
 
-[[nodiscard]] auto archive_version(const Archive &arch) noexcept -> std::optional<ArchiveVersion>;
-void set_archive_version(Archive &arch, ArchiveVersion version) noexcept;
+    // While it is possible to copy an archive, it is better to disable implicit copying: it is a heavy operation
+    Archive(const Archive &)            = delete;
+    Archive &operator=(const Archive &) = delete;
 
-[[nodiscard]] auto archive_type(const Archive &arch) noexcept -> std::optional<ArchiveType>;
+    Archive(Archive &&) noexcept            = default;
+    Archive &operator=(Archive &&) noexcept = default;
 
-[[nodiscard]] auto archive_size(const Archive &arch) noexcept -> size_t;
+    static auto read(Path path) -> std::optional<Archive>;
+    void write(Path path) &&;
+
+    void emplace(std::string name, File file);
+    [[nodiscard]] auto get(const std::string &name) -> File &;
+
+    [[nodiscard]] auto begin() noexcept { return files_.begin(); }
+    [[nodiscard]] auto end() noexcept { return files_.end(); }
+
+    [[nodiscard]] auto empty() const noexcept -> bool;
+
+    [[nodiscard]] auto size() const noexcept -> size_t;
+
+    [[nodiscard]] auto version() const noexcept -> ArchiveVersion { return ver_; }
+    void set_version(ArchiveVersion version) noexcept;
+
+    [[nodiscard]] auto type() const noexcept -> ArchiveType { return type_; }
+
+    [[nodiscard]] auto file_size() const noexcept -> size_t;
+
+private:
+    Archive() = default;
+
+    ArchiveVersion ver_;
+    ArchiveType type_;
+};
 
 } // namespace btu::bsa
