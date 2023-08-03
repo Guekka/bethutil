@@ -41,6 +41,29 @@ struct is_variant_member<T, std::variant<Ts...>> : std::bool_constant<(std::is_s
 template<class T, class... Ts>
 constexpr bool is_variant_member_v = is_variant_member<T, Ts...>::value;
 
+template<class>
+struct is_mutable_lambda_helper : std::false_type
+{
+};
+
+template<class Ret, class Class, class... Args>
+struct is_mutable_lambda_helper<Ret (Class::*)(Args...) const> : std::false_type
+{
+};
+
+template<class Ret, class Class, class... Args>
+struct is_mutable_lambda_helper<Ret (Class::*)(Args...)> : std::true_type
+{
+};
+
+template<class T>
+struct is_mutable_lambda : is_mutable_lambda_helper<decltype(&T::operator())>
+{
+};
+
+// Helper variable template for cleaner syntax
+template<class T>
+constexpr bool is_mutable_lambda_v = is_mutable_lambda<T>::value;
 } // namespace btu::common
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage): we need it to generate code

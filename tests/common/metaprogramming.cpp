@@ -43,3 +43,13 @@ TEST_CASE("overload", "[src]")
     check(float{});
     check(double{});
 }
+
+TEST_CASE("is_mutable_lambda", "[src]")
+{
+    using btu::common::is_mutable_lambda_v;
+    using lambda         = decltype([](int) { return int{}; });
+    using mutable_lambda = decltype([](int) mutable { return int{}; });
+
+    STATIC_REQUIRE_FALSE(is_mutable_lambda_v<lambda>);
+    STATIC_REQUIRE(is_mutable_lambda_v<mutable_lambda>);
+}
