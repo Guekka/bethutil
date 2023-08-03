@@ -82,23 +82,27 @@ struct PackGroup
     return {.standard = BTU_MOV(packable_files), .texture = {}};
 }
 
-[[nodiscard]] auto prepare_file(const Path &file_path, const PackSettings &sets, ArchiveType type) -> File
+[[nodiscard]] auto get_version(const Settings &sets, ArchiveType type) -> ArchiveVersion
 {
-    auto file = [type, &sets] {
-        switch (type)
+    switch (type)
+    {
+        case ArchiveType::Textures:
         {
-            case ArchiveType::Textures:
-            {
-                assert(sets.game_settings.texture_version.has_value());
-                return File{sets.game_settings.texture_version.value()};
-            }
-            case ArchiveType::Standard:
-            {
-                return File{sets.game_settings.version};
-            }
+            assert(sets.texture_version.has_value());
+            return sets.texture_version.value();
         }
-        libbsa::detail::declare_unreachable();
-    }();
+        case ArchiveType::Standard:
+        {
+            return sets.version;
+        }
+    }
+    libbsa::detail::declare_unreachable();
+}
+
+[[nodiscard]] auto prepare_file(const Path &file_path, const PackSettings &sets, ArchiveType type) noexcept
+    -> File
+{
+    auto file = File{get_version(sets.game_settings, type)};
     file.read(file_path);
 
     const bool fo4dx        = file.version() == ArchiveVersion::fo4dx;
@@ -111,21 +115,20 @@ struct PackGroup
 
 [[nodiscard]] auto file_fits(const Archive &arch, const File &file, const Settings &sets) noexcept -> bool
 {
-    const auto size = archive_size(arch);
-    return size + file.size() <= sets.max_size;
+    return arch.file_size() + file.size() <= sets.max_size;
 }
 
 [[nodiscard]] auto do_write(Archive arch, const PackSettings &settings, ArchiveType type)
 {
     auto filepath = settings.output_dir / settings.archive_name_gen(type);
 
-    write_archive(BTU_MOV(arch), BTU_MOV(filepath));
+    BTU_MOV(arch).write(BTU_MOV(filepath));
 }
 
 [[nodiscard]] auto do_pack(std::vector<Path> files, const PackSettings &settings, ArchiveType type) noexcept
     -> std::vector<std::pair<Path, std::exception_ptr>>
 {
-    auto arch = Archive{};
+    auto arch = Archive{get_version(settings.game_settings, type), type};
     auto ret  = std::vector<std::pair<Path, std::exception_ptr>>{};
 
     std::mutex mut;
@@ -146,10 +149,10 @@ struct PackGroup
             // to avoid locking the mutex for too long, we prepare the new archive first
             auto full_arch = BTU_MOV(arch);
 
-            arch = Archive{};
+            arch = Archive{get_version(settings.game_settings, type), type};
             arch.emplace(fs::relative(absolute_path, settings.input_dir).string(), BTU_MOV(file));
 
-            assert(archive_size(arch) <= settings.game_settings.max_size);
+            assert(arch.file_size() <= settings.game_settings.max_size);
 
             // it is now safe to unlock the mutex, the full archive is not shared with other threads
             lock.unlock();

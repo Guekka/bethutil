@@ -14,7 +14,7 @@ namespace btu::bsa {
 void unpack(UnpackSettings sets)
 {
     {
-        auto arch = read_archive(sets.file_path);
+        auto arch = Archive::read(sets.file_path);
         if (!arch)
             return;
         const auto &root = sets.root_opt != nullptr ? *sets.root_opt : sets.file_path.parent_path();

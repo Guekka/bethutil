@@ -10,26 +10,27 @@ TEST_CASE("Load and save to same location works", "[src]")
 
     const auto path = dir / "out" / "arch.bsa";
 
-    auto arch = btu::bsa::read_archive(path);
+    auto arch = btu::bsa::Archive::read(path);
     REQUIRE(arch.has_value());
 
-    btu::bsa::write_archive(*BTU_MOV(arch), path);
+    std::move(*arch).write(path);
 
     REQUIRE(btu::common::compare_directories(dir / "in", dir / "out"));
 }
 
 TEST_CASE("set archive version", "[src]")
 {
-    auto arch = btu::bsa::Archive{};
-    auto file = btu::bsa::File{btu::bsa::ArchiveVersion::tes3};
-    auto data = std::vector<std::byte>{1};
+    auto arch = btu::bsa::Archive{btu::bsa::ArchiveVersion::tes3, btu::bsa::ArchiveType::Standard};
+
+    auto &file = arch.get("file");
+    auto data  = std::vector{std::byte{0x00}, std::byte{0x01}, std::byte{0x02}, std::byte{0x03}};
     file.read(data);
 
-    arch.emplace("test.txt", BTU_MOV(file));
+    REQUIRE(arch.version() == btu::bsa::ArchiveVersion::tes3);
+    REQUIRE(file.version() == btu::bsa::ArchiveVersion::tes3);
 
-    REQUIRE(btu::bsa::archive_version(arch) == btu::bsa::ArchiveVersion::tes3);
+    arch.set_version(btu::bsa::ArchiveVersion::tes4);
 
-    btu::bsa::set_archive_version(arch, btu::bsa::ArchiveVersion::tes4);
-
-    REQUIRE(btu::bsa::archive_version(arch) == btu::bsa::ArchiveVersion::tes4);
+    REQUIRE(arch.version() == btu::bsa::ArchiveVersion::tes4);
+    REQUIRE(file.version() == btu::bsa::ArchiveVersion::tes4);
 }

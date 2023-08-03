@@ -72,7 +72,7 @@ auto process_args(std::vector<std::string_view> args) -> int
         erase_if(archives, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
         for (const auto &file : archives)
         {
-            std::cout << "Unpacking " << file.path().string() << std::endl;
+            std::cout << "Unpacking " << file.path().string() << '\n' << std::flush;
             btu::bsa::unpack({.file_path = file});
         }
     }
@@ -82,15 +82,14 @@ auto process_args(std::vector<std::string_view> args) -> int
         erase_if(archives, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
         for (const auto &file : archives)
         {
-            std::cout << "Files of: " << file.path().string() << std::endl;
-            auto arch = btu::bsa::read_archive(file.path());
+            std::cout << "Files of: " << file.path().string() << '\n' << std::flush;
+            auto arch = btu::bsa::Archive::read(file.path());
             if (!arch)
                 continue;
             for (auto &&elem : std::move(*arch))
             {
                 std::cout << elem.first << "  " << elem.second.size() << " bytes - Compressed: "
-                          << (elem.second.compressed() == btu::bsa::Compression::Yes ? "Yes" : "No")
-                          << std::endl;
+                          << (elem.second.compressed() == btu::bsa::Compression::Yes ? "Yes" : "No") << '\n';
             }
         }
     }
