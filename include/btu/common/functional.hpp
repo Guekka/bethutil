@@ -173,7 +173,7 @@ requires std::ranges::input_range<Range> && invocable_l_or_r<Func, std::ranges::
 auto for_each_mt(Range &&rng, Func &&func)
 {
     auto eptr = std::exception_ptr{};
-    auto call = [&eptr, f = std::forward<Func>(func)](auto &&elem) noexcept {
+    auto call = [&eptr, f = std::forward<Func>(func)](auto &&elem) mutable noexcept {
         if (eptr)
             return; // We do not process the remaining elements if an exception has been encountered
 
