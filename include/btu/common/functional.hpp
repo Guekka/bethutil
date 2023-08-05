@@ -17,12 +17,17 @@
 //
 
 #pragma once
+#include "metaprogramming.hpp"
+
+#include <mpsc/mpsc_channel.hpp>
+
 #include <exception>
 #include <execution>
 #include <functional>
 #include <iostream>
 #include <iterator>
 #include <optional>
+#include <thread>
 #include <tuple>
 #include <utility>
 
@@ -198,6 +203,44 @@ auto for_each_mt(Range &&rng, Func &&func)
 
     if (eptr)
         std::rethrow_exception(eptr);
+}
+
+/**
+ * \brief Creates a multi-threaded producer for the specified range and function.
+ *
+ * This function creates a multi-threaded producer that generates values by applying the specified function
+ * to each element in the given range. The producer distributes the workload across multiple threads to improve
+ * performance.
+ *
+ * \param rng   The range of elements to process.
+ * \param func  The function to apply to each element in the range.
+ *
+ * \tparam Range    The type of the range.
+ * \tparam Func     The type of the function.
+ *
+ * \return The multi-threaded producer object.
+ *
+ * \note The multi-threaded producer returned by this function is responsible for managing the parallel execution
+ *       of the given function on the range elements. The user is responsible for synchronizing access to any shared
+ *       data if needed.
+ */
+
+template<typename Out, typename Range, typename Func>
+[[nodiscard]] auto make_producer_mt(Range &&rng, Func &&func) requires
+    std::ranges::input_range<Range> && invocable_l_or_r<Func, std::ranges::range_value_t<Range>>
+{
+    auto channel = mpsc::Channel<Out>::make();
+    auto sender  = std::get<0>(channel);
+
+    auto producer = std::jthread([rng    = std::forward<Range>(rng),
+                                  func   = std::forward<Func>(func),
+                                  sender = std::move(sender)]() mutable {
+        for_each_mt(std::forward<Range>(rng),
+                    [func, sender](auto &&elem) mutable { sender.send(func(forward_like<Range>(elem))); });
+        sender.close();
+    });
+
+    return std::pair{std::move(producer), std::get<1>(std::move(channel))};
 }
 
 template<typename T>
