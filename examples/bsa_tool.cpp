@@ -38,33 +38,16 @@ auto process_args(std::vector<std::string_view> args) -> int
         if (plugins.empty()) // Used to find BSA name
             plugins.emplace_back(default_plug);
 
-        auto errs = btu::bsa::pack(btu::bsa::PackSettings{
-            .input_dir     = dir,
-            .output_dir    = dir,
-            .game_settings = sets,
-            .compress      = btu::bsa::Compression::Yes,
-            .archive_name_gen =
-                [&plugins, &sets](btu::bsa::ArchiveType type) {
-                    return btu::bsa::find_archive_name(plugins, sets, type).full_name();
-                },
-        });
+        btu::bsa::pack(btu::bsa::PackSettings{
+                           .input_dir     = dir,
+                           .game_settings = sets,
+                           .compress      = btu::bsa::Compression::Yes,
+                       })
+            .for_each([&plugins, &sets](btu::bsa::Archive &&arch) {
+                auto name = btu::bsa::find_archive_name(plugins, sets, arch.type());
 
-        if (!errs.empty())
-        {
-            std::cerr << "Errors while packing:\n";
-            for (const auto &[file, exc] : errs)
-            {
-                try
-                {
-                    std::rethrow_exception(exc);
-                }
-                catch (const std::exception &e)
-                {
-                    std::cerr << file.string() << ": " << e.what() << '\n';
-                }
-            }
-            return 1;
-        }
+                std::move(arch).write(name.full_path());
+            });
     }
     else if (arg == "unpack")
     {
@@ -85,7 +68,10 @@ auto process_args(std::vector<std::string_view> args) -> int
             std::cout << "Files of: " << file.path().string() << '\n' << std::flush;
             auto arch = btu::bsa::Archive::read(file.path());
             if (!arch)
+            {
+                std::cerr << "Failed to read archive\n";
                 continue;
+            }
             for (auto &&elem : std::move(*arch))
             {
                 std::cout << elem.first << "  " << elem.second.size() << " bytes - Compressed: "
