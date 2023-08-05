@@ -21,34 +21,20 @@ TEST_CASE("Pack", "[src]")
 
         const auto sets = Settings::get(game);
 
-        auto errs = pack(PackSettings{
+        const auto pack_settings = PackSettings{
             .input_dir     = dir / "input",
-            .output_dir    = dir / "output",
             .game_settings = sets,
             .compress      = Compression::Yes,
-            .archive_name_gen =
-                [name, &sets](ArchiveType type) {
-                    return std::u8string(name)
-                           + (type == ArchiveType::Textures ? u8" - Textures" : u8" - Main") + sets.extension;
-                },
-        });
+        };
 
-        if (!errs.empty())
-        {
-            std::cerr << "Errors while packing " << btu::common::as_ascii(name) << ":\n";
-            for (const auto &[file, exc] : errs)
-            {
-                try
-                {
-                    std::rethrow_exception(exc);
-                }
-                catch (const std::exception &e)
-                {
-                    std::cerr << file.string() << ": " << e.what() << '\n';
-                }
-            }
-            FAIL();
-        }
+        pack(pack_settings).for_each([name, &dir, &sets](btu::bsa::Archive &&arch) {
+            auto type      = arch.type();
+            auto arch_name = std::u8string(name)
+                             + (type == ArchiveType::Textures ? u8" - Textures" : u8" - Main")
+                             + sets.extension;
+
+            std::move(arch).write(dir / "output" / arch_name);
+        });
     };
 
     test_pack(btu::Game::SSE, u8"sse");

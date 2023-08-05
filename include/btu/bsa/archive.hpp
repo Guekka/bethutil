@@ -74,6 +74,8 @@ class Archive final
     std::map<std::string, File> files_;
 
 public:
+    using value_type = decltype(files_)::value_type;
+
     Archive(ArchiveVersion ver, ArchiveType type);
 
     // While it is possible to copy an archive, it is better to disable implicit copying: it is a heavy operation

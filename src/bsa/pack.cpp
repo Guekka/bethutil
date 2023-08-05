@@ -14,7 +14,6 @@
 
 #include <deque>
 #include <functional>
-#include <mutex>
 
 namespace btu::bsa {
 auto get_allow_file_pred(const PackSettings &sets) -> AllowFilePred
@@ -118,86 +117,62 @@ struct PackGroup
     return arch.file_size() + file.size() <= sets.max_size;
 }
 
-[[nodiscard]] auto do_write(Archive arch, const PackSettings &settings, ArchiveType type)
+[[nodiscard]] auto do_pack(std::vector<Path> file_paths, PackSettings settings, ArchiveType type) noexcept
+    -> flux::generator<bsa::Archive &&>
 {
-    auto filepath = settings.output_dir / settings.archive_name_gen(type);
-
-    BTU_MOV(arch).write(BTU_MOV(filepath));
-}
-
-[[nodiscard]] auto do_pack(std::vector<Path> files, const PackSettings &settings, ArchiveType type) noexcept
-    -> std::vector<std::pair<Path, std::exception_ptr>>
-{
-    auto arch = Archive{get_version(settings.game_settings, type), type};
-    auto ret  = std::vector<std::pair<Path, std::exception_ptr>>{};
-
-    std::mutex mut;
-    btu::common::for_each_mt(BTU_MOV(files), [&settings, &mut, &arch, type, &ret](Path &&absolute_path) {
-        try
-        {
+    auto [thread, receiver] = common::make_producer_mt<bsa::Archive::value_type>(
+        std::move(file_paths), [&](Path absolute_path) -> bsa::Archive::value_type {
             auto file = prepare_file(absolute_path, settings, type);
+            return {fs::relative(absolute_path, settings.input_dir).string(), BTU_MOV(file)};
+        });
 
-            std::unique_lock lock(mut);
-            if (file_fits(arch, file, settings.game_settings))
-            {
-                arch.emplace(fs::relative(absolute_path, settings.input_dir).string(), BTU_MOV(file));
-                return;
-            }
+    auto make_arch = [&] { return Archive{get_version(settings.game_settings, type), type}; };
+    auto arch      = make_arch();
 
-            // if we are here, the file does not fit into the archive
-            // we need to write the archive and start a new one
-            // to avoid locking the mutex for too long, we prepare the new archive first
-            auto full_arch = BTU_MOV(arch);
-
-            arch = Archive{get_version(settings.game_settings, type), type};
-            arch.emplace(fs::relative(absolute_path, settings.input_dir).string(), BTU_MOV(file));
-
-            assert(arch.file_size() <= settings.game_settings.max_size);
-
-            // it is now safe to unlock the mutex, the full archive is not shared with other threads
-            lock.unlock();
-
-            do_write(BTU_MOV(full_arch), settings, type);
-        }
-        catch (const std::exception &e)
+    for (auto [relative_path, file] : receiver)
+    {
+        if (file_fits(arch, file, settings.game_settings))
         {
-            const std::unique_lock lock(mut);
-            ret.emplace_back(BTU_MOV(absolute_path), std::make_exception_ptr(e));
+            arch.emplace(BTU_MOV(relative_path), BTU_MOV(file));
+            continue;
         }
-    });
 
-    // write the last archive
-    try
-    {
-        if (!arch.empty())
-            do_write(BTU_MOV(arch), settings, type);
-    }
-    catch (const std::exception &e)
-    {
-        ret.emplace_back(settings.archive_name_gen(type), std::make_exception_ptr(e));
+        // if we are here, the file does not fit into the archive
+        // so we yield the current archive and start a new one
+        co_yield std::exchange(arch, make_arch());
+
+        arch.emplace(BTU_MOV(relative_path), BTU_MOV(file));
+
+        // is it even possible that the file is bigger than the max size?
+        assert(arch.file_size() <= settings.game_settings.max_size);
     }
 
-    return ret;
+    // return the last archive
+    if (!arch.empty())
+        co_yield BTU_MOV(arch);
 }
 
-auto pack(const PackSettings &settings) noexcept -> std::vector<std::pair<Path, std::exception_ptr>>
+auto pack(PackSettings settings) noexcept -> flux::generator<bsa::Archive &&>
 {
     auto files = list_packable_files(settings.input_dir,
                                      settings.game_settings,
                                      get_allow_file_pred(settings));
 
-    auto ret = std::vector<std::pair<Path, std::exception_ptr>>{};
-
     if (!files.standard.empty())
-        ret = do_pack(BTU_MOV(files.standard), settings, ArchiveType::Standard);
+    {
+        FLUX_FOR(auto &&a, do_pack(BTU_MOV(files.standard), settings, ArchiveType::Standard))
+        {
+            co_yield BTU_MOV(a);
+        }
+    }
 
     if (!files.texture.empty())
     {
-        auto errs = do_pack(BTU_MOV(files.texture), settings, ArchiveType::Textures);
-        ret.insert(ret.end(), std::make_move_iterator(errs.begin()), std::make_move_iterator(errs.end()));
+        FLUX_FOR(auto &&a, do_pack(BTU_MOV(files.texture), settings, ArchiveType::Textures))
+        {
+            co_yield BTU_MOV(a);
+        }
     }
-
-    return ret;
 }
 
 } // namespace btu::bsa
