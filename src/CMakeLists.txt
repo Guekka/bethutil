@@ -97,6 +97,9 @@ target_link_libraries("${PROJECT_NAME}" PUBLIC Microsoft::DirectXTex)
 find_package(bc7enc CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE bc7enc::bc7enc)
 
+find_package(mpsc_channel CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE mpsc::mpsc_channel)
+
 if(${BETHUTIL_HKX})
   find_package(reproc++ CONFIG REQUIRED)
   target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)

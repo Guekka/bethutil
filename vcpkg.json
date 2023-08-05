@@ -13,6 +13,7 @@
     "bc7enc",
     "directxtex",
     "flux",
+    "mpsc-channel",
     "nifly",
     "utf8h",
     "rsm-bsa",
