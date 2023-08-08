@@ -16,17 +16,12 @@
     "mpsc-channel",
     "nifly",
     "nlohmann-json",
+    "reproc",
     "utf8h",
     "rsm-bsa",
     "tl-expected"
   ],
   "features": {
-    "hkx": {
-      "description": "Build hkx part. Windows only",
-      "dependencies": [
-        "reproc"
-      ]
-    },
     "tests": {
       "description": "Build tests",
       "dependencies": [

@@ -14,6 +14,7 @@ enum class AnimErr
     NoAppropriateExe,
     ExeFailed,
     NoExeFound,
+    OsNotSupported,
 };
 } // namespace btu::hkx
 
@@ -37,6 +38,7 @@ struct AnimErrCategory : std::error_category
             case AnimErr::NoAppropriateExe: return "no appropriate exe found";
             case AnimErr::ExeFailed: return "exe failed";
             case AnimErr::NoExeFound: return "no exe found at all";
+            case AnimErr::OsNotSupported: return "os not supported by exe";
         }
         return "(unrecognized error)";
     };

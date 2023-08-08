@@ -35,7 +35,7 @@ TEST_CASE("Converting from LE to SE", "[src]")
     CHECK(btu::common::compare_files(dir / "LE_EXPECTED.hkx", dir / "LE_OUTPUT.hkx"));
 }
 
-TEST_CASE("Converting from SE to LE", "[src]")
+TEST_CASE("Converting from SE to LE", "[src]" FAIL_ON_LINUX_TAG)
 {
     convert(btu::Game::SLE, dir / "SE_INPUT.hkx", dir / "SE_OUTPUT.hkx");
     CHECK(btu::common::compare_files(dir / "SE_EXPECTED.hkx", dir / "SE_OUTPUT.hkx"));

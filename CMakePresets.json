@@ -47,10 +47,6 @@
     },
     {
       "cacheVariables": {
-        "BETHUTIL_HKX": {
-          "type": "BOOL",
-          "value": "ON"
-        },
         "CMAKE_EXE_LINKER_FLAGS_RELEASE": {
           "type": "STRING",
           "value": "/DEBUG:FASTLINK"
@@ -61,7 +57,7 @@
         },
         "VCPKG_MANIFEST_FEATURES": {
           "type": "STRING",
-          "value": "hkx;tests"
+          "value": "tests"
         },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",

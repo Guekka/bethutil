@@ -16,6 +16,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/plugin.cpp"
     "${SOURCE_DIR}/bsa/unpack.cpp"
     "${SOURCE_DIR}/esp/functions.cpp"
+    "${SOURCE_DIR}/hkx/anim.cpp"
     "${SOURCE_DIR}/modmanager/mod_folder.cpp"
     "${SOURCE_DIR}/modmanager/mod_manager.cpp"
     "${SOURCE_DIR}/nif/functions.cpp"
@@ -24,10 +25,6 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/tex/formats.cpp"
     "${SOURCE_DIR}/tex/functions.cpp"
     "${SOURCE_DIR}/tex/optimize.cpp")
-
-if(${BETHUTIL_HKX})
-  list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/anim.cpp")
-endif()
 
 if("${BETHUTIL_BUILD_EXAMPLES}")
   list(APPEND SOURCE_FILES)
