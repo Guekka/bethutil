@@ -8,6 +8,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/utils.hpp"
     "${SOURCE_DIR}/common/filesystem.cpp"
     "${SOURCE_DIR}/common/functional.cpp"
+    "${SOURCE_DIR}/common/json.cpp"
     "${SOURCE_DIR}/common/metaprogramming.cpp"
     "${SOURCE_DIR}/common/string.cpp"
     "${SOURCE_DIR}/bsa/archive.cpp"

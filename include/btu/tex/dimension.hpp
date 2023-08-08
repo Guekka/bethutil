@@ -3,6 +3,8 @@
 #include "btu/tex/detail/common.hpp"
 #include "btu/tex/detail/formats_string.hpp"
 
+#include <btu/common/json.hpp>
+
 namespace btu::tex {
 
 struct Dimension
@@ -12,12 +14,16 @@ struct Dimension
     auto operator<=>(const Dimension &) const noexcept = default;
 };
 
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Dimension, w, h)
+
 namespace util {
 struct ResizeRatio
 {
     uint8_t ratio;
     Dimension min;
 };
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ResizeRatio, ratio, min)
 
 [[nodiscard]] constexpr auto is_pow2(size_t num) noexcept -> bool
 {

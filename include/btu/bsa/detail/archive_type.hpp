@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <nlohmann/json.hpp>
+
 #include <cstdint>
 
 namespace btu::bsa {
@@ -26,5 +28,17 @@ enum class ArchiveVersion : std::uint32_t
     fo4   = 1280462407,
     fo4dx = 808540228,
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(ArchiveType,
+                             {{ArchiveType::Textures, "textures"}, {ArchiveType::Standard, "standard"}})
+
+NLOHMANN_JSON_SERIALIZE_ENUM(ArchiveVersion,
+                             {{ArchiveVersion::tes3, "tes3"},
+                              {ArchiveVersion::tes4, "tes4"},
+                              {ArchiveVersion::fo3, "fo3"},
+                              {ArchiveVersion::tes5, "tes5"},
+                              {ArchiveVersion::sse, "sse"},
+                              {ArchiveVersion::fo4, "fo4"},
+                              {ArchiveVersion::fo4dx, "fo4dx"}})
 
 } // namespace btu::bsa

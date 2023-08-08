@@ -1,5 +1,6 @@
 #pragma once
 
+#include <btu/common/json.hpp>
 #include <btu/tex/dxtex.hpp>
 
 #include <optional>
@@ -16,6 +17,9 @@ struct BestFormatFor
     DXGI_FORMAT compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM;
 };
 
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+    BestFormatFor, uncompressed, uncompressed_without_alpha, compressed, compressed_without_alpha)
+
 enum class TextureType
 {
     Diffuse,
@@ -30,11 +34,25 @@ enum class TextureType
     EnvironmentMask
 };
 
+NLOHMANN_JSON_SERIALIZE_ENUM(TextureType,
+                             {{TextureType::Diffuse, "diffuse"},
+                              {TextureType::Normal, "normal"},
+                              {TextureType::Cube, "cube"},
+                              {TextureType::Specular, "specular"},
+                              {TextureType::Glow, "glow"},
+                              {TextureType::Parallax, "parallax"},
+                              {TextureType::ModelSpaceNormal, "model_space_normal"},
+                              {TextureType::Backlight, "backlight"},
+                              {TextureType::Skin, "skin"},
+                              {TextureType::EnvironmentMask, "environment_mask"}})
+
 enum class AllowCompressed
 {
     Yes,
     No,
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(AllowCompressed, {{AllowCompressed::Yes, "yes"}, {AllowCompressed::No, "no"}})
 
 /// Based on https://forums.nexusmods.com/index.php?/topic/476227-skyrim-nif-files-with-underscores/
 auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<TextureType>;
