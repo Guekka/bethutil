@@ -23,7 +23,11 @@ class Info32to64 : public detail::AnimExeInfo
 public:
     [[nodiscard]] constexpr auto name() const noexcept -> std::string_view override
     {
-        return "hkx32to64.exe";
+        return "hkx32to64"
+#ifndef __unix__
+               ".exe"
+#endif
+            ;
     }
     [[nodiscard]] constexpr auto input_file_name() const noexcept -> std::string_view override
     {
@@ -33,17 +37,29 @@ public:
     {
         return "OUTFILE64.hkx";
     }
-    [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override { return btu::Game::SSE; }
+    [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override
+    {
+        return btu::Game::SSE;
+    }
 
     [[nodiscard]] auto get_required_files([[maybe_unused]] const Path &exe_dir) const noexcept
         -> std::vector<Path> override
     {
+#ifdef __unix__
+        return {exe_dir / "hkx32to64.exe"};
+#else
         return {};
+#endif
     }
 
     [[nodiscard]] auto get_full_args(const Path &exe_dir) const -> std::vector<std::string> override
     {
         return {(exe_dir / name()).string(), std::string(input_file_name())};
+    }
+
+    [[nodiscard]] auto is_os_supported() const noexcept -> bool override
+    {
+        return true;
     }
 };
 static inline const auto k_exe_32to64 = Info32to64{};
@@ -73,6 +89,15 @@ public:
     [[nodiscard]] auto get_full_args(const Path &exe_dir) const -> std::vector<std::string> override
     {
         return {(exe_dir / name()).string(), std::string(input_file_name()), "-s", "32ref.hko"s};
+    }
+
+    [[nodiscard]] auto is_os_supported() const noexcept -> bool override
+    {
+#ifdef __unix__
+        return false;
+#else
+        return true;
+#endif
     }
 };
 static inline const auto k_exe_64to32 = Info64to32{};
@@ -130,6 +155,9 @@ auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
 
     if (it == detected.end())
         return tl::make_unexpected(Error(AnimErr::NoAppropriateExe));
+
+    if (!it->get().is_os_supported())
+        return tl::make_unexpected(Error(AnimErr::OsNotSupported));
 
     return *it;
 }
@@ -196,9 +224,10 @@ struct ReprocOptions : public reproc::options
     if (ec)
         return tl::make_unexpected(Error(ec));
 
-    fs::rename(output_path, output, ec);
+    fs::copy(output_path, output, ec);
     if (ec)
         return tl::make_unexpected(Error(ec));
+    fs::remove(output_path);
 
     return {};
 }

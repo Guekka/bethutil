@@ -6,6 +6,12 @@
 
 #include <fstream>
 
+#ifdef __unix__
+#define FAIL_ON_LINUX_TAG "[!nonportable] [!shouldfail]"
+#else
+#define FAIL_ON_LINUX_TAG "[!nonportable]"
+#endif
+
 using btu::Path;
 using namespace std::literals;
 

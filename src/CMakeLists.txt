@@ -18,6 +18,8 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
     "${INCLUDE_DIR}/btu/esp/error_code.hpp"
     "${INCLUDE_DIR}/btu/esp/functions.hpp"
+    "${INCLUDE_DIR}/btu/hkx/anim.hpp"
+    "${INCLUDE_DIR}/btu/hkx/error_code.hpp"
     "${INCLUDE_DIR}/btu/modmanager/mod_folder.hpp"
     "${INCLUDE_DIR}/btu/modmanager/mod_manager.hpp"
     "${INCLUDE_DIR}/btu/nif/detail/common.hpp"
@@ -45,6 +47,7 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/unpack.cpp"
     "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
     "${SOURCE_DIR}/esp/functions.cpp"
+    "${SOURCE_DIR}/hkx/anim.cpp"
     "${SOURCE_DIR}/modmanager/mod_folder.cpp"
     "${SOURCE_DIR}/modmanager/mod_manager.cpp"
     "${SOURCE_DIR}/nif/functions.cpp"
@@ -57,14 +60,6 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/tex/optimize.cpp"
     "${SOURCE_DIR}/tex/texture.cpp"
     "${SOURCE_DIR}/tex/error_code.cpp")
-
-option(BETHUTIL_HKX "Build hkx part" OFF)
-if(${BETHUTIL_HKX})
-  list(APPEND HEADER_FILES "${INCLUDE_DIR}/btu/hkx/anim.hpp"
-       "${INCLUDE_DIR}/btu/hkx/error_code.hpp")
-
-  list(APPEND SOURCE_FILES "${SOURCE_DIR}/hkx/anim.cpp")
-endif()
 
 source_group(TREE "${ROOT_DIR}" FILES ${HEADER_FILES} ${SOURCE_FILES})
 
@@ -104,10 +99,8 @@ target_link_libraries("${PROJECT_NAME}" PRIVATE mpsc::mpsc_channel)
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE nlohmann_json::nlohmann_json)
 
-if(${BETHUTIL_HKX})
-  find_package(reproc++ CONFIG REQUIRED)
-  target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)
-endif()
+find_package(reproc++ CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)
 
 set_target_properties("${PROJECT_NAME}" PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties("${PROJECT_NAME}" PROPERTIES LINKER_LANGUAGE CXX)
