@@ -38,6 +38,8 @@ public:
     [[nodiscard]] virtual auto get_required_files(const Path &exe_dir) const noexcept
         -> std::vector<Path>                                                                        = 0;
     [[nodiscard]] virtual auto get_full_args(const Path &exe_dir) const -> std::vector<std::string> = 0;
+
+    [[nodiscard]] virtual auto is_os_supported() const noexcept -> bool = 0;
 };
 
 using AnimExeRef = std::reference_wrapper<const AnimExeInfo>;
