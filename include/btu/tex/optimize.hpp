@@ -11,6 +11,7 @@
 #include "compression_device.hpp"
 
 #include <btu/common/games.hpp>
+#include <btu/common/json.hpp>
 
 #include <variant>
 
@@ -34,6 +35,16 @@ struct Settings
 
     std::vector<std::u8string> landscape_textures;
 };
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
+                                   game,
+                                   compress,
+                                   resize,
+                                   mipmaps,
+                                   use_format_whitelist,
+                                   allowed_formats,
+                                   output_format,
+                                   landscape_textures)
 
 struct OptimizationSteps
 {

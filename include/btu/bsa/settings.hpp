@@ -5,6 +5,8 @@
 #include "btu/common/games.hpp"
 #include "btu/common/metaprogramming.hpp"
 
+#include <btu/common/json.hpp>
+
 #include <array>
 #include <iostream>
 #include <optional>
@@ -49,6 +51,14 @@ enum class FileTypes
     BSA
 };
 
+NLOHMANN_JSON_SERIALIZE_ENUM(FileTypes,
+                             {{FileTypes::Standard, "standard"},
+                              {FileTypes::Texture, "texture"},
+                              {FileTypes::Incompressible, "incompressible"},
+                              {FileTypes::Blacklist, "blacklist"},
+                              {FileTypes::Plugin, "plugin"},
+                              {FileTypes::BSA, "bsa"}})
+
 static constexpr auto k_bsa_ext = u8".bsa";
 static constexpr auto k_ba2_ext = u8".ba2";
 
@@ -63,6 +73,8 @@ struct AllowedPath
 
     [[nodiscard]] auto check(const Path &filepath, const Path &root) const -> bool;
 };
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AllowedPath, extension, directories)
 
 struct Settings
 {
@@ -87,6 +99,20 @@ struct Settings
 
     [[nodiscard]] static auto get(Game game) -> const Settings &;
 };
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
+                                   game,
+                                   max_size,
+                                   version,
+                                   texture_version,
+                                   suffix,
+                                   texture_suffix,
+                                   extension,
+                                   plugin_extensions,
+                                   s_dummy_plugin,
+                                   standard_files,
+                                   texture_files,
+                                   incompressible_files)
 
 [[nodiscard]] inline auto Settings::get(Game game) -> const Settings &
 {
