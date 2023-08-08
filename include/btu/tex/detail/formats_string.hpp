@@ -4,6 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 #pragma once
+#include <btu/common/json.hpp>
 #include <btu/tex/dxtex.hpp>
 
 #include <array>
@@ -27,7 +28,6 @@ struct StringFormat
 };
 
 constexpr std::array k_dxgi_formats = std::to_array<StringFormat>({
-
     // List does not include _TYPELESS or depth/stencil formats_string
     DEFFMT(R32G32B32A32_FLOAT),
     DEFFMT(R32G32B32A32_UINT),
@@ -116,8 +116,30 @@ constexpr std::array k_dxgi_formats = std::to_array<StringFormat>({
 inline auto to_string(DXGI_FORMAT format) -> std::u8string_view
 {
     // NOLINTNEXTLINE(readability-qualified-auto): gcc iterator is a pointer, not MSVC's iterator
-    const auto it = std::ranges::find_if(detail::k_dxgi_formats, [&](auto &&f) { return f.format == format; });
+    const auto it = std::ranges::find(detail::k_dxgi_formats, format, &detail::StringFormat::format);
 
     return it != detail::k_dxgi_formats.cend() ? it->name : u8"DXGI_FORMAT_UNKNOWN";
 }
+
+inline auto from_string(std::u8string_view str) -> DXGI_FORMAT
+{
+    // NOLINTNEXTLINE(readability-qualified-auto): see above
+    const auto it = std::ranges::find(detail::k_dxgi_formats, str, &detail::StringFormat::name);
+
+    return it != detail::k_dxgi_formats.cend() ? it->format : DXGI_FORMAT_UNKNOWN;
+}
+
 } // namespace btu::tex
+
+namespace nlohmann {
+template<>
+struct adl_serializer<DXGI_FORMAT>
+{
+    static void to_json(json &j, const DXGI_FORMAT &format) { j = btu::tex::to_string(format); }
+
+    static void from_json(const json &j, DXGI_FORMAT &format)
+    {
+        format = btu::tex::from_string(btu::common::as_utf8(j.get<std::string>()));
+    }
+};
+} // namespace nlohmann

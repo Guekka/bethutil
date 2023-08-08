@@ -33,7 +33,8 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/tex/optimize.hpp"
     "${INCLUDE_DIR}/btu/tex/texture.hpp"
     "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
-    "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp")
+    "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp"
+    ../include/btu/common/json.hpp)
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
@@ -99,6 +100,9 @@ target_link_libraries("${PROJECT_NAME}" PRIVATE bc7enc::bc7enc)
 
 find_package(mpsc_channel CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE mpsc::mpsc_channel)
+
+find_package(nlohmann_json CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE nlohmann_json::nlohmann_json)
 
 if(${BETHUTIL_HKX})
   find_package(reproc++ CONFIG REQUIRED)
