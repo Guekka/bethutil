@@ -50,7 +50,7 @@ public:
     /// \arg transformer Function that takes a file content and returns a new content. If the function returns
     /// std::nullopt, the file is not changed.
     /// \note For optimal performance, it is recommended to return std::nullopt for files that do not need to be changed.
-    void transform(Transformer &&transformer, ArchiveTooLargeHandler &&archive_too_large_handler);
+    void transform(const Transformer &transformer, ArchiveTooLargeHandler &&archive_too_large_handler);
 
     /// Iterate over all files in the folder, including files in archives.
     /// Multithreaded.
@@ -69,7 +69,8 @@ private:
     // This function is used to implement transform() and one of the iterate() functions.
     // The reason for it to be private is that while it is `const`, it is not `const` semantically: it modifies the
     // folder
-    void transform_impl(Transformer &&transformer, ArchiveTooLargeHandler &&archive_too_large_handler) const;
+    void transform_impl(const Transformer &transformer,
+                        ArchiveTooLargeHandler &&archive_too_large_handler) const;
 
     Path dir_;
     btu::bsa::Settings bsa_settings_;

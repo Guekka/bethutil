@@ -20,12 +20,12 @@ TEST_CASE("is_equiv", "[src]")
 TEST_CASE("to_underlying", "[src]")
 {
     using btu::common::to_underlying;
-    enum class E : std::uint16_t
+    enum class E : std::uint8_t
     {
         val = 4
     };
 
-    STATIC_REQUIRE(std::is_same_v<decltype(to_underlying(E::val)), std::uint16_t>);
+    STATIC_REQUIRE(std::is_same_v<decltype(to_underlying(E::val)), std::uint8_t>);
     STATIC_REQUIRE(to_underlying(E::val) == 4);
 }
 

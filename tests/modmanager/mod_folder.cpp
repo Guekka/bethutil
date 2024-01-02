@@ -27,7 +27,7 @@ TEST_CASE("ModFolder", "[src]")
         [&](btu::modmanager::ModFolder::ModFile &&f) {
             const auto out = dir / "output" / f.relative_path;
             btu::fs::create_directories(out.parent_path());
-            btu::common::write_file(out, *f.content);
+            btu::common::write_file(out, std::move(*f.content));
         },
         archive_too_large_handler);
     REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
@@ -45,7 +45,7 @@ TEST_CASE("ModFolder transform", "[src]")
     mf.transform(
         [](btu::modmanager::ModFolder::ModFile &&f) {
             f.content->back() = std::byte{'0'}; // Change one byte
-            return std::make_optional(std::move(*f.content));
+            return std::make_optional(*std::move(f.content));
         },
         archive_too_large_handler);
 

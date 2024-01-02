@@ -55,7 +55,7 @@ auto ModFolder::size() const -> size_t
 {
     std::atomic<size_t> size = 0;
     iterate([&size](const Path &) { size += 1; },
-            [&size](const Path &, bsa::Archive &&archive) { size += archive.size(); });
+            [&size](const Path &, const bsa::Archive &archive) { size += archive.size(); });
 
     return size;
 }
@@ -71,10 +71,10 @@ void ModFolder::iterate(const std::function<void(ModFile)> &visitor,
         std::move(archive_too_large_handler));
 }
 
-void ModFolder::transform(ModFolder::Transformer &&transformer,
+void ModFolder::transform(const ModFolder::Transformer &transformer,
                           ArchiveTooLargeHandler &&archive_too_large_handler)
 {
-    transform_impl(std::move(transformer), std::move(archive_too_large_handler));
+    transform_impl(transformer, std::move(archive_too_large_handler));
 }
 
 /**
@@ -115,7 +115,7 @@ void ModFolder::transform(ModFolder::Transformer &&transformer,
     return target;
 }
 
-void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
+void ModFolder::transform_impl(const ModFolder::Transformer &transformer,
                                ArchiveTooLargeHandler &&archive_too_large_handler) const
 {
     iterate(
@@ -127,7 +127,10 @@ void ModFolder::transform_impl(ModFolder::Transformer &&transformer,
             if (transformed)
                 common::write_file(dir_ / relative_path, *transformed);
         },
-        [&transformer, this, &archive_too_large_handler](const Path &archive_path, bsa::Archive &&archive) {
+        [&transformer,
+         this,
+         archive_too_large_handler = std::move(archive_too_large_handler)](const Path &archive_path,
+                                                                           bsa::Archive &&archive) {
             // Check if the archive is too large and the caller wants to skip it
             auto check_archive_and_skip = [&](ArchiveTooLargeState state) {
                 if (archive.file_size() > bsa_settings_.max_size)

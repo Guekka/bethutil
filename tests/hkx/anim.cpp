@@ -8,12 +8,12 @@
 
 #include <filesystem>
 
-const Path dir     = "convert-hkx";
-const Path exe_dir = "exe";
+const Path k_dir     = "convert-hkx";
+const Path k_exe_dir = "exe";
 
 void convert(btu::Game target_game, const Path &input, const Path &output)
 {
-    const auto exe = btu::hkx::AnimExe::make(exe_dir);
+    const auto exe = btu::hkx::AnimExe::make(k_exe_dir);
     if (!exe)
     {
         INFO(exe.error());
@@ -31,12 +31,12 @@ void convert(btu::Game target_game, const Path &input, const Path &output)
 
 TEST_CASE("Converting from LE to SE", "[src]")
 {
-    convert(btu::Game::SSE, dir / "LE_INPUT.hkx", dir / "LE_OUTPUT.hkx");
-    CHECK(btu::common::compare_files(dir / "LE_EXPECTED.hkx", dir / "LE_OUTPUT.hkx"));
+    convert(btu::Game::SSE, k_dir / "LE_INPUT.hkx", k_dir / "LE_OUTPUT.hkx");
+    CHECK(btu::common::compare_files(k_dir / "LE_EXPECTED.hkx", k_dir / "LE_OUTPUT.hkx"));
 }
 
-TEST_CASE("Converting from SE to LE", "[src]" FAIL_ON_LINUX_TAG)
+TEST_CASE("Converting from SE to LE", std::string("[src]") + std::string(k_fail_on_linux_tag))
 {
-    convert(btu::Game::SLE, dir / "SE_INPUT.hkx", dir / "SE_OUTPUT.hkx");
-    CHECK(btu::common::compare_files(dir / "SE_EXPECTED.hkx", dir / "SE_OUTPUT.hkx"));
+    convert(btu::Game::SLE, k_dir / "SE_INPUT.hkx", k_dir / "SE_OUTPUT.hkx");
+    CHECK(btu::common::compare_files(k_dir / "SE_EXPECTED.hkx", k_dir / "SE_OUTPUT.hkx"));
 }

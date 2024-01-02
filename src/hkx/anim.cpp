@@ -37,10 +37,7 @@ public:
     {
         return "OUTFILE64.hkx";
     }
-    [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override
-    {
-        return btu::Game::SSE;
-    }
+    [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override { return btu::Game::SSE; }
 
     [[nodiscard]] auto get_required_files([[maybe_unused]] const Path &exe_dir) const noexcept
         -> std::vector<Path> override
@@ -57,10 +54,7 @@ public:
         return {(exe_dir / name()).string(), std::string(input_file_name())};
     }
 
-    [[nodiscard]] auto is_os_supported() const noexcept -> bool override
-    {
-        return true;
-    }
+    [[nodiscard]] auto is_os_supported() const noexcept -> bool override { return true; }
 };
 static inline const auto k_exe_32to64 = Info32to64{};
 
@@ -123,7 +117,7 @@ auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
 {
     static std::atomic<uint32_t> counter{0};
     const auto dir_name = "TEMPDIR_btu__hkx" + std::to_string(counter++);
-    const auto dir_path = fs::temp_directory_path() / dir_name;
+    auto dir_path       = fs::temp_directory_path() / dir_name;
 
     auto ec = std::error_code{};
     fs::create_directory(dir_path, ec);
@@ -138,7 +132,7 @@ auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
     -> tl::expected<int, Error>
 {
     for (const auto &arg : args)
-        std::cout << arg << std::endl;
+        std::cout << arg << '\n' << std::flush;
     auto [result, ec] = reproc::run(args, options);
     if (ec)
         return tl::make_unexpected(Error(ec));
@@ -177,7 +171,7 @@ struct ReprocOptions : public reproc::options
     return options;
 }
 
-/// hardlink all required files from exe_dir to working_dir
+/// hardlink all required files from k_exe_dir to working_dir
 [[nodiscard]] auto prepare_input_folder(const Path &working_dir,
                                         const Path &exe_dir,
                                         const detail::AnimExeRef exe_info) -> ResultError

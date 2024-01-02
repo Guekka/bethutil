@@ -69,6 +69,11 @@ public:
         return std::memcmp(value_.data(), other, k_length) == 0;
     }
 
+    [[nodiscard]] auto operator==(const std::array<char, k_length> &other) const noexcept -> bool
+    {
+        return std::memcmp(value_.data(), other.data(), other.size()) == 0;
+    }
+
 private:
     std::string_view value_;
 };

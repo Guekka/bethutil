@@ -13,7 +13,6 @@ namespace btu {
 namespace fs   = std::filesystem;
 using Path     = fs::path;
 using OsString = Path::string_type;
-using OsChar   = OsString::value_type;
 
 namespace common {
 /// @brief Convert backslashes to slashes in path.

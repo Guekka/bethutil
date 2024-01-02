@@ -21,7 +21,7 @@ auto decompress(Texture &&file) -> Result
         return tl::make_unexpected(error_from_hresult(hr));
 
     file.set(std::move(timage));
-    return file;
+    return std::move(file);
 }
 
 auto make_transparent_alpha(Texture &&file) -> Result
@@ -54,7 +54,7 @@ auto make_transparent_alpha(Texture &&file) -> Result
         return tl::make_unexpected(error_from_hresult(hr));
 
     file.set(std::move(timage));
-    return file;
+    return std::move(file);
 }
 
 auto convert_uncompressed(const ScratchImage &image,
@@ -173,7 +173,7 @@ auto convert(Texture &&file, DXGI_FORMAT format, const std::optional<Compression
         return tl::make_unexpected(error_from_hresult(hr));
 
     file.set(std::move(timage));
-    return file;
+    return std::move(file);
 }
 
 auto prepare_generate_mipmaps(Texture &&file) -> Result
@@ -201,7 +201,7 @@ auto prepare_generate_mipmaps(Texture &&file) -> Result
     }
 
     file.set(std::move(timage));
-    return file;
+    return std::move(file);
 }
 
 auto generate_mipmaps_impl(Texture &&file) -> Result
@@ -222,7 +222,7 @@ auto generate_mipmaps_impl(Texture &&file) -> Result
         return tl::make_unexpected(error_from_hresult(hr));
 
     file.set(std::move(timage));
-    return file;
+    return std::move(file);
 }
 
 auto generate_mipmaps(Texture &&file) -> Result
@@ -246,7 +246,7 @@ auto resize(Texture &&file, Dimension dim) -> Result
         return tl::make_unexpected(error_from_hresult(hr));
 
     file.set(std::move(timage));
-    return file;
+    return std::move(file);
 }
 
 } // namespace btu::tex

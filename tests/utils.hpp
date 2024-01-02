@@ -7,13 +7,13 @@
 #include <fstream>
 
 #ifdef __unix__
-#define FAIL_ON_LINUX_TAG "[!nonportable] [!shouldfail]"
+constexpr std::string_view k_fail_on_linux_tag = "[!nonportable] [!shouldfail]";
 #else
 #define FAIL_ON_LINUX_TAG "[!nonportable]"
 #endif
 
-using btu::Path;
-using namespace std::literals;
+using btu::Path;               // NOLINT(google-global-names-in-headers)
+using namespace std::literals; // NOLINT(google-global-names-in-headers)
 
 namespace Catch {
 template<typename T, typename E>
