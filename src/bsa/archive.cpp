@@ -223,8 +223,8 @@ auto Archive::read(Path path) -> std::optional<Archive>
  * @param path The path of the file to be written.
  */
 template<typename Archive, typename WriteFunc>
-void do_write(Archive &&arch, WriteFunc &&write_func, fs::path path) requires
-    std::is_rvalue_reference_v<decltype(arch)> && std::is_invocable_v<WriteFunc, Archive, fs::path>
+void do_write(Archive &&arch, WriteFunc &&write_func, fs::path path)
+    requires std::is_rvalue_reference_v<decltype(arch)> && std::is_invocable_v<WriteFunc, Archive, fs::path>
 {
     auto write_and_check = [&](fs::path p) {
         std::forward<WriteFunc>(write_func)(BTU_MOV(arch), p);
@@ -267,8 +267,7 @@ void Archive::write(btu::Path path) &&
             {
                 bsa.insert(elem.first, std::move(elem.second).as_raw_file<libbsa::tes3::file>());
             }
-            do_write(
-                BTU_MOV(bsa), [](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path)); }, BTU_MOV(path));
+            do_write(BTU_MOV(bsa), [](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path)); }, BTU_MOV(path));
             return;
         }
         case btu::bsa::ArchiveVersion::tes4:
@@ -360,7 +359,7 @@ auto Archive::get(const std::string &name) -> File &
 {
     return files_.try_emplace(name, ver_).first->second;
 }
-bool Archive::empty() const noexcept
+auto Archive::empty() const noexcept -> bool
 {
     return files_.empty();
 }

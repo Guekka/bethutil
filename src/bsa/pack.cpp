@@ -121,7 +121,7 @@ struct PackGroup
     -> flux::generator<bsa::Archive &&>
 {
     auto [thread, receiver] = common::make_producer_mt<bsa::Archive::value_type>(
-        std::move(file_paths), [&](Path absolute_path) -> bsa::Archive::value_type {
+        std::move(file_paths), [&](const Path &absolute_path) -> bsa::Archive::value_type {
             auto file = prepare_file(absolute_path, settings, type);
             return {fs::relative(absolute_path, settings.input_dir).string(), BTU_MOV(file)};
         });
@@ -137,7 +137,7 @@ struct PackGroup
             continue;
         }
 
-        // if we are here, the file does not fit into the archive
+        // if we are here, the file does not fit into the archive,
         // so we yield the current archive and start a new one
         co_yield std::exchange(arch, make_arch());
 

@@ -35,6 +35,13 @@ struct DeletableFacet : Facet
         : Facet(std::forward<Args>(args)...)
     {
     }
+
+    DeletableFacet(const DeletableFacet &)            = delete;
+    DeletableFacet &operator=(const DeletableFacet &) = delete;
+
+    DeletableFacet(DeletableFacet &&)            = default;
+    DeletableFacet &operator=(DeletableFacet &&) = default;
+
     ~DeletableFacet() override = default;
 };
 
@@ -71,6 +78,7 @@ void concat_codepoint(std::u8string &string, U8Unit cp)
     const auto oldsize = string.size();
     const auto cp_size = utf8codepointsize(cp);
     string.resize(oldsize + cp_size);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     utf8catcodepoint(string.data() + oldsize, cp, cp_size);
 }
 
