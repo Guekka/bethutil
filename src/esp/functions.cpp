@@ -59,12 +59,13 @@ auto list_headparts(std::fstream file) noexcept -> tl::expected<std::vector<std:
         // skip non headpart groups
         if (header.plugin.label != detail::k_group_hdpt)
         {
-            file.seekg(header.plugin.group_size - sizeof header, std::ios::cur);
+            file.seekg(static_cast<std::streamsize>(header.plugin.group_size - sizeof header), std::ios::cur);
             continue;
         }
 
         //Reading all headpart records
-        const int64_t group_end_pos = header.plugin.group_size - sizeof header + file.tellg();
+        const auto group_end_pos = static_cast<std::streamsize>(header.plugin.group_size - sizeof header)
+                                   + file.tellg();
         while (file.tellg() < group_end_pos)
         {
             read_headers(file, header);
@@ -124,15 +125,16 @@ auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::ve
         // skip other groups
         if (header.plugin.label != detail::k_group_ltex && header.plugin.label != detail::k_group_txst)
         {
-            file.seekg(header.plugin.group_size - sizeof header, std::ios::cur);
+            file.seekg(static_cast<std::streamsize>(header.plugin.group_size - sizeof header), std::ios::cur);
             continue;
         }
 
-        char signature_group[4];
-        memcpy(signature_group, header.plugin.label, 4);
+        std::array<char, 4> signature_group{};
+        std::copy_n(std::begin(header.plugin.label), signature_group.size(), signature_group.begin());
 
         //Reading all records
-        const int64_t group_end_pos = header.plugin.group_size - sizeof header + file.tellg();
+        const auto group_end_pos = static_cast<std::streamsize>(header.plugin.group_size - sizeof header)
+                                   + file.tellg();
         while (file.tellg() < group_end_pos)
         {
             read_headers(file, header);
