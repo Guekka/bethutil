@@ -37,7 +37,10 @@ public:
     {
         return "OUTFILE64.hkx";
     }
-    [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override { return btu::Game::SSE; }
+    [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override
+    {
+        return btu::Game::SSE;
+    }
 
     [[nodiscard]] auto get_required_files([[maybe_unused]] const Path &exe_dir) const noexcept
         -> std::vector<Path> override
@@ -54,7 +57,10 @@ public:
         return {(exe_dir / name()).string(), std::string(input_file_name())};
     }
 
-    [[nodiscard]] auto is_os_supported() const noexcept -> bool override { return true; }
+    [[nodiscard]] auto is_os_supported() const noexcept -> bool override
+    {
+        return true;
+    }
 };
 static inline const auto k_exe_32to64 = Info32to64{};
 
