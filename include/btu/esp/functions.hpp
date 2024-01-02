@@ -5,6 +5,7 @@
 #include <btu/esp/error_code.hpp>
 #include <tl/expected.hpp>
 
+#include <array>
 #include <cstring>
 #include <vector>
 
