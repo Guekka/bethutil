@@ -9,7 +9,7 @@
 #ifdef __unix__
 constexpr std::string_view k_fail_on_linux_tag = "[!nonportable] [!shouldfail]";
 #else
-#define FAIL_ON_LINUX_TAG "[!nonportable]"
+constexpr std::string_view k_fail_on_linux_tag = "[!nonportable]";
 #endif
 
 using btu::Path;               // NOLINT(google-global-names-in-headers)
