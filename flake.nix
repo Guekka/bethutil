@@ -1,7 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
-    vcpkg-repo.url = "github:Guekka/nixpkgs/vcpkg";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     systems.url = "github:nix-systems/default";
     devenv.url = "github:cachix/devenv";
   };
@@ -9,7 +8,6 @@
   outputs = {
     self,
     nixpkgs,
-    vcpkg-repo,
     devenv,
     systems,
     ...
@@ -20,16 +18,15 @@
       forEachSystem
       (system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        vcpkg = vcpkg-repo.legacyPackages.${system}.vcpkg;
       in {
         default = devenv.lib.mkShell {
           inherit inputs pkgs;
           modules = [
             {
-              packages = [pkgs.cmake pkgs.ninja pkgs.pkg-config pkgs.gcc vcpkg pkgs.libgccjit];
+              packages = [pkgs.cmake pkgs.ninja pkgs.pkg-config pkgs.gcc pkgs.vcpkg pkgs.libgccjit];
 
               enterShell = ''
-                export VCPKG_ROOT="$HOME/.local/share/vcpkg/root"
+                export VCPKG_ROOT=$(realpath $(dirname $(readlink -f $(type -p vcpkg)))/../share/vcpkg)
               '';
             }
           ];
