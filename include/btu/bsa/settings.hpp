@@ -171,7 +171,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
                                      AllowedPath{u8".strings", {u8"strings"}},
                                      AllowedPath{u8".swf", {u8"interface"}},
                                      AllowedPath{u8".txt", {u8"interface", u8"meshes", u8"scripts"}},
-                                     AllowedPath{u8".wav", {u8"sound"}},
+                                     AllowedPath{u8".wav", {u8"music", u8"sound"}},
                                      AllowedPath{u8".xml", {u8"dialogueviews"}},
                                      AllowedPath{u8".xwm", {u8"music", u8"sound"}}};
         return sets;
