@@ -166,7 +166,6 @@ struct bind_back_fn
 };
 } // namespace detail
 
-/// \ingroup group-utility
 /// \sa `bind_back_fn`
 inline constexpr detail::bind_back_fn bind_back{};
 
