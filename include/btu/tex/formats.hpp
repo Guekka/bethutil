@@ -52,7 +52,7 @@ enum class AllowCompressed
     No,
 };
 
-NLOHMANN_JSON_SERIALIZE_ENUM(AllowCompressed, {{AllowCompressed::Yes, "yes"}, {AllowCompressed::No, "no"}})
+NLOHMANN_JSON_SERIALIZE_ENUM(AllowCompressed, {{AllowCompressed::Yes, "yes"}, {AllowCompressed::No, "no"}});
 
 /// Based on https://forums.nexusmods.com/index.php?/topic/476227-skyrim-nif-files-with-underscores/
 auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<TextureType>;
