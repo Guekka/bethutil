@@ -63,7 +63,7 @@ struct PackGroup
     });
 
     // if we have separate texture archives, partition textures and standard files
-    if (sets.texture_version.has_value())
+    if (sets.has_texture_version)
     {
         // put textures at the end of the list
         auto [textures_start, _] = std::ranges::stable_partition(packable_files, [&](const auto &file) {
@@ -77,34 +77,20 @@ struct PackGroup
     return {.standard = BTU_MOV(packable_files), .texture = {}};
 }
 
-[[nodiscard]] auto get_version(const Settings &sets, ArchiveType type) -> ArchiveVersion
-{
-    switch (type)
-    {
-        case ArchiveType::Textures:
-        {
-            assert(sets.texture_version.has_value());
-            return sets.texture_version.value();
-        }
-        case ArchiveType::Standard:
-        {
-            return sets.version;
-        }
-    }
-    libbsa::detail::declare_unreachable();
-}
-
 [[nodiscard]] auto prepare_file(const Path &file_path,
                                 const PackSettings &sets,
                                 ArchiveType type) noexcept -> File
 {
-    auto file = File{get_version(sets.game_settings, type)};
+    auto file = File{sets.game_settings.version, type};
     file.read(file_path);
 
-    const bool fo4dx        = file.version() == ArchiveVersion::fo4dx;
+    const bool dx = (file.version() == ArchiveVersion::fo4 || file.version() == ArchiveVersion::starfield)
+                    && type == ArchiveType::Textures;
+
     const bool compressible = get_filetype(file_path, sets.input_dir, sets.game_settings)
                               != FileTypes::Incompressible;
-    if ((sets.compress == Compression::Yes && compressible) || fo4dx) // fo4dx is always compressed
+
+    if ((sets.compress == Compression::Yes && compressible) || dx) // dx is always compressed
         file.compress();
     return file;
 }
@@ -124,7 +110,7 @@ struct PackGroup
             return {relative(absolute_path, settings.input_dir).string(), BTU_MOV(file)};
         });
 
-    auto make_arch = [&] { return Archive{get_version(settings.game_settings, type), type}; };
+    auto make_arch = [&] { return Archive{settings.game_settings.version, type}; };
     auto arch      = make_arch();
 
     for (auto [relative_path, file] : receiver)

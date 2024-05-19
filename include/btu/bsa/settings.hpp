@@ -39,6 +39,15 @@ static constexpr auto fo4 = std::to_array<uint8_t>(
     {0x54, 0x45, 0x53, 0x34, 0x19, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      0x00, 0x00, 0x00, 0x83, 0x00, 0x00, 0x00, 0x48, 0x45, 0x44, 0x52, 0x0C, 0x00, 0x33, 0x33, 0x73, 0x3F,
      0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x43, 0x4E, 0x41, 0x4D, 0x01, 0x00, 0x00});
+
+static constexpr auto starfield = std::to_array<uint8_t>(
+    {0x54, 0x45, 0x53, 0x34, 0x50, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x2B, 0x02, 0x00, 0x00, 0x48, 0x45, 0x44, 0x52, 0x0C, 0x00,
+     0x8F, 0xC2, 0x75, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x43, 0x4E, 0x41,
+     0x4D, 0x01, 0x00, 0x00, 0x4D, 0x41, 0x53, 0x54, 0x0E, 0x00, 0x53, 0x74, 0x61, 0x72, 0x66,
+     0x69, 0x65, 0x6C, 0x64, 0x2E, 0x65, 0x73, 0x6D, 0x00, 0x4D, 0x41, 0x53, 0x54, 0x1D, 0x00,
+     0x42, 0x6C, 0x75, 0x65, 0x70, 0x72, 0x69, 0x6E, 0x74, 0x53, 0x68, 0x69, 0x70, 0x73, 0x2D,
+     0x53, 0x74, 0x61, 0x72, 0x66, 0x69, 0x65, 0x6C, 0x64, 0x2E, 0x65, 0x73, 0x6D, 0x00});
 } // namespace dummy
 
 enum class FileTypes
@@ -83,7 +92,7 @@ struct Settings
     uint64_t max_size{};
 
     ArchiveVersion version{};
-    std::optional<ArchiveVersion> texture_version;
+    bool has_texture_version;
 
     std::optional<std::u8string> suffix;
     std::optional<std::u8string> texture_suffix;
@@ -92,6 +101,7 @@ struct Settings
 
     std::vector<std::u8string> plugin_extensions;
     std::optional<std::vector<uint8_t>> s_dummy_plugin;
+    std::u8string dummy_extension;
 
     std::vector<AllowedPath> standard_files;
     std::vector<AllowedPath> texture_files;
@@ -104,7 +114,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
                                    game,
                                    max_size,
                                    version,
-                                   texture_version,
+                                   has_texture_version,
                                    suffix,
                                    texture_suffix,
                                    extension,
@@ -120,15 +130,16 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
 
     static const Settings default_sets = [=] {
         Settings sets;
-        sets.game              = Game::SSE;
-        sets.max_size          = 2000ULL * megabyte;
-        sets.version           = ArchiveVersion::sse;
-        sets.texture_version   = ArchiveVersion::sse;
-        sets.texture_suffix    = u8"Textures";
-        sets.extension         = u8".bsa";
-        sets.plugin_extensions = {u8".esl", u8".esm", u8".esp"};
-        sets.s_dummy_plugin    = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
-        sets.standard_files    = {
+        sets.game                = Game::SSE;
+        sets.max_size            = 2000ULL * megabyte;
+        sets.version             = ArchiveVersion::sse;
+        sets.has_texture_version = true;
+        sets.texture_suffix      = u8"Textures";
+        sets.extension           = u8".bsa";
+        sets.plugin_extensions   = {u8".esl", u8".esm", u8".esp"};
+        sets.s_dummy_plugin      = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
+        sets.dummy_extension     = u8".esp";
+        sets.standard_files      = {
             AllowedPath{u8".bgem", {u8"materials"}},
             AllowedPath{u8".bgsm", {u8"materials"}},
             AllowedPath{u8".bto", {u8"meshes"}},
@@ -182,13 +193,13 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
         case Game::TES4:
         {
             static const Settings sets_tes4 = [=] {
-                Settings s          = default_sets;
-                s.game              = Game::TES4;
-                s.version           = ArchiveVersion::tes4;
-                s.texture_version   = std::nullopt;
-                s.texture_suffix    = std::nullopt;
-                s.plugin_extensions = {u8".esm", u8".esp"};
-                s.s_dummy_plugin    = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
+                Settings s            = default_sets;
+                s.game                = Game::TES4;
+                s.version             = ArchiveVersion::tes4;
+                s.has_texture_version = false;
+                s.texture_suffix      = std::nullopt;
+                s.plugin_extensions   = {u8".esm", u8".esp"};
+                s.s_dummy_plugin      = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
                 return s;
             }();
             return sets_tes4;
@@ -196,13 +207,13 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
         case Game::FNV:
         {
             static const Settings sets_fnv = [=] {
-                Settings s          = default_sets;
-                s.game              = Game::FNV;
-                s.version           = ArchiveVersion::tes5;
-                s.texture_version   = std::nullopt;
-                s.texture_suffix    = std::nullopt;
-                s.plugin_extensions = {u8".esm", u8".esp"};
-                s.s_dummy_plugin    = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
+                Settings s            = default_sets;
+                s.game                = Game::FNV;
+                s.version             = ArchiveVersion::tes5;
+                s.has_texture_version = false;
+                s.texture_suffix      = std::nullopt;
+                s.plugin_extensions   = {u8".esm", u8".esp"};
+                s.s_dummy_plugin      = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
                 return s;
             }();
             return sets_fnv;
@@ -210,14 +221,14 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
         case Game::SLE:
         {
             static const Settings sets_sle = [=] {
-                Settings s          = default_sets;
-                s.game              = Game::SLE;
-                s.version           = ArchiveVersion::tes5;
-                s.texture_version   = std::nullopt;
-                s.suffix            = {};
-                s.texture_suffix    = std::nullopt;
-                s.plugin_extensions = {u8".esm", u8".esp"};
-                s.s_dummy_plugin    = std::vector(std::begin(dummy::tes5), std::end(dummy::tes5));
+                Settings s            = default_sets;
+                s.game                = Game::SLE;
+                s.version             = ArchiveVersion::tes5;
+                s.has_texture_version = false;
+                s.suffix              = {};
+                s.texture_suffix      = std::nullopt;
+                s.plugin_extensions   = {u8".esm", u8".esp"};
+                s.s_dummy_plugin      = std::vector(std::begin(dummy::tes5), std::end(dummy::tes5));
                 return s;
             }();
             return sets_sle;
@@ -226,20 +237,33 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
         case Game::FO4:
         {
             static const Settings sets_fo4 = [=] {
-                Settings s        = default_sets;
-                s.game            = Game::FO4;
-                s.version         = ArchiveVersion::fo4;
-                s.texture_version = ArchiveVersion::fo4dx;
-                s.max_size        = 4000ULL * megabyte;
-                s.extension       = u8".ba2";
-                s.suffix          = u8"Main";
-                s.texture_files   = {AllowedPath{u8".dds", {u8"textures", u8"interface"}}};
+                Settings s            = default_sets;
+                s.game                = Game::FO4;
+                s.version             = ArchiveVersion::fo4;
+                s.max_size            = 4000ULL * megabyte;
+                s.extension           = u8".ba2";
+                s.suffix              = u8"Main";
+                s.texture_files       = {AllowedPath{u8".dds", {u8"textures", u8"interface"}}};
+                s.has_texture_version = true;
                 s.standard_files.emplace_back(AllowedPath{u8".png", {u8"textures"}});
                 s.standard_files.emplace_back(AllowedPath{u8".uvd", {u8"vis"}});
                 s.s_dummy_plugin = std::vector(std::begin(dummy::fo4), std::end(dummy::fo4));
                 return s;
             }();
             return sets_fo4;
+        }
+        case Game::Starfield:
+        {
+            static const Settings sets_starfield = [=] {
+                Settings s            = get(Game::FO4);
+                s.game                = Game::Starfield;
+                s.version             = ArchiveVersion::starfield;
+                s.has_texture_version = true;
+                s.s_dummy_plugin      = std::vector(std::begin(dummy::starfield), std::end(dummy::starfield));
+                s.dummy_extension     = u8".esm";
+                return s;
+            }();
+            return sets_starfield;
         }
         default: return default_sets;
     }
