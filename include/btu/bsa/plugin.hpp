@@ -44,10 +44,7 @@ private:
 
 namespace detail {
 template<typename It>
-requires requires(It it)
-{
-    fs::path(it->path());
-}
+    requires requires(It it) { fs::path(it->path()); }
 auto list_helper(It begin, It end, const Settings &sets, FileTypes type) -> std::vector<FilePath>
 {
     std::vector<FilePath> res;
