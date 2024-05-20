@@ -15,7 +15,10 @@
 namespace btu::tex {
 namespace detail {
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage): we need to stringify the enum
-#define DEFFMT(fmt) {u8## #fmt, DXGI_FORMAT_##fmt}
+#define DEFFMT(fmt)                  \
+    {                                \
+        u8## #fmt, DXGI_FORMAT_##fmt \
+    }
 
 struct StringFormat
 {

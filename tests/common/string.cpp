@@ -18,10 +18,10 @@ TEST_CASE("UTF8 Iterator", "[src]")
     SECTION("Random data")
     {
         const auto data = std::to_array<std::u8string>({
-            u8R"(F)", u8R"(񗑴)", u8R"(N)",  u8R"(:)",  u8R"(f)", u8R"(9)", u8R"(򅁱)", u8R"(Ȁ)",
-            u8R"(㈗)", u8R"({)",  u8R"(򦄃)", u8R"(g)",  u8R"()", u8R"(Μ)", u8R"(\)",  u8R"(Ĺ)",
-            u8R"(i)", u8R"(ӆ)",  u8R"(ᔔ)",  u8R"(򊒏)", u8R"(ܨ)", u8R"(ꬵ)", u8R"(ρ)",  u8R"(Ħ)",
-            u8R"(Ҥ)", u8R"(ģ)",  u8R"(𦖋)", u8R"(㱏)",  u8R"(ሐ)", u8R"(4)", u8R"(=)",
+            u8R"(F)",  u8R"(񗑴)", u8R"(N)",    u8R"(:)",    u8R"(f)",   u8R"(9)", u8R"(򅁱)", u8R"(Ȁ)",
+            u8R"(㈗)", u8R"({)",    u8R"(򦄃)", u8R"(g)",    u8R"()", u8R"(Μ)", u8R"(\)",    u8R"(Ĺ)",
+            u8R"(i)",  u8R"(ӆ)",    u8R"(ᔔ)",    u8R"(򊒏)", u8R"(ܨ)",   u8R"(ꬵ)", u8R"(ρ)",    u8R"(Ħ)",
+            u8R"(Ҥ)",  u8R"(ģ)",    u8R"(𦖋)",   u8R"(㱏)",   u8R"(ሐ)",   u8R"(4)", u8R"(=)",
         });
 
         const auto string = std::reduce(data.begin(), data.end(), std::u8string{});
