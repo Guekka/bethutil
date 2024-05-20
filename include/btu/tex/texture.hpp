@@ -28,7 +28,7 @@ using DirectX::TexMetadata;
 
 struct Dimension;
 
-[[maybe_unused]] constexpr auto canonize_path = btu::common::make_path_canonizer(u8"textures/");
+[[maybe_unused]] constexpr auto canonize_path = common::make_path_canonizer(u8"textures/");
 
 class Texture
 {

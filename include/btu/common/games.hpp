@@ -3,7 +3,7 @@
 #include <btu/common/json.hpp>
 
 namespace btu {
-enum class Game
+enum class Game : std::uint8_t
 {
     TES3,
     TES4,

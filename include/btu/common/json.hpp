@@ -42,22 +42,22 @@ struct variant_switch<0>
 namespace std {
 inline void to_json(nlohmann::json &j, const u8string &str)
 {
-    j = ::btu::common::as_ascii(str);
+    j = btu::common::as_ascii(str);
 }
 
 inline void from_json(const nlohmann::json &j, u8string &str)
 {
-    str = ::btu::common::as_utf8(j.get<std::string>());
+    str = btu::common::as_utf8(j.get<std::string>());
 }
 
 inline void to_json(nlohmann::json &j, const u8string_view &str)
 {
-    j = ::btu::common::as_ascii(str);
+    j = btu::common::as_ascii(str);
 }
 
 inline void from_json(const nlohmann::json &j, u8string_view &str)
 {
-    str = ::btu::common::as_utf8(j.get<std::string>());
+    str = btu::common::as_utf8(j.get<std::string>());
 }
 
 } // namespace std
@@ -65,7 +65,7 @@ inline void from_json(const nlohmann::json &j, u8string_view &str)
 namespace nlohmann {
 
 template<typename T>
-struct adl_serializer<::std::optional<T>>
+struct adl_serializer<std::optional<T>>
 {
     static void to_json(json &j, const std::optional<T> &opt)
     {
@@ -80,12 +80,12 @@ struct adl_serializer<::std::optional<T>>
         if (j.is_null())
             opt = std::nullopt;
         else
-            opt = j.template get<T>();
+            opt = j.get<T>();
     }
 };
 
 template<typename... Args>
-struct adl_serializer<::std::variant<Args...>>
+struct adl_serializer<std::variant<Args...>>
 {
     static void to_json(json &j, std::variant<Args...> const &v)
     {
@@ -105,7 +105,7 @@ struct adl_serializer<::std::variant<Args...>>
 };
 
 template<>
-struct adl_serializer<::std::monostate>
+struct adl_serializer<std::monostate>
 {
     static void to_json(json &j, std::monostate const &) { j = nullptr; }
 

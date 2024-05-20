@@ -11,12 +11,12 @@
 
 namespace btu::common {
 template<class... Ts>
-struct overload : Ts...
+struct Overload : Ts...
 {
     using Ts::operator()...;
 };
 template<class... Ts>
-overload(Ts...) -> overload<Ts...>;
+Overload(Ts...) -> Overload<Ts...>;
 
 template<typename E>
     requires std::is_enum_v<E>
@@ -68,7 +68,7 @@ constexpr bool is_mutable_lambda_v = is_mutable_lambda<T>::value;
 
 /// See https://en.cppreference.com/w/cpp/utility/forward_like
 template<class T, class U>
-[[nodiscard]] constexpr auto &&forward_like(U &&x) noexcept
+[[nodiscard]] constexpr auto forward_like(U &&x) noexcept -> decltype(auto)
 {
     constexpr bool is_adding_const = std::is_const_v<std::remove_reference_t<T>>;
     if constexpr (std::is_lvalue_reference_v<T &&>)

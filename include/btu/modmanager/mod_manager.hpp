@@ -6,12 +6,10 @@
 
 #include "btu/modmanager/mod_folder.hpp"
 
-#include <flux.hpp>
-
 namespace btu::modmanager {
 [[maybe_unused]] constexpr auto k_force_process_folder = "ForceProcess.cao";
 
-enum class ModManager
+enum class ModManager : std::uint8_t
 {
     Vortex,
     MO2,

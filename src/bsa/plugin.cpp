@@ -22,7 +22,7 @@ FilePath::FilePath(Path dir, std::u8string name, std::u8string suffix, std::u8st
 
 auto FilePath::make(const Path &path, const Settings &sets, FileTypes type) -> std::optional<FilePath>
 {
-    if (fs::is_directory(path))
+    if (is_directory(path))
         return std::nullopt;
 
     FilePath file(path.parent_path(), path.stem().u8string(), {}, path.extension().u8string(), type);
@@ -49,7 +49,7 @@ auto FilePath::full_path() const -> Path
 
 auto FilePath::full_name() const -> std::u8string
 {
-    const auto count = counter ? btu::common::as_utf8_string(std::to_string(*counter)) : u8"";
+    const auto count = counter ? common::as_utf8_string(std::to_string(*counter)) : u8"";
     const auto suf   = suffix.empty() ? u8"" : suffix_separator + suffix;
     return {name + count + suf};
 }
@@ -66,7 +66,7 @@ auto FilePath::eat_digits(std::u8string &str) -> std::optional<uint32_t>
         std::optional<uint32_t> ret{};
         try
         {
-            ret = std::stoul(btu::common::as_ascii_string(str.substr(first_digit)));
+            ret = std::stoul(common::as_ascii_string(str.substr(first_digit)));
         }
         catch (const std::exception &)
         {
@@ -81,7 +81,7 @@ auto FilePath::eat_digits(std::u8string &str) -> std::optional<uint32_t>
 
 auto FilePath::eat_suffix(std::u8string &str, const Settings &sets) -> std::u8string
 {
-    auto suffix_pos = str.rfind(suffix_separator);
+    const auto suffix_pos = str.rfind(suffix_separator);
 
     if (suffix_pos == std::u8string::npos)
         return {};
@@ -96,16 +96,14 @@ auto FilePath::eat_suffix(std::u8string &str, const Settings &sets) -> std::u8st
 
 auto is_loaded(const FilePath &archive, const Settings &sets) -> bool
 {
-    return std::any_of(sets.plugin_extensions.cbegin(),
-                       sets.plugin_extensions.cend(),
-                       [&archive](const auto &ext) {
-                           auto b            = archive;
-                           b.ext             = ext;
-                           bool const exact  = fs::exists(b.full_path());
-                           b.suffix          = {};
-                           bool const approx = fs::exists(b.full_path());
-                           return exact || approx;
-                       });
+    return std::ranges::any_of(sets.plugin_extensions, [&archive](const auto &ext) {
+        auto b            = archive;
+        b.ext             = ext;
+        bool const exact  = exists(b.full_path());
+        b.suffix          = {};
+        bool const approx = exists(b.full_path());
+        return exact || approx;
+    });
 }
 
 auto find_archive_name(std::span<const FilePath> plugins, const Settings &sets, ArchiveType type) -> FilePath
@@ -124,7 +122,7 @@ auto find_archive_name(std::span<const FilePath> plugins, const Settings &sets, 
     auto check_plugin = [&sets, &suffix](FilePath &file) {
         file.ext    = sets.extension;
         file.suffix = suffix;
-        return !fs::exists(file.full_path());
+        return !exists(file.full_path());
     };
 
     for (auto plugin : plugins)
@@ -133,7 +131,7 @@ auto find_archive_name(std::span<const FilePath> plugins, const Settings &sets, 
 
     FilePath plug                    = plugins.front();
     constexpr uint8_t max_iterations = UINT8_MAX;
-    for (plug.counter = 0; plug.counter < max_iterations; ++(*plug.counter))
+    for (plug.counter = 0; plug.counter < max_iterations; ++*plug.counter)
         if (check_plugin(plug))
             return plug;
 

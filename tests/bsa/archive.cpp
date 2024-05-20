@@ -4,7 +4,7 @@
 
 TEST_CASE("Load and save to same location works", "[src]")
 {
-    const btu::Path dir = "bsa_load_save";
+    const Path dir = "bsa_load_save";
     btu::fs::remove_all(dir / "out");
     btu::fs::copy(dir / "in", dir / "out");
 

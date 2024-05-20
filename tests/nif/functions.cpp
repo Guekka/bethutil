@@ -17,7 +17,7 @@ TEST_CASE("nif convert", "[src]")
     const Path dir = "nif_convert";
 
     auto tester = [](btu::nif::Mesh m) {
-        return btu::nif::convert(std::move(m), btu::nif::HeadpartStatus::No, btu::Game::SSE);
+        return convert(std::move(m), btu::nif::HeadpartStatus::No, btu::Game::SSE);
     };
 
     test_expected(dir, "crashing.nif", tester);
@@ -38,7 +38,7 @@ TEST_CASE("Nif Memory IO", "[src]")
     REQUIRE(fs_nif.has_value());
 
     // save
-    auto mem_data = btu::nif::save(mem_nif.value());
+    auto mem_data = save(mem_nif.value());
     REQUIRE(mem_data.has_value());
 
     auto out = dir / "out" / "crashing.nif";

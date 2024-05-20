@@ -53,7 +53,7 @@ inline auto compute_mse(const btu::tex::Texture &lhs, const btu::tex::Texture &r
         const auto &rhs_sub = rhs.get_images()[i];
 
         float mse     = 0;
-        const auto hr = DirectX::ComputeMSE(lhs_sub, rhs_sub, mse, nullptr);
+        const auto hr = ComputeMSE(lhs_sub, rhs_sub, mse, nullptr);
         REQUIRE(SUCCEEDED(hr));
 
         total_mse += mse;
@@ -84,7 +84,7 @@ auto test_expected(const Path &root, const Path &filename, Func f, Approve appro
     if (!btu::fs::exists(expected_path) && approve == Approve::Yes)
     {
         btu::fs::create_directories(expected_path.parent_path());
-        const auto res = btu::tex::save(out.value(), expected_path);
+        const auto res = save(out.value(), expected_path);
         CHECK(res.has_value());
         FAIL_CHECK("Expected file not found:" + expected_path.string());
     }

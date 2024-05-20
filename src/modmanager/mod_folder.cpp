@@ -17,7 +17,7 @@
 
 namespace btu::modmanager {
 
-ModFolder::ModFolder(Path directory, btu::bsa::Settings bsa_settings)
+ModFolder::ModFolder(Path directory, bsa::Settings bsa_settings)
     : dir_(std::move(directory))
     , bsa_settings_(BTU_MOV(bsa_settings))
 {
@@ -28,8 +28,8 @@ void ModFolder::iterate(
     const std::function<void(const Path &archive_path, bsa::Archive &&archive)> &archive) const
 {
     auto is_arch = [](const Path &file_name) {
-        auto ext = btu::common::to_lower(file_name.extension().u8string());
-        return btu::common::contains(btu::bsa::k_archive_extensions, ext);
+        const auto ext = common::to_lower(file_name.extension().u8string());
+        return common::contains(bsa::k_archive_extensions, ext);
     };
 
     auto files =
@@ -39,7 +39,7 @@ void ModFolder::iterate(
             .map([](auto &&e) { return e.path(); })
             .to<std::vector>();
 
-    btu::common::for_each_mt(files, [&is_arch, this, &archive, &loose](auto &&path) {
+    common::for_each_mt(files, [&is_arch, this, &archive, &loose](auto &&path) {
         if (!is_arch(path)) [[likely]]
         {
             loose(path.lexically_relative(dir_));
@@ -71,8 +71,7 @@ void ModFolder::iterate(const std::function<void(ModFile)> &visitor,
         std::move(archive_too_large_handler));
 }
 
-void ModFolder::transform(const ModFolder::Transformer &transformer,
-                          ArchiveTooLargeHandler &&archive_too_large_handler)
+void ModFolder::transform(const Transformer &transformer, ArchiveTooLargeHandler &&archive_too_large_handler)
 {
     transform_impl(transformer, std::move(archive_too_large_handler));
 }
@@ -96,10 +95,10 @@ void ModFolder::transform(const ModFolder::Transformer &transformer,
                                                 const bsa::Settings bsa_settings) noexcept
     -> std::optional<bsa::ArchiveVersion>
 {
-    auto version = archive.version();
-    auto type    = archive.type();
+    const auto version = archive.version();
+    auto type          = archive.type();
 
-    auto target = [type, &bsa_settings]() -> std::optional<bsa::ArchiveVersion> {
+    const auto target = [type, &bsa_settings]() -> std::optional<bsa::ArchiveVersion> {
         switch (type)
         {
             case bsa::ArchiveType::Textures:
@@ -115,16 +114,15 @@ void ModFolder::transform(const ModFolder::Transformer &transformer,
     return target;
 }
 
-void ModFolder::transform_impl(const ModFolder::Transformer &transformer,
+void ModFolder::transform_impl(const Transformer &transformer,
                                ArchiveTooLargeHandler &&archive_too_large_handler) const
 {
     iterate(
         [this, &transformer](const Path &relative_path) {
-            auto file_data = common::Lazy<std::vector<std::byte>>(
-                [&relative_path, this]() { return common::read_file(dir_ / relative_path); });
+            const auto file_data = common::Lazy<std::vector<std::byte>>(
+                [&relative_path, this] { return common::read_file(dir_ / relative_path); });
 
-            auto transformed = transformer({relative_path, file_data});
-            if (transformed)
+            if (const auto transformed = transformer({relative_path, file_data}))
                 common::write_file(dir_ / relative_path, *transformed);
         },
         [&transformer,
@@ -146,7 +144,7 @@ void ModFolder::transform_impl(const ModFolder::Transformer &transformer,
             common::for_each_mt(archive, [transformer, &any_file_changed](auto &pair) {
                 auto &[relative_path, file] = pair;
 
-                auto file_data = common::Lazy<std::vector<std::byte>>([&pair]() {
+                auto file_data = common::Lazy<std::vector<std::byte>>([&pair] {
                     auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
                     pair.second.write(buffer);
                     return buffer.get<binary_io::memory_ostream>().rdbuf();

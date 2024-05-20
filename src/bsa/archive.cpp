@@ -15,18 +15,18 @@ File::File(ArchiveVersion v)
     file_ = [v]() -> UnderlyingFile {
         switch (v)
         {
-            case btu::bsa::ArchiveVersion::tes3: return libbsa::tes3::file{};
-            case btu::bsa::ArchiveVersion::tes4:
-            case btu::bsa::ArchiveVersion::tes5: [[fallthrough]];
-            case btu::bsa::ArchiveVersion::sse: return libbsa::tes4::file{};
-            case btu::bsa::ArchiveVersion::fo4: [[fallthrough]];
-            case btu::bsa::ArchiveVersion::fo4dx: return libbsa::fo4::file{};
+            case ArchiveVersion::tes3: return libbsa::tes3::file{};
+            case ArchiveVersion::tes4:
+            case ArchiveVersion::tes5: [[fallthrough]];
+            case ArchiveVersion::sse: return libbsa::tes4::file{};
+            case ArchiveVersion::fo4: [[fallthrough]];
+            case ArchiveVersion::fo4dx: return libbsa::fo4::file{};
         }
         libbsa::detail::declare_unreachable();
     }();
 }
 
-File::File(UnderlyingFile f, ArchiveVersion v)
+File::File(UnderlyingFile f, const ArchiveVersion v)
     : ver_(v)
     , file_(std::move(f))
 {
@@ -34,7 +34,7 @@ File::File(UnderlyingFile f, ArchiveVersion v)
 
 auto File::compressed() const noexcept -> Compression
 {
-    constexpr auto visitor = btu::common::overload{
+    constexpr auto visitor = common::Overload{
         [](const libbsa::tes3::file &) { return Compression::No; },
         [](const libbsa::tes4::file &f) { return f.compressed() ? Compression::Yes : Compression::No; },
         [](const libbsa::fo4::file &f) {
@@ -47,7 +47,7 @@ auto File::compressed() const noexcept -> Compression
 
 auto File::size() const noexcept -> size_t
 {
-    constexpr auto visitor = btu::common::overload{
+    constexpr auto visitor = common::Overload{
         [](const libbsa::tes3::file &f) { return f.size(); },
         [](const libbsa::tes4::file &f) { return f.size(); },
         [](const libbsa::fo4::file &f) { return flux::ref(f).map(&libbsa::fo4::chunk::size).sum(); },
@@ -58,7 +58,7 @@ auto File::size() const noexcept -> size_t
 
 void File::decompress()
 {
-    const auto visitor = btu::common::overload{
+    const auto visitor = common::Overload{
         [](libbsa::tes3::file &) {},
         [this](libbsa::tes4::file &f) { f.decompress(static_cast<libbsa::tes4::version>(ver_)); },
         [](libbsa::fo4::file &f) { flux::for_each(f, [](auto &c) { c.decompress(); }); },
@@ -70,7 +70,7 @@ void File::decompress()
 
 void File::compress()
 {
-    const auto visitor = btu::common::overload{
+    const auto visitor = common::Overload{
         [](libbsa::tes3::file &) {},
         [this](libbsa::tes4::file &f) { f.compress(static_cast<libbsa::tes4::version>(ver_)); },
         [](libbsa::fo4::file &f) { flux::for_each(f, [](auto &c) { c.compress(); }); },
@@ -82,7 +82,7 @@ void File::compress()
 
 void File::read(Path path)
 {
-    const auto visitor = btu::common::overload{
+    const auto visitor = common::Overload{
         [&path](libbsa::tes3::file &f) { f.read(std::move(path)); },
         [&path, this](libbsa::tes4::file &f) {
             f.read(std::move(path), static_cast<libbsa::tes4::version>(ver_));
@@ -97,7 +97,7 @@ void File::read(Path path)
 
 void File::read(std::span<std::byte> src)
 {
-    const auto visitor = btu::common::overload{
+    const auto visitor = common::Overload{
         [&](libbsa::tes3::file &f) { f.read(src); },
         [&src, this](libbsa::tes4::file &f) { f.read(src, static_cast<libbsa::tes4::version>(ver_)); },
         [&src, this](libbsa::fo4::file &f) { f.read(src, static_cast<libbsa::fo4::format>(ver_)); },
@@ -108,7 +108,7 @@ void File::read(std::span<std::byte> src)
 
 void File::write(Path path) const
 {
-    const auto visitor = btu::common::overload{
+    const auto visitor = common::Overload{
         [&](const libbsa::tes3::file &f) { f.write(std::move(path)); },
         [&path, this](const libbsa::tes4::file &f) {
             f.write(std::move(path), static_cast<libbsa::tes4::version>(ver_));
@@ -121,12 +121,12 @@ void File::write(Path path) const
     std::visit(visitor, file_);
 }
 
-void File::write(binary_io::any_ostream &os) const
+void File::write(binary_io::any_ostream &dst) const
 {
-    const auto visitor = btu::common::overload{
-        [&](const libbsa::tes3::file &f) { f.write(os); },
-        [&os, this](const libbsa::tes4::file &f) { f.write(os, static_cast<libbsa::tes4::version>(ver_)); },
-        [&os, this](const libbsa::fo4::file &f) { f.write(os, static_cast<libbsa::fo4::format>(ver_)); },
+    const auto visitor = common::Overload{
+        [&](const libbsa::tes3::file &f) { f.write(dst); },
+        [&dst, this](const libbsa::tes4::file &f) { f.write(dst, static_cast<libbsa::tes4::version>(ver_)); },
+        [&dst, this](const libbsa::fo4::file &f) { f.write(dst, static_cast<libbsa::fo4::format>(ver_)); },
     };
 
     std::visit(visitor, file_);
@@ -137,7 +137,7 @@ auto File::version() const noexcept -> ArchiveVersion
     return ver_;
 }
 
-Archive::Archive(ArchiveVersion ver, ArchiveType type)
+Archive::Archive(const ArchiveVersion ver, const ArchiveType type)
     : ver_(ver)
     , type_(type)
 {
@@ -182,13 +182,13 @@ auto Archive::read(Path path) -> std::optional<Archive>
             if (path.filename().u8string().ends_with(u8" - Textures.bsa"))
                 res.type_ = ArchiveType::Textures;
 
-            for (auto &&dir : std::move(arch))
+            for (auto &[dir_path, dir] : std::move(arch))
             {
-                for (auto &&file : std::move(dir.second))
+                for (auto &[file_path, file] : std::move(dir))
                 {
-                    const auto u8str = virtual_to_local_path(dir.first, file.first);
-                    const auto str   = btu::common::as_ascii_string(u8str);
-                    res.emplace(str, File(std::move(file.second), res.ver_));
+                    const auto u8str = virtual_to_local_path(dir_path, file_path);
+                    const auto str   = common::as_ascii_string(u8str);
+                    res.emplace(str, File(std::move(file), res.ver_));
                 }
             }
             return res;
@@ -223,13 +223,13 @@ auto Archive::read(Path path) -> std::optional<Archive>
  * @param path The path of the file to be written.
  */
 template<typename Archive, typename WriteFunc>
-void do_write(Archive &&arch, WriteFunc &&write_func, fs::path path)
+void do_write(Archive &&arch, WriteFunc &&write_func, const fs::path &path)
     requires std::is_rvalue_reference_v<decltype(arch)> && std::is_invocable_v<WriteFunc, Archive, fs::path>
 {
     auto write_and_check = [&](fs::path p) {
         std::forward<WriteFunc>(write_func)(BTU_MOV(arch), p);
         arch.clear(); // release memory mapping
-        if (!fs::exists(p))
+        if (!exists(p))
         {
             throw std::runtime_error("Failed to write archive to " + p.string());
         }
@@ -238,9 +238,9 @@ void do_write(Archive &&arch, WriteFunc &&write_func, fs::path path)
     // On Windows, we cannot remove the file while it is memory mapped
     // So we need to release the memory mapping first
     // That's why we have to move the archive to the lambda
-    if (fs::exists(path))
+    if (exists(path))
     {
-        auto tmp_path = path.parent_path() / (path.filename().u8string() + u8".tmp");
+        const auto tmp_path = path.parent_path() / (path.filename().u8string() + u8".tmp");
         write_and_check(tmp_path);
         fs::remove(path);
         fs::rename(tmp_path, path);
@@ -251,16 +251,16 @@ void do_write(Archive &&arch, WriteFunc &&write_func, fs::path path)
     }
 }
 
-void Archive::write(btu::Path path) &&
+void Archive::write(Path path) &&
 {
     if (files_.empty())
         return;
 
-    fs::create_directories(path.parent_path());
+    create_directories(path.parent_path());
 
     switch (ver_)
     {
-        case btu::bsa::ArchiveVersion::tes3:
+        case ArchiveVersion::tes3:
         {
             libbsa::tes3::archive bsa;
             for (auto &&elem : std::move(files_))
@@ -270,16 +270,16 @@ void Archive::write(btu::Path path) &&
             do_write(BTU_MOV(bsa), [](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path)); }, BTU_MOV(path));
             return;
         }
-        case btu::bsa::ArchiveVersion::tes4:
-        case btu::bsa::ArchiveVersion::tes5: [[fallthrough]];
-        case btu::bsa::ArchiveVersion::sse:
+        case ArchiveVersion::tes4:
+        case ArchiveVersion::tes5: [[fallthrough]];
+        case ArchiveVersion::sse:
         {
             libbsa::tes4::archive bsa;
 
             for (auto &&elem : std::move(files_))
             {
                 auto elem_path = Path(elem.first);
-                const auto d   = [&]() {
+                const auto d   = [&] {
                     const auto key = elem_path.parent_path().lexically_normal().generic_string();
                     if (bsa.find(key) == bsa.end())
                         bsa.insert(key, libbsa::tes4::directory());
@@ -301,8 +301,8 @@ void Archive::write(btu::Path path) &&
                 BTU_MOV(path));
             return;
         }
-        case btu::bsa::ArchiveVersion::fo4: [[fallthrough]];
-        case btu::bsa::ArchiveVersion::fo4dx:
+        case ArchiveVersion::fo4: [[fallthrough]];
+        case ArchiveVersion::fo4dx:
         {
             libbsa::fo4::archive ba2;
             for (auto &&elem : std::move(files_))
@@ -327,8 +327,8 @@ void Archive::set_version(ArchiveVersion version) noexcept
     if (version == std::exchange(ver_, version))
         return;
 
-    btu::common::for_each_mt(files_, [version](auto &path_file) {
-        auto res_file = bsa::File(version);
+    common::for_each_mt(files_, [version](auto &path_file) {
+        auto res_file = File(version);
 
         auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
 

@@ -1,3 +1,5 @@
+#include "btu/esp/error_code.hpp"
+
 #include <btu/common/algorithms.hpp>
 #include <btu/common/metaprogramming.hpp>
 #include <btu/esp/functions.hpp>
@@ -90,7 +92,7 @@ auto list_headparts(std::fstream file) noexcept -> tl::expected<std::vector<std:
                 file.read(headpart.data(), plugin_field_header.data_size);
 
                 constexpr auto cleanup_path = common::make_path_canonizer(u8"meshes/");
-                headparts.emplace_back(cleanup_path(std::move(headpart)));
+                headparts.emplace_back(cleanup_path(headpart));
             }
         }
     }
@@ -164,7 +166,7 @@ auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::ve
                     file.read(texture.data(), plugin_field_header.data_size);
 
                     constexpr auto cleanup_path = common::make_path_canonizer(u8"textures/");
-                    txst_textures.try_emplace(header.record.id, cleanup_path(std::move(texture)));
+                    txst_textures.try_emplace(header.record.id, cleanup_path(texture));
                 }
                 else
                 { // skip other fields

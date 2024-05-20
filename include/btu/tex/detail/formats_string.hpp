@@ -8,7 +8,6 @@
 #include <btu/tex/dxtex.hpp>
 
 #include <array>
-#include <ranges>
 #include <string>
 
 //Used to convert enum to string and vice versa
@@ -16,10 +15,7 @@
 namespace btu::tex {
 namespace detail {
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage): we need to stringify the enum
-#define DEFFMT(fmt)                  \
-    {                                \
-        u8## #fmt, DXGI_FORMAT_##fmt \
-    }
+#define DEFFMT(fmt) {u8## #fmt, DXGI_FORMAT_##fmt}
 
 struct StringFormat
 {
@@ -131,9 +127,8 @@ inline auto from_string(std::u8string_view str) -> DXGI_FORMAT
 
 } // namespace btu::tex
 
-namespace nlohmann {
 template<>
-struct adl_serializer<DXGI_FORMAT>
+struct nlohmann::adl_serializer<DXGI_FORMAT>
 {
     static void to_json(json &j, const DXGI_FORMAT &format) { j = btu::tex::to_string(format); }
 
@@ -141,5 +136,4 @@ struct adl_serializer<DXGI_FORMAT>
     {
         format = btu::tex::from_string(btu::common::as_utf8(j.get<std::string>()));
     }
-};
-} // namespace nlohmann
+}; // namespace nlohmann
