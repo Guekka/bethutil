@@ -43,8 +43,7 @@ jobs:
         run: |
           echo "GCOV=gcov-${{ matrix.version }}" >> $GITHUB_ENV
 
-          sudo apt install ninja-build liblz4-dev zlib1g-dev -y
-          sudo pip install gcovr
+          sudo apt install ninja-build gcovr liblz4-dev zlib1g-dev -y
 
       - uses: lukka/run-vcpkg@v11
         with:
