@@ -47,7 +47,7 @@ jobs:
 
       - uses: lukka/run-vcpkg@v11
         with:
-          vcpkgGitCommitId: f6a5d4e8eb7476b8d7fc12a56dff300c1c986131
+          vcpkgGitCommitId: fbf25ddd1119211278c257f2e19c96a9d5a6ede7
           vcpkgJsonGlob: ${{ github.workspace }}/bethutil/vcpkg.json
 
       - name: Configure & Build
@@ -101,7 +101,7 @@ jobs:
 
       - uses: lukka/run-vcpkg@v11
         with:
-          vcpkgGitCommitId: f6a5d4e8eb7476b8d7fc12a56dff300c1c986131
+          vcpkgGitCommitId: fbf25ddd1119211278c257f2e19c96a9d5a6ede7
           vcpkgJsonGlob: ${{ github.workspace }}/bethutil/vcpkg.json
 
       - name: (main) Configure & Build
