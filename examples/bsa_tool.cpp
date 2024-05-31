@@ -55,7 +55,7 @@ auto process_args(std::vector<std::string_view> args) -> int
         for (const auto &file : archives)
         {
             std::cout << "Unpacking " << file.path().string() << '\n' << std::flush;
-            btu::bsa::unpack({.file_path = file});
+            btu::bsa::unpack({.file_path = file.path()});
         }
     }
     else if (arg == "list")
