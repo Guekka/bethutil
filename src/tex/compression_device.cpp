@@ -97,7 +97,7 @@ auto CompressionDevice::make([[maybe_unused]] uint32_t adapter_index,
     if (s_dynamic_d3_d11_create_device == nullptr)
         return std::nullopt;
 
-    const auto feature_levels = std::to_array({
+    constexpr auto feature_levels = std::to_array({
         D3D_FEATURE_LEVEL_12_1,
         D3D_FEATURE_LEVEL_12_0,
         D3D_FEATURE_LEVEL_11_0,
@@ -123,12 +123,12 @@ auto CompressionDevice::make([[maybe_unused]] uint32_t adapter_index,
     if (FAILED(p_adapter->GetDesc1(&desc)))
         return std::nullopt;
 
-    if (((desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0U) && !allow_software)
+    if ((desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0U && !allow_software)
     {
         return std::nullopt;
     }
 
-    ret.gpu_name_ = btu::common::to_utf8(static_cast<const wchar_t *>(desc.Description));
+    ret.gpu_name_ = common::to_utf8(desc.Description);
 
     D3D_FEATURE_LEVEL fl{};
     hr = s_dynamic_d3_d11_create_device(p_adapter.Get(),
@@ -148,7 +148,7 @@ auto CompressionDevice::make([[maybe_unused]] uint32_t adapter_index,
     if (fl < D3D_FEATURE_LEVEL_11_0)
     {
         D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS hwopts;
-        if ((device == nullptr) || ((*device) == nullptr))
+        if (device == nullptr || *device == nullptr)
             return std::nullopt;
 
         hr = (*device)->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS, &hwopts, sizeof(hwopts));

@@ -31,8 +31,8 @@ TEST_CASE("to_underlying", "[src]")
 
 TEST_CASE("overload", "[src]")
 {
-    using btu::common::overload;
-    auto callable = overload{
+    using btu::common::Overload;
+    auto callable = Overload{
         [](int) { return int{}; },
         [](float) { return float{}; },
         [](double) { return double{}; },

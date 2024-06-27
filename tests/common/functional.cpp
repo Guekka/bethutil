@@ -7,7 +7,6 @@
 
 #include <catch.hpp>
 
-#include <iostream>
 #include <set>
 TEST_CASE("bind_back", "[src]")
 {
@@ -65,7 +64,7 @@ TEST_CASE("make_producer_mt", "[src]")
     {
         auto collection         = input;
         auto [thread, receiver] = make_producer_mt<int>(collection, [](std::string &) {
-            static std::atomic<int> i = 0;
+            static std::atomic i = 0;
             return i++;
         });
 

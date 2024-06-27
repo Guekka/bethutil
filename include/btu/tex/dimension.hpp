@@ -27,7 +27,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ResizeRatio, ratio, min)
 
 [[nodiscard]] constexpr auto is_pow2(size_t num) noexcept -> bool
 {
-    return (!!num & !(num & (num - 1))) != 0;
+    return (!!num & !(num & num - 1)) != 0;
 }
 
 [[nodiscard]] constexpr auto upper_pow2(size_t num) noexcept -> size_t
@@ -58,7 +58,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ResizeRatio, ratio, min)
 
     auto abs            = [](auto x) { return x > 0 ? x : -x; };
     auto compare_thresh = [abs](auto num, auto div, auto thresh) {
-        return abs(1 - static_cast<double>(num) / div) < (static_cast<double>(thresh) / 100);
+        return abs(1 - static_cast<double>(num) / div) < static_cast<double>(thresh) / 100;
     };
 
     // Already a power of two
@@ -113,8 +113,8 @@ constexpr void scale_fit(size_t &number, size_t target, size_t &number2)
     // Bad case. No power of 2. Which means we can afford less precise calculations
 
     // If target and current have same ratio
-    const auto cur_ratio    = (dim.h * 1000) / dim.w;
-    const auto target_ratio = (target.h * 1000) / target.w;
+    const auto cur_ratio    = dim.h * 1000 / dim.w;
+    const auto target_ratio = target.h * 1000 / target.w;
     if (cur_ratio == target_ratio)
         return target; // We can directly return target
 

@@ -22,7 +22,7 @@ TEST_CASE("Tex Memory IO", "[src]")
     REQUIRE(*mem_tex == *fs_tex);
 
     // save
-    auto mem_data = btu::tex::save(mem_tex.value());
+    auto mem_data = save(mem_tex.value());
     REQUIRE(mem_data.has_value());
 
     auto out = dir / "out" / u8"tex.dds";
@@ -80,8 +80,8 @@ TEST_CASE("generate_mipmaps", "[src]")
 TEST_CASE("resize", "[src]")
 {
     test_expected_dir(u8"resize", [](auto &&tex) {
-        const auto args = btu::tex::util::ResizeRatio{3, {200, 200}};
-        const auto dim  = btu::tex::util::compute_resize_dimension(tex.get_dimension(), args);
+        constexpr auto args = btu::tex::util::ResizeRatio{3, {200, 200}};
+        const auto dim      = btu::tex::util::compute_resize_dimension(tex.get_dimension(), args);
         return btu::tex::resize(std::forward<decltype(tex)>(tex), dim);
     });
 }
@@ -142,9 +142,9 @@ TEST_CASE("nearest_pow2", "[src]")
 TEST_CASE("scale_fit", "[src]")
 {
     using btu::tex::util::scale_fit;
-    size_t x        = 10;
-    size_t y        = 20;
-    const size_t tx = 2;
+    size_t x            = 10;
+    size_t y            = 20;
+    constexpr size_t tx = 2;
     scale_fit(x, tx, y);
     CHECK(x == 2);
     CHECK(y == 4);
@@ -211,7 +211,7 @@ TEST_CASE("compute_resize_dimension", "[src]")
         CHECK(compute_resize_dimension({100, 100}, args3) == Dimension{128, 128});
         CHECK(compute_resize_dimension({64, 65}, args3) == Dimension{64, 64});
 
-        const auto args4 = btu::tex::util::ResizeRatio{3, {200, 200}};
+        constexpr auto args4 = ResizeRatio{3, {200, 200}};
         CHECK(compute_resize_dimension({256, 256}, args4) == Dimension{256, 256});
     }
     SECTION("Absolute")

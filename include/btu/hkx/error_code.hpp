@@ -2,12 +2,10 @@
 
 #include <btu/common/error.hpp>
 
-#include <optional>
-
 namespace btu::hkx {
-using btu::common::Error;
+using common::Error;
 
-enum class AnimErr
+enum class AnimErr : std::uint8_t
 {
     Success = 0,
     Unknown = 1,
@@ -18,15 +16,13 @@ enum class AnimErr
 };
 } // namespace btu::hkx
 
-namespace std {
 template<>
-struct is_error_code_enum<btu::hkx::AnimErr> : true_type
+struct std::is_error_code_enum<btu::hkx::AnimErr> : true_type
 {
-};
-} // namespace std
+}; // namespace std
 
 namespace btu::hkx {
-struct AnimErrCategory : std::error_category
+struct AnimErrCategory final : std::error_category
 {
     [[nodiscard]] auto name() const noexcept -> const char * override { return "btu::hkx error"; }
     [[nodiscard]] auto message(int ev) const -> std::string override
@@ -45,27 +41,25 @@ struct AnimErrCategory : std::error_category
 };
 
 inline const AnimErrCategory k_anim_err_category{};
-auto make_error_code(AnimErr e) -> std::error_code
+inline auto make_error_code(AnimErr e) -> std::error_code
 {
     return {static_cast<int>(e), k_anim_err_category};
 }
 
-enum class FailureSource
+enum class FailureSource : std::uint8_t
 {
     BadUserInput = 1,
     SystemError  = 2,
 };
 } // namespace btu::hkx
 
-namespace std {
 template<>
-struct is_error_condition_enum<btu::hkx::FailureSource> : true_type
+struct std::is_error_condition_enum<btu::hkx::FailureSource> : true_type
 {
-};
-} // namespace std
+}; // namespace std
 
 namespace btu::hkx {
-class FailureSourceCategory : public std::error_category
+class FailureSourceCategory final : public std::error_category
 {
 public:
     [[nodiscard]] auto name() const noexcept -> const char * override { return "btu::hkx failure-source"; }
@@ -89,7 +83,7 @@ public:
 };
 
 inline const FailureSourceCategory k_failure_source_category{};
-auto make_error_condition(FailureSource e) -> std::error_condition
+inline auto make_error_condition(FailureSource e) -> std::error_condition
 {
     return {static_cast<int>(e), k_failure_source_category};
 }
