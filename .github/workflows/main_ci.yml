@@ -21,13 +21,13 @@ env:
 
 jobs:
   linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         config: [ gcc ]
         include:
           - config: gcc
-            version: '12'
+            version: '14'
 
     steps:
       - uses: actions/checkout@v2
