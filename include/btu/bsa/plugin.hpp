@@ -15,8 +15,9 @@ class FilePath
 
 public:
     FilePath(Path dir, std::u8string name, std::u8string suffix, std::u8string ext, FileTypes type);
-    [[nodiscard]] static auto make(const Path &path, const Settings &sets, FileTypes type)
-        -> std::optional<FilePath>;
+    [[nodiscard]] static auto make(const Path &path,
+                                   const Settings &sets,
+                                   FileTypes type) -> std::optional<FilePath>;
 
     [[nodiscard]] auto full_path() const -> Path;
     [[nodiscard]] auto full_name() const -> std::u8string;
@@ -37,8 +38,9 @@ private:
     explicit FilePath() = default;
 };
 
-[[nodiscard]] auto find_archive_name(std::span<const FilePath> plugins, const Settings &sets, ArchiveType type)
-    -> FilePath;
+[[nodiscard]] auto find_archive_name(std::span<const FilePath> plugins,
+                                     const Settings &sets,
+                                     ArchiveType type) -> FilePath;
 
 namespace detail {
 template<typename It>

@@ -44,7 +44,7 @@ struct bind_back_fn_
 
     template<typename... CallArgs>
     constexpr std::invoke_result_t<Fn, CallArgs..., Args...> //
-    operator()(CallArgs &&...cargs) &&noexcept(std::is_nothrow_invocable_v<Fn, CallArgs..., Args...>)
+    operator()(CallArgs &&...cargs) && noexcept(std::is_nothrow_invocable_v<Fn, CallArgs..., Args...>)
     {
         return tuple_apply(
             [&](auto &&fn, auto &&...args) -> decltype(auto) {
@@ -55,7 +55,7 @@ struct bind_back_fn_
 
     /// \overload
     template<typename... CallArgs>
-    constexpr std::invoke_result_t<Fn &, CallArgs..., Args &...> operator()(CallArgs &&...cargs) &noexcept(
+    constexpr std::invoke_result_t<Fn &, CallArgs..., Args &...> operator()(CallArgs &&...cargs) & noexcept(
         std::is_nothrow_invocable_v<Fn &, CallArgs..., Args &...>)
     {
         return tuple_apply([&](auto &fn, auto &...args)
@@ -145,7 +145,7 @@ struct bind_back_fn_<Fn, Arg0, Arg1>
     template<typename... CallArgs>
     constexpr std::invoke_result_t<Fn const &, CallArgs..., Arg0 const &, Arg1 const &> operator()(
         CallArgs &&...cargs)
-        const &noexcept(std::is_nothrow_invocable_v<Fn const &, CallArgs..., Arg0 const &, Arg1 const &>)
+        const & noexcept(std::is_nothrow_invocable_v<Fn const &, CallArgs..., Arg0 const &, Arg1 const &>)
     {
         return invoke(fn_args_.fn_, (CallArgs &&) cargs..., fn_args_.arg0_, fn_args_.arg1_);
     }
@@ -159,7 +159,7 @@ struct bind_back_fn
 {
     template<typename Fn, typename Arg1, typename... Args>
     constexpr bind_back_fn2<Fn, Arg1, Args...> //
-    operator()(Fn &&fn, Arg1 &&arg1, Args &&...args) const
+    operator()(Fn && fn, Arg1 && arg1, Args &&...args) const
     {
         return {{(Fn &&) fn, (Arg1 &&) arg1, (Args &&) args...}};
     }
@@ -173,7 +173,7 @@ template<class Func, class Arg>
 concept invocable_l_or_r = std::invocable<Func, Arg &> || std::invocable<Func, Arg &&>;
 
 template<typename Range, typename Func>
-requires std::ranges::input_range<Range> && invocable_l_or_r<Func, std::ranges::range_value_t<Range>>
+    requires std::ranges::input_range<Range> && invocable_l_or_r<Func, std::ranges::range_value_t<Range>>
 auto for_each_mt(Range &&rng, Func &&func)
 {
     auto eptr = std::exception_ptr{};
@@ -225,8 +225,8 @@ auto for_each_mt(Range &&rng, Func &&func)
  */
 
 template<typename Out, typename Range, typename Func>
-[[nodiscard]] auto make_producer_mt(Range &&rng, Func &&func) requires
-    std::ranges::input_range<Range> && invocable_l_or_r<Func, std::ranges::range_value_t<Range>>
+[[nodiscard]] auto make_producer_mt(Range &&rng, Func &&func)
+    requires std::ranges::input_range<Range> && invocable_l_or_r<Func, std::ranges::range_value_t<Range>>
 {
     auto channel = mpsc::Channel<Out>::make();
     auto sender  = std::get<0>(channel);

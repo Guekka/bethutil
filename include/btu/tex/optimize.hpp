@@ -62,6 +62,6 @@ struct OptimizationSteps
 [[nodiscard]] auto optimize(Texture &&file,
                             OptimizationSteps sets,
                             const std::optional<CompressionDevice> &dev) noexcept -> Result;
-[[nodiscard]] auto compute_optimization_steps(const Texture &file, const Settings &sets) noexcept
-    -> OptimizationSteps;
+[[nodiscard]] auto compute_optimization_steps(const Texture &file,
+                                              const Settings &sets) noexcept -> OptimizationSteps;
 } // namespace btu::tex

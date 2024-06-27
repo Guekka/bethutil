@@ -37,10 +37,7 @@ public:
     {
         return "OUTFILE64.hkx";
     }
-    [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override
-    {
-        return btu::Game::SSE;
-    }
+    [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override { return btu::Game::SSE; }
 
     [[nodiscard]] auto get_required_files([[maybe_unused]] const Path &exe_dir) const noexcept
         -> std::vector<Path> override
@@ -57,10 +54,7 @@ public:
         return {(exe_dir / name()).string(), std::string(input_file_name())};
     }
 
-    [[nodiscard]] auto is_os_supported() const noexcept -> bool override
-    {
-        return true;
-    }
+    [[nodiscard]] auto is_os_supported() const noexcept -> bool override { return true; }
 };
 static inline const auto k_exe_32to64 = Info32to64{};
 
@@ -134,8 +128,8 @@ auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
     return dir_path;
 }
 
-[[nodiscard]] auto reproc(const std::vector<std::string> &args, const reproc::options &options)
-    -> tl::expected<int, Error>
+[[nodiscard]] auto reproc(const std::vector<std::string> &args,
+                          const reproc::options &options) -> tl::expected<int, Error>
 {
     for (const auto &arg : args)
         std::cout << arg << '\n' << std::flush;
@@ -251,8 +245,8 @@ AnimExe::AnimExe(Path exe_dir, std::vector<detail::AnimExeRef> detected) noexcep
 {
 }
 
-auto AnimExe::convert_impl(btu::Game target_game, const CopyInput &copy_input) const noexcept
-    -> tl::expected<Path, Error>
+auto AnimExe::convert_impl(btu::Game target_game,
+                           const CopyInput &copy_input) const noexcept -> tl::expected<Path, Error>
 {
     const auto working_dir = make_working_dir();
     auto options           = working_dir.map(make_reproc_options);
@@ -288,8 +282,8 @@ auto AnimExe::convert(btu::Game target_game, const Path &input, const Path &outp
         .and_then([&](const Path &output_path) { return move_output_to_file(output_path, output); });
 }
 
-auto AnimExe::convert(btu::Game target_game, std::span<std::byte> input) const
-    -> tl::expected<std::vector<std::byte>, Error>
+auto AnimExe::convert(btu::Game target_game,
+                      std::span<std::byte> input) const -> tl::expected<std::vector<std::byte>, Error>
 {
     return convert_impl(target_game,
                         [&](const Path &input_path) -> ResultError {

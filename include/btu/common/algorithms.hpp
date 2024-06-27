@@ -17,8 +17,8 @@
 namespace btu::common {
 //Expects a range sorted in descending order
 template<class It, class Predicate, class Sum, class ValueType = typename std::iterator_traits<It>::value_type>
-requires std::bidirectional_iterator<
-    It> && std::invocable<Predicate, ValueType> && std::invocable<Sum, ValueType, ValueType>
+    requires std::bidirectional_iterator<It> && std::invocable<Predicate, ValueType>
+                 && std::invocable<Sum, ValueType, ValueType>
 [[nodiscard]] inline auto merge_if(It first, It last, const Predicate &predicate, const Sum &sum) -> It
 {
     if (first == last)
