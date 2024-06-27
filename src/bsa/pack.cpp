@@ -98,8 +98,9 @@ struct PackGroup
     libbsa::detail::declare_unreachable();
 }
 
-[[nodiscard]] auto prepare_file(const Path &file_path, const PackSettings &sets, ArchiveType type) noexcept
-    -> File
+[[nodiscard]] auto prepare_file(const Path &file_path,
+                                const PackSettings &sets,
+                                ArchiveType type) noexcept -> File
 {
     auto file = File{get_version(sets.game_settings, type)};
     file.read(file_path);
@@ -117,8 +118,9 @@ struct PackGroup
     return arch.file_size() + file.size() <= sets.max_size;
 }
 
-[[nodiscard]] auto do_pack(std::vector<Path> file_paths, PackSettings settings, ArchiveType type) noexcept
-    -> flux::generator<bsa::Archive &&>
+[[nodiscard]] auto do_pack(std::vector<Path> file_paths,
+                           PackSettings settings,
+                           ArchiveType type) noexcept -> flux::generator<bsa::Archive &&>
 {
     auto [thread, receiver] = common::make_producer_mt<bsa::Archive::value_type>(
         std::move(file_paths), [&](const Path &absolute_path) -> bsa::Archive::value_type {
