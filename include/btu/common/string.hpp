@@ -183,8 +183,9 @@ static_assert(sizeof(std::string_view::value_type) == sizeof(std::u8string_view:
                   && sizeof(std::string::value_type) == sizeof(std::u8string::value_type),
               "btu::common string assumption violated");
 
-constexpr auto str_compare(std::u8string_view lhs, std::u8string_view rhs, CaseSensitive case_sensitive)
-    -> bool
+constexpr auto str_compare(std::u8string_view lhs,
+                           std::u8string_view rhs,
+                           CaseSensitive case_sensitive) -> bool
 {
     if (lhs.size() != rhs.size())
         return false;
@@ -196,8 +197,9 @@ constexpr auto str_compare(std::u8string_view lhs, std::u8string_view rhs, CaseS
     return f(lhs.data(), rhs.data(), lhs.size()) == 0;
 }
 
-constexpr auto str_find(std::u8string_view string, std::u8string_view snippet, CaseSensitive case_sensitive)
-    -> size_t
+constexpr auto str_find(std::u8string_view string,
+                        std::u8string_view snippet,
+                        CaseSensitive case_sensitive) -> size_t
 {
     detail::assert_valid_utf8(string);
     detail::assert_valid_utf8(snippet);
@@ -213,8 +215,9 @@ constexpr auto str_find(std::u8string_view string, std::u8string_view snippet, C
     return ptr - string.data();
 }
 
-constexpr auto str_contain(std::u8string_view string, std::u8string_view snippet, CaseSensitive case_sensitive)
-    -> bool
+constexpr auto str_contain(std::u8string_view string,
+                           std::u8string_view snippet,
+                           CaseSensitive case_sensitive) -> bool
 {
     return str_find(string, snippet, case_sensitive) != std::string::npos;
 }

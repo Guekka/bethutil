@@ -35,8 +35,8 @@ public:
     [[nodiscard]] virtual constexpr auto output_file_name() const noexcept -> std::string_view = 0;
     [[nodiscard]] virtual constexpr auto target_game() const noexcept -> btu::Game             = 0;
 
-    [[nodiscard]] virtual auto get_required_files(const Path &exe_dir) const noexcept
-        -> std::vector<Path>                                                                        = 0;
+    [[nodiscard]] virtual auto get_required_files(const Path &exe_dir) const noexcept -> std::vector<Path>
+                                                                                         = 0;
     [[nodiscard]] virtual auto get_full_args(const Path &exe_dir) const -> std::vector<std::string> = 0;
 
     [[nodiscard]] virtual auto is_os_supported() const noexcept -> bool = 0;
@@ -51,8 +51,9 @@ class AnimExe
 public:
     [[nodiscard]] static auto make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>;
 
-    [[nodiscard]] auto convert(btu::Game target_game, const Path &input, const Path &output) const
-        -> ResultError;
+    [[nodiscard]] auto convert(btu::Game target_game,
+                               const Path &input,
+                               const Path &output) const -> ResultError;
 
     [[nodiscard]] auto convert(btu::Game target_game, std::span<std::byte> input) const
         -> tl::expected<std::vector<std::byte>, Error>;
@@ -63,8 +64,8 @@ private:
 
     using CopyInput = std::function<ResultError(const Path &input_path)>;
 
-    [[nodiscard]] auto convert_impl(btu::Game target_game, const CopyInput &copy_input) const noexcept
-        -> tl::expected<Path, Error>;
+    [[nodiscard]] auto convert_impl(btu::Game target_game,
+                                    const CopyInput &copy_input) const noexcept -> tl::expected<Path, Error>;
 
     AnimExe(Path exe_dir, std::vector<detail::AnimExeRef> detected) noexcept;
 };
