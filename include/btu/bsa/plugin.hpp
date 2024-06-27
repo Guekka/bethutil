@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "btu/bsa/detail/archive_type.hpp"
 #include "btu/bsa/settings.hpp"
 
 namespace btu::bsa {

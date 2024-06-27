@@ -92,23 +92,12 @@ void ModFolder::transform(const Transformer &transformer, ArchiveTooLargeHandler
  * \see bsa::Settings
  */
 [[nodiscard]] auto guess_target_archive_version(const bsa::Archive &archive,
-                                                const bsa::Settings bsa_settings) noexcept
+                                                const bsa::Settings &bsa_settings) noexcept
     -> std::optional<bsa::ArchiveVersion>
 {
-    const auto version = archive.version();
-    auto type          = archive.type();
+    const auto target = bsa_settings.version;
 
-    const auto target = [type, &bsa_settings]() -> std::optional<bsa::ArchiveVersion> {
-        switch (type)
-        {
-            case bsa::ArchiveType::Textures:
-                return bsa_settings.texture_version.value_or(bsa_settings.version);
-            case bsa::ArchiveType::Standard: return bsa_settings.version;
-        }
-        return std::nullopt;
-    }();
-
-    if (target == version)
+    if (target == archive.version())
         return std::nullopt;
 
     return target;

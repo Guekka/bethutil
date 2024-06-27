@@ -2,6 +2,7 @@
 
 #include <btu/common/error.hpp>
 
+#include <cstdint>
 #include <source_location>
 
 namespace btu::tex {
