@@ -19,7 +19,7 @@ template<class... Ts>
 overload(Ts...) -> overload<Ts...>;
 
 template<typename E>
-requires std::is_enum_v<E>
+    requires std::is_enum_v<E>
 constexpr auto to_underlying(E e) -> std::underlying_type_t<E>
 {
     return static_cast<std::underlying_type_t<E>>(e);
@@ -91,13 +91,13 @@ template<class T, class U>
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage): we need it to generate code
 #define BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, a_op)                                           \
-    [[nodiscard]] constexpr auto operator a_op(a_type a_lhs, a_type a_rhs) noexcept->a_type      \
+    [[nodiscard]] constexpr auto operator a_op(a_type a_lhs, a_type a_rhs) noexcept -> a_type    \
     {                                                                                            \
         return static_cast<a_type>(static_cast<std::underlying_type_t<a_type>>(a_lhs)            \
                                        a_op static_cast<std::underlying_type_t<a_type>>(a_rhs)); \
     }                                                                                            \
                                                                                                  \
-    constexpr auto operator a_op##=(a_type &a_lhs, a_type a_rhs) noexcept->a_type &              \
+    constexpr auto operator a_op##=(a_type &a_lhs, a_type a_rhs) noexcept -> a_type &            \
     {                                                                                            \
         return a_lhs = a_lhs a_op a_rhs;                                                         \
     }
@@ -106,7 +106,7 @@ template<class T, class U>
 #define BETHUTIL_MAKE_ALL_ENUM_OPERATORS(a_type)                                         \
     static_assert(std::is_enum_v<a_type>, "\'" #a_type "\' is not an enum");             \
                                                                                          \
-    [[nodiscard]] constexpr auto operator~(a_type a_val) noexcept->a_type                \
+    [[nodiscard]] constexpr auto operator~(a_type a_val) noexcept -> a_type              \
     {                                                                                    \
         return static_cast<a_type>(~static_cast<std::underlying_type_t<a_type>>(a_val)); \
     }                                                                                    \

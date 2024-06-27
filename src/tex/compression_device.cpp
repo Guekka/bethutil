@@ -82,8 +82,8 @@ auto CompressionDevice::gpu_name() const -> const std::u8string &
 #endif
 }
 
-auto CompressionDevice::make([[maybe_unused]] uint32_t adapter_index, [[maybe_unused]] bool allow_software)
-    -> std::optional<CompressionDevice>
+auto CompressionDevice::make([[maybe_unused]] uint32_t adapter_index,
+                             [[maybe_unused]] bool allow_software) -> std::optional<CompressionDevice>
 {
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     CompressionDevice ret;
