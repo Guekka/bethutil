@@ -10,7 +10,7 @@
 #include <cstdint>
 
 namespace btu::bsa {
-enum class ArchiveType
+enum class ArchiveType : std::uint8_t
 {
     Textures,
     Standard,

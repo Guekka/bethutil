@@ -6,11 +6,10 @@
 
 #include <bsa/bsa.hpp>
 
-#include <functional>
 #include <variant>
 
 namespace btu::bsa {
-enum class Compression
+enum class Compression : std::uint8_t
 {
     Yes,
     No,
@@ -18,10 +17,10 @@ enum class Compression
 
 template<class... Keys>
     requires requires(Keys... keys) { (std::string(keys.name()), ...); }
-[[nodiscard]] auto virtual_to_local_path(Keys &&...a_keys) noexcept -> std::u8string
+[[nodiscard]] auto virtual_to_local_path(const Keys &...a_keys) noexcept -> std::u8string
 {
     std::u8string local;
-    ((local += btu::common::as_utf8(a_keys.name()), local += u8'/'), ...);
+    ((local += common::as_utf8(a_keys.name()), local += u8'/'), ...);
     local.pop_back();
 
     for (auto &c : local)
@@ -31,7 +30,7 @@ template<class... Keys>
             c = Path::preferred_separator;
         }
     }
-    btu::common::make_valid(local, '_');
+    common::make_valid(local, '_');
     return local;
 }
 
@@ -79,11 +78,13 @@ public:
     Archive(ArchiveVersion ver, ArchiveType type);
 
     // While it is possible to copy an archive, it is better to disable implicit copying: it is a heavy operation
-    Archive(const Archive &)            = delete;
-    Archive &operator=(const Archive &) = delete;
+    Archive(const Archive &)                     = delete;
+    auto operator=(const Archive &) -> Archive & = delete;
 
-    Archive(Archive &&) noexcept            = default;
-    Archive &operator=(Archive &&) noexcept = default;
+    Archive(Archive &&) noexcept                     = default;
+    auto operator=(Archive &&) noexcept -> Archive & = default;
+
+    ~Archive() = default;
 
     static auto read(Path path) -> std::optional<Archive>;
     void write(Path path) &&;

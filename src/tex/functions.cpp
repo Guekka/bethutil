@@ -1,5 +1,3 @@
-
-#include <btu/common/metaprogramming.hpp>
 #include <btu/tex/compression_device.hpp>
 #include <btu/tex/dxtex.hpp>
 #include <btu/tex/error_code.hpp>
@@ -15,8 +13,8 @@ auto decompress(Texture &&file) -> Result
     const size_t &nimg = tex.GetImageCount();
     const auto &info   = tex.GetMetadata();
 
-    DirectX::ScratchImage timage;
-    const auto hr = DirectX::Decompress(img, nimg, info, DXGI_FORMAT_UNKNOWN /* picks good default */, timage);
+    ScratchImage timage;
+    const auto hr = Decompress(img, nimg, info, DXGI_FORMAT_UNKNOWN /* picks good default */, timage);
     if (FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
 
@@ -43,12 +41,8 @@ auto make_transparent_alpha(Texture &&file) -> Result
         });
     };
 
-    DirectX::ScratchImage timage;
-    const auto hr = DirectX::TransformImage(tex.GetImages(),
-                                            tex.GetImageCount(),
-                                            tex.GetMetadata(),
-                                            transform,
-                                            timage);
+    ScratchImage timage;
+    const auto hr = TransformImage(tex.GetImages(), tex.GetImageCount(), tex.GetMetadata(), transform, timage);
 
     if (FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
@@ -80,7 +74,7 @@ auto convert_uncompressed(const ScratchImage &image,
 // So there's a conflict
 // Also, we use another library because DirectXTex BC7 CPU encoder is unbearably slow
 auto convert_bc7(const uint8_t *source, uint8_t *dest, uint32_t width, uint32_t height, size_t slice_pitch)
-    -> tl::expected<void, common::Error>;
+    -> tl::expected<void, Error>;
 
 auto convert_compressed(const ScratchImage &image,
                         ScratchImage &timage,
@@ -105,14 +99,14 @@ auto convert_compressed(const ScratchImage &image,
     // hardware impl, only works on d3d11
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     if (bc6hbc7 && dev)
-        return DirectX::Compress(dev->get_device(),
-                                 img,
-                                 nimg,
-                                 image.GetMetadata(),
-                                 format,
-                                 DirectX::TEX_COMPRESS_DEFAULT,
-                                 DirectX::TEX_THRESHOLD_DEFAULT,
-                                 timage);
+        return Compress(dev->get_device(),
+                        img,
+                        nimg,
+                        image.GetMetadata(),
+                        format,
+                        DirectX::TEX_COMPRESS_DEFAULT,
+                        DirectX::TEX_THRESHOLD_DEFAULT,
+                        timage);
 #endif
     // slower bc7 impl, but faster than dxtex
     if (bc6hbc7)
@@ -139,7 +133,7 @@ auto convert_compressed(const ScratchImage &image,
         return S_OK;
     }
 
-    const auto compress_flags = [] {
+    constexpr auto compress_flags = [] {
 #if _OPENMP
         return DirectX::TEX_COMPRESS_PARALLEL;
 #else
@@ -147,13 +141,13 @@ auto convert_compressed(const ScratchImage &image,
 #endif
     }();
 
-    return DirectX::Compress(img,
-                             nimg,
-                             image.GetMetadata(),
-                             format,
-                             compress_flags,
-                             DirectX::TEX_THRESHOLD_DEFAULT,
-                             timage);
+    return Compress(img,
+                    nimg,
+                    image.GetMetadata(),
+                    format,
+                    compress_flags,
+                    DirectX::TEX_THRESHOLD_DEFAULT,
+                    timage);
 }
 auto convert(Texture &&file, DXGI_FORMAT format, const std::optional<CompressionDevice> &dev) -> Result
 {
@@ -165,9 +159,9 @@ auto convert(Texture &&file, DXGI_FORMAT format, const std::optional<Compression
     if (uncompressed_required && DirectX::IsCompressed(info.format))
         return tl::make_unexpected(Error(TextureErr::BadInput));
 
-    DirectX::ScratchImage timage;
+    ScratchImage timage;
 
-    auto f = DirectX::IsCompressed(format) ? convert_compressed : convert_uncompressed;
+    const auto f = DirectX::IsCompressed(format) ? convert_compressed : convert_uncompressed;
 
     if (const auto hr = f(tex, timage, format, dev); FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
@@ -181,11 +175,11 @@ auto prepare_generate_mipmaps(Texture &&file) -> Result
     const auto &tex = file.get();
     // Mips generation only works on a single base image, so strip off existing mip levels
     const auto &info = tex.GetMetadata();
-    DirectX::ScratchImage timage;
+    ScratchImage timage;
 
-    DirectX::TexMetadata mdata = info;
-    mdata.mipLevels            = 1;
-    if (auto hr = timage.Initialize(mdata); FAILED(hr))
+    TexMetadata mdata = info;
+    mdata.mipLevels   = 1;
+    if (const auto hr = timage.Initialize(mdata); FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
 
     for (size_t i = 0; i < info.arraySize; ++i)
@@ -210,7 +204,7 @@ auto generate_mipmaps_impl(Texture &&file) -> Result
     const auto &info  = tex.GetMetadata();
     const size_t mips = optimal_mip_count({info.width, info.height});
 
-    DirectX::ScratchImage timage;
+    ScratchImage timage;
     const auto hr = GenerateMipMaps(tex.GetImages(),
                                     tex.GetImageCount(),
                                     tex.GetMetadata(),
@@ -235,13 +229,13 @@ auto resize(Texture &&file, Dimension dim) -> Result
     const auto &tex  = file.get();
     const auto &info = tex.GetMetadata();
 
-    DirectX::ScratchImage timage;
+    ScratchImage timage;
 
     // DirectX::Resize is dumb. If WIC is used, it will convert the image to
     // R32G32B32A32 It works for small images... But will, for example, allocate
     // 1gb for a 8k picture. So disable WIC
-    const auto filter = DirectX::TEX_FILTER_SEPARATE_ALPHA | DirectX::TEX_FILTER_FORCE_NON_WIC;
-    const auto hr = DirectX::Resize(tex.GetImages(), tex.GetImageCount(), info, dim.w, dim.h, filter, timage);
+    constexpr auto filter = DirectX::TEX_FILTER_SEPARATE_ALPHA | DirectX::TEX_FILTER_FORCE_NON_WIC;
+    const auto hr         = Resize(tex.GetImages(), tex.GetImageCount(), info, dim.w, dim.h, filter, timage);
     if (FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
 

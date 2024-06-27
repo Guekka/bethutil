@@ -14,12 +14,12 @@ auto TextureErrCategory::name() const noexcept -> const char *
     return "btu::tex error";
 }
 
-auto btu::tex::TextureErrCategory::message(int ev) const -> std::string
+auto TextureErrCategory::message(int ev) const -> std::string
 {
     switch (static_cast<TextureErr>(ev))
     {
-        case btu::tex::TextureErr::Success: return "no error";
-        case btu::tex::TextureErr::Unknown: return "default error";
+        case TextureErr::Success: return "no error";
+        case TextureErr::Unknown: return "default error";
         default: return "(unrecognized error)";
     }
 }
@@ -29,12 +29,12 @@ auto make_error_code(TextureErr e) -> std::error_code
     return {static_cast<int>(e), k_texture_err_category};
 }
 
-auto btu::tex::FailureSourceCategory::name() const noexcept -> const char *
+auto FailureSourceCategory::name() const noexcept -> const char *
 {
     return "btu::tex failure-source";
 }
 
-auto btu::tex::FailureSourceCategory::message(int ev) const -> std::string
+auto FailureSourceCategory::message(int ev) const -> std::string
 {
     switch (static_cast<FailureSource>(ev))
     {
@@ -44,7 +44,7 @@ auto btu::tex::FailureSourceCategory::message(int ev) const -> std::string
     }
 }
 
-auto btu::tex::FailureSourceCategory::equivalent(const std::error_code &ec, int cond) const noexcept -> bool
+auto FailureSourceCategory::equivalent(const std::error_code &ec, int cond) const noexcept -> bool
 {
     switch (static_cast<FailureSource>(cond))
     {

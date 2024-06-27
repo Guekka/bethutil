@@ -22,6 +22,6 @@ struct PackSettings
     std::optional<AllowFilePred> allow_file_pred = std::nullopt;
 };
 
-[[nodiscard]] auto pack(PackSettings settings) noexcept -> flux::generator<bsa::Archive &&>;
+[[nodiscard]] auto pack(PackSettings settings) noexcept -> flux::generator<Archive &&>;
 
 } // namespace btu::bsa

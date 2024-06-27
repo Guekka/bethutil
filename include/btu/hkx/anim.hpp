@@ -10,10 +10,8 @@
 #include <btu/common/path.hpp>
 #include <tl/expected.hpp>
 
-#include <array>
-
 namespace btu::hkx {
-using btu::common::Error;
+using common::Error;
 
 using ResultError = tl::expected<void, Error>;
 
@@ -33,7 +31,7 @@ public:
     [[nodiscard]] virtual constexpr auto name() const noexcept -> std::string_view             = 0;
     [[nodiscard]] virtual constexpr auto input_file_name() const noexcept -> std::string_view  = 0;
     [[nodiscard]] virtual constexpr auto output_file_name() const noexcept -> std::string_view = 0;
-    [[nodiscard]] virtual constexpr auto target_game() const noexcept -> btu::Game             = 0;
+    [[nodiscard]] virtual constexpr auto target_game() const noexcept -> Game                  = 0;
 
     [[nodiscard]] virtual auto get_required_files(const Path &exe_dir) const noexcept -> std::vector<Path>
                                                                                          = 0;
@@ -51,11 +49,9 @@ class AnimExe
 public:
     [[nodiscard]] static auto make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>;
 
-    [[nodiscard]] auto convert(btu::Game target_game,
-                               const Path &input,
-                               const Path &output) const -> ResultError;
+    [[nodiscard]] auto convert(Game target_game, const Path &input, const Path &output) const -> ResultError;
 
-    [[nodiscard]] auto convert(btu::Game target_game, std::span<std::byte> input) const
+    [[nodiscard]] auto convert(Game target_game, std::span<const std::byte> input) const
         -> tl::expected<std::vector<std::byte>, Error>;
 
 private:
@@ -64,7 +60,7 @@ private:
 
     using CopyInput = std::function<ResultError(const Path &input_path)>;
 
-    [[nodiscard]] auto convert_impl(btu::Game target_game,
+    [[nodiscard]] auto convert_impl(Game target_game,
                                     const CopyInput &copy_input) const noexcept -> tl::expected<Path, Error>;
 
     AnimExe(Path exe_dir, std::vector<detail::AnimExeRef> detected) noexcept;

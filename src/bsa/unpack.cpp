@@ -8,8 +8,6 @@
 #include "btu/bsa/archive.hpp"
 #include "btu/common/functional.hpp"
 
-#include <iostream>
-
 namespace btu::bsa {
 void unpack(UnpackSettings sets)
 {
@@ -18,7 +16,7 @@ void unpack(UnpackSettings sets)
         if (!arch)
             return;
         const auto &root = sets.root_opt != nullptr ? *sets.root_opt : sets.file_path.parent_path();
-        btu::common::for_each_mt(std::move(*arch), [root, &sets](auto &&elem) {
+        common::for_each_mt(std::move(*arch), [root, &sets](auto &&elem) {
             const auto path = root / elem.first;
             if (sets.overwrite_existing_files || !fs::exists(path)) // preserve existing loose files
             {
@@ -38,7 +36,7 @@ void unpack_all(const Path &dir, const Path &out, const Settings &sets)
     std::vector files(fs::directory_iterator(dir), fs::directory_iterator{});
     erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
     std::ranges::for_each(files, [&out](const auto &file) {
-        btu::bsa::unpack(UnpackSettings{.file_path = file.path(), .root_opt = &out});
+        unpack(UnpackSettings{.file_path = file.path(), .root_opt = &out});
     });
 }
 

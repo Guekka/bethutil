@@ -27,7 +27,7 @@ void backslash_to_slash(std::basic_string<CharT> &path) noexcept
 constexpr auto make_path_canonizer(std::u8string_view start)
 {
     return [start](const Path &path) noexcept -> std::u8string {
-        auto str = btu::common::to_lower(path.generic_u8string());
+        auto str = to_lower(path.generic_u8string());
         backslash_to_slash(str);
 
         auto trimmed = str_trim(str);

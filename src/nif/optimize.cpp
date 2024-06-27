@@ -6,29 +6,29 @@
 
 namespace btu::nif {
 
-auto optimize(Mesh file, const OptimizationSteps &sets) -> tl::expected<Mesh, Error>
+auto optimize(Mesh file, const OptimizationSteps &steps) -> tl::expected<Mesh, Error>
 {
     auto res = tl::expected<Mesh, Error>(std::move(file));
-    if (sets.rename_referenced_textures)
+    if (steps.rename_referenced_textures)
         res.map([](auto &m) { rename_referenced_textures(m); });
-    if (sets.format)
-        res = res.and_then([&](auto &&m) { return convert(BTU_FWD(m), sets.headpart, *sets.format); });
+    if (steps.format)
+        res = res.and_then([&](auto &&m) { return convert(BTU_FWD(m), steps.headpart, *steps.format); });
     return res;
 }
 
 auto compute_optimization_steps(const Mesh &file, const Settings &sets) -> OptimizationSteps
 {
     // We only convert SSE and LE
-    std::optional<btu::Game> format{};
+    std::optional<Game> format{};
 
     const bool sse_compatible = file.get().IsSSECompatible();
-    const bool sse            = sets.game == btu::Game::SSE && !sse_compatible;
-    const bool sle            = sets.game == btu::Game::SLE;
+    const bool sse            = sets.game == Game::SSE && !sse_compatible;
+    const bool sle            = sets.game == Game::SLE;
     if (sse || sle)
         format = sets.game;
 
     const auto path        = canonize_path(file.get_load_path());
-    const auto is_headpart = btu::common::contains(sets.headpart_meshes, path);
+    const auto is_headpart = common::contains(sets.headpart_meshes, path);
 
     return OptimizationSteps{
         .rename_referenced_textures = sets.rename_referenced_textures,
@@ -39,7 +39,7 @@ auto compute_optimization_steps(const Mesh &file, const Settings &sets) -> Optim
 
 auto skyrim_headpart_meshes() noexcept -> const std::vector<std::u8string> &;
 
-auto Settings::get(btu::Game game) noexcept -> const Settings &
+auto Settings::get(Game game) noexcept -> const Settings &
 {
     switch (game)
     {

@@ -17,7 +17,7 @@ auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<Textu
         return TextureType::Diffuse;
 
     path.remove_prefix(type_pos + 1); // Remove underscore
-    auto type = btu::common::to_lower(path);
+    const auto type = common::to_lower(path);
 
     if (type == u8"n")
         return TextureType::Normal;

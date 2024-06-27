@@ -1,10 +1,9 @@
-#include "btu/common/error.hpp"
+#pragma once
+
 #include "btu/common/path.hpp"
 
 #include <catch.hpp>
 #include <tl/expected.hpp>
-
-#include <fstream>
 
 #ifdef __unix__
 constexpr std::string_view k_fail_on_linux_tag = "[!nonportable] [!shouldfail]";
@@ -37,12 +36,9 @@ struct StringMaker<tl::expected<void, E>>
 };
 
 template<>
-struct StringMaker<btu::Path>
+struct StringMaker<Path>
 {
-    static auto convert(const btu::Path &in) -> std::string
-    {
-        return btu::common::as_ascii_string(in.u8string());
-    }
+    static auto convert(const Path &in) -> std::string { return btu::common::as_ascii_string(in.u8string()); }
 };
 
 template<>

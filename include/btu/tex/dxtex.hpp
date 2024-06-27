@@ -1,3 +1,5 @@
+#pragma once
+
 /// Wrapper around DirectXTex.h to remove sal.
 /// We are not allowed to use reserved identifiers in C++. But it looks like Microsoft doesn't care.
 /// At least they provided a macro that disable some of them, but not enough.

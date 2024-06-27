@@ -16,7 +16,7 @@ inline auto operator<<(std::ostream &os, std::source_location loc) -> std::ostre
               << loc.function_name() << "`";
 }
 
-struct Error : public std::error_code
+struct Error : std::error_code
 {
     explicit Error(std::error_code ec, std::source_location l = std::source_location::current())
         : std::error_code(ec)

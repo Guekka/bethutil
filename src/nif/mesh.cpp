@@ -48,7 +48,7 @@ auto load(Path path) noexcept -> tl::expected<Mesh, Error>
 }
 
 /// istringstream without copying
-struct OneShotReadBuf : public std::streambuf
+struct OneShotReadBuf final : std::streambuf
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     OneShotReadBuf(char *s, std::size_t n) { setg(s, s, s + n); }
@@ -102,8 +102,8 @@ auto save(Mesh mesh) noexcept -> tl::expected<std::vector<std::byte>, Error>
     auto str = std::move(buf).str();
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    return std::vector<std::byte>(reinterpret_cast<std::byte *>(str.data()),
-                                  reinterpret_cast<std::byte *>(str.data() + str.size()));
+    return std::vector(reinterpret_cast<std::byte *>(str.data()),
+                       reinterpret_cast<std::byte *>(str.data() + str.size()));
     // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
 }

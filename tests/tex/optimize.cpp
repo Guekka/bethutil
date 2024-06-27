@@ -10,8 +10,6 @@
 #include <btu/tex/optimize.hpp>
 #include <btu/tex/texture.hpp>
 
-#include <iostream>
-
 auto operator<<(std::ostream &os, const btu::tex::OptimizationSteps &s) -> std::ostream &
 {
     const auto dim = s.resize.value_or(btu::tex::Dimension{});
@@ -36,8 +34,9 @@ constexpr auto info1 = [] {
 
 auto generate_tex(const DirectX::TexMetadata &info) -> btu::tex::Texture
 {
-    auto image = DirectX::ScratchImage{};
-    image.Initialize(info);
+    auto image    = DirectX::ScratchImage{};
+    const auto hr = image.Initialize(info);
+    REQUIRE(SUCCEEDED(hr));
     auto tex = btu::tex::Texture{};
     tex.set(std::move(image));
 
@@ -73,7 +72,8 @@ const auto k_sets2 = [] {
 auto generate_tex2() -> btu::tex::Texture
 {
     auto tex = DirectX::ScratchImage{};
-    tex.Initialize(info2);
+    auto hr  = tex.Initialize(info2);
+    REQUIRE(SUCCEEDED(hr));
 
     // We create a texture with opaque alpha
     constexpr auto transform = [](DirectX::XMVECTOR *out_pixels,
@@ -86,11 +86,7 @@ auto generate_tex2() -> btu::tex::Texture
     };
 
     DirectX::ScratchImage timage;
-    const auto hr = DirectX::TransformImage(tex.GetImages(),
-                                            tex.GetImageCount(),
-                                            tex.GetMetadata(),
-                                            transform,
-                                            timage);
+    hr = TransformImage(tex.GetImages(), tex.GetImageCount(), tex.GetMetadata(), transform, timage);
 
     REQUIRE(hr >= 0);
     REQUIRE(timage.IsAlphaAllOpaque());

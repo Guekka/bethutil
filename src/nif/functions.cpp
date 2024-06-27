@@ -6,23 +6,23 @@
 #include <nifly/NifFile.hpp>
 
 namespace btu::nif {
-auto get_niversion(btu::Game game) -> std::optional<nifly::NiVersion>
+auto get_niversion(Game game) -> std::optional<nifly::NiVersion>
 {
     using NiVer = nifly::NiVersion;
     switch (game)
     {
-        case btu::Game::TES3: return std::nullopt;
-        case btu::Game::TES4: return NiVer::getOB();
-        case btu::Game::FNV: return NiVer::getFO3();
-        case btu::Game::SLE: return NiVer::getSK();
-        case btu::Game::SSE: return NiVer::getSSE();
-        case btu::Game::FO4: return NiVer::getFO4();
-        case btu::Game::Custom: return std::nullopt;
+        case Game::TES3: return std::nullopt;
+        case Game::TES4: return NiVer::getOB();
+        case Game::FNV: return NiVer::getFO3();
+        case Game::SLE: return NiVer::getSK();
+        case Game::SSE: return NiVer::getSSE();
+        case Game::FO4: return NiVer::getFO4();
+        case Game::Custom: return std::nullopt;
     }
     return std::nullopt;
 }
 
-auto convert(Mesh file, HeadpartStatus headpart, btu::Game game) -> tl::expected<Mesh, Error>
+auto convert(Mesh file, HeadpartStatus headpart, Game game) -> tl::expected<Mesh, Error>
 {
     auto target_ver = get_niversion(game);
     if (!target_ver)
@@ -42,8 +42,8 @@ void rename_referenced_textures(Mesh &file)
         .flatten()
         .filter([](auto &tex) { return tex.get().size() >= 4; }) // Enough for ".tga"
         .for_each([&](auto &tex) {
-            auto ext = btu::common::as_utf8(tex.get()).substr(tex.get().size() - 4);
-            if (btu::common::str_compare(ext, u8".tga", common::CaseSensitive::No))
+            auto ext = common::as_utf8(tex.get()).substr(tex.get().size() - 4);
+            if (common::str_compare(ext, u8".tga", common::CaseSensitive::No))
                 tex.get().replace(tex.get().size() - 4, 4, ".dds");
         });
 }

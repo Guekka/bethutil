@@ -20,7 +20,7 @@ struct BestFormatFor
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
     BestFormatFor, uncompressed, uncompressed_without_alpha, compressed, compressed_without_alpha)
 
-enum class TextureType
+enum class TextureType : std::uint8_t
 {
     Diffuse,
     Normal,
@@ -46,7 +46,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(TextureType,
                               {TextureType::Skin, "skin"},
                               {TextureType::EnvironmentMask, "environment_mask"}})
 
-enum class AllowCompressed
+enum class AllowCompressed : std::uint8_t
 {
     Yes,
     No,

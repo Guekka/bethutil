@@ -248,13 +248,13 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
 [[nodiscard]] inline auto AllowedPath::check(const Path &filepath, const Path &root) const -> bool
 {
     const auto ext = filepath.extension().u8string();
-    if (!common::str_compare(extension, ext, common::CaseSensitive::No))
+    if (!str_compare(extension, ext, common::CaseSensitive::No))
         return false;
 
     const auto &relative = filepath.lexically_relative(root);
     const auto dir       = [&relative] {
         if (relative.empty())
-            return AllowedPath::k_root;
+            return k_root;
 
         return common::to_lower(relative.begin()->u8string());
     }();
@@ -266,14 +266,14 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
                                        const Path &root,
                                        const Settings &sets) -> FileTypes
 {
-    const auto ext = btu::common::to_lower(filepath.extension().u8string());
+    const auto ext = common::to_lower(filepath.extension().u8string());
     auto check     = [ext, &filepath, &root](const auto &vec) {
         using std::cbegin, std::cend;
         auto it = std::ranges::find_if(vec,
-                                       btu::common::overload{[&](const AllowedPath &p) {
-                                                                 return p.check(filepath, root);
-                                                             },
-                                                             [&](const auto &p) { return p == ext; }});
+                                       common::Overload{[&](const AllowedPath &p) {
+                                                            return p.check(filepath, root);
+                                                        },
+                                                        [&](const auto &p) { return p == ext; }});
         return it != cend(vec);
     };
 

@@ -13,11 +13,11 @@ auto find_manager(const Path &dir) -> ModManager
     namespace fs = fs;
 
     /* Manual forced */
-    if (fs::exists(dir / k_force_process_folder))
+    if (exists(dir / k_force_process_folder))
         return ModManager::ManualForced;
 
     /* Vortex */
-    if (fs::exists(dir / "__vortex_staging_folder"))
+    if (exists(dir / "__vortex_staging_folder"))
         return ModManager::Vortex;
 
     /* MO2 */

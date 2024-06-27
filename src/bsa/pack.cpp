@@ -12,7 +12,6 @@
 #include <btu/common/functional.hpp>
 #include <flux.hpp>
 
-#include <deque>
 #include <functional>
 
 namespace btu::bsa {
@@ -20,10 +19,10 @@ auto get_allow_file_pred(const PackSettings &sets) -> AllowFilePred
 {
     // this part is required, these files would break the archive if packed
     auto is_legal_path = [](const Path &root_dir, const fs::directory_entry &fileinfo) -> bool {
-        const bool is_regular = fs::is_regular_file(fileinfo);
+        const bool is_regular = is_regular_file(fileinfo);
 
         //Removing files at the root directory, those cannot be packed
-        const bool is_at_root = fs::equivalent(fileinfo.path().parent_path(), root_dir);
+        const bool is_at_root = equivalent(fileinfo.path().parent_path(), root_dir);
 
         return is_regular && !is_at_root;
     };
@@ -48,15 +47,12 @@ struct PackGroup
                                        const Settings &sets,
                                        const AllowFilePred &allow_path_pred) noexcept -> PackGroup
 {
-    constexpr std::array<FileTypes, 3> allowed_types = {FileTypes::Standard,
-                                                        FileTypes::Texture,
-                                                        FileTypes::Incompressible};
+    constexpr std::array allowed_types = {FileTypes::Standard, FileTypes::Texture, FileTypes::Incompressible};
 
     auto packable_files = flux::from_range(fs::recursive_directory_iterator(dir))
                               .filter([&](const auto &p) { return allow_path_pred(dir, p); })
                               .filter([&](const auto &p) {
-                                  return btu::common::contains(allowed_types,
-                                                               get_filetype(p.path(), dir, sets));
+                                  return common::contains(allowed_types, get_filetype(p.path(), dir, sets));
                               })
                               .map([](const auto &p) { return p.path(); })
                               .to<std::vector>();
@@ -74,8 +70,8 @@ struct PackGroup
             return get_filetype(file, dir, sets) != FileTypes::Texture;
         });
 
-        return {.standard = std::vector<Path>(packable_files.begin(), textures_start),
-                .texture  = std::vector<Path>(textures_start, packable_files.end())};
+        return {.standard = std::vector(packable_files.begin(), textures_start),
+                .texture  = std::vector(textures_start, packable_files.end())};
     }
 
     return {.standard = BTU_MOV(packable_files), .texture = {}};
@@ -120,12 +116,12 @@ struct PackGroup
 
 [[nodiscard]] auto do_pack(std::vector<Path> file_paths,
                            PackSettings settings,
-                           ArchiveType type) noexcept -> flux::generator<bsa::Archive &&>
+                           ArchiveType type) noexcept -> flux::generator<Archive &&>
 {
-    auto [thread, receiver] = common::make_producer_mt<bsa::Archive::value_type>(
-        std::move(file_paths), [&](const Path &absolute_path) -> bsa::Archive::value_type {
+    auto [thread, receiver] = common::make_producer_mt<Archive::value_type>(
+        std::move(file_paths), [&](const Path &absolute_path) -> Archive::value_type {
             auto file = prepare_file(absolute_path, settings, type);
-            return {fs::relative(absolute_path, settings.input_dir).string(), BTU_MOV(file)};
+            return {relative(absolute_path, settings.input_dir).string(), BTU_MOV(file)};
         });
 
     auto make_arch = [&] { return Archive{get_version(settings.game_settings, type), type}; };
@@ -154,7 +150,7 @@ struct PackGroup
         co_yield BTU_MOV(arch);
 }
 
-auto pack(PackSettings settings) noexcept -> flux::generator<bsa::Archive &&>
+auto pack(PackSettings settings) noexcept -> flux::generator<Archive &&>
 {
     auto files = list_packable_files(settings.input_dir,
                                      settings.game_settings,

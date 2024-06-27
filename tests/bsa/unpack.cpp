@@ -10,12 +10,12 @@
 
 TEST_CASE("unpack", "[src]")
 {
-    const btu::Path dir = "bsa_unpack";
-    const btu::Path in  = dir / "in";
+    const Path dir = "bsa_unpack";
+    const Path in  = dir / "in";
     btu::fs::remove_all(dir / "out");
 
-    btu::bsa::unpack_all(in, dir / "out", btu::bsa::Settings::get(btu::Game::SSE));
-    btu::bsa::unpack_all(in, dir / "out", btu::bsa::Settings::get(btu::Game::FO4));
+    unpack_all(in, dir / "out", btu::bsa::Settings::get(btu::Game::SSE));
+    unpack_all(in, dir / "out", btu::bsa::Settings::get(btu::Game::FO4));
 
     REQUIRE(btu::common::compare_directories(dir / "out", dir / "expected"));
 }

@@ -47,7 +47,7 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
 {
     const auto &tex         = file.get();
     const auto path         = canonize_path(file.get_load_path());
-    const bool is_landscape = btu::common::contains(sets.landscape_textures, path);
+    const bool is_landscape = common::contains(sets.landscape_textures, path);
     if (!is_landscape)
         return false;
 
@@ -77,7 +77,7 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
 [[nodiscard]] auto is_tga(const Texture &file) noexcept -> bool
 {
     const auto ext = file.get_load_path().extension();
-    return btu::common::str_compare(ext.u8string(), u8".tga", btu::common::CaseSensitive::No);
+    return str_compare(ext.u8string(), u8".tga", common::CaseSensitive::No);
 }
 
 [[nodiscard]] auto conversion_required(const Texture &file, const Settings &sets) noexcept -> bool
@@ -85,7 +85,7 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
     const auto &info = file.get().GetMetadata();
 
     const bool forbidden_format = sets.use_format_whitelist
-                                  && !btu::common::contains(sets.allowed_formats, info.format);
+                                  && !common::contains(sets.allowed_formats, info.format);
 
     const bool is_bad_cube = is_bad_cubemap(info);
     const bool bad         = forbidden_format || is_bad_cube;
@@ -111,19 +111,21 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     res.best_format = best_output_format(file, sets);
     res.convert     = conversion_required(file, sets);
 
-    const auto dim                            = Dimension{info.width, info.height};
-    const std::optional<Dimension> target_dim = std::visit(
-        btu::common::overload{
-            [](std::monostate) -> std::optional<Dimension> { return {}; },
-            [&](util::ResizeRatio r) { return std::optional(util::compute_resize_dimension(dim, r)); },
-            [&](Dimension target) { return std::optional(util::compute_resize_dimension(dim, target)); },
-        },
-        sets.resize);
+    const auto dim = Dimension{info.width, info.height};
+    const std::optional<Dimension> target_dim
+        = std::visit(common::Overload{
+                         [](std::monostate) -> std::optional<Dimension> { return {}; },
+                         [&](util::ResizeRatio r) { return std::optional(compute_resize_dimension(dim, r)); },
+                         [&](Dimension target) {
+                             return std::optional(util::compute_resize_dimension(dim, target));
+                         },
+                     },
+                     sets.resize);
 
     if (target_dim.has_value() && dim != target_dim.value())
         res.resize = target_dim.value();
 
-    if (sets.game == btu::Game::SSE)
+    if (sets.game == Game::SSE)
         if (can_be_optimized_landscape(file, sets))
             res.add_transparent_alpha = true;
 
@@ -154,35 +156,35 @@ auto Settings::get(Game game) noexcept -> const Settings &
 
     switch (game)
     {
-        case btu::Game::TES3: return tes3_sets;
-        case btu::Game::TES4:
+        case Game::TES3: return tes3_sets;
+        case Game::TES4:
         {
             static auto tes4_sets = [&] {
                 auto sets = tes3_sets;
-                sets.game = btu::Game::TES4;
+                sets.game = Game::TES4;
                 return sets;
             }();
             return tes4_sets;
         }
-        case btu::Game::FNV:
+        case Game::FNV:
         {
             static auto fnv_sets = [&] {
                 auto sets = tes3_sets;
-                sets.game = btu::Game::FNV;
+                sets.game = Game::FNV;
                 return sets;
             }();
             return fnv_sets;
         }
-        case btu::Game::SLE:
+        case Game::SLE:
         {
             static auto sle_sets = [&] {
                 auto sets = tes3_sets;
-                sets.game = btu::Game::SLE;
+                sets.game = Game::SLE;
                 return sets;
             }();
             return sle_sets;
         }
-        case btu::Game::SSE:
+        case Game::SSE:
         {
             static auto sse_sets = [&] {
                 auto sets                 = tes3_sets;
@@ -196,21 +198,21 @@ auto Settings::get(Game game) noexcept -> const Settings &
                     DXGI_FORMAT_R8G8B8A8_UNORM,
                 };
                 sets.output_format.compressed = DXGI_FORMAT_BC7_UNORM;
-                sets.game                     = btu::Game::SSE;
+                sets.game                     = Game::SSE;
                 return sets;
             }();
             return sse_sets;
         }
-        case btu::Game::FO4:
+        case Game::FO4:
         {
             static auto fo4_sets = [&] {
-                auto sets = Settings::get(Game::SSE);
-                sets.game = btu::Game::FO4;
+                auto sets = get(Game::SSE);
+                sets.game = Game::FO4;
                 return sets;
             }();
             return fo4_sets;
         }
-        case btu::Game::Custom: return tes3_sets;
+        case Game::Custom: return tes3_sets;
     }
     return tes3_sets;
 }

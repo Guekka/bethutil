@@ -11,10 +11,10 @@
 #include <tl/expected.hpp>
 
 namespace btu::nif {
-using Error       = btu::common::Error;
+using Error       = common::Error;
 using ResultError = tl::expected<void, Error>;
 
-enum class HeadpartStatus
+enum class HeadpartStatus : std::uint8_t
 {
     Yes,
     No,

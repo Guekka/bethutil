@@ -36,17 +36,16 @@ struct DeletableFacet : Facet
     {
     }
 
-    DeletableFacet(const DeletableFacet &)            = delete;
-    DeletableFacet &operator=(const DeletableFacet &) = delete;
+    DeletableFacet(const DeletableFacet &)                     = delete;
+    auto operator=(const DeletableFacet &) -> DeletableFacet & = delete;
 
-    DeletableFacet(DeletableFacet &&)            = default;
-    DeletableFacet &operator=(DeletableFacet &&) = default;
+    DeletableFacet(DeletableFacet &&)                     = default;
+    auto operator=(DeletableFacet &&) -> DeletableFacet & = default;
 
     ~DeletableFacet() override = default;
 };
 
-thread_local std::wstring_convert<DeletableFacet<std::codecvt<wchar_t, char, std::mbstate_t>>, wchar_t>
-    converter{};
+thread_local std::wstring_convert<DeletableFacet<std::codecvt<wchar_t, char, std::mbstate_t>>> converter{};
 } // namespace detail
 
 auto to_utf8(const std::wstring &str) -> std::u8string

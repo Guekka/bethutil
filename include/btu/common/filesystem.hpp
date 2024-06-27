@@ -17,7 +17,7 @@ namespace btu::common {
 [[nodiscard]] inline auto read_file(const Path &a_path) -> std::vector<std::byte>
 {
     std::vector<std::byte> data;
-    data.resize(fs::file_size(a_path));
+    data.resize(file_size(a_path));
 
     std::ifstream in{a_path, std::ios_base::in | std::ios_base::binary};
     in.exceptions(std::ios_base::failbit);
@@ -46,8 +46,8 @@ inline void write_file(const Path &a_path, std::span<const std::byte> data)
     file1.seekg(0); //rewind
     file2.seekg(0); //rewind
 
-    const std::istreambuf_iterator<char> begin1(file1);
-    const std::istreambuf_iterator<char> begin2(file2);
+    const std::istreambuf_iterator begin1(file1);
+    const std::istreambuf_iterator begin2(file2);
 
     return std::equal(begin1,
                       std::istreambuf_iterator<char>(),
@@ -100,10 +100,10 @@ inline void write_file(const Path &a_path, std::span<const std::byte> data)
 [[nodiscard]] inline auto hard_link(const Path &from, const Path &to) -> tl::expected<void, Error>
 {
     // simple case
-    if (!fs::is_directory(from))
+    if (!is_directory(from))
     {
         auto ec = std::error_code{};
-        fs::create_hard_link(from, to, ec);
+        create_hard_link(from, to, ec);
 
         if (ec)
         {
@@ -116,9 +116,12 @@ inline void write_file(const Path &a_path, std::span<const std::byte> data)
     }
 
     // we cannot hard link directories on Windows, so we create a directory and hardlink files inside
-    fs::create_directories(to);
+    create_directories(to);
     for (const auto &e : fs::recursive_directory_iterator(from))
-        hard_link(e.path(), to / fs::relative(e.path(), from));
+    {
+        if (const auto success = hard_link(e.path(), to / relative(e.path(), from)); !success)
+            return success;
+    }
 
     return {};
 }

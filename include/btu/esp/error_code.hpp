@@ -2,12 +2,10 @@
 
 #include <btu/common/error.hpp>
 
-#include <optional>
-
 namespace btu::esp {
-using btu::common::Error;
+using common::Error;
 
-enum class EspErr
+enum class EspErr : std::uint8_t
 {
     Success = 0,
     Unknown = 1,
@@ -15,15 +13,13 @@ enum class EspErr
 };
 } // namespace btu::esp
 
-namespace std {
 template<>
-struct is_error_code_enum<btu::esp::EspErr> : true_type
+struct std::is_error_code_enum<btu::esp::EspErr> : true_type
 {
-};
-} // namespace std
+}; // namespace std
 
 namespace btu::esp {
-struct EspErrCategory : std::error_category
+struct EspErrCategory final : std::error_category
 {
     [[nodiscard]] auto name() const noexcept -> const char * override { return "btu::esp error"; }
     [[nodiscard]] auto message(int ev) const -> std::string override
@@ -38,28 +34,26 @@ struct EspErrCategory : std::error_category
     };
 };
 
-inline const EspErrCategory k_Esp_err_category{};
+inline const EspErrCategory k_esp_err_category{};
 inline auto make_error_code(EspErr e) -> std::error_code
 {
-    return {static_cast<int>(e), k_Esp_err_category};
+    return {static_cast<int>(e), k_esp_err_category};
 }
 
-enum class FailureSource
+enum class FailureSource : std::uint8_t
 {
     BadUserInput = 1,
     SystemError  = 2,
 };
 } // namespace btu::esp
 
-namespace std {
 template<>
-struct is_error_condition_enum<btu::esp::FailureSource> : true_type
+struct std::is_error_condition_enum<btu::esp::FailureSource> : true_type
 {
-};
-} // namespace std
+}; // namespace std
 
 namespace btu::esp {
-class FailureSourceCategory : public std::error_category
+class FailureSourceCategory final : public std::error_category
 {
 public:
     [[nodiscard]] auto name() const noexcept -> const char * override { return "btu::esp failure-source"; }

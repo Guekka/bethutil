@@ -48,7 +48,7 @@ private:
     value_type cur_{};
 };
 
-class InvalidUTF8 : public std::exception
+class InvalidUTF8 final : public std::exception
 {
 public:
     [[nodiscard]] constexpr auto what() const noexcept -> const char * override
@@ -57,7 +57,7 @@ public:
     }
 };
 
-enum class CaseSensitive
+enum class CaseSensitive : std::uint8_t
 {
     Yes,
     No
@@ -87,7 +87,7 @@ constexpr auto str_contain(std::u8string_view string,
                                              CaseSensitive case_sensitive = CaseSensitive::Yes) -> bool;
 
 /* Returns a string_view of the string without leading and trailing whitespace, including null */
-[[nodiscard]] constexpr auto str_trim(std::u8string_view string) noexcept -> std::u8string_view;
+[[nodiscard]] constexpr auto str_trim(std::u8string_view in) noexcept -> std::u8string_view;
 
 struct Cards
 {
@@ -140,12 +140,12 @@ constexpr auto UTF8Iterator::end(std::u8string_view string) -> UTF8Iterator
     return it;
 }
 
-constexpr auto UTF8Iterator::operator*() const -> UTF8Iterator::value_type
+constexpr auto UTF8Iterator::operator*() const -> value_type
 {
     return cur_;
 }
 
-constexpr auto UTF8Iterator::operator->() const -> UTF8Iterator::pointer
+constexpr auto UTF8Iterator::operator->() const -> pointer
 {
     return cur_;
 }
@@ -170,13 +170,13 @@ constexpr auto UTF8Iterator::operator<=>(const UTF8Iterator &other) const -> std
 
 constexpr auto UTF8Iterator::operator++(int) -> UTF8Iterator
 {
-    auto copy = *this;
+    const auto copy = *this;
     ++*this;
     return copy;
 }
 constexpr auto UTF8Iterator::operator==(const UTF8Iterator &other) const -> bool
 {
-    return (*this <=> other) == std::strong_ordering::equal;
+    return *this <=> other == std::strong_ordering::equal;
 }
 
 static_assert(sizeof(std::string_view::value_type) == sizeof(std::u8string_view::value_type)
@@ -193,7 +193,7 @@ constexpr auto str_compare(std::u8string_view lhs,
     detail::assert_valid_utf8(lhs);
     detail::assert_valid_utf8(rhs);
 
-    auto f = case_sensitive == CaseSensitive::Yes ? utf8ncmp : utf8ncasecmp;
+    const auto f = case_sensitive == CaseSensitive::Yes ? utf8ncmp : utf8ncasecmp;
     return f(lhs.data(), rhs.data(), lhs.size()) == 0;
 }
 
@@ -206,8 +206,8 @@ constexpr auto str_find(std::u8string_view string,
 
     using std::cbegin, std::cend;
 
-    auto f    = case_sensitive == CaseSensitive::Yes ? utf8str : utf8casestr;
-    auto *ptr = f(string.data(), snippet.data());
+    const auto f    = case_sensitive == CaseSensitive::Yes ? utf8str : utf8casestr;
+    const auto *ptr = f(string.data(), snippet.data());
 
     if (ptr == nullptr)
         return std::u8string::npos;
@@ -233,12 +233,12 @@ constexpr auto str_starts_with(std::u8string_view string,
 constexpr auto str_trim(std::u8string_view in) noexcept -> std::u8string_view
 {
     if (in.empty())
-        return in;
+        return {};
 
     auto pred = [](char8_t c) { return isspace(c) || c == u8'\0'; };
 
-    auto begin = std::ranges::find_if_not(in, pred);
-    auto end   = std::ranges::find_if_not(in | std::views::reverse, pred).base();
+    const auto begin = std::ranges::find_if_not(in, pred);
+    const auto end   = std::ranges::find_if_not(in | std::views::reverse, pred).base();
 
     if (begin >= end)
         return std::u8string_view{};
@@ -298,7 +298,7 @@ constexpr auto str_match(std::u8string_view string,
             if (anyrep_pos_pat != pat_end)
             {
                 set_pos_pat = pat_end;
-                pat_it++;
+                ++pat_it;
             }
             else
             {

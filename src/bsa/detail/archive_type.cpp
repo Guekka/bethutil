@@ -12,7 +12,7 @@
 // Avoid including rsm-bsa in public header
 namespace btu::bsa {
 
-using btu::common::to_underlying;
+using common::to_underlying;
 
 static_assert(to_underlying(ArchiveVersion::tes3) == 1);
 static_assert(to_underlying(ArchiveVersion::tes4) == to_underlying(::bsa::tes4::version::tes4));

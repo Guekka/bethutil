@@ -107,11 +107,9 @@ TEST_CASE("clean_dummy_plugins", "[src]")
 
     const auto &sets = Settings::get(btu::Game::SSE);
 
-    auto plugins = btu::bsa::list_plugins(btu::fs::directory_iterator(out),
-                                          btu::fs::directory_iterator(),
-                                          sets);
+    auto plugins = list_plugins(btu::fs::directory_iterator(out), btu::fs::directory_iterator(), sets);
     REQUIRE(plugins == std::vector{FilePath(out, u8"dummy_sse", u8"", u8".esp", FileTypes::Plugin)});
-    btu::bsa::clean_dummy_plugins(plugins, sets);
+    clean_dummy_plugins(plugins, sets);
     REQUIRE(plugins.empty());
     REQUIRE(btu::common::compare_directories(out, dir / "expected"));
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../utils.hpp"
 #include "btu/common/filesystem.hpp"
 #include "btu/nif/functions.hpp"
@@ -30,9 +32,9 @@ inline auto test_expected(const Path &root,
     REQUIRE(out);
 
     const auto expected_path = root / "expected" / filename;
-    if (!std::filesystem::exists(expected_path) && approve == Approve::Yes)
+    if (!exists(expected_path) && approve == Approve::Yes)
     {
-        std::filesystem::create_directories(expected_path.parent_path());
+        create_directories(expected_path.parent_path());
         CHECK(btu::nif::save(out.value(), expected_path));
         FAIL_CHECK("Expected file not found:" + expected_path.string());
     }

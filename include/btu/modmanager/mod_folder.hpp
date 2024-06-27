@@ -10,8 +10,6 @@
 #include <btu/common/functional.hpp>
 #include <btu/common/path.hpp>
 
-#include <variant>
-
 namespace btu::modmanager {
 class ModFolder
 {
@@ -22,17 +20,17 @@ public:
         common::Lazy<std::vector<std::byte>> content;
     };
 
-    explicit ModFolder(Path directory, btu::bsa::Settings bsa_settings);
+    explicit ModFolder(Path directory, bsa::Settings bsa_settings);
 
     using Transformer = std::function<std::optional<std::vector<std::byte>>(ModFile)>;
 
-    enum class ArchiveTooLargeState
+    enum class ArchiveTooLargeState : std::uint8_t
     {
         BeforeProcessing,
         AfterProcessing,
     };
 
-    enum class ArchiveTooLargeAction
+    enum class ArchiveTooLargeAction : std::uint8_t
     {
         Skip,
         Process,
@@ -73,6 +71,6 @@ private:
                         ArchiveTooLargeHandler &&archive_too_large_handler) const;
 
     Path dir_;
-    btu::bsa::Settings bsa_settings_;
+    bsa::Settings bsa_settings_;
 };
 } // namespace btu::modmanager

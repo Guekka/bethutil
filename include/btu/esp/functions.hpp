@@ -2,7 +2,6 @@
 
 #include <btu/common/error.hpp>
 #include <btu/common/path.hpp>
-#include <btu/esp/error_code.hpp>
 #include <tl/expected.hpp>
 
 #include <array>
@@ -10,7 +9,7 @@
 #include <vector>
 
 namespace btu::esp {
-using btu::common::Error;
+using common::Error;
 
 namespace detail {
 #ifdef __GNUC__

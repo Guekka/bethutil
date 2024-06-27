@@ -18,7 +18,7 @@
 using namespace std::literals;
 
 namespace btu::hkx {
-class Info32to64 : public detail::AnimExeInfo
+class Info32to64 final : public detail::AnimExeInfo
 {
 public:
     [[nodiscard]] constexpr auto name() const noexcept -> std::string_view override
@@ -37,7 +37,7 @@ public:
     {
         return "OUTFILE64.hkx";
     }
-    [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override { return btu::Game::SSE; }
+    [[nodiscard]] constexpr auto target_game() const noexcept -> Game override { return Game::SSE; }
 
     [[nodiscard]] auto get_required_files([[maybe_unused]] const Path &exe_dir) const noexcept
         -> std::vector<Path> override
@@ -58,7 +58,7 @@ public:
 };
 static inline const auto k_exe_32to64 = Info32to64{};
 
-class Info64to32 : public detail::AnimExeInfo
+class Info64to32 final : public detail::AnimExeInfo
 {
 public:
     [[nodiscard]] constexpr auto name() const noexcept -> std::string_view override
@@ -73,7 +73,7 @@ public:
     {
         return "OUTFILE32.hkx";
     }
-    [[nodiscard]] constexpr auto target_game() const noexcept -> btu::Game override { return btu::Game::SLE; }
+    [[nodiscard]] constexpr auto target_game() const noexcept -> Game override { return Game::SLE; }
 
     [[nodiscard]] auto get_required_files(const Path &exe_dir) const noexcept -> std::vector<Path> override
     {
@@ -120,7 +120,7 @@ auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
     auto dir_path       = fs::temp_directory_path() / dir_name;
 
     auto ec = std::error_code{};
-    fs::create_directory(dir_path, ec);
+    create_directory(dir_path, ec);
 
     if (ec)
         return tl::make_unexpected(Error(ec));
@@ -133,7 +133,7 @@ auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
 {
     for (const auto &arg : args)
         std::cout << arg << '\n' << std::flush;
-    auto [result, ec] = reproc::run(args, options);
+    auto [result, ec] = run(args, options);
     if (ec)
         return tl::make_unexpected(Error(ec));
 
@@ -141,7 +141,7 @@ auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
 }
 
 [[nodiscard]] auto find_appropriate_exe(const std::vector<detail::AnimExeRef> &detected,
-                                        btu::Game target_game) -> tl::expected<detail::AnimExeRef, Error>
+                                        Game target_game) -> tl::expected<detail::AnimExeRef, Error>
 {
     const auto it = std::ranges::find_if(detected, [target_game](auto info) {
         return info.get().target_game() == target_game;
@@ -156,7 +156,7 @@ auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
     return *it;
 }
 
-struct ReprocOptions : public reproc::options
+struct ReprocOptions : reproc::options
 {
     std::string working_directory_storage; // working_directory expects a pointer. This allows us to use RAII
 };
@@ -166,7 +166,7 @@ struct ReprocOptions : public reproc::options
     ReprocOptions options;
     options.deadline                  = std::chrono::milliseconds(5000);
     options.redirect.parent           = true;
-    options.working_directory_storage = btu::common::as_ascii_string(working_dir.u8string());
+    options.working_directory_storage = common::as_ascii_string(working_dir.u8string());
     options.working_directory         = options.working_directory_storage.c_str();
     return options;
 }
@@ -178,7 +178,7 @@ struct ReprocOptions : public reproc::options
 {
     for (const auto &req_file : exe_info.get().get_required_files(exe_dir))
     {
-        const auto target = working_dir / fs::relative(req_file, exe_dir);
+        const auto target = working_dir / relative(req_file, exe_dir);
         const auto res    = common::hard_link(req_file, target);
         if (!res.has_value())
         {
@@ -245,7 +245,7 @@ AnimExe::AnimExe(Path exe_dir, std::vector<detail::AnimExeRef> detected) noexcep
 {
 }
 
-auto AnimExe::convert_impl(btu::Game target_game,
+auto AnimExe::convert_impl(const Game target_game,
                            const CopyInput &copy_input) const noexcept -> tl::expected<Path, Error>
 {
     const auto working_dir = make_working_dir();
@@ -269,21 +269,21 @@ auto AnimExe::convert_impl(btu::Game target_game,
     const auto args = exe->get().get_full_args(exe_dir_);
 
     return reproc(args, *options)
-        .and_then([](int result) noexcept -> ResultError {
+        .and_then([](const int result) noexcept -> ResultError {
             return result == 0 ? ResultError{} : tl::make_unexpected(Error(AnimErr::ExeFailed));
         })
         .map([&] { return *working_dir / exe->get().output_file_name(); });
 }
 
-auto AnimExe::convert(btu::Game target_game, const Path &input, const Path &output) const -> ResultError
+auto AnimExe::convert(const Game target_game, const Path &input, const Path &output) const -> ResultError
 {
     return convert_impl(target_game,
                         [&](const Path &input_path) { return copy_input_file(input, input_path); })
         .and_then([&](const Path &output_path) { return move_output_to_file(output_path, output); });
 }
 
-auto AnimExe::convert(btu::Game target_game,
-                      std::span<std::byte> input) const -> tl::expected<std::vector<std::byte>, Error>
+auto AnimExe::convert(const Game target_game, const std::span<const std::byte> input) const
+    -> tl::expected<std::vector<std::byte>, Error>
 {
     return convert_impl(target_game,
                         [&](const Path &input_path) -> ResultError {

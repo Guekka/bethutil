@@ -2,13 +2,12 @@
 
 #include <btu/common/error.hpp>
 
-#include <optional>
 #include <source_location>
 
 namespace btu::tex {
-using btu::common::Error;
+using common::Error;
 
-enum class TextureErr
+enum class TextureErr : std::uint8_t
 {
     Success = 0,
     Unknown = 1,
@@ -18,15 +17,13 @@ enum class TextureErr
 };
 } // namespace btu::tex
 
-namespace std {
 template<>
-struct is_error_code_enum<btu::tex::TextureErr> : true_type
+struct std::is_error_code_enum<btu::tex::TextureErr> : true_type
 {
-};
-} // namespace std
+}; // namespace std
 
 namespace btu::tex {
-struct TextureErrCategory : std::error_category
+struct TextureErrCategory final : std::error_category
 {
     [[nodiscard]] auto name() const noexcept -> const char * override;
     [[nodiscard]] auto message(int ev) const -> std::string override;
@@ -35,22 +32,20 @@ struct TextureErrCategory : std::error_category
 inline const TextureErrCategory k_texture_err_category{};
 auto make_error_code(TextureErr e) -> std::error_code;
 
-enum class FailureSource
+enum class FailureSource : std::uint8_t
 {
     BadUserInput = 1,
     SystemError  = 2,
 };
 } // namespace btu::tex
 
-namespace std {
 template<>
-struct is_error_condition_enum<btu::tex::FailureSource> : true_type
+struct std::is_error_condition_enum<btu::tex::FailureSource> : true_type
 {
-};
-} // namespace std
+}; // namespace std
 
 namespace btu::tex {
-class FailureSourceCategory : public std::error_category
+class FailureSourceCategory final : public std::error_category
 {
 public:
     [[nodiscard]] auto name() const noexcept -> const char * override;
