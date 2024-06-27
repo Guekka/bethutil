@@ -139,7 +139,7 @@ void ModFolder::transform_impl(const Transformer &transformer,
             if (check_archive_and_skip(ArchiveTooLargeState::BeforeProcessing))
                 return;
 
-            bool any_file_changed = false;
+            std::atomic_bool any_file_changed = false;
 
             common::for_each_mt(archive, [transformer, &any_file_changed](auto &pair) {
                 auto &[relative_path, file] = pair;
