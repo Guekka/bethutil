@@ -90,7 +90,7 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
     const bool is_bad_cube = is_bad_cubemap(info);
     const bool bad         = forbidden_format || is_bad_cube;
 
-    return bad || sets.compress || is_tga(file);
+    return bad || is_tga(file);
 }
 
 [[nodiscard]] auto best_output_format(const Texture &file, const Settings &sets) noexcept -> DXGI_FORMAT
@@ -109,7 +109,10 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     auto res = OptimizationSteps{};
 
     res.best_format = best_output_format(file, sets);
-    res.convert     = conversion_required(file, sets);
+
+    res.convert = conversion_required(file, sets);
+    if (sets.compress && res.best_format != info.format)
+        res.convert = true;
 
     const auto dim = Dimension{info.width, info.height};
     const std::optional<Dimension> target_dim
