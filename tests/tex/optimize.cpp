@@ -59,6 +59,12 @@ constexpr auto info2 = [] {
     return info;
 }();
 
+constexpr auto bc7_tex = [] {
+    auto info   = info1;
+    info.format = DXGI_FORMAT_BC7_UNORM;
+    return info;
+}();
+
 const auto k_sets2 = [] {
     auto sets                 = btu::tex::Settings::get(btu::Game::SSE);
     sets.use_format_whitelist = false;
@@ -107,19 +113,31 @@ TEST_CASE("compute_optimization_steps", "[src]")
         auto res = compute_optimization_steps(tex, k_sets1);
         CHECK(res.resize == btu::tex::Dimension{256, 256});
         CHECK_FALSE(res.add_transparent_alpha);
-        CHECK(res.mipmaps == true);
+        CHECK(res.mipmaps);
         CHECK(res.best_format == DXGI_FORMAT_BC7_UNORM);
-        CHECK(res.convert == true);
+        CHECK(res.convert);
     }
     SECTION("tex2")
     {
         auto tex = generate_tex2();
         auto res = compute_optimization_steps(tex, k_sets2);
         CHECK(res.resize == std::nullopt);
-        CHECK(res.add_transparent_alpha == true);
+        CHECK(res.add_transparent_alpha);
         CHECK_FALSE(res.mipmaps);
         CHECK(res.best_format == DXGI_FORMAT_R8G8B8A8_UNORM);
-        CHECK(res.convert == false);
+        CHECK_FALSE(res.convert);
+    }
+    SECTION("do not compress to same format as current")
+    {
+        auto tex       = generate_tex(bc7_tex);
+        auto sets      = k_sets1;
+        sets.resize    = {};
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize == std::nullopt);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK(res.mipmaps);
+        CHECK(res.best_format == DXGI_FORMAT_BC7_UNORM);
+        CHECK_FALSE(res.convert);
     }
 }
 
