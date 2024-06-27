@@ -136,6 +136,7 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     return res;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 auto Settings::get(Game game) noexcept -> const Settings &
 {
     static auto tes3_sets = [&] {
@@ -205,12 +206,23 @@ auto Settings::get(Game game) noexcept -> const Settings &
         }
         case Game::FO4:
         {
+            // NOLINTNEXTLINE(misc-no-recursion)
             static auto fo4_sets = [&] {
                 auto sets = get(Game::SSE);
                 sets.game = Game::FO4;
                 return sets;
             }();
             return fo4_sets;
+        }
+        case Game::Starfield:
+        {
+            // NOLINTNEXTLINE(misc-no-recursion)
+            static auto starfield_sets = [&] {
+                auto sets = get(Game::SSE);
+                sets.game = Game::Starfield;
+                return sets;
+            }();
+            return starfield_sets;
         }
         case Game::Custom: return tes3_sets;
     }

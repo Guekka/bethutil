@@ -17,6 +17,7 @@ auto get_niversion(Game game) -> std::optional<nifly::NiVersion>
         case Game::SLE: return NiVer::getSK();
         case Game::SSE: return NiVer::getSSE();
         case Game::FO4: return NiVer::getFO4();
+        case Game::Starfield: return NiVer::getSF();
         case Game::Custom: return std::nullopt;
     }
     return std::nullopt;

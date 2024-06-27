@@ -169,7 +169,7 @@ void make_dummy_plugins(std::span<const FilePath> archives, const Settings &sets
             continue;
 
         auto mut_bsa   = bsa;
-        mut_bsa.ext    = sets.plugin_extensions.back();
+        mut_bsa.ext    = sets.dummy_extension;
         mut_bsa.suffix = {};
         std::ofstream dummy(mut_bsa.full_path(), std::ios::out | std::ios::binary);
 

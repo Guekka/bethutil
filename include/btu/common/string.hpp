@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cctype>
 #include <codecvt>
+#include <cstdint>
 #include <ranges>
 #include <string>
 

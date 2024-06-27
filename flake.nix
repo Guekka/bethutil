@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     systems.url = "github:nix-systems/default";
     devenv.url = "github:cachix/devenv";
   };
@@ -23,7 +23,7 @@
           inherit inputs pkgs;
           modules = [
             {
-              packages = [pkgs.cmake pkgs.ninja pkgs.pkg-config pkgs.gcc pkgs.vcpkg pkgs.libgccjit];
+              packages = [pkgs.cmake pkgs.ninja pkgs.pkg-config pkgs.gcc pkgs.vcpkg pkgs.libgccjit pkgs.zip];
 
               enterShell = ''
                 export VCPKG_ROOT=$(realpath $(dirname $(readlink -f $(type -p vcpkg)))/../share/vcpkg)

@@ -37,6 +37,7 @@ TEST_CASE("Pack", "[src]")
 
     test_pack(btu::Game::SSE, u8"sse");
     test_pack(btu::Game::FO4, u8"fo4");
+    test_pack(btu::Game::Starfield, u8"starfield");
 
     CHECK(btu::common::compare_directories(dir / "output", dir / "expected"));
 }

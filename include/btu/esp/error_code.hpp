@@ -2,6 +2,8 @@
 
 #include <btu/common/error.hpp>
 
+#include <cstdint>
+
 namespace btu::esp {
 using common::Error;
 

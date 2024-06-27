@@ -15,7 +15,6 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/bsa/archive.hpp"
     "${INCLUDE_DIR}/btu/bsa/settings.hpp"
     "${INCLUDE_DIR}/btu/bsa/plugin.hpp"
-    "${INCLUDE_DIR}/btu/bsa/detail/archive_type.hpp"
     "${INCLUDE_DIR}/btu/esp/error_code.hpp"
     "${INCLUDE_DIR}/btu/esp/functions.hpp"
     "${INCLUDE_DIR}/btu/hkx/anim.hpp"
@@ -45,7 +44,6 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/bsa/pack.cpp"
     "${SOURCE_DIR}/bsa/plugin.cpp"
     "${SOURCE_DIR}/bsa/unpack.cpp"
-    "${SOURCE_DIR}/bsa/detail/archive_type.cpp"
     "${SOURCE_DIR}/esp/functions.cpp"
     "${SOURCE_DIR}/hkx/anim.cpp"
     "${SOURCE_DIR}/modmanager/mod_folder.cpp"
@@ -113,7 +111,7 @@ target_compile_definitions(
 target_compile_definitions(
   "${PROJECT_NAME}" PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
                             _GLIBCXX_PARALLEL) # required for parallel STL
-                                               # algorithms on GCC
+# algorithms on GCC
 
 target_compile_options(
   "${PROJECT_NAME}"

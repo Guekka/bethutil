@@ -11,6 +11,7 @@ enum class Game : std::uint8_t
     SLE,
     SSE,
     FO4,
+    Starfield,
     Custom
 };
 
@@ -21,6 +22,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(Game,
                               {Game::SLE, "sle"},
                               {Game::SSE, "sse"},
                               {Game::FO4, "fo4"},
+                              {Game::Starfield, "starfield"},
                               {Game::Custom, "custom"}})
 
 } // namespace btu

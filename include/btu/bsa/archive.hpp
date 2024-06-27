@@ -1,10 +1,10 @@
 #pragma once
 
-#include "btu/bsa/detail/archive_type.hpp"
 #include "btu/common/metaprogramming.hpp"
 #include "btu/common/path.hpp"
 
 #include <bsa/bsa.hpp>
+#include <nlohmann/json.hpp>
 
 #include <variant>
 
@@ -34,17 +34,48 @@ template<class... Keys>
     return local;
 }
 
-namespace libbsa     = ::bsa;
+namespace libbsa = ::bsa;
+
+enum class ArchiveType : std::uint8_t
+{
+    Textures,
+    Standard,
+};
+
+enum class ArchiveVersion : std::uint32_t
+{
+    tes3 = 1,
+    tes4 = static_cast<std::underlying_type_t<ArchiveVersion>>(libbsa::tes4::version::tes4),
+    fo3  = static_cast<std::underlying_type_t<ArchiveVersion>>(libbsa::tes4::version::fo3),
+    tes5 = static_cast<std::underlying_type_t<ArchiveVersion>>(libbsa::tes4::version::tes5),
+    sse  = static_cast<std::underlying_type_t<ArchiveVersion>>(libbsa::tes4::version::sse),
+    fo4,
+    starfield,
+};
+
+NLOHMANN_JSON_SERIALIZE_ENUM(ArchiveType,
+                             {{ArchiveType::Textures, "textures"}, {ArchiveType::Standard, "standard"}})
+
+NLOHMANN_JSON_SERIALIZE_ENUM(ArchiveVersion,
+                             {
+                                 {ArchiveVersion::tes3, "tes3"},
+                                 {ArchiveVersion::tes4, "tes4"},
+                                 {ArchiveVersion::fo3, "fo3"},
+                                 {ArchiveVersion::tes5, "tes5"},
+                                 {ArchiveVersion::sse, "sse"},
+                                 {ArchiveVersion::fo4, "fo4"},
+                                 {ArchiveVersion::starfield, "starfield"},
+                             })
+
 using UnderlyingFile = std::variant<libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file>;
 
 class File final
 {
 public:
-    explicit File(ArchiveVersion v);
-    File(UnderlyingFile f, ArchiveVersion v);
+    explicit File(ArchiveVersion version, ArchiveType type);
+    File(UnderlyingFile f, ArchiveVersion version, ArchiveType type);
 
     [[nodiscard]] auto compressed() const noexcept -> Compression;
-    void decompress();
     void compress();
 
     void read(Path path);
@@ -54,6 +85,7 @@ public:
     void write(binary_io::any_ostream &dst) const;
 
     [[nodiscard]] auto version() const noexcept -> ArchiveVersion;
+    [[nodiscard]] auto type() const noexcept -> ArchiveType;
     [[nodiscard]] auto size() const noexcept -> size_t;
 
     template<typename T>
@@ -65,6 +97,7 @@ public:
 
 private:
     ArchiveVersion ver_;
+    ArchiveType type_;
     UnderlyingFile file_;
 };
 
