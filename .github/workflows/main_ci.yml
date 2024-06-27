@@ -43,11 +43,7 @@ jobs:
         run: |
           echo "GCOV=gcov-${{ matrix.version }}" >> $GITHUB_ENV
 
-          wget https://github.com/ninja-build/ninja/releases/download/v1.11.0/ninja-linux.zip
-          unzip ninja-linux.zip
-          sudo mv ninja /usr/local/bin
-
-          sudo apt install liblz4-dev zlib1g-dev -y
+          sudo apt install ninja-build liblz4-dev zlib1g-dev -y
           sudo pip install gcovr
 
       - uses: lukka/run-vcpkg@v11
