@@ -41,57 +41,67 @@ auto skyrim_headpart_meshes() noexcept -> const std::vector<std::u8string> &;
 
 auto Settings::get(Game game) noexcept -> const Settings &
 {
+    constexpr auto get_base_sets = [](Game game) noexcept -> Settings {
+        return Settings{
+            .game                       = game,
+            .rename_referenced_textures = true,
+            .headpart_meshes            = {},
+        };
+    };
+
     switch (game)
     {
         case Game::TES3:
         {
-            static const auto tes3_sets = Settings{.game = game};
+            static const auto tes3_sets = get_base_sets(game);
             return tes3_sets;
         }
         case Game::TES4:
         {
-            static const auto tes4_sets = Settings{.game = game};
+            static const auto tes4_sets = get_base_sets(game);
             return tes4_sets;
         }
         case Game::FNV:
         {
-            static const auto fnv_sets = Settings{.game = game};
+            static const auto fnv_sets = get_base_sets(game);
             return fnv_sets;
+        }
+        case Game::FO4:
+        {
+            static const auto fo4_sets = get_base_sets(game);
+            return fo4_sets;
+        }
+        case Game::Starfield:
+        {
+            static const auto starfield_sets = get_base_sets(game);
+            return starfield_sets;
+        }
+        case Game::Custom:
+        {
+            static const auto custom_sets = get_base_sets(game);
+            return custom_sets;
         }
         case Game::SLE:
         {
-            static const auto sle_sets = Settings{
-                .game            = game,
-                .headpart_meshes = skyrim_headpart_meshes(),
-            };
+            static const auto sle_sets = [&get_base_sets, game]() {
+                auto sets            = get_base_sets(game);
+                sets.headpart_meshes = skyrim_headpart_meshes();
+                return sets;
+            }();
             return sle_sets;
         }
         case Game::SSE:
         {
-            static const auto sse_sets = Settings{
-                .game                       = game,
-                .rename_referenced_textures = true,
-                .headpart_meshes            = skyrim_headpart_meshes(),
-            };
+            static const auto sse_sets = [&get_base_sets, game]() {
+                auto sets            = get_base_sets(game);
+                sets.headpart_meshes = skyrim_headpart_meshes();
+                return sets;
+            }();
             return sse_sets;
-        }
-        case Game::FO4:
-        {
-            static const auto fo4_sets = Settings{
-                .game                       = game,
-                .rename_referenced_textures = true,
-            };
-            return fo4_sets;
-        }
-        case Game::Custom:
-        {
-            static const auto custom_sets = Settings{.game = game};
-            return custom_sets;
         }
     }
 
-    static const auto default_sets = Settings{.game = game};
-    return default_sets;
+    assert(false && "Invalid game");
 }
 
 auto skyrim_headpart_meshes() noexcept -> const std::vector<std::u8string> &
