@@ -57,7 +57,7 @@ Texture::Texture()
     std::call_once(wic_initialized, initialize_com);
 }
 
-void Texture::set(DirectX::ScratchImage &&tex) noexcept
+void Texture::set(ScratchImage &&tex) noexcept
 {
     tex_ = std::move(tex);
 }
@@ -101,16 +101,13 @@ auto load(Path path) noexcept -> tl::expected<Texture, Error>
     Texture tex;
     tex.set_load_path(std::move(path));
 
-    DirectX::TexMetadata info{};
+    TexMetadata info{};
     const auto load_path = tex.get_load_path().wstring();
-    auto hr = DirectX::LoadFromDDSFile(load_path.c_str(), DirectX::DDS_FLAGS_NONE, &info, tex.get());
+    auto hr              = LoadFromDDSFile(load_path.c_str(), DirectX::DDS_FLAGS_NONE, &info, tex.get());
     if (FAILED(hr))
     {
         // Maybe it's a TGA then?
-        const auto hr2 = DirectX::LoadFromTGAFile(load_path.c_str(),
-                                                  DirectX::TGA_FLAGS_NONE,
-                                                  &info,
-                                                  tex.get());
+        const auto hr2 = LoadFromTGAFile(load_path.c_str(), DirectX::TGA_FLAGS_NONE, &info, tex.get());
         if (FAILED(hr2))
             return tl::make_unexpected(error_from_hresult(hr)); // preserve original error
     }
@@ -122,20 +119,12 @@ auto load(Path relative_path, std::span<std::byte> data) noexcept -> tl::expecte
     Texture tex;
     tex.set_load_path(std::move(relative_path));
 
-    DirectX::TexMetadata info{};
-    const auto hr = DirectX::LoadFromDDSMemory(data.data(),
-                                               data.size(),
-                                               DirectX::DDS_FLAGS_NONE,
-                                               &info,
-                                               tex.get());
+    TexMetadata info{};
+    const auto hr = LoadFromDDSMemory(data.data(), data.size(), DirectX::DDS_FLAGS_NONE, &info, tex.get());
     if (FAILED(hr))
     {
         // Maybe it's a TGA then?
-        const auto hr2 = DirectX::LoadFromTGAMemory(data.data(),
-                                                    data.size(),
-                                                    DirectX::TGA_FLAGS_NONE,
-                                                    &info,
-                                                    tex.get());
+        const auto hr2 = LoadFromTGAMemory(data.data(), data.size(), DirectX::TGA_FLAGS_NONE, &info, tex.get());
         if (FAILED(hr2))
             return tl::make_unexpected(error_from_hresult(hr)); // preserve original error
     }
@@ -144,11 +133,11 @@ auto load(Path relative_path, std::span<std::byte> data) noexcept -> tl::expecte
 
 auto save(const Texture &tex, const Path &path) noexcept -> ResultError
 {
-    const auto res = DirectX::SaveToDDSFile(tex.get().GetImages(),
-                                            tex.get().GetImageCount(),
-                                            tex.get().GetMetadata(),
-                                            DirectX::DDS_FLAGS_NONE,
-                                            path.wstring().c_str());
+    const auto res = SaveToDDSFile(tex.get().GetImages(),
+                                   tex.get().GetImageCount(),
+                                   tex.get().GetMetadata(),
+                                   DirectX::DDS_FLAGS_NONE,
+                                   path.wstring().c_str());
     if (FAILED(res))
         return tl::make_unexpected(error_from_hresult(res));
     return {};
@@ -157,17 +146,17 @@ auto save(const Texture &tex, const Path &path) noexcept -> ResultError
 auto save(const Texture &tex) noexcept -> tl::expected<std::vector<std::byte>, Error>
 {
     auto blob      = DirectX::Blob{};
-    const auto res = DirectX::SaveToDDSMemory(tex.get().GetImages(),
-                                              tex.get().GetImageCount(),
-                                              tex.get().GetMetadata(),
-                                              DirectX::DDS_FLAGS_NONE,
-                                              blob);
+    const auto res = SaveToDDSMemory(tex.get().GetImages(),
+                                     tex.get().GetImageCount(),
+                                     tex.get().GetMetadata(),
+                                     DirectX::DDS_FLAGS_NONE,
+                                     blob);
     if (FAILED(res))
         return tl::make_unexpected(error_from_hresult(res));
 
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    return std::vector<std::byte>(static_cast<std::byte *>(blob.GetBufferPointer()),
-                                  static_cast<std::byte *>(blob.GetBufferPointer()) + blob.GetBufferSize());
+    return std::vector(static_cast<std::byte *>(blob.GetBufferPointer()),
+                       static_cast<std::byte *>(blob.GetBufferPointer()) + blob.GetBufferSize());
     // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 

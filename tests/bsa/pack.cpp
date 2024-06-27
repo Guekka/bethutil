@@ -10,8 +10,6 @@
 
 #include <btu/bsa/unpack.hpp>
 
-#include <iostream>
-
 TEST_CASE("Pack", "[src]")
 {
     const Path dir = "pack";
@@ -27,9 +25,9 @@ TEST_CASE("Pack", "[src]")
             .compress      = Compression::Yes,
         };
 
-        pack(pack_settings).for_each([name, &dir, &sets](btu::bsa::Archive &&arch) {
-            auto type      = arch.type();
-            auto arch_name = std::u8string(name)
+        pack(pack_settings).for_each([name, &dir, &sets](Archive &&arch) {
+            const auto type = arch.type();
+            auto arch_name  = std::u8string(name)
                              + (type == ArchiveType::Textures ? u8" - Textures" : u8" - Main")
                              + sets.extension;
 

@@ -1,3 +1,4 @@
+#pragma once
 /// Wrapper for Windows.h header
 /// Removes as much as possible from the global namespace
 

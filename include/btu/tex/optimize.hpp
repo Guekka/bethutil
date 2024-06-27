@@ -22,7 +22,7 @@ struct Settings
 {
     [[nodiscard]] static auto get(Game game) noexcept -> const Settings &;
 
-    btu::Game game;
+    Game game;
 
     bool compress;
     std::variant<std::monostate, util::ResizeRatio, Dimension> resize;
