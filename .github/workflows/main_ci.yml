@@ -61,8 +61,8 @@ jobs:
         env:
           gcovr: gcovr -r .. . --coveralls --exclude-unreachable-branches --exclude-function-lines --exclude-throw-branches
         run: |
-          (cd tests && ./tests [src])
-          ${{ env.gcovr }} -f ".*/src/.*" -f ".*/include/.*" -o src.json
+          (cd tests && ./tests)
+          ${{ env.gcovr }} -f ".*/src/.*" -f ".*/include/btu/.*" -o src.json
 
           find -type f -name *.gcda | xargs rm
 
