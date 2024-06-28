@@ -10,6 +10,7 @@
 #include <utf8h/utf8.h>
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <codecvt>
 #include <cstdint>
@@ -89,6 +90,14 @@ constexpr auto str_contain(std::u8string_view string,
 
 /* Returns a string_view of the string without leading and trailing whitespace, including null */
 [[nodiscard]] constexpr auto str_trim(std::u8string_view in) noexcept -> std::u8string_view;
+
+constexpr auto k_lower_alphabetic_charset = std::to_array<char8_t>({
+    u8'a', u8'b', u8'c', u8'd', u8'e', u8'f', u8'g', u8'h', u8'i', u8'j', u8'k', u8'l', u8'm',
+    u8'n', u8'o', u8'p', u8'q', u8'r', u8's', u8't', u8'u', u8'v', u8'w', u8'x', u8'y', u8'z',
+});
+
+[[nodiscard]] auto str_random(
+    size_t length, std::span<const char8_t> charset = k_lower_alphabetic_charset) noexcept -> std::u8string;
 
 struct Cards
 {
