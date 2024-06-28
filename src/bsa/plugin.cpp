@@ -6,6 +6,7 @@
 #include "btu/bsa/plugin.hpp"
 
 #include "btu/common/algorithms.hpp"
+#include "btu/common/functional.hpp"
 
 #include <fstream>
 #include <ios>
@@ -138,6 +139,39 @@ auto find_archive_name(std::span<const FilePath> plugins,
         if (check_plugin(plug))
             return plug;
 
+    return std::nullopt;
+}
+
+auto find_archive_name(const Path &directory,
+                       const Settings &sets,
+                       ArchiveType type) noexcept -> std::optional<FilePath>
+{
+    auto plugins = list_plugins(fs::directory_iterator(directory), fs::directory_iterator(), sets);
+    if (plugins.empty())
+    {
+        plugins.emplace_back(directory,
+                             directory.filename().u8string(),
+                             u8"",
+                             sets.dummy_extension,
+                             FileTypes::Plugin);
+    }
+
+    auto name = find_archive_name(plugins, sets, type);
+    if (name.has_value())
+        return name;
+
+    // alright, I have no idea how we can get here. But let's try to make a name just in case
+    constexpr auto max_attempts = std::numeric_limits<uint16_t>::max();
+
+    for (uint16_t i = 0; i < max_attempts; ++i)
+    {
+        auto filename = u8"archive - " + common::str_random(8);
+        FilePath file(directory, filename, u8"", sets.extension, FileTypes::BSA);
+        if (!exists(file.full_path()))
+            return file; // finally found a name
+    }
+
+    // guess we are out of luck
     return std::nullopt;
 }
 
