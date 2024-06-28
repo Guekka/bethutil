@@ -67,10 +67,11 @@ jobs:
           find -type f -name *.gcda | xargs rm
 
       - name: Collect code coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
           files: bethutil/build/examples.json,bethutil/build/src.json
+          token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
 
   windows:
@@ -113,11 +114,12 @@ jobs:
       - name: (main) Test
         working-directory: ${{ github.workspace }}/bethutil/build
         run: |
-          & "$($env:SystemDrive)/Program Files/OpenCppCoverage/OpenCppCoverage.exe" -q --sources bethutil\examples --sources bethutil\src --sources bethutil\tests --cover_children --export_type cobertura -- ctest -C ${{ env.BUILD_TYPE }} -V --rerun-failed --output-on-failure
+          & "$($env:SystemDrive)/Program Files/OpenCppCoverage/OpenCppCoverage.exe" -q --sources bethutil\examples --sources bethutil\src --sources bethutil\tests --cover_children --export_type cobertura:cov.xml -- ctest -C ${{ env.BUILD_TYPE }} -V --rerun-failed --output-on-failure
 
       - name: (main) Collect code coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v4
         with:
-          fail_ci_if_error: true
-          files: build/ctestCoverage.xml
+          fail_ci_if_error: false # Windows coverage is almost the same as Linux, so as long as one of them passes, we're good
+          files: cov.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
           working-directory: ${{ github.workspace }}/bethutil/build
