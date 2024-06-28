@@ -106,10 +106,13 @@ auto is_loaded(const FilePath &archive, const Settings &sets) -> bool
     });
 }
 
-auto find_archive_name(std::span<const FilePath> plugins, const Settings &sets, ArchiveType type) -> FilePath
+auto find_archive_name(std::span<const FilePath> plugins,
+                       const Settings &sets,
+                       ArchiveType type) -> std::optional<FilePath>
 {
+    // TODO: proper error messages
     if (plugins.empty())
-        throw std::invalid_argument("Plugins cannot be empty");
+        return std::nullopt;
 
     const std::u8string suffix = [type, &sets] {
         if (type == ArchiveType::Textures)
@@ -135,7 +138,7 @@ auto find_archive_name(std::span<const FilePath> plugins, const Settings &sets, 
         if (check_plugin(plug))
             return plug;
 
-    throw std::runtime_error("No btu/bsa/plugin name found after 256 tries.");
+    return std::nullopt;
 }
 
 void clean_dummy_plugins(std::vector<FilePath> &plugins, const Settings &sets)

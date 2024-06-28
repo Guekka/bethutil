@@ -39,7 +39,7 @@ private:
 
 [[nodiscard]] auto find_archive_name(std::span<const FilePath> plugins,
                                      const Settings &sets,
-                                     ArchiveType type) -> FilePath;
+                                     ArchiveType type) -> std::optional<FilePath>;
 
 namespace detail {
 template<typename It>

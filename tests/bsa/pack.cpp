@@ -31,7 +31,8 @@ TEST_CASE("Pack", "[src]")
                              + (type == ArchiveType::Textures ? u8" - Textures" : u8" - Main")
                              + sets.extension;
 
-            std::move(arch).write(dir / "output" / arch_name);
+            const bool success = std::move(arch).write(dir / "output" / arch_name);
+            REQUIRE(success);
         });
     };
 

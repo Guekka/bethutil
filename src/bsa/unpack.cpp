@@ -9,12 +9,13 @@
 #include "btu/common/functional.hpp"
 
 namespace btu::bsa {
-void unpack(UnpackSettings sets)
+auto unpack(UnpackSettings sets) -> UnpackResult
 {
     {
         auto arch = Archive::read(sets.file_path);
         if (!arch)
-            return;
+            return UnpackResult::UnreadableArchive;
+
         const auto &root = sets.root_opt != nullptr ? *sets.root_opt : sets.file_path.parent_path();
         common::for_each_mt(std::move(*arch), [root, &sets](auto &&elem) {
             const auto path = root / elem.first;
@@ -27,17 +28,10 @@ void unpack(UnpackSettings sets)
     }
     if (sets.remove_arch && !fs::remove(sets.file_path))
     {
-        throw std::runtime_error("BSA Extract succeeded but failed to delete the extracted BSA");
+        return UnpackResult::FailedToDeleteArchive;
     }
-}
 
-void unpack_all(const Path &dir, const Path &out, const Settings &sets)
-{
-    std::vector files(fs::directory_iterator(dir), fs::directory_iterator{});
-    erase_if(files, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
-    std::ranges::for_each(files, [&out](const auto &file) {
-        unpack(UnpackSettings{.file_path = file.path(), .root_opt = &out});
-    });
+    return UnpackResult::Success;
 }
 
 } // namespace btu::bsa

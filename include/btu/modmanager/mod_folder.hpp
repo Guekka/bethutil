@@ -41,24 +41,26 @@ public:
 
     /// Get the size of the folder, including files in archives.
     /// Utility function, equivalent to iterate() and counting the files.
-    [[nodiscard]] auto size() const -> size_t;
+    [[nodiscard]] auto size() const noexcept -> size_t;
 
     /// Transform all files in the folder, including files in archives.
     /// Multithreaded.
     /// \arg transformer Function that takes a file content and returns a new content. If the function returns
     /// std::nullopt, the file is not changed.
     /// \note For optimal performance, it is recommended to return std::nullopt for files that do not need to be changed.
-    void transform(const Transformer &transformer, ArchiveTooLargeHandler &&archive_too_large_handler);
+    void transform(const Transformer &transformer,
+                   ArchiveTooLargeHandler &&archive_too_large_handler) noexcept;
 
     /// Iterate over all files in the folder, including files in archives.
     /// Multithreaded.
     void iterate(const std::function<void(ModFile)> &visitor,
-                 ArchiveTooLargeHandler &&archive_too_large_handler) const;
+                 ArchiveTooLargeHandler &&archive_too_large_handler) const noexcept;
 
     /// Iterate over all files in the folder, including archives.
     /// Multithreaded.
-    void iterate(const std::function<void(Path relative_path)> &loose,
-                 const std::function<void(const Path &archive_path, bsa::Archive &&archive)> &archive) const;
+    void iterate(
+        const std::function<void(Path relative_path)> &loose,
+        const std::function<void(const Path &archive_path, bsa::Archive &&archive)> &archive) const noexcept;
 
     [[nodiscard]] auto name() const noexcept -> std::u8string { return dir_.filename().u8string(); }
     [[nodiscard]] auto path() const noexcept -> const Path & { return dir_; }
@@ -68,7 +70,7 @@ private:
     // The reason for it to be private is that while it is `const`, it is not `const` semantically: it modifies the
     // folder
     void transform_impl(const Transformer &transformer,
-                        ArchiveTooLargeHandler &&archive_too_large_handler) const;
+                        ArchiveTooLargeHandler &&archive_too_large_handler) const noexcept;
 
     Path dir_;
     bsa::Settings bsa_settings_;
