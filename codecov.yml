@@ -12,6 +12,8 @@ fixes:
 ignore:
   - "tests/"
   - "build/"
+  - "bethutil/" # for some reason, the entire project is being included in the coverage report, duplicating the results
+  - "usr/" # for some reason, the entire project is being included in the coverage report, duplicating the results
 
 parsers:
   gcov:
