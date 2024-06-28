@@ -226,8 +226,12 @@ auto Archive::read(Path path) -> std::optional<Archive>
             {
                 auto relative_file_path = virtual_to_local_path(key);
 
-                res.emplace(common::as_ascii_string(std::move(relative_file_path)),
-                            File(std::move(file), ArchiveVersion::tes3, ArchiveType::Standard));
+                const bool success = res.emplace(common::as_ascii_string(std::move(relative_file_path)),
+                                                 File(std::move(file),
+                                                      ArchiveVersion::tes3,
+                                                      ArchiveType::Standard));
+
+                assert(success && "Invalid archive file type, this should never happen");
             }
             return res;
         }
@@ -249,7 +253,9 @@ auto Archive::read(Path path) -> std::optional<Archive>
                 {
                     const auto u8str = virtual_to_local_path(dir_path, file_path);
                     const auto str   = common::as_ascii_string(u8str);
-                    res.emplace(str, File(std::move(file), res.ver_, res.type_));
+
+                    const bool success = res.emplace(str, File(std::move(file), res.ver_, res.type_));
+                    assert(success && "Invalid archive file type, this should never happen");
                 }
             }
             return res;
@@ -277,8 +283,9 @@ auto Archive::read(Path path) -> std::optional<Archive>
             for (auto &&[key, file] : std::move(arch))
             {
                 auto relative_file_path = virtual_to_local_path(key);
-                res.emplace(common::as_ascii_string(std::move(relative_file_path)),
-                            File(std::move(file), res.ver_, res.type_));
+                const bool success      = res.emplace(common::as_ascii_string(std::move(relative_file_path)),
+                                                 File(std::move(file), res.ver_, res.type_));
+                assert(success && "Invalid archive file type, this should never happen");
             }
             return res;
         }
@@ -297,16 +304,15 @@ auto Archive::read(Path path) -> std::optional<Archive>
  * @param path The path of the file to be written.
  */
 template<typename Archive, typename WriteFunc>
-void do_write(Archive &&arch, WriteFunc &&write_func, const fs::path &path)
+[[nodiscard]] auto do_write(Archive &&arch, WriteFunc &&write_func, const fs::path &path) -> bool
     requires std::is_rvalue_reference_v<decltype(arch)> && std::is_invocable_v<WriteFunc, Archive, fs::path>
 {
     auto write_and_check = [&](fs::path p) {
         std::forward<WriteFunc>(write_func)(BTU_MOV(arch), p);
         arch.clear(); // release memory mapping
         if (!exists(p))
-        {
-            throw std::runtime_error("Failed to write archive to " + p.string());
-        }
+            return false;
+        return true;
     };
 
     // On Windows, we cannot remove the file while it is memory mapped
@@ -318,17 +324,16 @@ void do_write(Archive &&arch, WriteFunc &&write_func, const fs::path &path)
         write_and_check(tmp_path);
         fs::remove(path);
         fs::rename(tmp_path, path);
+        return true;
     }
-    else
-    {
-        write_and_check(path);
-    }
+
+    return write_and_check(path);
 }
 
-void Archive::write(Path path) &&
+auto Archive::write(Path path) && -> bool
 {
     if (files_.empty())
-        return;
+        return false;
 
     create_directories(path.parent_path());
 
@@ -341,8 +346,8 @@ void Archive::write(Path path) &&
             {
                 bsa.insert(elem.first, std::move(elem.second).as_raw_file<libbsa::tes3::file>());
             }
-            do_write(BTU_MOV(bsa), [](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path)); }, BTU_MOV(path));
-            return;
+            return do_write(
+                BTU_MOV(bsa), [](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path)); }, BTU_MOV(path));
         }
         case ArchiveVersion::tes4:
         case ArchiveVersion::tes5: [[fallthrough]];
@@ -367,11 +372,10 @@ void Archive::write(Path path) &&
             bsa.archive_flags(libbsa::tes4::archive_flag::directory_strings
                               | libbsa::tes4::archive_flag::file_strings);
 
-            do_write(
+            return do_write(
                 BTU_MOV(bsa),
                 [this](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path), *to_tes4_version(ver_)); },
                 BTU_MOV(path));
-            return;
         }
         case ArchiveVersion::fo4: [[fallthrough]];
         case ArchiveVersion::starfield:
@@ -381,7 +385,7 @@ void Archive::write(Path path) &&
             {
                 ba2.insert(elem.first, std::move(elem.second).as_raw_file<libbsa::fo4::file>());
             }
-            do_write(
+            return do_write(
                 BTU_MOV(ba2),
                 [this](auto &&ba2, auto &&path) {
                     const auto v = ver_ == ArchiveVersion::starfield ? libbsa::fo4::version::v3
@@ -395,8 +399,6 @@ void Archive::write(Path path) &&
                               });
                 },
                 BTU_MOV(path));
-
-            return;
         }
     }
     libbsa::detail::declare_unreachable();
@@ -427,12 +429,13 @@ auto Archive::file_size() const noexcept -> size_t
     return flux::from_range(files_).map([](const auto &pair) { return pair.second.size(); }).sum();
 }
 
-void Archive::emplace(std::string name, File file)
+auto Archive::emplace(std::string name, File file) -> bool
 {
     if (file.version() != ver_)
-        throw std::invalid_argument("File version does not match archive version");
+        return false;
 
     files_.insert_or_assign(std::move(name), std::move(file));
+    return true;
 }
 
 auto Archive::get(const std::string &name) -> File &

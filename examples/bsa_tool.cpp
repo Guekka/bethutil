@@ -44,18 +44,29 @@ auto process_args(std::vector<std::string_view> args) -> int
              })
             .for_each([&plugins, &sets](btu::bsa::Archive &&arch) {
                 const auto name = find_archive_name(plugins, sets, arch.type());
+                if (!name)
+                {
+                    std::cerr << "Failed to find archive name\n";
+                    return;
+                }
 
-                std::move(arch).write(name.full_path());
+                if (!std::move(arch).write(name->full_path()))
+                {
+                    std::cerr << "Failed to write archive\n";
+                }
             });
     }
     else if (arg == "unpack")
     {
-        auto archives = files;
-        erase_if(archives, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
+        auto archives = list_archive(files.begin(), files.end(), sets);
         for (const auto &file : archives)
         {
-            std::cout << "Unpacking " << file.path().string() << '\n' << std::flush;
-            btu::bsa::unpack({.file_path = file.path()});
+            std::cout << "Unpacking " << file.full_path().string() << '\n' << std::flush;
+            const auto params = btu::bsa::UnpackSettings{
+                .file_path = file.full_path(),
+            };
+            if (unpack(params) != btu::bsa::UnpackResult::Success)
+                std::cerr << "Failed to unpack archive\n";
         }
     }
     else if (arg == "list")

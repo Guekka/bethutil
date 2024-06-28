@@ -13,8 +13,8 @@ TEST_CASE("Load and save to same location works", "[src]")
     auto arch = btu::bsa::Archive::read(path);
     REQUIRE(arch.has_value());
 
-    std::move(*arch).write(path);
-
+    const bool success = std::move(*arch).write(path);
+    REQUIRE(success);
     REQUIRE(btu::common::compare_directories(dir / "in", dir / "out"));
 }
 

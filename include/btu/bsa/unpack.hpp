@@ -16,7 +16,14 @@ struct UnpackSettings
     const Path *root_opt          = nullptr;
 };
 
-void unpack(UnpackSettings sets);
+// TODO: use std::error_code
+enum class UnpackResult
+{
+    Success = 0,
+    UnreadableArchive,
+    FailedToDeleteArchive
+};
 
-void unpack_all(const Path &dir, const Path &out, const Settings &sets);
+[[nodiscard]] auto unpack(UnpackSettings sets) -> UnpackResult;
+
 } // namespace btu::bsa
