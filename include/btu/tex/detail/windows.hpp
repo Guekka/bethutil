@@ -174,3 +174,5 @@ inline void *SecureZeroMemory(void *ptr, size_t size) noexcept
     return ::RtlSecureZeroMemory(ptr, size);
 }
 #endif
+
+#undef __pre
