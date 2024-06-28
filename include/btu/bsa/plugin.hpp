@@ -41,6 +41,18 @@ private:
                                      const Settings &sets,
                                      ArchiveType type) -> std::optional<FilePath>;
 
+/**
+ * @brief Find a name for the archive. Try plugin name, then directory name, then random name
+ *
+ * @param directory The directory that will contain the archive
+ * @param sets Game settings
+ * @param type Archive type
+ * @return An archive name,or std::nullopt if you are particularly unlucky
+ */
+[[nodiscard]] auto find_archive_name(const Path &directory,
+                                     const Settings &sets,
+                                     ArchiveType type) noexcept -> std::optional<FilePath>;
+
 namespace detail {
 template<typename It>
     requires requires(It it) { fs::path(it->path()); }

@@ -3,6 +3,7 @@
 #include "utf8h/utf8.h"
 
 #include <locale>
+#include <random>
 
 namespace btu::common {
 auto as_utf8_string(std::string str) -> std::u8string
@@ -56,6 +57,20 @@ auto to_utf8(const std::wstring &str) -> std::u8string
 auto to_utf16(const std::u8string &str) -> std::wstring
 {
     return detail::converter.from_bytes(as_ascii_string(str));
+}
+
+auto str_random(const size_t length, const std::span<const char8_t> charset) noexcept -> std::u8string
+{
+    std::default_random_engine generator(std::random_device{}());
+    std::uniform_int_distribution<size_t> distribution(0, charset.size() - 1);
+
+    std::u8string str(length, u8'\0');
+    for (size_t i = 0; i < length; ++i)
+    {
+        str[i] = charset[distribution(generator)];
+    }
+
+    return str;
 }
 
 auto to_lower(std::u8string_view string) -> std::u8string
