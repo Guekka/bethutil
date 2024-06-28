@@ -25,7 +25,7 @@ ModFolder::ModFolder(Path directory, bsa::Settings bsa_settings)
 
 void ModFolder::iterate(
     const std::function<void(Path relative_path)> &loose,
-    const std::function<void(const Path &archive_path, bsa::Archive &&archive)> &archive) const
+    const std::function<void(const Path &archive_path, bsa::Archive &&archive)> &archive) const noexcept
 {
     auto is_arch = [](const Path &file_name) {
         const auto ext = common::to_lower(file_name.extension().u8string());
@@ -51,7 +51,7 @@ void ModFolder::iterate(
     });
 }
 
-auto ModFolder::size() const -> size_t
+auto ModFolder::size() const noexcept -> size_t
 {
     std::atomic<size_t> size = 0;
     iterate([&size](const Path &) { size += 1; },
@@ -61,7 +61,7 @@ auto ModFolder::size() const -> size_t
 }
 
 void ModFolder::iterate(const std::function<void(ModFile)> &visitor,
-                        ArchiveTooLargeHandler &&archive_too_large_handler) const
+                        ArchiveTooLargeHandler &&archive_too_large_handler) const noexcept
 {
     transform_impl(
         [&visitor](ModFile file) {
@@ -71,7 +71,8 @@ void ModFolder::iterate(const std::function<void(ModFile)> &visitor,
         std::move(archive_too_large_handler));
 }
 
-void ModFolder::transform(const Transformer &transformer, ArchiveTooLargeHandler &&archive_too_large_handler)
+void ModFolder::transform(const Transformer &transformer,
+                          ArchiveTooLargeHandler &&archive_too_large_handler) noexcept
 {
     transform_impl(transformer, std::move(archive_too_large_handler));
 }
@@ -85,8 +86,6 @@ void ModFolder::transform(const Transformer &transformer, ArchiveTooLargeHandler
  * \return An optional `bsa::ArchiveVersion` indicating the guessed target version
  *         or `std::nullopt` if the target version could not be determined. This can also happen if the
  *         target version is the same as the current version.
- *
- * \note This function does not throw any exceptions.
  *
  * \see bsa::Archive
  * \see bsa::Settings
@@ -104,7 +103,7 @@ void ModFolder::transform(const Transformer &transformer, ArchiveTooLargeHandler
 }
 
 void ModFolder::transform_impl(const Transformer &transformer,
-                               ArchiveTooLargeHandler &&archive_too_large_handler) const
+                               ArchiveTooLargeHandler &&archive_too_large_handler) const noexcept
 {
     iterate(
         [this, &transformer](const Path &relative_path) {
@@ -161,7 +160,10 @@ void ModFolder::transform_impl(const Transformer &transformer,
                 if (path.extension() != bsa_settings_.extension)
                     path.replace_extension(bsa_settings_.extension);
 
-                std::move(archive).write(path);
+                // TODO: replace throw with a better error handling mechanism
+                if (!std::move(archive).write(path))
+                    throw std::runtime_error(std::string("Failed to write archive: ")
+                                             + common::as_ascii_string(path.u8string()));
 
                 // Remove the old archive if the new one has a different name
                 if (path != archive_path)

@@ -117,7 +117,8 @@ struct PackGroup
     {
         if (file_fits(arch, file, settings.game_settings))
         {
-            arch.emplace(BTU_MOV(relative_path), BTU_MOV(file));
+            const bool success = arch.emplace(BTU_MOV(relative_path), BTU_MOV(file));
+            assert(success && "file type in bsa mismatch, this should not happen");
             continue;
         }
 
@@ -125,7 +126,8 @@ struct PackGroup
         // so we yield the current archive and start a new one
         co_yield std::exchange(arch, make_arch());
 
-        arch.emplace(BTU_MOV(relative_path), BTU_MOV(file));
+        const bool success = arch.emplace(BTU_MOV(relative_path), BTU_MOV(file));
+        assert(success && "file type in bsa mismatch, this should not happen");
 
         // is it even possible that the file is bigger than the max size?
         assert(arch.file_size() <= settings.game_settings.max_size);

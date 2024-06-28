@@ -120,9 +120,9 @@ public:
     ~Archive() = default;
 
     static auto read(Path path) -> std::optional<Archive>;
-    void write(Path path) &&;
+    [[nodiscard]] auto write(Path path) && -> bool;
 
-    void emplace(std::string name, File file);
+    [[nodiscard]] auto emplace(std::string name, File file) -> bool;
     [[nodiscard]] auto get(const std::string &name) -> File &;
 
     [[nodiscard]] auto begin() noexcept { return files_.begin(); }

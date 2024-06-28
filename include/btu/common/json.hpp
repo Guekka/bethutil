@@ -111,8 +111,7 @@ struct adl_serializer<std::monostate>
 
     static void from_json(json const &j, std::monostate &)
     {
-        if (!j.is_null())
-            throw std::runtime_error("while converting json to variant: invalid index");
+        // to be strict, we could check if j is null, but what would be the point?
     }
 };
 
