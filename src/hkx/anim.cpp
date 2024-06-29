@@ -271,7 +271,13 @@ auto AnimExe::convert_impl(const Game target_game,
         .and_then([](const int result) noexcept -> ResultError {
             return result == 0 ? ResultError{} : tl::make_unexpected(Error(AnimErr::ExeFailed));
         })
-        .map([&] { return *working_dir / exe->get().output_file_name(); });
+        .map([&] { return *working_dir / exe->get().output_file_name(); })
+        .and_then([&](const Path &output_path) -> tl::expected<Path, Error> {
+            if (!fs::exists(output_path))
+                return tl::make_unexpected(Error(AnimErr::NoOutputFile));
+
+            return output_path;
+        });
 }
 
 auto AnimExe::convert(const Game target_game, const Path &input, const Path &output) const -> ResultError
