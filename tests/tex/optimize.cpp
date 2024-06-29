@@ -20,8 +20,8 @@ auto operator<<(std::ostream &os, const btu::tex::OptimizationSteps &s) -> std::
 
 constexpr auto info1 = [] {
     return DirectX::TexMetadata{
-        .width      = 1024,
-        .height     = 1024,
+        .width      = 512,
+        .height     = 512,
         .depth      = 1,
         .arraySize  = 1,
         .mipLevels  = 1,
@@ -49,7 +49,7 @@ const auto k_sets1 = []() noexcept {
     sets.allowed_formats      = {DXGI_FORMAT_BC7_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM};
     sets.compress             = true;
     sets.mipmaps              = true;
-    sets.resize               = btu::tex::util::ResizeRatio{.ratio = 7, .min = {256, 256}};
+    sets.resize               = btu::tex::util::ResizeRatio{.ratio = 7, .min = {128, 128}};
     return sets;
 }();
 
@@ -111,7 +111,7 @@ TEST_CASE("compute_optimization_steps", "[src]")
     {
         auto tex = generate_tex(info1);
         auto res = compute_optimization_steps(tex, k_sets1);
-        CHECK(res.resize == btu::tex::Dimension{256, 256});
+        CHECK(res.resize == btu::tex::Dimension{128, 128});
         CHECK_FALSE(res.add_transparent_alpha);
         CHECK(res.mipmaps);
         CHECK(res.best_format == DXGI_FORMAT_BC7_UNORM);
@@ -153,11 +153,11 @@ TEST_CASE("tex_optimize", "[src]")
 
         const auto res_info = res->get().GetMetadata();
 
-        CHECK(res_info.width == 256);
-        CHECK(res_info.height == 256);
+        CHECK(res_info.width == 128);
+        CHECK(res_info.height == 128);
         CHECK(res_info.depth == 1);
         CHECK(res_info.arraySize == 1);
-        CHECK(res_info.mipLevels == 9);
+        CHECK(res_info.mipLevels == 8);
         CHECK(res_info.format == DXGI_FORMAT_BC7_UNORM);
         CHECK(res_info.dimension == DirectX::TEX_DIMENSION_TEXTURE2D);
     }
@@ -171,8 +171,8 @@ TEST_CASE("tex_optimize", "[src]")
 
         const auto res_info = res->get().GetMetadata();
 
-        CHECK(res_info.width == 1024);
-        CHECK(res_info.height == 1024);
+        CHECK(res_info.width == 512);
+        CHECK(res_info.height == 512);
         CHECK(res_info.depth == 1);
         CHECK(res_info.arraySize == 1);
         CHECK(res_info.mipLevels == 1);
