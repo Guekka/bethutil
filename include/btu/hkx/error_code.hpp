@@ -13,6 +13,7 @@ enum class AnimErr : std::uint8_t
     ExeFailed,
     NoExeFound,
     OsNotSupported,
+    NoOutputFile,
 };
 } // namespace btu::hkx
 
@@ -35,6 +36,7 @@ struct AnimErrCategory final : std::error_category
             case AnimErr::ExeFailed: return "exe failed";
             case AnimErr::NoExeFound: return "no exe found at all";
             case AnimErr::OsNotSupported: return "os not supported by exe";
+            case AnimErr::NoOutputFile: return "exe failed to produce output file";
         }
         return "(unrecognized error)";
     };
