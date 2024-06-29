@@ -227,14 +227,15 @@ struct ReprocOptions : reproc::options
 [[nodiscard]] auto move_output_to_memory(const Path &output_path)
     -> tl::expected<std::vector<std::byte>, Error>
 {
-    auto ret = common::read_file(output_path);
+    return common::read_file(output_path)
+        .and_then([&output_path](auto &&data) -> tl::expected<std::vector<std::byte>, Error> {
+            auto ec = std::error_code{};
+            fs::remove(output_path, ec);
+            if (ec)
+                return tl::make_unexpected(Error(ec));
 
-    auto ec = std::error_code{};
-    fs::remove(output_path, ec);
-    if (ec)
-        return tl::make_unexpected(Error(ec));
-
-    return ret;
+            return data;
+        });
 }
 
 AnimExe::AnimExe(Path exe_dir, std::vector<detail::AnimExeRef> detected) noexcept
@@ -285,8 +286,7 @@ auto AnimExe::convert(const Game target_game, const std::span<const std::byte> i
 {
     return convert_impl(target_game,
                         [&](const Path &input_path) -> ResultError {
-                            common::write_file(input_path, input);
-                            return {};
+                            return common::write_file(input_path, input);
                         })
         .and_then(move_output_to_memory);
 }

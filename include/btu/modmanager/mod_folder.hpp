@@ -7,8 +7,10 @@
 
 #include <btu/bsa/archive.hpp>
 #include <btu/bsa/settings.hpp>
+#include <btu/common/error.hpp>
 #include <btu/common/functional.hpp>
 #include <btu/common/path.hpp>
+#include <tl/expected.hpp>
 
 namespace btu::modmanager {
 class ModFolder
@@ -17,7 +19,7 @@ public:
     struct ModFile
     {
         Path relative_path;
-        common::Lazy<std::vector<std::byte>> content;
+        common::Lazy<tl::expected<std::vector<std::byte>, common::Error>> content;
     };
 
     explicit ModFolder(Path directory, bsa::Settings bsa_settings);

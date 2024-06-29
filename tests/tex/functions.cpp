@@ -15,7 +15,7 @@ TEST_CASE("Tex Memory IO", "[src]")
     const auto file = dir / "in" / u8"tex.dds";
 
     // load
-    auto data    = btu::common::read_file(file);
+    auto data    = require_expected(btu::common::read_file(file));
     auto mem_tex = btu::tex::load(file, data);
     auto fs_tex  = btu::tex::load(file);
 

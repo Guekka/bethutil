@@ -107,11 +107,18 @@ void ModFolder::transform_impl(const Transformer &transformer,
 {
     iterate(
         [this, &transformer](const Path &relative_path) {
-            const auto file_data = common::Lazy<std::vector<std::byte>>(
+            const auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, btu::common::Error>>(
                 [&relative_path, this] { return common::read_file(dir_ / relative_path); });
 
             if (const auto transformed = transformer({relative_path, file_data}))
-                common::write_file(dir_ / relative_path, *transformed);
+            {
+                const auto res = common::write_file(dir_ / relative_path, *transformed);
+                if (!res)
+                {
+                    // TODO: what should we do here? We're not going to cancel the whole operation just
+                    //  because of one file that failed to write, right?
+                }
+            }
         },
         [&transformer,
          this,
@@ -132,7 +139,7 @@ void ModFolder::transform_impl(const Transformer &transformer,
             common::for_each_mt(archive, [transformer, &any_file_changed](auto &pair) {
                 auto &[relative_path, file] = pair;
 
-                auto file_data = common::Lazy<std::vector<std::byte>>([&pair] {
+                auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>([&pair] {
                     auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
                     pair.second.write(buffer);
                     return buffer.get<binary_io::memory_ostream>().rdbuf();

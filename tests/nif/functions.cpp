@@ -30,7 +30,7 @@ TEST_CASE("Nif Memory IO", "[src]")
     const Path file = dir / "in" / "crashing.nif";
 
     // load
-    auto data    = btu::common::read_file(file);
+    auto data    = require_expected(btu::common::read_file(file));
     auto mem_nif = btu::nif::load(file, data);
     auto fs_nif  = btu::nif::load(file);
 

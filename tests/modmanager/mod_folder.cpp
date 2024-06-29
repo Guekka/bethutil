@@ -9,6 +9,7 @@
 #include "btu/common/filesystem.hpp"
 
 #include <binary_io/memory_stream.hpp>
+#include <btu/hkx/anim.hpp>
 
 auto archive_too_large_handler(const Path & /*unused*/,
                                const btu::modmanager::ModFolder::ArchiveTooLargeState & /*unused*/)
@@ -27,7 +28,8 @@ TEST_CASE("ModFolder", "[src]")
         [&](btu::modmanager::ModFolder::ModFile &&f) {
             const auto out = dir / "output" / f.relative_path;
             btu::fs::create_directories(out.parent_path());
-            btu::common::write_file(out, std::move(*f.content));
+            auto content = require_expected(*f.content);
+            require_expected(btu::common::write_file(out, content));
         },
         archive_too_large_handler);
     REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
@@ -44,8 +46,9 @@ TEST_CASE("ModFolder transform", "[src]")
     // Change one byte in each file
     mf.transform(
         [](btu::modmanager::ModFolder::ModFile &&f) {
-            f.content->back() = std::byte{'0'}; // Change one byte
-            return std::make_optional(*std::move(f.content));
+            auto content   = require_expected(*f.content);
+            content.back() = std::byte{'0'}; // Change one byte
+            return std::optional(std ::move(content));
         },
         archive_too_large_handler);
 
