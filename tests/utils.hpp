@@ -63,3 +63,40 @@ struct StringMaker<std::u8string>
     }
 };
 } // namespace Catch
+
+class TempPath
+{
+    Path path_;
+
+public:
+    explicit TempPath(const Path &dir, std::u8string_view ext = u8"")
+        : path_(dir / btu::common::str_random(10) += ext)
+    {
+    }
+
+    TempPath(const TempPath &) = delete;
+    TempPath(TempPath &&other) = delete;
+
+    [[nodiscard]] auto operator=(const TempPath &) = delete;
+    [[nodiscard]] auto operator=(TempPath &&)      = delete;
+
+    ~TempPath() { btu::fs::remove(path_); }
+
+    [[nodiscard]] auto path() const noexcept -> const Path & { return path_; }
+};
+
+template<class T, class E>
+[[nodiscard]] auto require_expected(tl::expected<T, E> res) -> T
+{
+    if (!res)
+        FAIL(res.error());
+
+    return std::move(res).value();
+}
+
+template<class E>
+void require_expected(tl::expected<void, E> res)
+{
+    if (!res)
+        FAIL(res.error());
+}

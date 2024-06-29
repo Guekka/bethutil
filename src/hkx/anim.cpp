@@ -131,8 +131,6 @@ auto AnimExe::make(Path exe_dir) noexcept -> tl::expected<AnimExe, Error>
 [[nodiscard]] auto reproc(const std::vector<std::string> &args,
                           const reproc::options &options) -> tl::expected<int, Error>
 {
-    for (const auto &arg : args)
-        std::cout << arg << '\n' << std::flush;
     auto [result, ec] = run(args, options);
     if (ec)
         return tl::make_unexpected(Error(ec));
