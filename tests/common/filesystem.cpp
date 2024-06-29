@@ -3,21 +3,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-#include "btu/common/filesystem.hpp"
+#include "utils.hpp"
 
+#include <btu/common/filesystem.hpp>
 #include <catch.hpp>
 
 TEST_CASE("read_file", "[src]")
 {
-    SECTION("invalid path throw exception")
+    SECTION("invalid path has error")
     {
-        REQUIRE_THROWS(btu::common::read_file(""));
+        const auto data = btu::common::read_file("invalid_path");
+        REQUIRE(!data);
     }
     SECTION("100space.bin")
     {
         constexpr auto file = "read_file/100space.bin";
         const auto content  = std::string(100, ' ');
-        const auto data     = btu::common::read_file(file);
+        const auto data     = require_expected(btu::common::read_file(file));
         REQUIRE(data.size() == btu::fs::file_size(file));
         REQUIRE(std::equal(data.cbegin(), data.cend(), content.cbegin(), [](auto byte, auto c) {
             return static_cast<std::byte>(c) == byte;

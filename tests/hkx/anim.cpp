@@ -5,6 +5,7 @@
 #include "btu/common/games.hpp"
 
 #include <catch.hpp>
+#include <flux.hpp>
 
 #include <filesystem>
 #include <thread>
@@ -35,10 +36,10 @@ void convert(btu::Game target_game, const Path &input, const Path &output)
     require_expected(exe.convert(target_game, input, output));
 
     const auto out      = HkxTempPath();
-    const auto in_data  = btu::common::read_file(input);
+    const auto in_data  = require_expected(btu::common::read_file(input));
     const auto out_data = require_expected(exe.convert(target_game, in_data));
 
-    btu::common::write_file(out.path(), out_data);
+    require_expected(btu::common::write_file(out.path(), out_data));
     CHECK(btu::common::compare_files(output, out.path()));
 }
 
