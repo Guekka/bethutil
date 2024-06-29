@@ -24,7 +24,7 @@ TEST_CASE("set archive version", "[src]")
 
     auto &file = arch.get("file");
     auto data  = std::vector{std::byte{0x00}, std::byte{0x01}, std::byte{0x02}, std::byte{0x03}};
-    file.read(data);
+    REQUIRE(file.read(data));
 
     REQUIRE(arch.version() == btu::bsa::ArchiveVersion::tes3);
     REQUIRE(file.version() == btu::bsa::ArchiveVersion::tes3);
