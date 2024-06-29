@@ -10,6 +10,62 @@
 
 #include <iostream>
 
+void pack(const btu::Path &dir, const btu::bsa::Settings &sets)
+{
+    pack(btu::bsa::PackSettings{
+             .input_dir     = dir,
+             .game_settings = sets,
+             .compress      = btu::bsa::Compression::Yes,
+         })
+        .for_each([&sets, &dir](btu::bsa::Archive &&arch) {
+            const auto name = find_archive_name(dir, sets, arch.type());
+            if (!name)
+            {
+                std::cerr << "Failed to find archive name\n";
+                return;
+            }
+
+            if (!std::move(arch).write(name->full_path()))
+            {
+                std::cerr << "Failed to write archive\n";
+            }
+        });
+}
+
+void unpack(const btu::Path &dir, const btu::bsa::Settings &sets)
+{
+    auto archives = list_archive(dir, sets);
+    for (const auto &file : archives)
+    {
+        std::cout << "Unpacking " << file.full_path().string() << '\n' << std::flush;
+        const auto params = btu::bsa::UnpackSettings{
+            .file_path = file.full_path(),
+        };
+        if (unpack(params) != btu::bsa::UnpackResult::Success)
+            std::cerr << "Failed to unpack archive\n";
+    }
+}
+
+void list(const btu::Path &dir, const btu::bsa::Settings &sets)
+{
+    auto archives = list_archive(dir, sets);
+    for (const auto &file : archives)
+    {
+        std::cout << "Files of: " << file.full_path().string() << '\n' << std::flush;
+        auto arch = btu::bsa::Archive::read(file.full_path());
+        if (!arch)
+        {
+            std::cerr << "Failed to read archive\n";
+            continue;
+        }
+        for (auto &&elem : std::move(*arch))
+        {
+            std::cout << elem.first << "  " << elem.second.size() << " bytes - Compressed: "
+                      << (elem.second.compressed() == btu::bsa::Compression::Yes ? "Yes" : "No") << '\n';
+        }
+    }
+}
+
 auto process_args(std::vector<std::string_view> args) -> int
 {
     auto dir = btu::fs::current_path();
@@ -23,75 +79,22 @@ auto process_args(std::vector<std::string_view> args) -> int
         return 1;
     }
 
-    const auto &sets = btu::bsa::Settings::get(btu::Game::SSE);
-    const auto arg   = args[0];
-    const std::vector files(btu::fs::directory_iterator(dir), btu::fs::directory_iterator{});
-    if (arg == "pack")
-    {
-        auto plugins            = list_plugins(files.begin(), files.end(), sets);
-        const auto default_plug = btu::bsa::FilePath(dir,
-                                                     dir.filename().u8string(),
-                                                     u8"",
-                                                     u8".esp",
-                                                     btu::bsa::FileTypes::Plugin);
-        if (plugins.empty()) // Used to find BSA name
-            plugins.emplace_back(default_plug);
+    const auto &sets   = btu::bsa::Settings::get(btu::Game::SSE);
+    const auto command = args[0];
 
-        pack(btu::bsa::PackSettings{
-                 .input_dir     = dir,
-                 .game_settings = sets,
-                 .compress      = btu::bsa::Compression::Yes,
-             })
-            .for_each([&plugins, &sets](btu::bsa::Archive &&arch) {
-                const auto name = find_archive_name(plugins, sets, arch.type());
-                if (!name)
-                {
-                    std::cerr << "Failed to find archive name\n";
-                    return;
-                }
+    auto func = std::unordered_map<std::string_view,
+                                   std::function<void(const btu::Path &, const btu::bsa::Settings &)>>{
+        {"pack", pack},
+        {"unpack", unpack},
+        {"list", list},
+    };
 
-                if (!std::move(arch).write(name->full_path()))
-                {
-                    std::cerr << "Failed to write archive\n";
-                }
-            });
-    }
-    else if (arg == "unpack")
-    {
-        auto archives = list_archive(files.begin(), files.end(), sets);
-        for (const auto &file : archives)
-        {
-            std::cout << "Unpacking " << file.full_path().string() << '\n' << std::flush;
-            const auto params = btu::bsa::UnpackSettings{
-                .file_path = file.full_path(),
-            };
-            if (unpack(params) != btu::bsa::UnpackResult::Success)
-                std::cerr << "Failed to unpack archive\n";
-        }
-    }
-    else if (arg == "list")
-    {
-        auto archives = files;
-        erase_if(archives, [&sets](const auto &file) { return file.path().extension() != sets.extension; });
-        for (const auto &file : archives)
-        {
-            std::cout << "Files of: " << file.path().string() << '\n' << std::flush;
-            auto arch = btu::bsa::Archive::read(file.path());
-            if (!arch)
-            {
-                std::cerr << "Failed to read archive\n";
-                continue;
-            }
-            for (auto &&elem : std::move(*arch))
-            {
-                std::cout << elem.first << "  " << elem.second.size() << " bytes - Compressed: "
-                          << (elem.second.compressed() == btu::bsa::Compression::Yes ? "Yes" : "No") << '\n';
-            }
-        }
-    }
+    if (const auto it = func.find(command); it != func.end())
+        it->second(dir, sets);
     else
     {
-        std::cout << "Unknown arg: " << arg;
+        std::cerr << "Unknown command";
+        return 1;
     }
 
     return 0;

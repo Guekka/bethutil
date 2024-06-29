@@ -68,16 +68,18 @@ auto list_helper(It begin, It end, const Settings &sets, FileTypes type) -> std:
 } // namespace detail
 
 template<typename It>
-auto list_plugins(It begin, It end, const Settings &sets) -> std::vector<FilePath>
+[[nodiscard]] auto list_plugins(It begin, It end, const Settings &sets) -> std::vector<FilePath>
 {
     return detail::list_helper(begin, end, sets, FileTypes::Plugin);
 }
 
 template<typename It>
-auto list_archive(It begin, It end, const Settings &sets) -> std::vector<FilePath>
+[[nodiscard]] auto list_archive(It begin, It end, const Settings &sets) -> std::vector<FilePath>
 {
     return detail::list_helper(begin, end, sets, FileTypes::BSA);
 }
+
+[[nodiscard]] auto list_archive(const btu::Path &dir, const Settings &sets) noexcept -> std::vector<FilePath>;
 
 void clean_dummy_plugins(std::vector<FilePath> &plugins, const Settings &sets);
 void make_dummy_plugins(std::span<const FilePath> archives, const Settings &sets);
