@@ -17,15 +17,26 @@ namespace btu::bsa {
 {
     switch (version)
     {
-        case ArchiveVersion::tes3: return std::nullopt;
-        case ArchiveVersion::tes4: [[fallthrough]];
-        case ArchiveVersion::fo3: [[fallthrough]];
-        case ArchiveVersion::sse:
-        {
-            return static_cast<libbsa::tes4::version>(version);
-        }
-        default: return std::nullopt;
+        case ArchiveVersion::tes4: return libbsa::tes4::version::tes4;
+        case ArchiveVersion::fo3: return libbsa::tes4::version::fo3;
+        case ArchiveVersion::sse: return libbsa::tes4::version::sse;
+        case ArchiveVersion::tes5: return libbsa::tes4::version::tes5;
+        case ArchiveVersion::tes3:
+        case ArchiveVersion::fo4:
+        case ArchiveVersion::starfield: return std::nullopt;
     }
+    libbsa::detail::declare_unreachable();
+}
+
+[[nodiscard]] constexpr auto from_tes4_version(libbsa::tes4::version version) noexcept -> ArchiveVersion
+{
+    switch (version)
+    {
+        case libbsa::tes4::version::tes4: return ArchiveVersion::tes4;
+        case libbsa::tes4::version::fo3: return ArchiveVersion::fo3;
+        case libbsa::tes4::version::sse: return ArchiveVersion::sse;
+    }
+    libbsa::detail::declare_unreachable();
 }
 
 [[nodiscard]] constexpr auto to_fo4_format(ArchiveVersion version,
@@ -59,11 +70,12 @@ File::File(ArchiveVersion version, ArchiveType type)
     : ver_(version)
     , type_(type)
 {
-    file_ = [version, type]() -> UnderlyingFile {
+    file_ = [version]() -> UnderlyingFile {
         switch (version)
         {
             case ArchiveVersion::tes3: return libbsa::tes3::file{};
             case ArchiveVersion::tes4:
+            case ArchiveVersion::fo3:
             case ArchiveVersion::tes5: [[fallthrough]];
             case ArchiveVersion::sse: return libbsa::tes4::file{};
             case ArchiveVersion::fo4: [[fallthrough]];
@@ -137,7 +149,7 @@ void File::read(Path path)
     const auto visitor = common::Overload{
         [&path](libbsa::tes3::file &f) { f.read(std::move(path)); },
         [&path, this](libbsa::tes4::file &f) {
-            f.read(std::move(path), {.version_ = *to_tes4_version(ver_)});
+            f.read(libbsa::read_source(std::move(path)), {.version_ = *to_tes4_version(ver_)});
         },
         [&path, this](libbsa::fo4::file &f) {
             f.read(std::move(path), {.format_ = *to_fo4_format(ver_, type_)});
@@ -238,7 +250,7 @@ auto Archive::read(Path path) -> std::optional<Archive>
         case libbsa::file_format::tes4:
         {
             libbsa::tes4::archive arch;
-            res.ver_ = static_cast<ArchiveVersion>(arch.read(path));
+            res.ver_ = from_tes4_version(arch.read(path));
 
             // Here we can't know easily if it's standard or textures. Because they're basically the same in SSE
             // Let's rely on the name of the archive. The only tes4 texture archive is x - Textures.bsa
@@ -310,9 +322,7 @@ template<typename Archive, typename WriteFunc>
     auto write_and_check = [&](fs::path p) {
         std::forward<WriteFunc>(write_func)(BTU_MOV(arch), p);
         arch.clear(); // release memory mapping
-        if (!exists(p))
-            return false;
-        return true;
+        return exists(p);
     };
 
     // On Windows, we cannot remove the file while it is memory mapped
@@ -350,6 +360,7 @@ auto Archive::write(Path path) && -> bool
                 BTU_MOV(bsa), [](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path)); }, BTU_MOV(path));
         }
         case ArchiveVersion::tes4:
+        case ArchiveVersion::fo3:
         case ArchiveVersion::tes5: [[fallthrough]];
         case ArchiveVersion::sse:
         {
