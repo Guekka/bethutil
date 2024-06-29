@@ -55,6 +55,10 @@ struct PackGroup
                                   return common::contains(allowed_types, get_filetype(p.path(), dir, sets));
                               })
                               .map([](const auto &p) { return p.path(); })
+                              .filter([](const auto &p) {
+                                  // filter out empty files
+                                  return fs::is_regular_file(p) && fs::file_size(p) > 0;
+                              })
                               .to<std::vector>();
 
     // sort by size, largest first
