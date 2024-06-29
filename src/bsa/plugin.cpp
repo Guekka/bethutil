@@ -216,4 +216,9 @@ void make_dummy_plugins(std::span<const FilePath> archives, const Settings &sets
     }
 }
 
+auto list_archive(const Path &dir, const Settings &sets) noexcept -> std::vector<FilePath>
+{
+    return list_archive(fs::directory_iterator(dir), fs::directory_iterator(), sets);
+}
+
 } // namespace btu::bsa
