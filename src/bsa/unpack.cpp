@@ -22,7 +22,11 @@ auto unpack(UnpackSettings sets) -> UnpackResult
             if (sets.overwrite_existing_files || !fs::exists(path)) // preserve existing loose files
             {
                 fs::create_directories(path.parent_path());
-                elem.second.write(path);
+                const bool res = elem.second.write(path);
+                if (!res)
+                {
+                    // TODO: how to handle error here?
+                }
             }
         });
     }

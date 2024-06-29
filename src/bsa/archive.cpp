@@ -122,7 +122,7 @@ void File::compress()
         [](libbsa::tes3::file &) {},
         [this](libbsa::tes4::file &f) { f.compress({.version_ = *to_tes4_version(ver_)}); },
         [this](libbsa::fo4::file &f) {
-            flux::for_each(f, [this, &f](auto &c) {
+            flux::for_each(f, [this](auto &c) {
                 const auto comp_level = [this] {
                     switch (ver_)
                     {
@@ -144,7 +144,7 @@ void File::compress()
     assert(compressed() == Compression::Yes);
 }
 
-void File::read(Path path)
+auto File::read(Path path) -> bool
 {
     const auto visitor = common::Overload{
         [&path](libbsa::tes3::file &f) { f.read(std::move(path)); },
@@ -156,10 +156,18 @@ void File::read(Path path)
         },
     };
 
-    std::visit(visitor, file_);
+    try
+    {
+        std::visit(visitor, file_);
+        return true;
+    }
+    catch (const std::exception &)
+    {
+        return false;
+    }
 }
 
-void File::read(std::span<std::byte> src)
+auto File::read(std::span<std::byte> src) -> bool
 {
     const auto visitor = common::Overload{
         [&](libbsa::tes3::file &f) { f.read(libbsa::read_source(src)); },
@@ -171,10 +179,18 @@ void File::read(std::span<std::byte> src)
         },
     };
 
-    std::visit(visitor, file_);
+    try
+    {
+        std::visit(visitor, file_);
+        return true;
+    }
+    catch (const std::exception &)
+    {
+        return false;
+    }
 }
 
-void File::write(Path path) const
+auto File::write(Path path) const -> bool
 {
     const auto visitor = common::Overload{
         [&](const libbsa::tes3::file &f) { f.write(std::move(path)); },
@@ -186,10 +202,18 @@ void File::write(Path path) const
         },
     };
 
-    std::visit(visitor, file_);
+    try
+    {
+        std::visit(visitor, file_);
+        return true;
+    }
+    catch (const std::exception &)
+    {
+        return false;
+    }
 }
 
-void File::write(binary_io::any_ostream &dst) const
+auto File::write(binary_io::any_ostream &dst) const -> bool
 {
     const auto visitor = common::Overload{
         [&](const libbsa::tes3::file &f) { f.write(dst); },
@@ -197,7 +221,15 @@ void File::write(binary_io::any_ostream &dst) const
         [&dst, this](const libbsa::fo4::file &f) { f.write(dst, {.format_ = *to_fo4_format(ver_, type_)}); },
     };
 
-    std::visit(visitor, file_);
+    try
+    {
+        std::visit(visitor, file_);
+        return true;
+    }
+    catch (const std::exception &)
+    {
+        return false;
+    }
 }
 
 auto File::version() const noexcept -> ArchiveVersion
@@ -425,8 +457,11 @@ void Archive::set_version(ArchiveVersion version) noexcept
 
         auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
 
-        path_file.second.write(buffer);
-        res_file.read(buffer.get<binary_io::memory_ostream>().rdbuf());
+        bool res = path_file.second.write(buffer);
+        // TODO: better error handling
+        assert(res);
+        res = res_file.read(buffer.get<binary_io::memory_ostream>().rdbuf());
+        assert(res);
 
         if (path_file.second.compressed() == Compression::Yes)
             res_file.compress();

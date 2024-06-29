@@ -139,17 +139,26 @@ void ModFolder::transform_impl(const Transformer &transformer,
             common::for_each_mt(archive, [transformer, &any_file_changed](auto &pair) {
                 auto &[relative_path, file] = pair;
 
-                auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>([&pair] {
-                    auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
-                    pair.second.write(buffer);
-                    return buffer.get<binary_io::memory_ostream>().rdbuf();
-                });
+                auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
+                    [&pair]() -> tl::expected<std::vector<std::byte>, common::Error> {
+                        auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
+                        if (!pair.second.write(buffer))
+                            // TODO: better error here?
+                            return tl::make_unexpected(
+                                common::Error(std::error_code(errno, std::system_category())));
+
+                        return buffer.get<binary_io::memory_ostream>().rdbuf();
+                    });
 
                 auto transformed = transformer({relative_path, BTU_MOV(file_data)});
                 if (transformed)
                 {
-                    file.read(*transformed);
-                    any_file_changed = true;
+                    const bool res = file.read(*transformed);
+                    if (!res)
+                    {
+                        // TODO: how could we handle this?
+                    }
+                    any_file_changed = any_file_changed || res;
                 }
             });
 

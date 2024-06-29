@@ -81,12 +81,13 @@ struct PackGroup
     return {.standard = BTU_MOV(packable_files), .texture = {}};
 }
 
-[[nodiscard]] auto prepare_file(const Path &file_path,
-                                const PackSettings &sets,
-                                ArchiveType type) noexcept -> File
+[[nodiscard]] auto prepare_file(const Path &file_path, const PackSettings &sets, ArchiveType type) noexcept
+    -> std::optional<File>
 {
     auto file = File{sets.game_settings.version, type};
-    file.read(file_path);
+    const bool res = file.read(file_path);
+    if (!res)
+        return std::nullopt;
 
     const bool dx = (file.version() == ArchiveVersion::fo4 || file.version() == ArchiveVersion::starfield)
                     && type == ArchiveType::Textures;
@@ -108,17 +109,27 @@ struct PackGroup
                            PackSettings settings,
                            ArchiveType type) noexcept -> flux::generator<Archive &&>
 {
-    auto [thread, receiver] = common::make_producer_mt<Archive::value_type>(
-        std::move(file_paths), [&](const Path &absolute_path) -> Archive::value_type {
+    auto [thread, receiver] = common::make_producer_mt<std::optional<Archive::value_type>>(
+        std::move(file_paths), [&](const Path &absolute_path) -> std::optional<Archive::value_type> {
             auto file = prepare_file(absolute_path, settings, type);
-            return {relative(absolute_path, settings.input_dir).string(), BTU_MOV(file)};
+            if (!file)
+                return std::nullopt;
+
+            auto ret = Archive::value_type{relative(absolute_path, settings.input_dir).string(),
+                                           BTU_MOV(file).value()};
+            return std::optional{BTU_MOV(ret)};
         });
 
     auto make_arch = [&] { return Archive{settings.game_settings.version, type}; };
     auto arch      = make_arch();
 
-    for (auto [relative_path, file] : receiver)
+    for (auto maybe_prepared : receiver)
     {
+        if (!maybe_prepared)
+            continue; // just ignore this file. TODO: maybe warn?
+
+        auto [relative_path, file] = BTU_MOV(maybe_prepared).value();
+
         if (file_fits(arch, file, settings.game_settings))
         {
             const bool success = arch.emplace(BTU_MOV(relative_path), BTU_MOV(file));

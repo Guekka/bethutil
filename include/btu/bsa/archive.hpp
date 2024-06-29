@@ -78,11 +78,11 @@ public:
     [[nodiscard]] auto compressed() const noexcept -> Compression;
     void compress();
 
-    void read(Path path);
-    void read(std::span<std::byte> src);
+    [[nodiscard]] auto read(Path path) -> bool;
+    [[nodiscard]] auto read(std::span<std::byte> src) -> bool;
 
-    void write(Path path) const;
-    void write(binary_io::any_ostream &dst) const;
+    [[nodiscard]] auto write(Path path) const -> bool;
+    [[nodiscard]] auto write(binary_io::any_ostream &dst) const -> bool;
 
     [[nodiscard]] auto version() const noexcept -> ArchiveVersion;
     [[nodiscard]] auto type() const noexcept -> ArchiveType;
