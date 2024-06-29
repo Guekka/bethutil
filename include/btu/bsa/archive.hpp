@@ -44,11 +44,11 @@ enum class ArchiveType : std::uint8_t
 
 enum class ArchiveVersion : std::uint32_t
 {
-    tes3 = 1,
-    tes4 = static_cast<std::underlying_type_t<ArchiveVersion>>(libbsa::tes4::version::tes4),
-    fo3  = static_cast<std::underlying_type_t<ArchiveVersion>>(libbsa::tes4::version::fo3),
-    tes5 = static_cast<std::underlying_type_t<ArchiveVersion>>(libbsa::tes4::version::tes5),
-    sse  = static_cast<std::underlying_type_t<ArchiveVersion>>(libbsa::tes4::version::sse),
+    tes3,
+    tes4,
+    fo3,
+    tes5,
+    sse,
     fo4,
     starfield,
 };
