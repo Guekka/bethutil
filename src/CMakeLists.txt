@@ -39,6 +39,7 @@ set(HEADER_FILES
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
+    "${SOURCE_DIR}/common/filesystem.cpp"
     "${SOURCE_DIR}/common/string.cpp"
     "${SOURCE_DIR}/bsa/archive.cpp"
     "${SOURCE_DIR}/bsa/pack.cpp"
