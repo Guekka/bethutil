@@ -22,7 +22,7 @@ jobs:
         run: sudo apt install doxygen -y
 
       - name: Install Poxy
-        run: pip install poxy --user
+        run: sudo pip install poxy --break-system-packages
 
       - name: Configure CMake
         run: cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} -DBETHUTIL_BUILD_DOCS=ON -DBETHUTIL_BUILD_SRC=OFF -DBUILD_TESTING=OFF
