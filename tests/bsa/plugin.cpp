@@ -139,12 +139,14 @@ TEST_CASE("clean_dummy_plugins", "[src]")
         CHECK(btu::common::compare_directories(out, dir / "expected"));
     }
 
-     SECTION("empty directory")
+    SECTION("empty directory")
     {
         const auto dir = TempPath(btu::fs::temp_directory_path());
         btu::fs::create_directories(dir.path());
 
-        auto plugins = list_plugins(btu::fs::directory_iterator(dir.path()), btu::fs::directory_iterator(), sets);
+        auto plugins = list_plugins(btu::fs::directory_iterator(dir.path()),
+                                    btu::fs::directory_iterator(),
+                                    sets);
         CHECK(plugins.empty());
         clean_dummy_plugins(plugins, sets);
         CHECK(plugins.empty());
@@ -191,7 +193,7 @@ TEST_CASE("find_archive_name tests with directory input", "[src]")
     SECTION("handles empty directory")
     {
         const Path dir = "empty_directory";
-        auto result = find_archive_name(dir, sets, ArchiveType::Textures);
+        auto result    = find_archive_name(dir, sets, ArchiveType::Textures);
         CHECK_FALSE(result.has_value());
     }
 
@@ -207,7 +209,7 @@ TEST_CASE("find_archive_name tests with directory input", "[src]")
     SECTION("returns nullopt if all possible file names in directory are taken")
     {
         const Path dir = "directory_with_all_possible_names_taken";
-        auto result = find_archive_name(dir, sets, ArchiveType::Textures);
+        auto result    = find_archive_name(dir, sets, ArchiveType::Textures);
         CHECK_FALSE(result.has_value());
     }
 }

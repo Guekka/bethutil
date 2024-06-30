@@ -87,7 +87,6 @@ public:
     [[nodiscard]] auto path() const noexcept -> const Path & { return path_; }
 };
 
-
 inline void create_file(const Path &path, const std::string &content = "")
 {
     std::ofstream out(path);
