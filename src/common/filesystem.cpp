@@ -4,8 +4,8 @@
 
 #include <fstream>
 
-namespace btu {
-auto common::read_file(const Path &a_path) noexcept -> tl::expected<std::vector<std::byte>, common::Error>
+namespace btu::common {
+auto read_file(const Path &a_path) noexcept -> tl::expected<std::vector<std::byte>, Error>
 {
     std::error_code ec;
 
@@ -25,8 +25,7 @@ auto common::read_file(const Path &a_path) noexcept -> tl::expected<std::vector<
     return data;
 }
 
-auto common::write_file(const Path &a_path, std::span<const std::byte> data) noexcept
-    -> tl::expected<void, common::Error>
+auto write_file(const Path &a_path, std::span<const std::byte> data) noexcept -> tl::expected<void, Error>
 {
     std::ofstream out{a_path, std::ios_base::binary};
     if (!out)
@@ -38,7 +37,7 @@ auto common::write_file(const Path &a_path, std::span<const std::byte> data) noe
     return {};
 }
 
-auto common::compare_files(const Path &filename1, const Path &filename2) noexcept -> bool
+auto compare_files(const Path &filename1, const Path &filename2) noexcept -> bool
 {
     try
     {
@@ -66,7 +65,7 @@ auto common::compare_files(const Path &filename1, const Path &filename2) noexcep
     }
 }
 
-auto common::compare_directories(const Path &dir1, const Path &dir2) noexcept -> bool
+auto compare_directories(const Path &dir1, const Path &dir2) noexcept -> bool
 {
     try
     {
@@ -116,7 +115,7 @@ auto common::compare_directories(const Path &dir1, const Path &dir2) noexcept ->
     }
 }
 
-auto common::hard_link(const Path &from, const Path &to) noexcept -> tl::expected<void, common::Error>
+auto hard_link(const Path &from, const Path &to) noexcept -> tl::expected<void, Error>
 {
     try
     {
@@ -138,10 +137,11 @@ auto common::hard_link(const Path &from, const Path &to) noexcept -> tl::expecte
 
         // we cannot hard link directories on Windows, so we create a directory and hardlink files inside
         create_directories(to);
+
         for (const auto &e : fs::recursive_directory_iterator(from))
         {
-            if (const auto success = hard_link(e.path(), to / relative(e.path(), from)); !success)
-                return success;
+            if (const auto res = hard_link(e.path(), to / relative(e.path(), from)); !res)
+                return res;
         }
 
         return {};
@@ -152,39 +152,41 @@ auto common::hard_link(const Path &from, const Path &to) noexcept -> tl::expecte
     }
 }
 
-auto find_matching_paths_icase(const btu::Path &directory, std::span<const btu::Path> paths) noexcept
-    -> std::vector<btu::Path>
+auto find_matching_paths_icase(const Path &directory,
+                               std::span<const Path> relative_lowercase_paths) noexcept -> std::vector<Path>
 {
+    if (!fs::exists(directory))
+        return {};
+
 #ifdef _WIN32
     // Windows is case-insensitive by default. Only check if the file exists
-    return flux::from(paths)
-        .map([&directory](const btu::Path &path) { return directory / path; })
-        .filter([](const auto &path) { return btu::fs::exists(path); })
-        .to<std::vector<btu::Path>>();
+    return flux::from(relative_lowercase_paths)
+        .map([&directory](const Path &path) { return directory / path; })
+        .filter([](const auto &path) { return fs::exists(path); })
+        .to<std::vector<Path>>();
 #else
     // On Linux, we need to make a case-insensitive map of the files in the directory. This is slow.
     // We also assume there is only one file with the same lowercase path. This is probably fine since
     // mods were made for Windows and Windows is case-insensitive.
-    const auto files_in_directory
-        = flux::from_range(btu::fs::recursive_directory_iterator(directory))
-              .map([&directory](const btu::fs::directory_entry &entry) {
-                  const auto &path         = entry.path();
-                  const auto relative_path = btu::fs::relative(path, directory);
-                  return std::pair{btu::common::to_lower(relative_path.u8string()), path};
-              })
-              .to<std::unordered_map<std::u8string, btu::Path>>();
+    const auto files_in_directory = flux::from_range(fs::recursive_directory_iterator(directory))
+                                        .map([&directory](const fs::directory_entry &entry) {
+                                            const auto &path         = entry.path();
+                                            const auto relative_path = fs::relative(path, directory);
+                                            return std::pair{to_lower(relative_path.u8string()), path};
+                                        })
+                                        .to<std::unordered_map<std::u8string, Path>>();
 
-    return flux::from(paths)
-        .map([&files_in_directory](const btu::Path &path) -> std::optional<btu::Path> {
-            const auto lower_path = btu::common::to_lower(path.u8string());
+    return flux::from(relative_lowercase_paths)
+        .map([&files_in_directory](const Path &path) -> std::optional<Path> {
+            const auto lower_path = to_lower(path.u8string());
             if (const auto it = files_in_directory.find(lower_path); it != files_in_directory.end())
                 return it->second;
             return {};
         })
         .filter([](const auto &path) { return path.has_value(); })
         .map([](const auto &path) { return path.value(); })
-        .to<std::vector<btu::Path>>();
+        .to<std::vector<Path>>();
 #endif
 }
 
-} // namespace btu
+} // namespace btu::common
