@@ -221,4 +221,14 @@ auto list_archive(const Path &dir, const Settings &sets) noexcept -> std::vector
     return list_archive(fs::directory_iterator(dir), fs::directory_iterator(), sets);
 }
 
+void remake_dummy_plugins(const Path &directory, const Settings &sets)
+{
+    auto files = std::vector(btu::fs::directory_iterator(directory), btu::fs::directory_iterator{});
+
+    auto plugins = list_plugins(files.cbegin(), files.cend(), sets);
+    clean_dummy_plugins(plugins, sets);
+    auto archives = list_archive(files.cbegin(), files.cend(), sets);
+    btu::bsa::make_dummy_plugins(archives, sets);
+}
+
 } // namespace btu::bsa

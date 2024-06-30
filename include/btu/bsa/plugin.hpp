@@ -83,4 +83,7 @@ template<typename It>
 
 void clean_dummy_plugins(std::vector<FilePath> &plugins, const Settings &sets);
 void make_dummy_plugins(std::span<const FilePath> archives, const Settings &sets);
+
+/// Cleans dummy plugins and make new ones
+void remake_dummy_plugins(const btu::Path &directory, const Settings &sets);
 } // namespace btu::bsa
