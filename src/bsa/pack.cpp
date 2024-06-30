@@ -81,10 +81,11 @@ struct PackGroup
     return {.standard = BTU_MOV(packable_files), .texture = {}};
 }
 
-[[nodiscard]] auto prepare_file(const Path &file_path, const PackSettings &sets, ArchiveType type) noexcept
-    -> std::optional<File>
+[[nodiscard]] auto prepare_file(const Path &file_path,
+                                const PackSettings &sets,
+                                ArchiveType type) noexcept -> std::optional<File>
 {
-    auto file = File{sets.game_settings.version, type};
+    auto file      = File{sets.game_settings.version, type};
     const bool res = file.read(file_path);
     if (!res)
         return std::nullopt;
