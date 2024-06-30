@@ -11,12 +11,32 @@
 #include <binary_io/memory_stream.hpp>
 #include <btu/hkx/anim.hpp>
 
-auto archive_too_large_handler(const Path & /*unused*/,
-                               const btu::modmanager::ModFolder::ArchiveTooLargeState & /*unused*/)
+class Iterator final : public btu::modmanager::ModFolderIterator
 {
-    FAIL("Archive too large, should not happen in tests");
-    return btu::modmanager::ModFolder::ArchiveTooLargeAction::Skip;
-}
+    Path out_dir_;
+
+public:
+    explicit Iterator(Path out_dir)
+        : out_dir_(std::move(out_dir))
+    {
+    }
+
+    [[nodiscard]] auto archive_too_large(const Path & /*archive_path */,
+                                         ArchiveTooLargeState /*state*/) noexcept
+        -> ArchiveTooLargeAction override
+    {
+        FAIL("Archive too large, should not happen in tests");
+        return ArchiveTooLargeAction::Skip;
+    }
+
+    void process_file(btu::modmanager::ModFile f) noexcept override
+    {
+        const auto out = out_dir_ / f.relative_path;
+        btu::fs::create_directories(out.parent_path());
+        auto content = require_expected(*f.content);
+        require_expected(btu::common::write_file(out, content));
+    }
+};
 
 TEST_CASE("ModFolder", "[src]")
 {
@@ -24,16 +44,31 @@ TEST_CASE("ModFolder", "[src]")
     btu::fs::remove_all(dir / "output");
 
     const auto mf = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
-    mf.iterate(
-        [&](btu::modmanager::ModFolder::ModFile &&f) {
-            const auto out = dir / "output" / f.relative_path;
-            btu::fs::create_directories(out.parent_path());
-            auto content = require_expected(*f.content);
-            require_expected(btu::common::write_file(out, content));
-        },
-        archive_too_large_handler);
-    REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
+    Iterator iterator{dir / "output"};
+    mf.iterate(iterator);
+    CHECK(btu::common::compare_directories(dir / "output", dir / "expected"));
 }
+
+class Transformer final : public btu::modmanager::ModFolderTransformer
+{
+public:
+    [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,
+                                         ArchiveTooLargeState /*state*/) noexcept
+        -> ArchiveTooLargeAction override
+    {
+        FAIL("Archive too large, should not happen in tests");
+        return ArchiveTooLargeAction::Skip;
+    }
+
+    [[nodiscard]] auto transform_file(btu::modmanager::ModFile file) noexcept
+        -> std::optional<std::vector<std::byte>> override
+    {
+        // Change one byte in each file
+        auto content   = require_expected(*file.content);
+        content.back() = std::byte{'0'};
+        return content;
+    }
+};
 
 TEST_CASE("ModFolder transform", "[src]")
 {
@@ -43,24 +78,38 @@ TEST_CASE("ModFolder transform", "[src]")
     btu::fs::copy(dir / "input", dir / "output");
 
     auto mf = btu::modmanager::ModFolder(dir / "output", btu::bsa::Settings::get(btu::Game::SSE));
-    // Change one byte in each file
-    mf.transform(
-        [](btu::modmanager::ModFolder::ModFile &&f) {
-            auto content   = require_expected(*f.content);
-            content.back() = std::byte{'0'}; // Change one byte
-            return std::optional(std ::move(content));
-        },
-        archive_too_large_handler);
 
-    REQUIRE(btu::common::compare_directories(dir / "output", dir / "expected"));
+    Transformer transformer;
+    mf.transform(transformer);
+
+    CHECK(btu::common::compare_directories(dir / "output", dir / "expected"));
 }
 
 TEST_CASE("ModFolder size", "[src]")
 {
     const Path dir = "modfolder";
     const auto mf  = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
-    REQUIRE(mf.size() == 4);
+    CHECK(mf.size() == 4);
 }
+
+class IteratorWithArchiveTooLarge final : public btu::modmanager::ModFolderIterator
+{
+    bool called_ = false;
+
+public:
+    [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,
+                                         ArchiveTooLargeState state) noexcept -> ArchiveTooLargeAction override
+    {
+        CHECK_FALSE(called_);
+        CHECK(state == ArchiveTooLargeState::BeforeProcessing);
+        called_ = true;
+        return ArchiveTooLargeAction::Skip;
+    }
+
+    void process_file(btu::modmanager::ModFile /*file*/) noexcept override {}
+
+    [[nodiscard]] auto called() const noexcept -> bool { return called_; }
+};
 
 TEST_CASE("Iterate mod folder with archive too big")
 {
@@ -68,15 +117,9 @@ TEST_CASE("Iterate mod folder with archive too big")
     auto sets      = btu::bsa::Settings::get(btu::Game::FO4);
     sets.max_size  = 1;
 
-    bool called = false;
-
     const auto mf = btu::modmanager::ModFolder(dir / "input", sets);
-    mf.iterate([](const btu::modmanager::ModFolder::ModFile & /*unused*/) {},
-               [&](const Path & /*unused*/, const btu::modmanager::ModFolder::ArchiveTooLargeState &state) {
-                   CHECK(state == btu::modmanager::ModFolder::ArchiveTooLargeState::BeforeProcessing);
-                   called = true;
-                   return btu::modmanager::ModFolder::ArchiveTooLargeAction::Skip;
-               });
+    auto iterator = IteratorWithArchiveTooLarge{};
+    mf.iterate(iterator);
 
-    REQUIRE(called);
+    CHECK(iterator.called());
 }

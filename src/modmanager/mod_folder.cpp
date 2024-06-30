@@ -23,31 +23,25 @@ ModFolder::ModFolder(Path directory, bsa::Settings bsa_settings)
 {
 }
 
-void ModFolder::iterate(
-    const std::function<void(Path relative_path)> &loose,
-    const std::function<void(const Path &archive_path, bsa::Archive &&archive)> &archive) const noexcept
+void ModFolder::iterate(const std::function<void(Path relative_path)> &loose,
+                        const std::function<void(const Path &archive_path)> &archive) const noexcept
 {
     auto is_arch = [](const Path &file_name) {
         const auto ext = common::to_lower(file_name.extension().u8string());
         return common::contains(bsa::k_archive_extensions, ext);
     };
 
-    auto files =
-
-        flux::from_range(fs::recursive_directory_iterator(dir_))
-            .filter([](auto &&e) { return e.is_regular_file(); })
-            .map([](auto &&e) { return e.path(); })
-            .to<std::vector>();
+    auto files = flux::from_range(fs::recursive_directory_iterator(dir_))
+                     .filter([](auto &&e) { return e.is_regular_file(); })
+                     .map([](auto &&e) { return e.path(); })
+                     .to<std::vector>();
 
     common::for_each_mt(files, [&is_arch, this, &archive, &loose](auto &&path) {
         if (!is_arch(path)) [[likely]]
-        {
             loose(path.lexically_relative(dir_));
-            return;
-        }
 
-        if (auto arch = bsa::Archive::read(path))
-            archive(path, std::move(*arch));
+        else if (is_arch(path)) [[unlikely]]
+            archive(path);
     });
 }
 
@@ -55,26 +49,48 @@ auto ModFolder::size() const noexcept -> size_t
 {
     std::atomic<size_t> size = 0;
     iterate([&size](const Path &) { size += 1; },
-            [&size](const Path &, const bsa::Archive &archive) { size += archive.size(); });
+            [&size](const Path &archive_path) {
+                if (const auto arch = bsa::Archive::read(archive_path); arch)
+                    size += arch->size();
+            });
 
     return size;
 }
 
-void ModFolder::iterate(const std::function<void(ModFile)> &visitor,
-                        ArchiveTooLargeHandler &&archive_too_large_handler) const noexcept
+void ModFolder::transform(ModFolderTransformer &transformer) noexcept
 {
-    transform_impl(
-        [&visitor](ModFile file) {
-            visitor(std::move(file));
-            return std::nullopt;
-        },
-        std::move(archive_too_large_handler));
+    transform_impl(transformer);
 }
 
-void ModFolder::transform(const Transformer &transformer,
-                          ArchiveTooLargeHandler &&archive_too_large_handler) noexcept
+void ModFolder::iterate(ModFolderIterator &iterator) const noexcept
 {
-    transform_impl(transformer, std::move(archive_too_large_handler));
+    // creates a ModFolderTransformer based on the user-provided ModFolderIterator
+    class ModFolderProcessorReadOnly final : public ModFolderTransformer
+    {
+    public:
+        explicit ModFolderProcessorReadOnly(ModFolderIterator &iterator) noexcept
+            : iterator_(iterator)
+        {
+        }
+
+        [[nodiscard]] auto archive_too_large(const Path &archive_path, ArchiveTooLargeState state) noexcept
+            -> ArchiveTooLargeAction override
+        {
+            return iterator_.get().archive_too_large(archive_path, state);
+        }
+
+        [[nodiscard]] auto transform_file(ModFile file) noexcept
+            -> std::optional<std::vector<std::byte>> override
+        {
+            iterator_.get().process_file(file);
+            return std::nullopt;
+        }
+
+    private:
+        std::reference_wrapper<ModFolderIterator> iterator_;
+    } transformer(iterator);
+
+    transform_impl(transformer);
 }
 
 /**
@@ -102,41 +118,38 @@ void ModFolder::transform(const Transformer &transformer,
     return target;
 }
 
-void ModFolder::transform_impl(const Transformer &transformer,
-                               ArchiveTooLargeHandler &&archive_too_large_handler) const noexcept
+void ModFolder::transform_impl(ModFolderTransformer &transformer) const noexcept
 {
     iterate(
         [this, &transformer](const Path &relative_path) {
-            const auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, btu::common::Error>>(
+            const auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
                 [&relative_path, this] { return common::read_file(dir_ / relative_path); });
 
-            if (const auto transformed = transformer({relative_path, file_data}))
+            if (const auto transformed = transformer.transform_file({relative_path, file_data}))
             {
-                const auto res = common::write_file(dir_ / relative_path, *transformed);
-                if (!res)
-                {
-                    // TODO: what should we do here? We're not going to cancel the whole operation just
-                    //  because of one file that failed to write, right?
-                }
+                if (!common::write_file(dir_ / relative_path, *transformed))
+                    transformer.failed_to_write_transformed_file(relative_path, *transformed);
             }
         },
-        [&transformer,
-         this,
-         archive_too_large_handler = std::move(archive_too_large_handler)](const Path &archive_path,
-                                                                           bsa::Archive &&archive) {
-            // Check if the archive is too large and the caller wants to skip it
-            auto check_archive_and_skip = [&](ArchiveTooLargeState state) {
-                if (archive.file_size() > bsa_settings_.max_size)
-                    return archive_too_large_handler(archive_path, state) == ArchiveTooLargeAction::Skip;
-                return false;
-            };
+        [&transformer, this](const Path &archive_path) {
+            if (const auto arch_size = file_size(archive_path); arch_size > bsa_settings_.max_size)
+            {
+                if (const auto action = transformer.archive_too_large(archive_path, BeforeProcessing);
+                    action == Skip)
+                    return;
+            }
 
-            if (check_archive_and_skip(ArchiveTooLargeState::BeforeProcessing))
+            auto opt_arch = bsa::Archive::read(archive_path);
+            if (!opt_arch)
+            {
+                transformer.failed_to_read_archive(archive_path);
                 return;
+            }
+            auto archive = std::move(*opt_arch);
 
             std::atomic_bool any_file_changed = false;
 
-            common::for_each_mt(archive, [transformer, &any_file_changed](auto &pair) {
+            common::for_each_mt(archive, [&transformer, &any_file_changed](auto &pair) {
                 auto &[relative_path, file] = pair;
 
                 auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
@@ -150,14 +163,13 @@ void ModFolder::transform_impl(const Transformer &transformer,
                         return buffer.get<binary_io::memory_ostream>().rdbuf();
                     });
 
-                auto transformed = transformer({relative_path, BTU_MOV(file_data)});
+                auto transformed = transformer.transform_file({relative_path, file_data});
                 if (transformed)
                 {
                     const bool res = file.read(*transformed);
                     if (!res)
-                    {
-                        // TODO: how could we handle this?
-                    }
+                        transformer.failed_to_read_transformed_file(relative_path, *transformed);
+
                     any_file_changed = any_file_changed || res;
                 }
             });
@@ -166,8 +178,12 @@ void ModFolder::transform_impl(const Transformer &transformer,
             if (target_version)
                 archive.set_version(*target_version);
 
-            if (check_archive_and_skip(ArchiveTooLargeState::AfterProcessing))
-                return;
+            if (const auto arch_size = archive.file_size(); arch_size > bsa_settings_.max_size)
+            {
+                if (const auto action = transformer.archive_too_large(archive_path, AfterProcessing);
+                    action == Skip)
+                    return;
+            }
 
             if (any_file_changed || target_version)
             {
@@ -176,10 +192,8 @@ void ModFolder::transform_impl(const Transformer &transformer,
                 if (path.extension() != bsa_settings_.extension)
                     path.replace_extension(bsa_settings_.extension);
 
-                // TODO: replace throw with a better error handling mechanism
                 if (!std::move(archive).write(path))
-                    throw std::runtime_error(std::string("Failed to write archive: ")
-                                             + common::as_ascii_string(path.u8string()));
+                    transformer.failed_to_write_archive(archive_path, path);
 
                 // Remove the old archive if the new one has a different name
                 if (path != archive_path)
