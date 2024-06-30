@@ -146,6 +146,9 @@ auto find_archive_name(const Path &directory,
                        const Settings &sets,
                        ArchiveType type) noexcept -> std::optional<FilePath>
 {
+    if (!is_directory(directory))
+        return std::nullopt;
+
     auto plugins = list_plugins(fs::directory_iterator(directory), fs::directory_iterator(), sets);
     if (plugins.empty())
     {
