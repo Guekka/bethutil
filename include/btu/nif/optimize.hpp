@@ -26,7 +26,7 @@ struct Settings
 
 // NOTE: we ignore headpart_meshes on purpose. While this could result in a loss of data, it is a compromise
 // to reduce the amount of data that needs to be stored in the settings file. This list tends to be very long
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings, target_game, rename_referenced_textures)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings, target_game, rename_referenced_textures, optimize)
 
 struct OptimizationSteps
 {
