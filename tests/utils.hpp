@@ -5,6 +5,8 @@
 #include <catch.hpp>
 #include <tl/expected.hpp>
 
+#include <fstream>
+
 #ifdef __unix__
 constexpr std::string_view k_fail_on_linux_tag = "[!nonportable] [!shouldfail]";
 #else
@@ -84,6 +86,15 @@ public:
 
     [[nodiscard]] auto path() const noexcept -> const Path & { return path_; }
 };
+
+
+inline void create_file(const Path &path, const std::string &content = "")
+{
+    std::ofstream out(path);
+    out << content;
+    out.close();
+    REQUIRE(btu::fs::exists(path));
+}
 
 template<class T, class E>
 [[nodiscard]] auto require_expected(tl::expected<T, E> res) -> T
