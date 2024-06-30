@@ -250,6 +250,9 @@ Archive::Archive(const ArchiveVersion ver, const ArchiveType type)
 
 auto Archive::read(Path path) -> std::optional<Archive>
 {
+    if (!exists(path))
+        return {};
+
     const auto opt_format = libbsa::guess_file_format(path);
     if (!opt_format.has_value())
         return {};
