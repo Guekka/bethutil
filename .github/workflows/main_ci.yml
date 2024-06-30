@@ -13,6 +13,20 @@ on:
       - '.github/workflows/main_ci.yml'
       - 'codecov.yml'
 
+  push:
+    branches: [ main ]
+    paths:
+      - '**/*.cpp'
+      - '**/*.hpp'
+      - '**/CMakeLists.txt'
+      - '**/CMakePresets.txt'
+      - '**/cmake/**'
+      - '**/vcpkg.json'
+      - '.github/workflows/main_ci.yml'
+      - 'codecov.yml'
+    tags-ignore:
+      - '*'
+
   workflow_dispatch:
 
 env:
