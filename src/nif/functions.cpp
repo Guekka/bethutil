@@ -25,9 +25,17 @@ auto get_niversion(Game game) -> std::optional<nifly::NiVersion>
 
 auto convert(Mesh file, HeadpartStatus headpart, Game game) -> tl::expected<Mesh, Error>
 {
+    if (game != Game::SSE && game != Game::SLE)
+    {
+        // Only SSE and SLE are supported
+        // TODO: better error code
+        return tl::make_unexpected(Error(std::error_code(2, std::generic_category())));
+    }
+
     auto target_ver = get_niversion(game);
     if (!target_ver)
         return tl::make_unexpected(Error(std::error_code(1, std::generic_category())));
+
     nifly::OptOptions opt_options{.targetVersion  = *std::move(target_ver),
                                   .headParts      = headpart == HeadpartStatus::Yes,
                                   .removeParallax = false};
@@ -48,4 +56,10 @@ void rename_referenced_textures(Mesh &file)
                 tex.get().replace(tex.get().size() - 4, 4, ".dds");
         });
 }
+
+void nif_optimize(Mesh &file)
+{
+    file.get().Optimize();
+}
+
 } // namespace btu::nif

@@ -22,10 +22,22 @@ TEST_CASE("nif_optimize", "[src]")
 
 TEST_CASE("detect headpart", "[src]")
 {
-    auto mesh = btu::nif::Mesh{};
+    SECTION("headparts are not computed if the mesh does not require conversion")
+    {
+        auto mesh = btu::nif::Mesh{};
 
-    const auto opt_sets = btu::nif::Settings::get(btu::Game::SSE);
-    mesh.set_load_path(opt_sets.headpart_meshes[0]);
+        const auto opt_sets = btu::nif::Settings::get(btu::Game::SSE);
+        mesh.set_load_path(opt_sets.headpart_meshes[0]);
 
-    REQUIRE(btu::nif::compute_optimization_steps(mesh, opt_sets).headpart == btu::nif::HeadpartStatus::Yes);
+        CHECK(btu::nif::compute_optimization_steps(mesh, opt_sets).headpart == btu::nif::HeadpartStatus::No);
+    }
+    SECTION("headparts are detected")
+    {
+        auto mesh = require_expected(btu::nif::load("nif_optimize/in/crashing.nif"));
+
+        const auto opt_sets = btu::nif::Settings::get(btu::Game::SSE);
+        mesh.set_load_path(opt_sets.headpart_meshes[0]);
+
+        CHECK(btu::nif::compute_optimization_steps(mesh, opt_sets).headpart == btu::nif::HeadpartStatus::Yes);
+    }
 }
