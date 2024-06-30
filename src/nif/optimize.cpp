@@ -13,39 +13,47 @@ auto optimize(Mesh file, const OptimizationSteps &steps) -> tl::expected<Mesh, E
         res.map([](auto &m) { rename_referenced_textures(m); });
     if (steps.format)
         res = res.and_then([&](auto &&m) { return convert(BTU_FWD(m), steps.headpart, *steps.format); });
+    if (steps.optimize)
+        res.map([](auto &m) { nif_optimize(m); });
+
     return res;
 }
 
 auto compute_optimization_steps(const Mesh &file, const Settings &sets) -> OptimizationSteps
 {
-    // We only convert SSE and LE
-    std::optional<Game> format{};
+    auto ret = OptimizationSteps{};
 
     const bool sse_compatible = file.get().IsSSECompatible();
-    const bool sse            = sets.game == Game::SSE && !sse_compatible;
-    const bool sle            = sets.game == Game::SLE;
+    const bool sse            = sets.target_game == Game::SSE && !sse_compatible;
+    const bool sle            = sets.target_game == Game::SLE;
+    // all these settings are only relevant for SSE and SLE
     if (sse || sle)
-        format = sets.game;
+    {
+        ret.format = sets.target_game;
 
-    const auto path        = canonize_path(file.get_load_path());
-    const auto is_headpart = common::contains(sets.headpart_meshes, path);
+        const auto path = canonize_path(file.get_load_path());
+        ret.headpart    = common::contains(sets.headpart_meshes, path) ? HeadpartStatus::Yes
+                                                                       : HeadpartStatus::No;
 
-    return OptimizationSteps{
-        .rename_referenced_textures = sets.rename_referenced_textures,
-        .format                     = format,
-        .headpart                   = is_headpart ? HeadpartStatus::Yes : HeadpartStatus::No,
-    };
+        ret.rename_referenced_textures = sets.rename_referenced_textures;
+    }
+
+    // this setting is relevant for all games
+    ret.optimize = sets.optimize;
+
+    return ret;
 }
 
-auto skyrim_headpart_meshes() noexcept -> const std::vector<std::u8string> &;
+[[nodiscard]] auto skyrim_headpart_meshes() noexcept -> const std::vector<std::u8string> &;
 
 auto Settings::get(Game game) noexcept -> const Settings &
 {
     constexpr auto get_base_sets = [](Game game) noexcept -> Settings {
         return Settings{
-            .game                       = game,
-            .rename_referenced_textures = true,
+            .target_game                = game,
             .headpart_meshes            = {},
+            .rename_referenced_textures = true,
+            .optimize                   = false,
         };
     };
 
@@ -104,6 +112,7 @@ auto Settings::get(Game game) noexcept -> const Settings &
     assert(false && "Invalid game");
 }
 
+/// These are the base headpart meshes, present in Skyrim.esm, Dawnguard.esm, Hearthfires.esm and Dragonborn.esm
 auto skyrim_headpart_meshes() noexcept -> const std::vector<std::u8string> &
 {
     static const auto meshes = [] {

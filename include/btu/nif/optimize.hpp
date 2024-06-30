@@ -16,17 +16,22 @@ struct Settings
 {
     [[nodiscard]] static auto get(Game game) noexcept -> const Settings &;
 
-    Game game;
-    bool rename_referenced_textures = false;
+    // For SLE and SSE only
+    Game target_game;
     std::vector<std::u8string> headpart_meshes;
+    bool rename_referenced_textures = false;
+
+    bool optimize = false;
 };
 
 // NOTE: we ignore headpart_meshes on purpose. While this could result in a loss of data, it is a compromise
 // to reduce the amount of data that needs to be stored in the settings file. This list tends to be very long
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings, game, rename_referenced_textures)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings, target_game, rename_referenced_textures)
 
 struct OptimizationSteps
 {
+    bool optimize = false;
+
     bool rename_referenced_textures = true;
     std::optional<Game> format;
     HeadpartStatus headpart = HeadpartStatus::No;
