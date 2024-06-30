@@ -18,8 +18,7 @@ jobs:
         with:
           submodules: true
 
-      - name: Install Doxygen
-        run: sudo apt install doxygen -y
+      - uses: ssciwr/doxygen-install@v1
 
       - name: Install Poxy
         run: sudo pip install poxy --break-system-packages
