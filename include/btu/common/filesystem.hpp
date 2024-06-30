@@ -24,4 +24,8 @@ namespace btu::common {
 
 [[nodiscard]] auto hard_link(const Path &from, const Path &to) noexcept -> tl::expected<void, Error>;
 
+[[nodiscard]] auto find_matching_paths_icase(const btu::Path &directory,
+                                             std::span<const btu::Path> paths) noexcept
+    -> std::vector<btu::Path>;
+
 } // namespace btu::common

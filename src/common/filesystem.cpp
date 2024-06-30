@@ -1,5 +1,6 @@
 
 #include <btu/common/filesystem.hpp>
+#include <flux.hpp>
 
 #include <fstream>
 
@@ -150,4 +151,40 @@ auto common::hard_link(const Path &from, const Path &to) noexcept -> tl::expecte
         return tl::make_unexpected(Error(std::error_code{errno, std::system_category()}));
     }
 }
+
+auto find_matching_paths_icase(const btu::Path &directory, std::span<const btu::Path> paths) noexcept
+    -> std::vector<btu::Path>
+{
+#ifdef _WIN32
+    // Windows is case-insensitive by default. Only check if the file exists
+    return flux::from(paths)
+        .map([&directory](const btu::Path &path) { return directory / path; })
+        .filter([](const auto &path) { return btu::fs::exists(path); })
+        .to<std::vector<btu::Path>>();
+#else
+    // On Linux, we need to make a case-insensitive map of the files in the directory. This is slow.
+    // We also assume there is only one file with the same lowercase path. This is probably fine since
+    // mods were made for Windows and Windows is case-insensitive.
+    const auto files_in_directory
+        = flux::from_range(btu::fs::recursive_directory_iterator(directory))
+              .map([&directory](const btu::fs::directory_entry &entry) {
+                  const auto &path         = entry.path();
+                  const auto relative_path = btu::fs::relative(path, directory);
+                  return std::pair{btu::common::to_lower(relative_path.u8string()), path};
+              })
+              .to<std::unordered_map<std::u8string, btu::Path>>();
+
+    return flux::from(paths)
+        .map([&files_in_directory](const btu::Path &path) -> std::optional<btu::Path> {
+            const auto lower_path = btu::common::to_lower(path.u8string());
+            if (const auto it = files_in_directory.find(lower_path); it != files_in_directory.end())
+                return it->second;
+            return {};
+        })
+        .filter([](const auto &path) { return path.has_value(); })
+        .map([](const auto &path) { return path.value(); })
+        .to<std::vector<btu::Path>>();
+#endif
+}
+
 } // namespace btu
