@@ -80,7 +80,7 @@ public:
     [[nodiscard]] auto operator=(const TempPath &) = delete;
     [[nodiscard]] auto operator=(TempPath &&)      = delete;
 
-    ~TempPath() { btu::fs::remove(path_); }
+    ~TempPath() { btu::fs::remove_all(path_); }
 
     [[nodiscard]] auto path() const noexcept -> const Path & { return path_; }
 };

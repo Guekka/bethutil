@@ -15,8 +15,8 @@
 namespace btu::common {
 [[nodiscard]] auto read_file(const Path &a_path) noexcept -> tl::expected<std::vector<std::byte>, Error>;
 
-[[nodiscard]] auto write_file(const Path &a_path, std::span<const std::byte> data) noexcept
-    -> tl::expected<void, Error>;
+[[nodiscard]] auto write_file(const Path &a_path,
+                              std::span<const std::byte> data) noexcept -> tl::expected<void, Error>;
 
 [[nodiscard]] auto compare_files(const Path &filename1, const Path &filename2) noexcept -> bool;
 
@@ -25,7 +25,7 @@ namespace btu::common {
 [[nodiscard]] auto hard_link(const Path &from, const Path &to) noexcept -> tl::expected<void, Error>;
 
 [[nodiscard]] auto find_matching_paths_icase(const btu::Path &directory,
-                                             std::span<const btu::Path> paths) noexcept
+                                             std::span<const btu::Path> relative_lowercase_paths) noexcept
     -> std::vector<btu::Path>;
 
 } // namespace btu::common
