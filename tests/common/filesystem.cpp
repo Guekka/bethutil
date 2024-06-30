@@ -13,14 +13,6 @@
 
 namespace fs = btu::fs;
 
-void create_file(const btu::Path &path, const std::string &content = "")
-{
-    std::ofstream out(path);
-    out << content;
-    out.close();
-    REQUIRE(fs::exists(path));
-}
-
 class FsTempPath : public TempPath
 {
 public:
