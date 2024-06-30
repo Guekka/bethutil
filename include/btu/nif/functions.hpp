@@ -7,4 +7,5 @@
 namespace btu::nif {
 [[nodiscard]] auto convert(Mesh file, HeadpartStatus headpart, Game game) -> tl::expected<Mesh, Error>;
 void rename_referenced_textures(Mesh &file);
+void nif_optimize(Mesh &file);
 } // namespace btu::nif

@@ -80,7 +80,7 @@ auto load(Path relative_path, std::span<std::byte> data) noexcept -> tl::expecte
 
 auto save(Mesh mesh, const Path &path) noexcept -> ResultError
 {
-    const int res = mesh.get().Save(path);
+    const int res = mesh.get().Save(path, nifly::NifSaveOptions{.optimize = false});
     if (res != 0)
         return tl::make_unexpected(Error(std::error_code(res, std::generic_category())));
     return {};
@@ -91,7 +91,7 @@ auto save(Mesh mesh) noexcept -> tl::expected<std::vector<std::byte>, Error>
     auto buf = std::ostringstream{};
     try
     {
-        const int res = mesh.get().Save(buf);
+        const int res = mesh.get().Save(buf, nifly::NifSaveOptions{.optimize = false});
         if (res != 0)
             return tl::make_unexpected(Error(std::error_code(res, std::generic_category())));
     }
