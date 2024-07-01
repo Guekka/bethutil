@@ -6,232 +6,200 @@
 #include "btu/bsa/plugin.hpp"
 
 #include "btu/common/algorithms.hpp"
+#include "btu/common/filesystem.hpp"
 #include "btu/common/functional.hpp"
+
+#include <flux.hpp>
 
 #include <fstream>
 #include <ios>
 
 namespace btu::bsa {
-FilePath::FilePath(Path dir, std::u8string name, std::u8string suffix, std::u8string ext, FileTypes type)
-    : dir(std::move(dir))
-    , name(std::move(name))
-    , suffix(std::move(suffix))
-    , ext(std::move(ext))
-    , type(type)
+const auto k_suffix_separator = std::u8string(u8" - ");
+
+[[nodiscard]] auto list_plugins(const Path &dir, const Settings &sets) noexcept -> std::vector<Path>
 {
+    return flux::from_range(fs::directory_iterator(dir))
+        .filter([](const auto &f) { return f.is_regular_file(); })
+        .filter([&sets](const auto &f) {
+            return common::contains(sets.plugin_extensions, f.path().extension().u8string());
+        })
+        .map([](const auto &f) { return f.path(); })
+        .to<std::vector>();
 }
 
-auto FilePath::make(const Path &path, const Settings &sets, FileTypes type) -> std::optional<FilePath>
+[[nodiscard]] auto archive_suffixes(const Settings &sets) -> std::vector<std::u8string>
 {
-    if (is_directory(path))
-        return std::nullopt;
-
-    FilePath file(path.parent_path(), path.stem().u8string(), {}, path.extension().u8string(), type);
-
-    if (type == FileTypes::Plugin && !common::contains(sets.plugin_extensions, file.ext))
-        return std::nullopt;
-
-    if (type == FileTypes::BSA && file.ext != sets.extension)
-        return std::nullopt;
-
-    file.counter = eat_digits(file.name);
-    file.suffix  = eat_suffix(file.name, sets);
-
-    if (!file.counter.has_value())
-        file.counter = eat_digits(file.name);
-
-    return file;
+    const auto raw_suffixes = std::to_array({sets.suffix, sets.texture_suffix});
+    return flux::ref(raw_suffixes)
+        // TODO: filter_map
+        .filter([](const auto &s) { return s.has_value(); })
+        .map([](const auto &s) { return k_suffix_separator + s.value(); })
+        .to<std::vector>();
 }
 
-auto FilePath::full_path() const -> Path
+[[nodiscard]] auto archive_suffix_with_sep(const Settings &sets, ArchiveType type) -> std::u8string
 {
-    return dir / (full_name() + ext);
-}
+    auto suffix = (type == ArchiveType::Textures ? sets.texture_suffix : sets.suffix).value_or(u8"");
+    if (!suffix.empty())
+        suffix = k_suffix_separator + suffix;
 
-auto FilePath::full_name() const -> std::u8string
-{
-    const auto count = counter ? common::as_utf8_string(std::to_string(*counter)) : u8"";
-    const auto suf   = suffix.empty() ? u8"" : suffix_separator + suffix;
-    return {name + count + suf};
-}
-
-auto FilePath::eat_digits(std::u8string &str) -> std::optional<uint32_t>
-{
-    size_t first_digit = str.length() - 1;
-    for (; isdigit(str[first_digit]) != 0; --first_digit)
-        ;
-    ++first_digit;
-
-    if (first_digit != str.length())
-    {
-        std::optional<uint32_t> ret{};
-        try
-        {
-            ret = std::stoul(common::as_ascii_string(str.substr(first_digit)));
-        }
-        catch (const std::exception &)
-        {
-            return std::nullopt;
-        }
-
-        str.erase(first_digit);
-        return ret;
-    }
-    return std::nullopt;
-}
-
-auto FilePath::eat_suffix(std::u8string &str, const Settings &sets) -> std::u8string
-{
-    const auto suffix_pos = str.rfind(suffix_separator);
-
-    if (suffix_pos == std::u8string::npos)
-        return {};
-
-    auto suffix = str.substr(suffix_pos + suffix_separator.length());
-    if (suffix != sets.suffix && suffix != sets.texture_suffix)
-        return {};
-
-    str.erase(suffix_pos);
     return suffix;
 }
 
-auto is_loaded(const FilePath &archive, const Settings &sets) -> bool
+[[nodiscard]] auto archive_loaded_by_plugin(Path plugin_path, const Settings &sets, ArchiveType type) -> Path
 {
-    return std::ranges::any_of(sets.plugin_extensions, [&archive](const auto &ext) {
-        auto b            = archive;
-        b.ext             = ext;
-        bool const exact  = exists(b.full_path());
-        b.suffix          = {};
-        bool const approx = exists(b.full_path());
-        return exact || approx;
-    });
+    const auto new_filename = plugin_path.stem().u8string() + archive_suffix_with_sep(sets, type)
+                              + sets.extension;
+
+    return plugin_path.replace_extension(sets.extension).replace_filename(new_filename);
 }
 
-auto find_archive_name(std::span<const FilePath> plugins,
-                       const Settings &sets,
-                       ArchiveType type) -> std::optional<FilePath>
+void remove_suffixes(std::u8string &filename, const Settings &sets)
 {
-    // TODO: proper error messages
+    for (const auto &suffix : archive_suffixes(sets))
+        filename = str_replace_once(filename, suffix, u8"", common::CaseSensitive::Yes);
+}
+
+[[nodiscard]] auto plugins_loading_archive(const Path &archive, const Settings &sets)
+{
+    auto filename = archive.filename().u8string();
+    remove_suffixes(filename, sets);
+
+    return flux::ref(sets.plugin_extensions)
+        .map([&archive, &filename](const auto &ext) { return archive.parent_path() / (filename + ext); })
+        .to<std::vector>();
+}
+
+auto find_archive_name_using_plugins(std::span<const Path> plugins,
+                                     const Settings &sets,
+                                     ArchiveType type) -> std::optional<Path>
+{
     if (plugins.empty())
         return std::nullopt;
 
-    const std::u8string suffix = [type, &sets] {
-        if (type == ArchiveType::Textures)
-        {
-            return sets.texture_suffix.value_or(u8"");
-        }
-        return sets.suffix.value_or(u8"");
-    }();
+    const auto archive_candidates = flux::from(plugins)
+                                        .map([&sets, type](const auto &plugin) {
+                                            return archive_loaded_by_plugin(plugin, sets, type);
+                                        })
+                                        .filter([](const auto &f) { return !exists(f); })
+                                        // TODO: propose .first()
+                                        .to<std::vector>();
 
-    auto check_plugin = [&sets, &suffix](FilePath &file) {
-        file.ext    = sets.extension;
-        file.suffix = suffix;
-        return !exists(file.full_path());
-    };
+    if (!archive_candidates.empty())
+        return archive_candidates.front();
 
-    for (auto plugin : plugins)
-        if (check_plugin(plugin))
-            return plugin;
+    // let's try to make a name based on the first plugin
+    const auto plugin = plugins.front();
+    const auto stem   = plugin.stem().u8string();
 
-    FilePath plug                    = plugins.front();
-    constexpr uint8_t max_iterations = UINT8_MAX;
-    for (plug.counter = 0; plug.counter < max_iterations; ++*plug.counter)
-        if (check_plugin(plug))
-            return plug;
+    for (uint8_t i = 1; i < std::numeric_limits<uint8_t>::max(); ++i)
+    {
+        const auto counter = common::as_utf8_string(std::to_string(i));
+        const auto file    = plugin.parent_path()
+                          / (stem + counter + archive_suffix_with_sep(sets, type) + sets.extension);
+        if (!exists(file))
+            return file;
+    }
 
     return std::nullopt;
 }
 
 auto find_archive_name(const Path &directory,
                        const Settings &sets,
-                       ArchiveType type) noexcept -> std::optional<FilePath>
+                       ArchiveType type) noexcept -> std::optional<Path>
 {
     if (!is_directory(directory))
         return std::nullopt;
 
-    auto plugins = list_plugins(fs::directory_iterator(directory), fs::directory_iterator(), sets);
-    if (plugins.empty())
-    {
-        plugins.emplace_back(directory,
-                             directory.filename().u8string(),
-                             u8"",
-                             sets.dummy_extension,
-                             FileTypes::Plugin);
-    }
+    auto plugins = list_plugins(directory, sets);
 
-    auto name = find_archive_name(plugins, sets, type);
-    if (name.has_value())
+    if (plugins.empty())
+        plugins.emplace_back(directory / (directory.filename().u8string() + sets.dummy_extension));
+
+    if (auto name = find_archive_name_using_plugins(plugins, sets, type))
         return name;
 
     // alright, I have no idea how we can get here. But let's try to make a name just in case
-    constexpr auto max_attempts = std::numeric_limits<uint16_t>::max();
+    constexpr auto max_attempts = std::numeric_limits<uint8_t>::max();
 
-    for (uint16_t i = 0; i < max_attempts; ++i)
+    for (uint8_t i = 0; i < max_attempts; ++i)
     {
         auto filename = u8"archive - " + common::str_random(8);
-        FilePath file(directory, filename, u8"", sets.extension, FileTypes::BSA);
-        if (!exists(file.full_path()))
-            return file; // finally found a name
+        std::error_code error;
+        auto file = directory / (filename + sets.extension);
+        if (!exists(file, error) && !error)
+            return file; // finally found a name, though I doubt the user will like it
     }
 
     // guess we are out of luck
     return std::nullopt;
 }
 
-void clean_dummy_plugins(std::vector<FilePath> &plugins, const Settings &sets)
+void clean_dummy_plugins(std::span<const Path> plugins, const Settings &sets)
 {
-    if (!sets.s_dummy_plugin.has_value())
+    if (!sets.dummy_plugin.has_value())
         return;
-    const auto &dummy = *sets.s_dummy_plugin;
 
-    auto is_dummy = [&dummy](const FilePath &f) {
-        std::fstream file(f.full_path(), std::ios::binary | std::ios::in | std::ios::ate);
+    const auto &dummy = *sets.dummy_plugin;
+
+    auto is_dummy = [&dummy](const Path &f) {
+        std::fstream file(f, std::ios::binary | std::ios::in | std::ios::ate);
 
         // It is safe to evaluate file size, as the embedded dummies are the smallest plugins possible
         return file && file.tellg() == static_cast<std::streamoff>(dummy.size());
     };
 
-    auto dummies = std::ranges::stable_partition(plugins, std::not_fn(is_dummy));
-
-    std::ranges::for_each(dummies, [](const auto &f) { fs::remove(f.full_path()); });
-    // remove dummy plugins from plugins
-    plugins.erase(dummies.begin(), dummies.end());
+    flux::from(plugins).filter(is_dummy).for_each([](const auto &f) { fs::remove(f); });
 }
 
-void make_dummy_plugins(std::span<const FilePath> archives, const Settings &sets)
+void make_dummy_plugins(std::span<const Path> archives, const Settings &sets)
 {
-    if (!sets.s_dummy_plugin.has_value())
+    if (!sets.dummy_plugin.has_value())
         return;
 
-    for (auto &&bsa : archives)
+    for (const Path &arch : archives)
     {
-        if (is_loaded(bsa, sets))
+        if (flux::any(plugins_loading_archive(arch, sets), BTU_RESOLVE_OVERLOAD(btu::fs::exists)))
             continue;
 
-        auto mut_bsa   = bsa;
-        mut_bsa.ext    = sets.dummy_extension;
-        mut_bsa.suffix = {};
-        std::ofstream dummy(mut_bsa.full_path(), std::ios::out | std::ios::binary);
+        auto plugin = arch;
+        plugin.replace_extension(sets.dummy_extension);
 
-        const auto dummy_bytes = *sets.s_dummy_plugin;
-        dummy.write(reinterpret_cast<const char *>(dummy_bytes.data()),
-                    static_cast<std::streamsize>(dummy_bytes.size()));
+        auto filename = plugin.filename().u8string();
+        remove_suffixes(filename, sets);
+        plugin.replace_filename(filename);
+
+        const auto res = common::write_file(plugin, *sets.dummy_plugin);
+        if (!res)
+        {
+            // TODO: what to do?
+        }
     }
 }
 
-auto list_archive(const Path &dir, const Settings &sets) noexcept -> std::vector<FilePath>
+auto list_archive(const Path &dir, const Settings &sets) noexcept -> std::vector<Path>
 {
-    return list_archive(fs::directory_iterator(dir), fs::directory_iterator(), sets);
+    try
+    {
+        return flux::from_range(fs::directory_iterator(dir))
+            .filter([](const auto &f) { return f.is_regular_file(); })
+            .filter([&sets](const auto &f) { return f.path().extension() == sets.extension; })
+            .map([](const auto &f) { return f.path(); })
+            .to<std::vector>();
+    }
+    catch (const std::exception &)
+    {
+        return {};
+    }
 }
 
 void remake_dummy_plugins(const Path &directory, const Settings &sets)
 {
-    auto files = std::vector(btu::fs::directory_iterator(directory), btu::fs::directory_iterator{});
-
-    auto plugins = list_plugins(files.cbegin(), files.cend(), sets);
+    auto plugins = list_plugins(directory, sets);
     clean_dummy_plugins(plugins, sets);
-    auto archives = list_archive(files.cbegin(), files.cend(), sets);
-    btu::bsa::make_dummy_plugins(archives, sets);
+    auto archives = list_archive(directory, sets);
+    make_dummy_plugins(archives, sets);
 }
 
 } // namespace btu::bsa

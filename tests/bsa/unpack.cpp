@@ -11,13 +11,11 @@
 
 auto unpack_all(const Path &in, const Path &out, const btu::bsa::Settings &sets)
 {
-    auto archives = list_archive(std::filesystem::directory_iterator(in),
-                                 std::filesystem::directory_iterator(),
-                                 sets);
+    auto archives = list_archive(in, sets);
 
     for (auto &&arch : archives)
     {
-        const auto res = btu::bsa::unpack({.file_path = arch.full_path(), .root_opt = &out});
+        const auto res = btu::bsa::unpack({.file_path = arch, .root_opt = &out});
         CHECK(res == btu::bsa::UnpackResult::Success);
     }
 }

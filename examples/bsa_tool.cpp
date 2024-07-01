@@ -25,7 +25,7 @@ void pack(const btu::Path &dir, const btu::bsa::Settings &sets)
                 return;
             }
 
-            if (!std::move(arch).write(name->full_path()))
+            if (!std::move(arch).write(name.value()))
             {
                 std::cerr << "Failed to write archive\n";
             }
@@ -37,9 +37,9 @@ void unpack(const btu::Path &dir, const btu::bsa::Settings &sets)
     auto archives = list_archive(dir, sets);
     for (const auto &file : archives)
     {
-        std::cout << "Unpacking " << file.full_path().string() << '\n' << std::flush;
+        std::cout << "Unpacking " << file.string() << '\n' << std::flush;
         const auto params = btu::bsa::UnpackSettings{
-            .file_path = file.full_path(),
+            .file_path = file,
         };
         if (unpack(params) != btu::bsa::UnpackResult::Success)
             std::cerr << "Failed to unpack archive\n";
@@ -51,8 +51,8 @@ void list(const btu::Path &dir, const btu::bsa::Settings &sets)
     auto archives = list_archive(dir, sets);
     for (const auto &file : archives)
     {
-        std::cout << "Files of: " << file.full_path().string() << '\n' << std::flush;
-        auto arch = btu::bsa::Archive::read(file.full_path());
+        std::cout << "Files of: " << file.string() << '\n' << std::flush;
+        auto arch = btu::bsa::Archive::read(file);
         if (!arch)
         {
             std::cerr << "Failed to read archive\n";
@@ -79,7 +79,7 @@ auto process_args(std::vector<std::string_view> args) -> int
         return 1;
     }
 
-    const auto &sets   = btu::bsa::Settings::get(btu::Game::SSE);
+    const auto &sets   = btu::bsa::Settings::get(btu::Game::Starfield);
     const auto command = args[0];
 
     auto func = std::unordered_map<std::string_view,
