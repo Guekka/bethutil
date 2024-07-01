@@ -1,5 +1,6 @@
 #pragma once
 
+#include "btu/common/filesystem.hpp"
 #include "btu/common/path.hpp"
 
 #include <catch.hpp>
@@ -77,23 +78,26 @@ public:
     }
 
     TempPath(const TempPath &) = delete;
-    TempPath(TempPath &&other) = delete;
+    TempPath(TempPath &&other) noexcept
+        : path_(std::exchange(other.path_, {}))
+    {
+    }
 
     [[nodiscard]] auto operator=(const TempPath &) = delete;
-    [[nodiscard]] auto operator=(TempPath &&)      = delete;
+    [[nodiscard]] auto operator=(TempPath &&) noexcept -> TempPath &
+    {
+        path_ = std::exchange(path_, {});
+        return *this;
+    }
 
-    ~TempPath() { btu::fs::remove_all(path_); }
+    ~TempPath()
+    {
+        if (btu::fs::exists(path_) && path_.native().size() > 10) // just in case
+            btu::fs::remove_all(path_);
+    }
 
     [[nodiscard]] auto path() const noexcept -> const Path & { return path_; }
 };
-
-inline void create_file(const Path &path, const std::string &content = "")
-{
-    std::ofstream out(path);
-    out << content;
-    out.close();
-    REQUIRE(btu::fs::exists(path));
-}
 
 template<class T, class E>
 [[nodiscard]] auto require_expected(tl::expected<T, E> res) -> T
@@ -109,4 +113,14 @@ void require_expected(tl::expected<void, E> res)
 {
     if (!res)
         FAIL(res.error());
+}
+
+inline void create_file(const Path &path, std::span<const std::byte> content)
+{
+    require_expected(btu::common::write_file(path, content));
+}
+
+inline void create_file(const Path &path, const std::string &content = "")
+{
+    create_file(path, std::span{reinterpret_cast<const std::byte *>(content.data()), content.size()});
 }

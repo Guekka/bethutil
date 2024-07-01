@@ -268,4 +268,12 @@ public:
     }
 };
 
+#define BTU_RETURNS(...)                                   \
+    noexcept(noexcept(__VA_ARGS__))->decltype(__VA_ARGS__) \
+    {                                                      \
+        return __VA_ARGS__;                                \
+    }
+
+#define BTU_RESOLVE_OVERLOAD(f) [](auto &&...xs) BTU_RETURNS(f(::std::forward<decltype(xs)>(xs)...))
+
 } // namespace btu::common

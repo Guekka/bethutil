@@ -256,6 +256,18 @@ constexpr auto str_trim(std::u8string_view in) noexcept -> std::u8string_view
     return std::u8string_view(&*begin, end - begin);
 }
 
+constexpr auto str_replace_once(std::u8string &string,
+                                std::u8string_view from,
+                                std::u8string_view to,
+                                CaseSensitive case_sensitive) -> std::u8string &
+{
+    const auto idx = str_find(string, from, case_sensitive);
+    if (idx == std::u8string::npos)
+        return string;
+
+    return string.replace(idx, from.size(), to);
+}
+
 constexpr auto first_codepoint(std::u8string_view string) -> U8Unit
 {
     U8Unit res{};
