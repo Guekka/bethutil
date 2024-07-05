@@ -4,47 +4,47 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 #pragma once
 
-struct ID3D11Device;
-struct IDXGIFactory1;
+#include <btu/common/threading.hpp>
 
-#include <memory>
-#include <optional>
 #include <string>
 
-namespace Microsoft::WRL {
-template<typename>
-class ComPtr;
-} // namespace Microsoft::WRL
+class ID3D11Device;
 
 namespace btu::tex {
+namespace detail {
+struct DxAdapter;
+} // namespace detail
 
+/// Recommended way to use is to make it static
 class CompressionDevice
 {
 public:
-    explicit operator bool() const;
-    [[nodiscard]] auto is_valid() const -> bool;
+    struct AdapterInfo
+    {
+        uint32_t index{};
+        std::u8string name;
+    };
 
-    [[nodiscard]] auto get_device() const -> ID3D11Device *;
-    [[nodiscard]] auto gpu_name() const -> const std::u8string &;
+    using Callback = std::function<void(ID3D11Device *dev)>;
 
-    static auto make(uint32_t adapter_index, bool allow_software = true) -> std::optional<CompressionDevice>;
+    CompressionDevice();
+    ~CompressionDevice(); // = default;
 
-    CompressionDevice(const CompressionDevice &) = delete;
-    CompressionDevice(CompressionDevice &&other) noexcept;
+    [[nodiscard]] auto list_adapters() const noexcept -> const std::vector<AdapterInfo> &;
 
-    auto operator=(const CompressionDevice &) -> CompressionDevice & = delete;
-    auto operator=(CompressionDevice &&other) noexcept -> CompressionDevice &;
+    // I don't like platform specific API,, but I can't think of a better way
+#ifdef _WIN32
+    void apply(const Callback &callback) noexcept(noexcept(callback));
+#endif
 
-    ~CompressionDevice();
+    // This one will always return false on non-windows platforms
+    [[nodiscard]] auto try_apply(const Callback &callback) noexcept(noexcept(callback)) -> bool;
 
 private:
-    CompressionDevice();
+    std::vector<std::unique_ptr<common::synchronized<detail::DxAdapter>>> devices_;
+    std::vector<AdapterInfo> cached_info_;
 
-#ifdef _WIN32
-    // Kinda ridiculous to have a smart pointer own another one,
-    // But I don't want to leak Windows headers
-    std::unique_ptr<Microsoft::WRL::ComPtr<ID3D11Device>> device_;
-    std::u8string gpu_name_;
-#endif
+    std::mutex apply_mutex_;
+    std::condition_variable cv_;
 };
 } // namespace btu::tex

@@ -57,11 +57,7 @@ struct OptimizationSteps
     auto operator<=>(const OptimizationSteps &) const noexcept = default;
 };
 
-/// `dev` may be null
-/// Thread-safety : see `convert`
-[[nodiscard]] auto optimize(Texture &&file,
-                            OptimizationSteps sets,
-                            const std::optional<CompressionDevice> &dev) noexcept -> Result;
+[[nodiscard]] auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) noexcept -> Result;
 [[nodiscard]] auto compute_optimization_steps(const Texture &file,
                                               const Settings &sets) noexcept -> OptimizationSteps;
 } // namespace btu::tex

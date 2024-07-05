@@ -54,7 +54,7 @@ auto make_transparent_alpha(Texture &&file) -> Result
 auto convert_uncompressed(const ScratchImage &image,
                           ScratchImage &timage,
                           DXGI_FORMAT format,
-                          [[maybe_unused]] const std::optional<CompressionDevice> &dummy) -> HRESULT
+                          [[maybe_unused]] CompressionDevice &dummy) -> HRESULT
 {
     const auto *const img = image.GetImages();
     if (img == nullptr)
@@ -79,7 +79,7 @@ auto convert_bc7(const uint8_t *source, uint8_t *dest, uint32_t width, uint32_t 
 auto convert_compressed(const ScratchImage &image,
                         ScratchImage &timage,
                         DXGI_FORMAT format,
-                        [[maybe_unused]] const std::optional<CompressionDevice> &dev) -> HRESULT
+                        [[maybe_unused]] CompressionDevice &dev) -> HRESULT
 {
     const auto *const img = image.GetImages();
     if (img == nullptr)
@@ -96,21 +96,27 @@ auto convert_compressed(const ScratchImage &image,
         }
     }();
 
-    // hardware impl, only works on d3d11
-#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-    if (bc6hbc7 && dev)
-        return Compress(dev->get_device(),
-                        img,
-                        nimg,
-                        image.GetMetadata(),
-                        format,
-                        DirectX::TEX_COMPRESS_DEFAULT,
-                        DirectX::TEX_THRESHOLD_DEFAULT,
-                        timage);
-#endif
-    // slower bc7 impl, but faster than dxtex
     if (bc6hbc7)
     {
+        // hardware impl, only works on d3d11
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
+        HRESULT bc7_ret    = E_FAIL;
+        const bool applied = dev.try_apply([&](auto *d3d11_dev) {
+            bc7_ret = Compress(d3d11_dev,
+                               img,
+                               nimg,
+                               image.GetMetadata(),
+                               format,
+                               DirectX::TEX_COMPRESS_DEFAULT,
+                               DirectX::TEX_THRESHOLD_DEFAULT,
+                               timage);
+        });
+
+        if (applied)
+            return bc7_ret;
+#endif
+
+        // slower bc7 impl, but faster than dxtex
         auto metadata   = image.GetMetadata();
         metadata.format = DXGI_FORMAT_BC7_UNORM;
         const auto hr   = timage.Initialize(metadata);
@@ -149,7 +155,8 @@ auto convert_compressed(const ScratchImage &image,
                     DirectX::TEX_THRESHOLD_DEFAULT,
                     timage);
 }
-auto convert(Texture &&file, DXGI_FORMAT format, const std::optional<CompressionDevice> &dev) -> Result
+
+auto convert(Texture &&file, DXGI_FORMAT format, CompressionDevice &dev) -> Result
 {
     const auto &tex = file.get();
     const auto info = tex.GetMetadata();

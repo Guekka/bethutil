@@ -14,9 +14,7 @@
 
 namespace btu::tex {
 
-auto optimize(Texture &&file,
-              OptimizationSteps sets,
-              const std::optional<CompressionDevice> &dev) noexcept -> Result
+auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) noexcept -> Result
 {
     const auto compressed = DirectX::IsCompressed(file.get().GetMetadata().format);
     auto res              = Result{std::move(file)};

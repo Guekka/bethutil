@@ -1,9 +1,7 @@
-#include "btu/tex/functions.hpp"
-
 #include "./utils.hpp"
-#include "btu/tex/compression_device.hpp"
 
 #include <btu/common/filesystem.hpp>
+#include <btu/tex/functions.hpp>
 
 #include <filesystem>
 
@@ -51,24 +49,26 @@ TEST_CASE("convert", "[src]")
     {
         SECTION("With compression device")
         {
-            auto dev = btu::tex::CompressionDevice::make(0);
-            test_expected_dir(u8"convert", [&dev](auto &&tex) {
-                return btu::tex::convert(std::forward<decltype(tex)>(tex), DXGI_FORMAT_BC7_UNORM, dev);
+            test_expected_dir(u8"convert", [](auto &&tex) {
+                return btu::tex::convert(std::forward<decltype(tex)>(tex),
+                                         DXGI_FORMAT_BC7_UNORM,
+                                         compression_dev);
             });
         }
         SECTION("Without compression device")
         {
+            // TODO
             test_expected_dir(u8"convert2", [](auto &&tex) {
                 return btu::tex::convert(std::forward<decltype(tex)>(tex),
                                          DXGI_FORMAT_BC7_UNORM,
-                                         std::nullopt);
+                                         compression_dev);
             });
         }
     }
     SECTION("bc1")
     {
         test_expected(u8"convert_bc1", u8"01.dds", [](auto &&tex) {
-            return btu::tex::convert(std::forward<decltype(tex)>(tex), DXGI_FORMAT_BC1_UNORM, std::nullopt);
+            return btu::tex::convert(std::forward<decltype(tex)>(tex), DXGI_FORMAT_BC1_UNORM, compression_dev);
         });
     }
 }

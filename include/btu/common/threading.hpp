@@ -2,6 +2,7 @@
 
 #include <BS_thread_pool.hpp>
 #include <btu/common/functional.hpp>
+#include <btu/common/metaprogramming.hpp>
 
 #include <span>
 
@@ -41,8 +42,20 @@ public:
     {
     }
 
-    auto operator->() noexcept -> GuardedType * { return guarded_data_; }
+    explicit update_guard(synchronized<GuardedType, MutexType> &sv, std::unique_lock<MutexType> lock)
+        : lock_{std::move(lock)}
+        , guarded_data_{&sv.guarded_data_}
+    {
+    }
 
+    explicit update_guard(const synchronized<std::remove_const_t<GuardedType>, MutexType> &sv,
+                          std::unique_lock<MutexType> lock)
+        : lock_{std::move(lock)}
+        , guarded_data_{&sv.guarded_data_}
+    {
+    }
+
+    auto operator->() noexcept -> GuardedType * { return guarded_data_; }
     auto operator*() noexcept -> GuardedType & { return *guarded_data_; }
 };
 
@@ -75,9 +88,26 @@ public:
         return func(guarded_data_);
     }
 
-    auto wlock() { return update_guard{*this}; }
+    [[nodiscard]] auto wlock() { return update_guard{*this}; }
 
-    auto rlock() const { return update_guard<GuardedData const, MutexType>{*this}; }
+    [[nodiscard]] auto rlock() const { return update_guard<GuardedData const, MutexType>{*this}; }
+
+    // The two next functions are mine, hope I did nothing wrong
+    [[nodiscard]] auto try_rlock() const -> std::optional<update_guard<GuardedData const, MutexType>>
+    {
+        std::unique_lock lock{mutex_, std::try_to_lock};
+        if (lock.owns_lock())
+            return update_guard<GuardedData const, MutexType>{*this, std::move(lock)};
+        return std::nullopt;
+    }
+
+    [[nodiscard]] auto try_wlock() -> std::optional<update_guard<GuardedData, MutexType>>
+    {
+        std::unique_lock lock{mutex_, std::try_to_lock};
+        if (lock.owns_lock())
+            return update_guard<GuardedData, MutexType>{*this, std::move(lock)};
+        return std::nullopt;
+    }
 };
 
 // GCOVR_EXCL_STOP : end of synchronized_value code
