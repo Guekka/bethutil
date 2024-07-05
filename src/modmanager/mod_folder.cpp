@@ -106,110 +106,144 @@ void ModFolder::iterate(ModFolderIterator &iterator) noexcept
     return target;
 }
 
+void transform_loose_file(const Path &absolute_path,
+                          const Path &dir,
+                          ModFolderTransformer &transformer) noexcept
+{
+    if (transformer.stop_requested())
+        return;
+
+    const auto relative_path = absolute_path.lexically_relative(dir);
+
+    const auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
+        [&absolute_path] { return common::read_file(absolute_path); });
+
+    if (const auto transformed = transformer.transform_file({relative_path, file_data}))
+    {
+        if (!common::write_file(absolute_path, *transformed))
+            transformer.failed_to_write_transformed_file(relative_path, *transformed);
+    }
+}
+
+[[nodiscard]] auto want_to_skip_archive(const Path &archive_path,
+                                        ModFolderTransformer &transformer,
+                                        ModFolderIteratorBase::ArchiveTooLargeState state) noexcept -> bool
+{
+    return transformer.archive_too_large(archive_path, state)
+           == ModFolderIteratorBase::ArchiveTooLargeAction::Skip;
+}
+
+[[nodiscard]] auto transform_archive_file_inner(ModFolderTransformer &transformer,
+                                                std::atomic_bool &any_file_changed,
+                                                bsa::Archive::value_type &pair) noexcept
+{
+    return [&transformer, &any_file_changed, &pair] {
+        if (transformer.stop_requested())
+            return;
+
+        auto &[relative_path, file] = pair;
+
+        auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
+            [&pair]() -> tl::expected<std::vector<std::byte>, common::Error> {
+                auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
+                if (!pair.second.write(buffer))
+                    // TODO: better error here?
+                    return tl::make_unexpected(common::Error(std::error_code(errno, std::system_category())));
+
+                return buffer.get<binary_io::memory_ostream>().rdbuf();
+            });
+
+        auto transformed = transformer.transform_file({relative_path, file_data});
+        if (transformed)
+        {
+            const bool res = file.read(*transformed);
+            if (!res)
+                transformer.failed_to_read_transformed_file(relative_path, *transformed);
+
+            any_file_changed = any_file_changed || res;
+        }
+    };
+}
+
+[[nodiscard]] auto change_archive_version_if_needed(bsa::Archive &archive,
+                                                    const bsa::Settings &bsa_settings) noexcept -> bool
+{
+    if (const auto target_version = guess_target_archive_version(archive, bsa_settings))
+    {
+        archive.set_version(*target_version);
+        return true;
+    }
+    return false;
+}
+
+void transform_archive_file(const Path &archive_path,
+                            ModFolderTransformer &transformer,
+                            const bsa::Settings &bsa_settings,
+                            common::ThreadPool &thread_pool) noexcept
+{
+    if (const auto arch_size = file_size(archive_path); arch_size > bsa_settings.max_size)
+    {
+        if (want_to_skip_archive(archive_path,
+                                 transformer,
+                                 ModFolderIteratorBase::ArchiveTooLargeState::BeforeProcessing))
+            return;
+    }
+
+    auto opt_arch = bsa::Archive::read(archive_path);
+    if (!opt_arch)
+    {
+        transformer.failed_to_read_archive(archive_path);
+        return;
+    }
+
+    auto archive                      = std::move(*opt_arch);
+    std::atomic_bool any_file_changed = false;
+    std::vector<std::future<void>> futs;
+    for (auto &pair : archive)
+    {
+        if (transformer.stop_requested())
+            return;
+
+        auto fut = thread_pool.submit_task(transform_archive_file_inner(transformer, any_file_changed, pair));
+        futs.push_back(std::move(fut));
+    }
+    flux::for_each(futs, [](auto &&fut) { fut.wait(); });
+    // TODO: there might be an exception in fut. Should we ignore it?
+
+    if (transformer.stop_requested())
+        return;
+
+    const bool version_changed = change_archive_version_if_needed(archive, bsa_settings);
+
+    if (const auto arch_size = archive.file_size(); arch_size > bsa_settings.max_size)
+    {
+        if (want_to_skip_archive(archive_path,
+                                 transformer,
+                                 ModFolderIteratorBase::ArchiveTooLargeState::AfterProcessing))
+            return;
+    }
+
+    if (transformer.stop_requested())
+        return;
+
+    if (any_file_changed || version_changed)
+    {
+        // Change the extension of the archive if needed
+        auto path = archive_path;
+        if (path.extension() != bsa_settings.extension)
+            path.replace_extension(bsa_settings.extension);
+
+        if (!std::move(archive).write(path))
+            transformer.failed_to_write_archive(archive_path, path);
+
+        // Remove the old archive if the new one has a different name
+        if (path != archive_path)
+            fs::remove(archive_path);
+    }
+}
+
 void ModFolder::transform(ModFolderTransformer &transformer) noexcept
 {
-    const auto transform_loose = [this, &transformer](const Path &relative_path) {
-        if (transformer.stop_requested())
-            return;
-
-        const auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
-            [&relative_path, this] { return common::read_file(dir_ / relative_path); });
-
-        if (const auto transformed = transformer.transform_file({relative_path, file_data}))
-        {
-            if (!common::write_file(dir_ / relative_path, *transformed))
-                transformer.failed_to_write_transformed_file(relative_path, *transformed);
-        }
-    };
-
-    const auto transform_archive = [&transformer, this](const Path &archive_path) {
-        if (const auto arch_size = file_size(archive_path); arch_size > bsa_settings_.max_size)
-        {
-            if (const auto action = transformer.archive_too_large(archive_path, BeforeProcessing);
-                action == Skip)
-                return;
-        }
-
-        auto opt_arch = bsa::Archive::read(archive_path);
-        if (!opt_arch)
-        {
-            transformer.failed_to_read_archive(archive_path);
-            return;
-        }
-
-        auto archive                      = std::move(*opt_arch);
-        std::atomic_bool any_file_changed = false;
-        std::vector<std::future<void>> futs;
-        for (auto &pair : archive)
-        {
-            if (transformer.stop_requested())
-                return;
-
-            auto fut = thread_pool_.submit_task([&transformer, &any_file_changed, &pair] {
-                if (transformer.stop_requested())
-                    return;
-
-                auto &[relative_path, file] = pair;
-
-                auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
-                    [&pair]() -> tl::expected<std::vector<std::byte>, common::Error> {
-                        auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
-                        if (!pair.second.write(buffer))
-                            // TODO: better error here?
-                            return tl::make_unexpected(
-                                common::Error(std::error_code(errno, std::system_category())));
-
-                        return buffer.get<binary_io::memory_ostream>().rdbuf();
-                    });
-
-                auto transformed = transformer.transform_file({relative_path, file_data});
-                if (transformed)
-                {
-                    const bool res = file.read(*transformed);
-                    if (!res)
-                        transformer.failed_to_read_transformed_file(relative_path, *transformed);
-
-                    any_file_changed = any_file_changed || res;
-                }
-            });
-            futs.push_back(std::move(fut));
-        }
-        flux::for_each(futs, [](auto &&fut) { fut.wait(); });
-        // TODO: there might be an exception in fut. Should we ignore it?
-
-        if (transformer.stop_requested())
-            return;
-
-        const auto target_version = guess_target_archive_version(archive, bsa_settings_);
-        if (target_version)
-            archive.set_version(*target_version);
-
-        if (const auto arch_size = archive.file_size(); arch_size > bsa_settings_.max_size)
-        {
-            if (const auto action = transformer.archive_too_large(archive_path, AfterProcessing);
-                action == Skip)
-                return;
-        }
-
-        if (transformer.stop_requested())
-            return;
-
-        if (any_file_changed || target_version)
-        {
-            // Change the extension of the archive if needed
-            auto path = archive_path;
-            if (path.extension() != bsa_settings_.extension)
-                path.replace_extension(bsa_settings_.extension);
-
-            if (!std::move(archive).write(path))
-                transformer.failed_to_write_archive(archive_path, path);
-
-            // Remove the old archive if the new one has a different name
-            if (path != archive_path)
-                fs::remove(archive_path);
-        }
-    };
-
     auto is_arch = [](const Path &file_name) {
         const auto ext = common::to_lower(file_name.extension().u8string());
         return common::contains(bsa::k_archive_extensions, ext);
@@ -226,13 +260,12 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
         if (transformer.stop_requested())
             return;
 
-        futs.push_back(
-            thread_pool_.submit_task([this, &file_path, &is_arch, &transform_loose, &transform_archive] {
-                if (is_arch(file_path)) [[unlikely]]
-                    transform_archive(file_path);
-                else [[likely]]
-                    transform_loose(file_path.lexically_relative(dir_));
-            }));
+        futs.push_back(thread_pool_.submit_task([this, &file_path, &is_arch, &transformer] {
+            if (is_arch(file_path)) [[unlikely]]
+                transform_archive_file(file_path, transformer, bsa_settings_, thread_pool_);
+            else [[likely]]
+                transform_loose_file(file_path, dir_, transformer);
+        }));
     }
     flux::for_each(futs, [](auto &&fut) { fut.wait(); });
     // TODO: there might be an exception in fut. Should we ignore it?
