@@ -42,6 +42,8 @@ public:
         const Path &archive_path, ArchiveTooLargeState state) noexcept -> ArchiveTooLargeAction = 0;
 
     virtual void failed_to_read_archive(const Path &archive_path) noexcept {}
+
+    [[nodiscard]] virtual auto stop_requested() const noexcept -> bool { return false; }
 };
 
 class ModFolderTransformer : public ModFolderIteratorBase
@@ -92,12 +94,7 @@ public:
 
     /// Iterate over all files in the folder, including files in archives.
     /// Multithreaded.
-    void iterate(ModFolderIterator &transformer) noexcept;
-
-    /// Iterate over all files in the folder, including archives.
-    /// Multithreaded.
-    void iterate(const std::function<void(Path relative_path)> &loose,
-                 const std::function<void(const Path &archive_path)> &archive) noexcept;
+    void iterate(ModFolderIterator &iterator) noexcept;
 
     [[nodiscard]] auto name() const noexcept -> std::u8string { return dir_.filename().u8string(); }
     [[nodiscard]] auto path() const noexcept -> const Path & { return dir_; }
