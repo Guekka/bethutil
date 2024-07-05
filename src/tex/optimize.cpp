@@ -109,7 +109,8 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     res.best_format = best_output_format(file, sets);
 
     res.convert = conversion_required(file, sets);
-    if (sets.compress && res.best_format != info.format)
+    // do not recompress if original is already compressed
+    if (sets.compress && res.best_format != info.format && !DirectX::IsCompressed(info.format))
         res.convert = true;
 
     const auto dim = Dimension{info.width, info.height};
