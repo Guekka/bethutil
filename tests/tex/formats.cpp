@@ -2,6 +2,9 @@
 
 #include <catch.hpp>
 
+using btu::tex::BestFormatFor, btu::tex::guess_best_format;
+using enum btu::tex::AllowCompressed;
+
 TEST_CASE("guess_texture_type", "[src]")
 {
     using btu::tex::guess_texture_type, btu::tex::TextureType;
@@ -38,4 +41,45 @@ TEST_CASE("guess_texture_type", "[src]")
         CHECK(guess_texture_type(u8"some_name_em.dds") == TextureType::EnvironmentMask);
         CHECK(guess_texture_type(u8"some_name_m.dds") == TextureType::EnvironmentMask);
     }
+}
+
+constexpr auto k_best_formats = BestFormatFor{.uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
+                                              .uncompressed_without_alpha = DXGI_FORMAT_R8G8_UNORM,
+                                              .compressed                 = DXGI_FORMAT_BC7_UNORM,
+                                              .compressed_without_alpha   = DXGI_FORMAT_BC5_UNORM};
+
+TEST_CASE("guess_best_format compressed with alpha", "[src]")
+{
+    auto result = guess_best_format(DXGI_FORMAT_BC3_UNORM, k_best_formats, Yes);
+    CHECK(result == DXGI_FORMAT_BC7_UNORM);
+}
+
+TEST_CASE("guess_best_format compressed without alpha", "[src]")
+{
+    auto result = guess_best_format(DXGI_FORMAT_BC5_UNORM, k_best_formats, Yes);
+    CHECK(result == DXGI_FORMAT_BC5_UNORM);
+}
+
+TEST_CASE("guess_best_format uncompressed with alpha", "[src]")
+{
+    auto result = guess_best_format(DXGI_FORMAT_R8G8B8A8_UNORM, k_best_formats, No);
+    CHECK(result == DXGI_FORMAT_R8G8B8A8_UNORM);
+}
+
+TEST_CASE("guess_best_format uncompressed without alpha", "[src]")
+{
+    auto result = guess_best_format(DXGI_FORMAT_R8G8_B8G8_UNORM, k_best_formats, No);
+    CHECK(result == DXGI_FORMAT_R8G8_UNORM);
+}
+
+TEST_CASE("guess_best_format already compressed with allow compressed no", "[src]")
+{
+    auto result = guess_best_format(DXGI_FORMAT_BC3_UNORM, k_best_formats, No);
+    CHECK(result == DXGI_FORMAT_BC7_UNORM);
+}
+
+TEST_CASE("guess_best_format non compressed with allow compressed yes", "[src]")
+{
+    auto result = guess_best_format(DXGI_FORMAT_R8G8B8A8_UNORM, k_best_formats, Yes);
+    CHECK(result == DXGI_FORMAT_BC7_UNORM);
 }
