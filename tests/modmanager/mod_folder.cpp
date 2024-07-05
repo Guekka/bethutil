@@ -127,16 +127,16 @@ TEST_CASE("Iterate mod folder with archive too big")
 class StoppingIterator final : public btu::modmanager::ModFolderIterator
 {
 public:
-    [[nodiscard]] auto archive_too_large(const Path &/*archive_path*/,
-                                         ArchiveTooLargeState /*state*/) noexcept ->
-        ArchiveTooLargeAction override
+    [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,
+                                         ArchiveTooLargeState /*state*/) noexcept
+        -> ArchiveTooLargeAction override
     {
         return ArchiveTooLargeAction::Process;
     }
 
-    void process_file(btu::modmanager::ModFile file) noexcept override { processed_file_ = true; }
-    [[nodiscard]] auto stop_requested() const noexcept -> bool override { return true; }
     void process_file(btu::modmanager::ModFile /*file*/) noexcept override { processed_file_ = true; }
+    [[nodiscard]] auto stop_requested() const noexcept -> bool override { return true; }
+
     [[nodiscard]] auto processed_file() const noexcept -> bool { return processed_file_; }
 
 private:
