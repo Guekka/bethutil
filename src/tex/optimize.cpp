@@ -31,9 +31,19 @@ auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) no
 
     // We have uncompressed the texture. If it was compressed, it's best to convert it to a better format
     const auto cur_format_is_same_as_best = res && res->get().GetMetadata().format == sets.best_format;
+
     if ((sets.convert || compressed) && !cur_format_is_same_as_best)
-        res = std::move(res).and_then(
-            [&](Texture &&tex) { return convert(std::move(tex), sets.best_format, dev); });
+    {
+        auto out = sets.best_format;
+        res      = std::move(res)
+                  // // safety check: make sure we don't remove the alpha
+                  .and_then([&](Texture &&tex) -> Result {
+                      if (!DirectX::HasAlpha(out) && !tex.get().IsAlphaAllOpaque())
+                          return tl::make_unexpected(Error(TextureErr::BadInput));
+                      return std::move(tex);
+                  })
+                  .and_then([&](Texture &&tex) { return convert(std::move(tex), out, dev); });
+    }
 
     return res;
 }
@@ -41,7 +51,7 @@ auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) no
 /// SSE landscape textures uses alpha channel as specularity
 /// Textures with opaque alpha are thus rendered shiny
 /// To fix this, alpha has to be made transparent
-auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bool
+auto transparent_alpha_required(const Texture &file, const Settings &sets) -> bool
 {
     const auto &tex         = file.get();
     const auto path         = canonize_path(file.get_load_path());
@@ -91,12 +101,14 @@ auto can_be_optimized_landscape(const Texture &file, const Settings &sets) -> bo
     return bad || is_tga(file);
 }
 
-[[nodiscard]] auto best_output_format(const Texture &file, const Settings &sets) noexcept -> DXGI_FORMAT
+[[nodiscard]] auto best_output_format(const Texture &file,
+                                      const Settings &sets,
+                                      ForceAlpha force_alpha) noexcept -> DXGI_FORMAT
 {
     const auto &info = file.get().GetMetadata();
 
     const auto allow_compressed = can_be_compressed(info) ? AllowCompressed::Yes : AllowCompressed::No;
-    return guess_best_format(file, sets.output_format, allow_compressed);
+    return guess_best_format(info.format, sets.output_format, allow_compressed, force_alpha);
 }
 
 auto compute_optimization_steps(const Texture &file, const Settings &sets) noexcept -> OptimizationSteps
@@ -105,8 +117,6 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     const auto &info = tex.GetMetadata();
 
     auto res = OptimizationSteps{};
-
-    res.best_format = best_output_format(file, sets);
 
     res.convert = conversion_required(file, sets);
     // do not recompress if original is already compressed
@@ -128,12 +138,17 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
         res.resize = target_dim.value();
 
     if (sets.game == Game::SSE)
-        if (can_be_optimized_landscape(file, sets))
+        if (transparent_alpha_required(file, sets))
             res.add_transparent_alpha = true;
 
     const bool opt_mip = optimal_mip_count(file.get_dimension()) == info.mipLevels;
     if (sets.mipmaps && (!opt_mip || res.resize)) // resize removes mips
         res.mipmaps = true;
+
+    // I prefer to keep steps independent, but this one has to depend on add_transparent_alpha. If we add an alpha, the output format must have alpha
+    res.best_format = best_output_format(file,
+                                         sets,
+                                         res.add_transparent_alpha ? ForceAlpha::Yes : ForceAlpha::No);
 
     return res;
 }
@@ -152,7 +167,7 @@ auto Settings::get(Game game) noexcept -> const Settings &
             .output_format        = {.uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
                                      .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
                                      .compressed                 = DXGI_FORMAT_BC3_UNORM,
-                                     .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
+                                     .compressed_without_alpha   = DXGI_FORMAT_BC5_UNORM},
             .landscape_textures   = {}, // Unknown
         };
     }();
@@ -200,8 +215,9 @@ auto Settings::get(Game game) noexcept -> const Settings &
                     DXGI_FORMAT_BC1_UNORM,
                     DXGI_FORMAT_R8G8B8A8_UNORM,
                 };
-                sets.output_format.compressed = DXGI_FORMAT_BC7_UNORM;
-                sets.game                     = Game::SSE;
+                sets.output_format.compressed               = DXGI_FORMAT_BC7_UNORM;
+                sets.output_format.compressed_without_alpha = DXGI_FORMAT_BC7_UNORM;
+                sets.game                                   = Game::SSE;
                 return sets;
             }();
             return sse_sets;

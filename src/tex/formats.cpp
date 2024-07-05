@@ -1,6 +1,5 @@
 #include <btu/common/string.hpp>
 #include <btu/tex/formats.hpp>
-#include <btu/tex/texture.hpp>
 
 namespace btu::tex {
 
@@ -43,13 +42,15 @@ auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<Textu
     return std::nullopt;
 }
 
-auto guess_best_format(const Texture &tex,
-                       BestFormatFor formats,
-                       AllowCompressed allow_compressed) noexcept -> DXGI_FORMAT
+auto guess_best_format(const DXGI_FORMAT current_format,
+                       const BestFormatFor formats,
+                       const AllowCompressed allow_compressed,
+                       const ForceAlpha force_alpha) noexcept -> DXGI_FORMAT
 {
-    const bool compressed = allow_compressed == AllowCompressed::Yes
-                            && DirectX::IsCompressed(tex.get().GetMetadata().format);
-    const bool alpha = DirectX::IsCompressed(tex.get().GetMetadata().format);
+    // allow compression if user requested it, or it was already compressed
+    const bool compressed = allow_compressed == AllowCompressed::Yes || DirectX::IsCompressed(current_format);
+    // provide an alpha channel if there was already one
+    const bool alpha = DirectX::HasAlpha(current_format) || force_alpha == ForceAlpha::Yes;
     if (compressed && alpha)
         return formats.compressed;
     if (compressed)

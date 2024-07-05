@@ -54,10 +54,19 @@ enum class AllowCompressed : std::uint8_t
 
 NLOHMANN_JSON_SERIALIZE_ENUM(AllowCompressed, {{AllowCompressed::Yes, "yes"}, {AllowCompressed::No, "no"}});
 
+enum class ForceAlpha : std::uint8_t
+{
+    Yes,
+    No
+};
+
+NLOHMANN_JSON_SERIALIZE_ENUM(ForceAlpha, {{ForceAlpha::Yes, "yes"}, {ForceAlpha::No, "no"}});
+
 /// Based on https://forums.nexusmods.com/index.php?/topic/476227-skyrim-nif-files-with-underscores/
 auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<TextureType>;
 
-auto guess_best_format(const Texture &tex,
+auto guess_best_format(DXGI_FORMAT current_format,
                        BestFormatFor formats,
-                       AllowCompressed allow_compressed = AllowCompressed::Yes) noexcept -> DXGI_FORMAT;
+                       AllowCompressed allow_compressed = AllowCompressed::Yes,
+                       ForceAlpha force_alpha           = ForceAlpha::No) noexcept -> DXGI_FORMAT;
 } // namespace btu::tex
