@@ -5,15 +5,19 @@ github = 'Guekka/bethutil'
 license = [ 'MPL', 'https://github.com/Guekka/bethutil/blob/main/LICENSE' ]
 name = 'bethutil'
 navbar = [ 'classes', 'namespaces' ]
+html_header = '''
+<script defer data-domain="guekka.github.io/bethutil" src="https://plausible.bizel.fr/js/script.js"></script>
+'''
+sponsor = 'https://github.com/sponsors/Guekka/dashboard/profile'
 
 [badges]
 'build' = [
-	'https://img.shields.io/github/workflow/status/Guekka/bethutil/Main%20CI?logo=github&style=flat-square',
-	'https://github.com/Guekka/bethutil/actions/workflows/main_ci.yml'
+    'https://img.shields.io/github/actions/workflow/status/guekka/bethutil/main_ci.yml?branch=main&logo=github',
+    'https://github.com/Guekka/bethutil/actions/workflows/main_ci.yml'
 ]
 'codecov' = [
-	'https://img.shields.io/codecov/c/github/Guekka/bethutil?logo=codecov&logoColor=white&style=flat-square',
-	'https://app.codecov.io/gh/Guekka/bethutil'
+    'https://img.shields.io/codecov/c/github/Guekka/bethutil?logo=codecov&logoColor=white&style=flat-square',
+    'https://app.codecov.io/gh/Guekka/bethutil'
 ]
 
 [macros]
