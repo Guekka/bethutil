@@ -6,7 +6,8 @@
 #include "btu/bsa/unpack.hpp"
 
 #include "btu/bsa/archive.hpp"
-#include "btu/common/functional.hpp"
+
+#include <btu/common/threading.hpp>
 
 namespace btu::bsa {
 auto unpack(UnpackSettings sets) -> UnpackResult
