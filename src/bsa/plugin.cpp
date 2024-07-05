@@ -19,13 +19,21 @@ const auto k_suffix_separator = std::u8string(u8" - ");
 
 [[nodiscard]] auto list_plugins(const Path &dir, const Settings &sets) noexcept -> std::vector<Path>
 {
-    return flux::from_range(fs::directory_iterator(dir))
-        .filter([](const auto &f) { return f.is_regular_file(); })
-        .filter([&sets](const auto &f) {
-            return common::contains(sets.plugin_extensions, f.path().extension().u8string());
-        })
-        .map([](const auto &f) { return f.path(); })
-        .to<std::vector>();
+    try
+    {
+        return flux::from_range(fs::directory_iterator(dir))
+            .filter([](const auto &f) { return f.is_regular_file(); })
+            .filter([&sets](const auto &f) {
+                return common::contains(sets.plugin_extensions,
+                                        common::to_lower(f.path().extension().u8string()));
+            })
+            .map([](const auto &f) { return f.path(); })
+            .to<std::vector>();
+    }
+    catch (const std::exception &)
+    {
+        return {};
+    }
 }
 
 [[nodiscard]] auto archive_suffixes(const Settings &sets) -> std::vector<std::u8string>
@@ -184,7 +192,9 @@ auto list_archive(const Path &dir, const Settings &sets) noexcept -> std::vector
     {
         return flux::from_range(fs::directory_iterator(dir))
             .filter([](const auto &f) { return f.is_regular_file(); })
-            .filter([&sets](const auto &f) { return f.path().extension() == sets.extension; })
+            .filter([&sets](const auto &f) {
+                return common::to_lower(f.path().extension().u8string()) == sets.extension;
+            })
             .map([](const auto &f) { return f.path(); })
             .to<std::vector>();
     }
