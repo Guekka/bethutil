@@ -9,7 +9,7 @@
 #include "btu/common/filesystem.hpp"
 
 #include <binary_io/memory_stream.hpp>
-#include <btu/common/functional.hpp>
+#include <btu/common/threading.hpp>
 #include <flux.hpp>
 
 #include <atomic>
