@@ -17,21 +17,23 @@
 //
 
 #pragma once
-#include "metaprogramming.hpp"
 
 #include <mpsc/mpsc_channel.hpp>
 
-#include <exception>
 #include <execution>
 #include <functional>
 #include <iterator>
 #include <optional>
-#include <thread>
 #include <tuple>
 #include <utility>
 
 namespace btu::common {
+
 namespace detail {
+
+// GCOVR_EXCL_START : this code comes from range-v3, we can assume it is correct
+// NOLINTBEGIN
+
 // bind_back like std::bind_front has no special treatment for nested
 // bind-expressions or reference_wrappers; there is no need to wrap
 // Callables with ranges::protect.
@@ -163,6 +165,10 @@ struct bind_back_fn
         return {{(Fn &&) fn, (Arg1 &&) arg1, (Args &&) args...}};
     }
 };
+
+// GCOVR_EXCL_STOP : end of range-v3 code
+// NOLINTEND
+
 } // namespace detail
 
 /// \sa `bind_back_fn`
