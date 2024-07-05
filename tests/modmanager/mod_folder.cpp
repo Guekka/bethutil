@@ -43,7 +43,7 @@ TEST_CASE("ModFolder", "[src]")
     const Path dir = "modfolder";
     btu::fs::remove_all(dir / "output");
 
-    const auto mf = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
+    auto mf = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
     Iterator iterator{dir / "output"};
     mf.iterate(iterator);
     CHECK(btu::common::compare_directories(dir / "output", dir / "expected"));
@@ -88,7 +88,7 @@ TEST_CASE("ModFolder transform", "[src]")
 TEST_CASE("ModFolder size", "[src]")
 {
     const Path dir = "modfolder";
-    const auto mf  = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
+    auto mf        = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
     CHECK(mf.size() == 4);
 }
 
@@ -117,7 +117,7 @@ TEST_CASE("Iterate mod folder with archive too big")
     auto sets      = btu::bsa::Settings::get(btu::Game::FO4);
     sets.max_size  = 1;
 
-    const auto mf = btu::modmanager::ModFolder(dir / "input", sets);
+    auto mf        = btu::modmanager::ModFolder(dir / "input", sets);
     auto iterator = IteratorWithArchiveTooLarge{};
     mf.iterate(iterator);
 
