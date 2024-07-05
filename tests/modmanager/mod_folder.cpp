@@ -152,3 +152,25 @@ TEST_CASE("Iteration can be stopped early")
 
     CHECK_FALSE(iterator.processed_file());
 }
+
+// Oops, this happened
+TEST_CASE("ModFolder transform does not remove the archive it just written because of a case difference")
+{
+    const Path dir = "modfolder_transform";
+    const Path out = dir / "output";
+    // operate on copy
+    btu::fs::remove_all(out);
+    btu::fs::copy(dir / "input", out);
+
+    // expected_fo4.bsa and .BSA point to the same file but are different path
+    btu::fs::rename(out / "expected_fo4.ba2", out / "expected_fo4.BA2");
+    // and with these settings, the archive will be written as .ba2
+    auto sets = btu::bsa::Settings::get(btu::Game::FO4);
+
+    auto mf = btu::modmanager::ModFolder(dir / "output", sets);
+
+    Transformer transformer;
+    mf.transform(transformer);
+
+    CHECK(exists(out / "expected_fo4.ba2"));
+}
