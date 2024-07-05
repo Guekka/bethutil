@@ -234,10 +234,13 @@ void transform_archive_file(const Path &archive_path,
             path.replace_extension(bsa_settings.extension);
 
         if (!std::move(archive).write(path))
+        {
             transformer.failed_to_write_archive(archive_path, path);
+            return;
+        }
 
         // Remove the old archive if the new one has a different name
-        if (path != archive_path)
+        if (!equivalent(archive_path, path))
             fs::remove(archive_path);
     }
 }
