@@ -117,9 +117,38 @@ TEST_CASE("Iterate mod folder with archive too big")
     auto sets      = btu::bsa::Settings::get(btu::Game::FO4);
     sets.max_size  = 1;
 
-    auto mf        = btu::modmanager::ModFolder(dir / "input", sets);
+    auto mf       = btu::modmanager::ModFolder(dir / "input", sets);
     auto iterator = IteratorWithArchiveTooLarge{};
     mf.iterate(iterator);
 
     CHECK(iterator.called());
+}
+
+class StoppingIterator final : public btu::modmanager::ModFolderIterator
+{
+public:
+    [[nodiscard]] auto archive_too_large(const Path &/*archive_path*/,
+                                         ArchiveTooLargeState /*state*/) noexcept ->
+        ArchiveTooLargeAction override
+    {
+        return ArchiveTooLargeAction::Process;
+    }
+
+    void process_file(btu::modmanager::ModFile file) noexcept override { processed_file_ = true; }
+    [[nodiscard]] auto stop_requested() const noexcept -> bool override { return true; }
+    void process_file(btu::modmanager::ModFile /*file*/) noexcept override { processed_file_ = true; }
+    [[nodiscard]] auto processed_file() const noexcept -> bool { return processed_file_; }
+
+private:
+    bool processed_file_ = false;
+};
+
+TEST_CASE("Iteration can be stopped early")
+{
+    const Path dir = "modfolder";
+    auto mf        = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
+    auto iterator  = StoppingIterator{};
+    mf.iterate(iterator);
+
+    CHECK_FALSE(iterator.processed_file());
 }

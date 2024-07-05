@@ -23,44 +23,26 @@ ModFolder::ModFolder(Path directory, bsa::Settings bsa_settings)
 {
 }
 
-void ModFolder::iterate(const std::function<void(Path relative_path)> &loose,
-                        const std::function<void(const Path &archive_path)> &archive) noexcept
-{
-    auto is_arch = [](const Path &file_name) {
-        const auto ext = common::to_lower(file_name.extension().u8string());
-        return common::contains(bsa::k_archive_extensions, ext);
-    };
-
-    auto files = flux::from_range(fs::recursive_directory_iterator(dir_))
-                     .filter([](auto &&e) { return e.is_regular_file(); })
-                     .map([](auto &&e) { return e.path(); })
-                     .to<std::vector>();
-
-    const auto fut = thread_pool_.submit_loop(size_t{0},
-                                              files.size(),
-                                              [&is_arch, this, &archive, &loose, &files](auto idx) {
-                                                  auto &&path = files[idx];
-                                                  if (!is_arch(path)) [[likely]]
-                                                      loose(path.lexically_relative(dir_));
-
-                                                  else if (is_arch(path)) [[unlikely]]
-                                                      archive(path);
-                                              });
-
-    fut.wait();
-    // TODO: there might be an exception in fut. Should we ignore it?
-}
-
 auto ModFolder::size() noexcept -> size_t
 {
-    std::atomic<size_t> size = 0;
-    iterate([&size](const Path &) { size += 1; },
-            [&size](const Path &archive_path) {
-                if (const auto arch = bsa::Archive::read(archive_path); arch)
-                    size += arch->size();
-            });
+    class SizeIterator final : public ModFolderIterator
+    {
+    public:
+        size_t size;
 
-    return size;
+        [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,
+                                             ArchiveTooLargeState /*state*/) noexcept
+            -> ArchiveTooLargeAction override
+        {
+            return Skip;
+        }
+
+        void process_file(ModFile /*file*/) noexcept override { size += 1; }
+    };
+
+    auto iterator = SizeIterator{};
+    iterate(iterator);
+    return iterator.size;
 }
 
 void ModFolder::iterate(ModFolderIterator &iterator) noexcept
@@ -85,6 +67,11 @@ void ModFolder::iterate(ModFolderIterator &iterator) noexcept
         {
             iterator_.get().process_file(file);
             return std::nullopt;
+        }
+
+        [[nodiscard]] auto stop_requested() const noexcept -> bool override
+        {
+            return iterator_.get().stop_requested();
         }
 
     private:
@@ -122,6 +109,9 @@ void ModFolder::iterate(ModFolderIterator &iterator) noexcept
 void ModFolder::transform(ModFolderTransformer &transformer) noexcept
 {
     const auto transform_loose = [this, &transformer](const Path &relative_path) {
+        if (transformer.stop_requested())
+            return;
+
         const auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
             [&relative_path, this] { return common::read_file(dir_ / relative_path); });
 
@@ -152,7 +142,13 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
         std::vector<std::future<void>> futs;
         for (auto &pair : archive)
         {
+            if (transformer.stop_requested())
+                return;
+
             auto fut = thread_pool_.submit_task([&transformer, &any_file_changed, &pair] {
+                if (transformer.stop_requested())
+                    return;
+
                 auto &[relative_path, file] = pair;
 
                 auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
@@ -181,6 +177,9 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
         flux::for_each(futs, [](auto &&fut) { fut.wait(); });
         // TODO: there might be an exception in fut. Should we ignore it?
 
+        if (transformer.stop_requested())
+            return;
+
         const auto target_version = guess_target_archive_version(archive, bsa_settings_);
         if (target_version)
             archive.set_version(*target_version);
@@ -191,6 +190,9 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
                 action == Skip)
                 return;
         }
+
+        if (transformer.stop_requested())
+            return;
 
         if (any_file_changed || target_version)
         {
@@ -208,6 +210,31 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
         }
     };
 
-    iterate(transform_loose, transform_archive);
+    auto is_arch = [](const Path &file_name) {
+        const auto ext = common::to_lower(file_name.extension().u8string());
+        return common::contains(bsa::k_archive_extensions, ext);
+    };
+
+    auto files = flux::from_range(fs::recursive_directory_iterator(dir_))
+                     .filter([](auto &&e) { return e.is_regular_file(); })
+                     .map([](auto &&e) { return e.path(); })
+                     .to<std::vector>();
+
+    std::vector<std::future<void>> futs;
+    for (const auto &file_path : files)
+    {
+        if (transformer.stop_requested())
+            return;
+
+        futs.push_back(
+            thread_pool_.submit_task([this, &file_path, &is_arch, &transform_loose, &transform_archive] {
+                if (is_arch(file_path)) [[unlikely]]
+                    transform_archive(file_path);
+                else [[likely]]
+                    transform_loose(file_path.lexically_relative(dir_));
+            }));
+    }
+    flux::for_each(futs, [](auto &&fut) { fut.wait(); });
+    // TODO: there might be an exception in fut. Should we ignore it?
 };
 } // namespace btu::modmanager
