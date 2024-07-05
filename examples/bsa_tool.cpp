@@ -30,6 +30,8 @@ void pack(const btu::Path &dir, const btu::bsa::Settings &sets)
                 std::cerr << "Failed to write archive\n";
             }
         });
+
+    make_dummy_plugins(list_archive(dir, sets), sets);
 }
 
 void unpack(const btu::Path &dir, const btu::bsa::Settings &sets)
@@ -68,18 +70,20 @@ void list(const btu::Path &dir, const btu::bsa::Settings &sets)
 
 auto process_args(std::vector<std::string_view> args) -> int
 {
-    auto dir = btu::fs::current_path();
-    if (args.size() == 2)
-    {
-        dir = args[1];
-    }
-    else if (args.size() != 1)
+    auto dir  = btu::fs::current_path();
+    auto game = btu::Game::SSE;
+    if (args.empty())
     {
         std::cerr << "Bad usage";
         return 1;
     }
 
-    const auto &sets   = btu::bsa::Settings::get(btu::Game::Starfield);
+    if (args.size() >= 2)
+        dir = args[1];
+
+    if (args.size() >= 3)
+        game = nlohmann::json(args[2]).get<btu::Game>();
+
     const auto command = args[0];
 
     auto func = std::unordered_map<std::string_view,
@@ -89,8 +93,15 @@ auto process_args(std::vector<std::string_view> args) -> int
         {"list", list},
     };
 
+    auto sets = btu::bsa::Settings::get(game);
     if (const auto it = func.find(command); it != func.end())
+    {
+        std::cout << "Processing with parameters:\n"
+                  << "Command: " << command << '\n'
+                  << "Directory: " << dir.string() << '\n'
+                  << "Game: " << nlohmann::json(game) << '\n';
         it->second(dir, sets);
+    }
     else
     {
         std::cerr << "Unknown command";
