@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../utils.hpp"
+#include "btu/tex/compression_device.hpp"
 #include "btu/tex/dimension.hpp"
 #include "btu/tex/texture.hpp"
 
@@ -109,3 +110,5 @@ void test_expected_dir(const Path &root, const Func &f)
         if (file.is_regular_file())
             test_expected(root, file.path().lexically_relative(in_dir), f);
 }
+
+static inline auto compression_dev = btu::tex::CompressionDevice();

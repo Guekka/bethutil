@@ -15,6 +15,7 @@
 #endif
 
 namespace btu::tex {
+namespace detail {
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
 template<typename Func>
 auto get_api_from_dll(const wchar_t *dll, const char *func) -> Func
@@ -49,45 +50,22 @@ auto get_dxgi_factory(IDXGIFactory1 **factory) -> bool
 }
 #endif
 
-CompressionDevice::operator bool() const
+struct DxAdapter
 {
-    return is_valid();
-}
-
-auto CompressionDevice::is_valid() const -> bool
-{
-#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-    return static_cast<bool>(device_);
-#else
-    return false;
+#ifdef _WIN32
+    // Kinda ridiculous to have a smart pointer own another one,
+    // But I don't want to leak Windows headers
+    Microsoft::WRL::ComPtr<ID3D11Device> device;
+    std::u8string gpu_name;
 #endif
-}
+};
 
-auto CompressionDevice::get_device() const -> ID3D11Device *
+[[nodiscard]] auto make_dx_adapter([[maybe_unused]] uint32_t adapter_index,
+                                   [[maybe_unused]] bool allow_software = true) -> std::optional<DxAdapter>
 {
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-    return device_->Get();
-#else
-    return nullptr;
-#endif
-}
-
-auto CompressionDevice::gpu_name() const -> const std::u8string &
-{
-#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-    return gpu_name_;
-#else
-    static const std::u8string empty;
-    return empty;
-#endif
-}
-
-auto CompressionDevice::make([[maybe_unused]] uint32_t adapter_index,
-                             [[maybe_unused]] bool allow_software) -> std::optional<CompressionDevice>
-{
-#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-    CompressionDevice ret;
-    ID3D11Device **device = ret.device_->GetAddressOf();
+    DxAdapter ret;
+    ID3D11Device **device = ret.device.GetAddressOf();
     if (device == nullptr)
         return std::nullopt;
 
@@ -128,7 +106,7 @@ auto CompressionDevice::make([[maybe_unused]] uint32_t adapter_index,
         return std::nullopt;
     }
 
-    ret.gpu_name_ = common::to_utf8(desc.Description);
+    ret.gpu_name = common::to_utf8(desc.Description);
 
     D3D_FEATURE_LEVEL fl{};
     hr = s_dynamic_d3_d11_create_device(p_adapter.Get(),
@@ -175,37 +153,71 @@ auto CompressionDevice::make([[maybe_unused]] uint32_t adapter_index,
     if FAILED (hr)
         return std::nullopt;
 
-    return std::make_optional(std::move(ret));
+    return ret;
 #else
     return std::nullopt;
 #endif
 }
-
-CompressionDevice::CompressionDevice([[maybe_unused]] CompressionDevice &&other) noexcept
-#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-    : device_(std::move(other.device_))
-    , gpu_name_(std::move(other.gpu_name_))
-#endif
-{
-}
-
-auto CompressionDevice::operator=([[maybe_unused]] CompressionDevice &&other) noexcept -> CompressionDevice &
-{
-#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-    if (this != &other)
-    {
-        device_   = std::move(other.device_);
-        gpu_name_ = std::move(other.gpu_name_);
-    }
-#endif
-    return *this;
-}
+} // namespace detail
 
 CompressionDevice::CompressionDevice()
-#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-    : device_(std::make_unique<Microsoft::WRL::ComPtr<ID3D11Device>>())
-#endif
 {
+#ifdef _WIN32
+    // NOTE: this code was first implemented as a while loop, which, for some reason, made MSVC stuck on linkage
+    for (auto dev = detail::make_dx_adapter(0); dev;
+         dev      = detail::make_dx_adapter(static_cast<uint32_t>(cached_info_.size())))
+    {
+        cached_info_.emplace_back(static_cast<uint32_t>(cached_info_.size()), dev->gpu_name);
+        devices_.emplace_back(std::make_unique<common::synchronized<detail::DxAdapter>>(std::move(*dev)));
+    }
+#endif
 }
+
+auto CompressionDevice::list_adapters() const noexcept -> const std::vector<AdapterInfo> &
+{
+    return cached_info_;
+}
+
+#ifdef _WIN32
+void CompressionDevice::apply(const Callback &callback) noexcept(noexcept(callback))
+{
+    std::unique_lock lock(apply_mutex_);
+
+    // Try to find an available device
+    while (true)
+    {
+        for (auto &dev : devices_)
+        {
+            if (auto locked_dev = dev->try_wlock())
+            {
+                lock.unlock(); // Release the lock on runnersMutex before calling the callback
+                callback((*locked_dev)->device.Get()); // Run the callback on the available device
+                cv_.notify_one(); // Notify any waiting threads that a device may now be available
+                return;
+            }
+        }
+
+        // If no device is available, wait until one becomes available
+        cv_.wait(lock);
+    }
+}
+#endif
+
+auto CompressionDevice::try_apply(const Callback &callback) noexcept(noexcept(callback)) -> bool
+{
+#ifdef _WIN32
+    for (auto &dev : devices_)
+    {
+        if (auto locked = dev->try_wlock())
+        {
+            callback((*locked)->device.Get());
+            return true;
+        }
+    }
+#endif
+
+    return false;
+}
+
 CompressionDevice::~CompressionDevice() = default;
 } // namespace btu::tex
