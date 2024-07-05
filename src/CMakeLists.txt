@@ -93,6 +93,10 @@ target_link_libraries("${PROJECT_NAME}" PUBLIC Microsoft::DirectXTex)
 find_package(bc7enc CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE bc7enc::bc7enc)
 
+find_path(BSHOSHANY_THREAD_POOL_INCLUDE_DIRS "BS_thread_pool.hpp")
+target_include_directories("${PROJECT_NAME}"
+                           PRIVATE ${BSHOSHANY_THREAD_POOL_INCLUDE_DIRS})
+
 find_package(mpsc_channel CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE mpsc::mpsc_channel)
 

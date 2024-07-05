@@ -10,6 +10,7 @@
 #include <btu/common/error.hpp>
 #include <btu/common/functional.hpp>
 #include <btu/common/path.hpp>
+#include <btu/common/threading.hpp>
 #include <tl/expected.hpp>
 
 namespace btu::modmanager {
@@ -83,7 +84,7 @@ public:
 
     /// Get the size of the folder, including files in archives.
     /// Utility function, equivalent to iterate() and counting the files.
-    [[nodiscard]] auto size() const noexcept -> size_t;
+    [[nodiscard]] auto size() noexcept -> size_t;
 
     /// Transform all files in the folder, including files in archives.
     /// Multithreaded.
@@ -91,23 +92,19 @@ public:
 
     /// Iterate over all files in the folder, including files in archives.
     /// Multithreaded.
-    void iterate(ModFolderIterator &transformer) const noexcept;
+    void iterate(ModFolderIterator &transformer) noexcept;
 
     /// Iterate over all files in the folder, including archives.
     /// Multithreaded.
     void iterate(const std::function<void(Path relative_path)> &loose,
-                 const std::function<void(const Path &archive_path)> &archive) const noexcept;
+                 const std::function<void(const Path &archive_path)> &archive) noexcept;
 
     [[nodiscard]] auto name() const noexcept -> std::u8string { return dir_.filename().u8string(); }
     [[nodiscard]] auto path() const noexcept -> const Path & { return dir_; }
 
 private:
-    // This function is used to implement transform() and one of the iterate() functions.
-    // The reason for it to be private is that while it is `const`, it is not `const` semantically: it modifies the
-    // folder
-    void transform_impl(ModFolderTransformer &transformer) const noexcept;
-
     Path dir_;
     bsa::Settings bsa_settings_;
+    common::ThreadPool thread_pool_;
 };
 } // namespace btu::modmanager
