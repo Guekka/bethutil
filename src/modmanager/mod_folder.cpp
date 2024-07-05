@@ -120,86 +120,87 @@ void ModFolder::iterate(ModFolderIterator &iterator) const noexcept
 
 void ModFolder::transform_impl(ModFolderTransformer &transformer) const noexcept
 {
-    iterate(
-        [this, &transformer](const Path &relative_path) {
-            const auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
-                [&relative_path, this] { return common::read_file(dir_ / relative_path); });
+    const auto transform_loose = [this, &transformer](const Path &relative_path) {
+        const auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
+            [&relative_path, this] { return common::read_file(dir_ / relative_path); });
 
-            if (const auto transformed = transformer.transform_file({relative_path, file_data}))
-            {
-                if (!common::write_file(dir_ / relative_path, *transformed))
-                    transformer.failed_to_write_transformed_file(relative_path, *transformed);
-            }
-        },
-        [&transformer, this](const Path &archive_path) {
-            if (const auto arch_size = file_size(archive_path); arch_size > bsa_settings_.max_size)
-            {
-                if (const auto action = transformer.archive_too_large(archive_path, BeforeProcessing);
-                    action == Skip)
-                    return;
-            }
+        if (const auto transformed = transformer.transform_file({relative_path, file_data}))
+        {
+            if (!common::write_file(dir_ / relative_path, *transformed))
+                transformer.failed_to_write_transformed_file(relative_path, *transformed);
+        }
+    };
 
-            auto opt_arch = bsa::Archive::read(archive_path);
-            if (!opt_arch)
-            {
-                transformer.failed_to_read_archive(archive_path);
+    const auto transform_archive = [&transformer, this](const Path &archive_path) {
+        if (const auto arch_size = file_size(archive_path); arch_size > bsa_settings_.max_size)
+        {
+            if (const auto action = transformer.archive_too_large(archive_path, BeforeProcessing);
+                action == Skip)
                 return;
-            }
-            auto archive = std::move(*opt_arch);
+        }
 
-            std::atomic_bool any_file_changed = false;
+        auto opt_arch = bsa::Archive::read(archive_path);
+        if (!opt_arch)
+        {
+            transformer.failed_to_read_archive(archive_path);
+            return;
+        }
+        auto archive = std::move(*opt_arch);
 
-            common::for_each_mt(archive, [&transformer, &any_file_changed](auto &pair) {
-                auto &[relative_path, file] = pair;
+        std::atomic_bool any_file_changed = false;
 
-                auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
-                    [&pair]() -> tl::expected<std::vector<std::byte>, common::Error> {
-                        auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
-                        if (!pair.second.write(buffer))
-                            // TODO: better error here?
-                            return tl::make_unexpected(
-                                common::Error(std::error_code(errno, std::system_category())));
+        common::for_each_mt(archive, [&transformer, &any_file_changed](auto &pair) {
+            auto &[relative_path, file] = pair;
 
-                        return buffer.get<binary_io::memory_ostream>().rdbuf();
-                    });
+            auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
+                [&pair]() -> tl::expected<std::vector<std::byte>, common::Error> {
+                    auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
+                    if (!pair.second.write(buffer))
+                        // TODO: better error here?
+                        return tl::make_unexpected(
+                            common::Error(std::error_code(errno, std::system_category())));
 
-                auto transformed = transformer.transform_file({relative_path, file_data});
-                if (transformed)
-                {
-                    const bool res = file.read(*transformed);
-                    if (!res)
-                        transformer.failed_to_read_transformed_file(relative_path, *transformed);
+                    return buffer.get<binary_io::memory_ostream>().rdbuf();
+                });
 
-                    any_file_changed = any_file_changed || res;
-                }
-            });
-
-            const auto target_version = guess_target_archive_version(archive, bsa_settings_);
-            if (target_version)
-                archive.set_version(*target_version);
-
-            if (const auto arch_size = archive.file_size(); arch_size > bsa_settings_.max_size)
+            auto transformed = transformer.transform_file({relative_path, file_data});
+            if (transformed)
             {
-                if (const auto action = transformer.archive_too_large(archive_path, AfterProcessing);
-                    action == Skip)
-                    return;
-            }
+                const bool res = file.read(*transformed);
+                if (!res)
+                    transformer.failed_to_read_transformed_file(relative_path, *transformed);
 
-            if (any_file_changed || target_version)
-            {
-                // Change the extension of the archive if needed
-                auto path = archive_path;
-                if (path.extension() != bsa_settings_.extension)
-                    path.replace_extension(bsa_settings_.extension);
-
-                if (!std::move(archive).write(path))
-                    transformer.failed_to_write_archive(archive_path, path);
-
-                // Remove the old archive if the new one has a different name
-                if (path != archive_path)
-                    fs::remove(archive_path);
+                any_file_changed = any_file_changed || res;
             }
         });
-}
 
+        const auto target_version = guess_target_archive_version(archive, bsa_settings_);
+        if (target_version)
+            archive.set_version(*target_version);
+
+        if (const auto arch_size = archive.file_size(); arch_size > bsa_settings_.max_size)
+        {
+            if (const auto action = transformer.archive_too_large(archive_path, AfterProcessing);
+                action == Skip)
+                return;
+        }
+
+        if (any_file_changed || target_version)
+        {
+            // Change the extension of the archive if needed
+            auto path = archive_path;
+            if (path.extension() != bsa_settings_.extension)
+                path.replace_extension(bsa_settings_.extension);
+
+            if (!std::move(archive).write(path))
+                transformer.failed_to_write_archive(archive_path, path);
+
+            // Remove the old archive if the new one has a different name
+            if (path != archive_path)
+                fs::remove(archive_path);
+        }
+    };
+
+    iterate(transform_loose, transform_archive);
+};
 } // namespace btu::modmanager
