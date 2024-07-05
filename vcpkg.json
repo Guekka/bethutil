@@ -11,6 +11,7 @@
       "host": true
     },
     "bc7enc",
+    "bshoshany-thread-pool",
     "directxtex",
     "flux",
     "mpsc-channel",

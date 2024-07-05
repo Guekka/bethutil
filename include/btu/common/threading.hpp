@@ -1,8 +1,29 @@
 #pragma once
 
+#include <BS_thread_pool.hpp>
 #include <btu/common/functional.hpp>
 
+#include <span>
+
 namespace btu::common {
+using ThreadPool = BS::thread_pool;
+
+[[nodiscard]] inline auto hardware_concurrency() noexcept -> unsigned
+{
+    const auto result = std::thread::hardware_concurrency();
+    return result ? result : 1;
+}
+
+/** \brief Creates a thread pool with the number of threads equal to the number of hardware threads minus one.
+ *
+ * \return The thread pool object.
+ */
+[[nodiscard]] inline auto make_thread_pool()
+{
+    static const auto num_threads = std::max(hardware_concurrency() - 1, 1u);
+    return ThreadPool{num_threads};
+}
+
 template<typename Range, typename Func>
     requires std::ranges::input_range<Range> && invocable_l_or_r<Func, std::ranges::range_value_t<Range>>
 auto for_each_mt(Range &&rng, Func &&func)
@@ -72,4 +93,5 @@ template<typename Out, typename Range, typename Func>
 
     return std::pair{std::move(producer), std::get<1>(std::move(channel))};
 }
+
 } // namespace btu::common
