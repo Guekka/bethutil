@@ -64,6 +64,12 @@ constexpr auto bc7_tex = [] {
     return info;
 }();
 
+constexpr auto bc1_tex = [] {
+    auto info   = info1;
+    info.format = DXGI_FORMAT_BC1_UNORM;
+    return info;
+}();
+
 const auto k_sets2 = [] {
     auto sets                 = btu::tex::Settings::get(btu::Game::SSE);
     sets.use_format_whitelist = false;
@@ -135,6 +141,19 @@ TEST_CASE("compute_optimization_steps", "[src]")
         CHECK(res.resize == std::nullopt);
         CHECK_FALSE(res.add_transparent_alpha);
         CHECK(res.mipmaps);
+        CHECK(res.best_format == DXGI_FORMAT_BC7_UNORM);
+        CHECK_FALSE(res.convert);
+    }
+    SECTION("do not recompress if already compressed")
+    {
+        auto tex      = generate_tex(bc1_tex);
+        auto sets     = k_sets2;
+        sets.compress = true;
+
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize == std::nullopt);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK_FALSE(res.mipmaps);
         CHECK(res.best_format == DXGI_FORMAT_BC7_UNORM);
         CHECK_FALSE(res.convert);
     }
