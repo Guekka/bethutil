@@ -10,6 +10,7 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/common/metaprogramming.hpp"
     "${INCLUDE_DIR}/btu/common/path.hpp"
     "${INCLUDE_DIR}/btu/common/string.hpp"
+    "${INCLUDE_DIR}/btu/common/threading.hpp"
     "${INCLUDE_DIR}/btu/bsa/pack.hpp"
     "${INCLUDE_DIR}/btu/bsa/unpack.hpp"
     "${INCLUDE_DIR}/btu/bsa/archive.hpp"

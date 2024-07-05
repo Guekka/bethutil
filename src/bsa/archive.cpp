@@ -4,7 +4,7 @@
 
 #include <binary_io/memory_stream.hpp>
 #include <bsa/bsa.hpp>
-#include <btu/common/functional.hpp>
+#include <btu/common/threading.hpp>
 #include <flux.hpp>
 
 #include <filesystem>
