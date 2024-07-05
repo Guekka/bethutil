@@ -106,12 +106,21 @@ void ModFolder::iterate(ModFolderIterator &iterator) noexcept
     return target;
 }
 
+/// Multiple users reported freezing. This should let other threads run.
+/// There is probably a better way, but I don't know it
+void reduce_cpu_usage() noexcept
+{
+    std::this_thread::sleep_for(std::chrono::nanoseconds(5));
+}
+
 void transform_loose_file(const Path &absolute_path,
                           const Path &dir,
                           ModFolderTransformer &transformer) noexcept
 {
     if (transformer.stop_requested())
         return;
+
+    reduce_cpu_usage();
 
     const auto relative_path = absolute_path.lexically_relative(dir);
 
@@ -140,6 +149,8 @@ void transform_loose_file(const Path &absolute_path,
     return [&transformer, &any_file_changed, &pair] {
         if (transformer.stop_requested())
             return;
+
+        reduce_cpu_usage();
 
         auto &[relative_path, file] = pair;
 
