@@ -18,6 +18,9 @@ namespace btu::common {
 [[nodiscard]] auto write_file(const Path &a_path,
                               std::span<const std::byte> data) noexcept -> tl::expected<void, Error>;
 
+[[nodiscard]] auto write_file_new(const Path &a_path,
+                                  std::span<const std::byte> data) noexcept -> tl::expected<void, Error>;
+
 [[nodiscard]] auto compare_files(const Path &filename1, const Path &filename2) noexcept -> bool;
 
 [[nodiscard]] auto compare_directories(const Path &dir1, const Path &dir2) noexcept -> bool;

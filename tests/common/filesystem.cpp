@@ -172,3 +172,34 @@ TEST_CASE("compare_files", "[src]")
         CHECK_FALSE(btu::common::compare_files(file1.path(), file2));
     }
 }
+
+TEST_CASE("write_file", "[src]")
+{
+    SECTION("valid path and content")
+    {
+        const auto file    = FsTempFile();
+        const auto content = std::vector(100, static_cast<std::byte>(' '));
+        const auto result  = btu::common::write_file(file.path(), content);
+        CHECK(result);
+        CHECK(fs::file_size(file.path()) == content.size());
+    }
+}
+
+TEST_CASE("write_file_new", "[src]")
+{
+    const auto content = std::vector(100, static_cast<std::byte>(' '));
+
+    SECTION("valid path and content")
+    {
+        const auto file   = FsTempPath();
+        const auto result = btu::common::write_file_new(file.path(), content);
+        CHECK(result);
+        CHECK(fs::file_size(file.path()) == content.size());
+    }
+    SECTION("file already exists")
+    {
+        const auto file   = FsTempFile();
+        const auto result = btu::common::write_file_new(file.path(), content);
+        CHECK_FALSE(result);
+    }
+}
