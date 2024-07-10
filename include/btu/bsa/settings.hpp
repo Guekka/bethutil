@@ -5,6 +5,7 @@
 #include "btu/common/games.hpp"
 #include "btu/common/metaprogramming.hpp"
 
+#include <bsa/bsa.hpp>
 #include <btu/common/json.hpp>
 
 #include <array>
@@ -89,6 +90,7 @@ struct AllowedPath
 
     std::u8string extension;
     std::vector<std::u8string> directories;
+    std::optional<TES4ArchiveType> tes4_archive_type;
 
     [[nodiscard]] auto check(const Path &filepath, const Path &root) const -> bool;
 };
@@ -224,6 +226,39 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
                 s.texture_suffix      = std::nullopt;
                 s.plugin_extensions   = {u8".esm", u8".esp"};
                 s.dummy_plugin        = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
+                s.standard_files      = {
+                    {u8".nif", {u8"meshes"}, TES4ArchiveType::meshes},
+                    {u8".egm", {u8"meshes"}, TES4ArchiveType::meshes},
+                    {u8".egt", {u8"meshes"}, TES4ArchiveType::meshes},
+                    {u8".tri", {u8"meshes"}, TES4ArchiveType::meshes},
+                    {u8".cmp", {u8"meshes"}, TES4ArchiveType::meshes},
+                    {u8".lst", {u8"meshes"}, TES4ArchiveType::meshes},
+                    {u8".dtl", {u8"meshes"}, TES4ArchiveType::meshes},
+                    {u8".spt", {u8"trees"}, TES4ArchiveType::meshes},
+                };
+                s.texture_files = {
+                    {u8".dds", {u8"textures"}, TES4ArchiveType::textures},
+                    {u8".tai", {u8"textures"}, TES4ArchiveType::textures},
+                    {u8".tga", {u8"textures"}, TES4ArchiveType::textures},
+                    {u8".bmp", {u8"textures"}, TES4ArchiveType::textures},
+                    {u8".fnt", {u8"textures"}, TES4ArchiveType::fonts},
+                    {u8".tex", {u8"textures"}, TES4ArchiveType::fonts},
+                };
+                s.incompressible_files = {
+                    {u8".wav", {u8"sound"}, TES4ArchiveType::sounds},
+                    {u8".ogg", {u8"sound"}, TES4ArchiveType::voices},
+                    {u8".lip", {u8"sound"}, TES4ArchiveType::voices},
+                    {u8".txt", {u8"menus"}, TES4ArchiveType::menus},
+                    {u8".vso", {u8"shaders"}, TES4ArchiveType::shaders},
+                    {u8".pso", {u8"shaders"}, TES4ArchiveType::shaders},
+                    {u8".vsh", {u8"shaders"}, TES4ArchiveType::shaders},
+                    {u8".psh", {u8"shaders"}, TES4ArchiveType::shaders},
+                    {u8".lsl", {u8"shaders"}, TES4ArchiveType::shaders},
+                    {u8".h", {u8"shaders"}, TES4ArchiveType::shaders},
+                    {u8".dat", {u8"lsdata"}, TES4ArchiveType::misc},
+                    {u8".dlodsettings", {u8"lodsettings"}, TES4ArchiveType::misc},
+                    {u8".ctl", {u8"facegen"}, TES4ArchiveType::misc},
+                };
                 return s;
             }();
             return sets_fnv;
@@ -325,5 +360,29 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
         return FileTypes::BSA;
 
     return FileTypes::Blacklist;
+}
+
+[[nodiscard]] inline auto get_tes4_archive_type(const Path& filepath, 
+                                                const Settings& sets) -> std::optional<TES4ArchiveType>
+{
+    const auto ext = common::to_lower(filepath.extension().u8string());
+    auto get     = [ext](const auto &vec) {
+        using std::cbegin, std::cend;
+        auto it = std::ranges::find_if(vec, [&](const auto &p) { return p.extension == ext; });
+        if (it != cend(vec))
+        {
+            return (*it).tes4_archive_type;
+        }
+        return std::optional<TES4ArchiveType>(std::nullopt);
+    };
+
+    if (auto arch_type = get(sets.standard_files); arch_type)
+        return arch_type;
+    if (auto arch_type = get(sets.texture_files); arch_type)
+        return arch_type;
+    if (auto arch_type = get(sets.incompressible_files); arch_type)
+        return arch_type;
+
+    return std::nullopt;
 }
 } // namespace btu::bsa
