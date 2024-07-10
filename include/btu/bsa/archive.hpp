@@ -67,13 +67,14 @@ NLOHMANN_JSON_SERIALIZE_ENUM(ArchiveVersion,
                                  {ArchiveVersion::starfield, "starfield"},
                              })
 
+using TES4ArchiveType = libbsa::tes4::archive_type;
 using UnderlyingFile = std::variant<libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file>;
 
 class File final
 {
 public:
-    explicit File(ArchiveVersion version, ArchiveType type);
-    File(UnderlyingFile f, ArchiveVersion version, ArchiveType type);
+    explicit File(ArchiveVersion version, ArchiveType type, std::optional<TES4ArchiveType> tes4_type);
+    File(UnderlyingFile f, ArchiveVersion version, ArchiveType type, std::optional<TES4ArchiveType> tes4_type);
 
     [[nodiscard]] auto compressed() const noexcept -> Compression;
     void compress();
@@ -86,6 +87,7 @@ public:
 
     [[nodiscard]] auto version() const noexcept -> ArchiveVersion;
     [[nodiscard]] auto type() const noexcept -> ArchiveType;
+    [[nodiscard]] auto tes4_archive_type() const noexcept -> std::optional<TES4ArchiveType>;
     [[nodiscard]] auto size() const noexcept -> size_t;
 
     template<typename T>
@@ -98,6 +100,7 @@ public:
 private:
     ArchiveVersion ver_;
     ArchiveType type_;
+    std::optional<TES4ArchiveType> tes4_archive_type_;
     UnderlyingFile file_;
 };
 

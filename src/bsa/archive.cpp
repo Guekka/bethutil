@@ -66,9 +66,10 @@ namespace btu::bsa {
     return libbsa::fo4::compression_format::zip;
 }
 
-File::File(ArchiveVersion version, ArchiveType type)
+File::File(ArchiveVersion version, ArchiveType type, std::optional<TES4ArchiveType> tes4_type = std::nullopt)
     : ver_(version)
     , type_(type)
+    , tes4_archive_type_(tes4_type)
 {
     file_ = [version]() -> UnderlyingFile {
         switch (version)
@@ -85,9 +86,10 @@ File::File(ArchiveVersion version, ArchiveType type)
     }();
 }
 
-File::File(UnderlyingFile f, ArchiveVersion version, ArchiveType type)
+File::File(UnderlyingFile f, ArchiveVersion version, ArchiveType type, std::optional<TES4ArchiveType> tes4_type = std::nullopt)
     : ver_(version)
     , type_(type)
+    , tes4_archive_type_(tes4_type)
     , file_(std::move(f))
 {
 }
@@ -240,6 +242,11 @@ auto File::version() const noexcept -> ArchiveVersion
 auto File::type() const noexcept -> ArchiveType
 {
     return type_;
+}
+
+auto File::tes4_archive_type() const noexcept -> std::optional<TES4ArchiveType>
+{
+    return tes4_archive_type_;
 }
 
 Archive::Archive(const ArchiveVersion ver, const ArchiveType type)
@@ -411,12 +418,29 @@ auto Archive::write(Path path) && -> bool
                     return bsa[key];
                 }();
 
-                d->insert(elem_path.filename().lexically_normal().generic_string(),
+                auto result = d->insert(elem_path.filename().lexically_normal().generic_string(),
                           std::move(elem.second).as_raw_file<libbsa::tes4::file>());
+
+                if (result.second)
+                {
+                    if (auto arch_type = elem.second.tes4_archive_type();
+                        arch_type)
+                    {
+                        bsa.archive_types(bsa.archive_types() | arch_type.value());
+                    }
+                }
             }
 
             bsa.archive_flags(libbsa::tes4::archive_flag::directory_strings
                               | libbsa::tes4::archive_flag::file_strings);
+
+            if (bsa.meshes())
+                bsa.archive_flags(bsa.archive_flags()
+                                  | libbsa::tes4::archive_flag::retain_strings_during_startup);
+            if (bsa.textures())
+                bsa.archive_flags(bsa.archive_flags() | libbsa::tes4::archive_flag::embedded_file_names);
+            if (bsa.sounds())
+                bsa.archive_flags(bsa.archive_flags() | libbsa::tes4::archive_flag::retain_file_names);
 
             return do_write(
                 BTU_MOV(bsa),
