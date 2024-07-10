@@ -37,6 +37,14 @@ auto write_file(const Path &a_path, std::span<const std::byte> data) noexcept ->
     return {};
 }
 
+auto write_file_new(const Path &a_path, std::span<const std::byte> data) noexcept -> tl::expected<void, Error>
+{
+    if (exists(a_path))
+        return tl::make_unexpected(Error(std::make_error_code(std::errc::file_exists)));
+
+    return write_file(a_path, data);
+}
+
 auto compare_files(const Path &filename1, const Path &filename2) noexcept -> bool
 {
     try
