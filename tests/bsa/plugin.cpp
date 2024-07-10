@@ -77,19 +77,26 @@ TEST_CASE("find_archive_name", "[src]")
 
 TEST_CASE("remake dummy plugins")
 {
-    SECTION("base")
+    GIVEN("a directory with a plugin, a loaded archive and an unloaded archive")
     {
         auto dir = prepare_dir(
-            std::vector{u8"dummy_sse.esp"sv, u8"dummy_sse - Textures.bsa"sv, u8"another.bsa"sv});
+            std::vector{u8"existing.esp"sv, u8"existing - Textures.bsa"sv, u8"unloaded.bsa"sv});
 
-        create_file(dir.path() / u8"dummy_sse.esp", Settings::get(btu::Game::SSE).dummy_plugin.value());
-        remake_dummy_plugins(dir.path(), Settings::get(btu::Game::SSE));
+        WHEN("remake_dummy_plugins is called")
+        {
+            remake_dummy_plugins(dir.path(), Settings::get(btu::Game::SSE));
 
-        CHECK(btu::fs::exists(dir.path() / u8"dummy_sse.esp"));
-        CHECK(btu::fs::exists(dir.path() / u8"another.esp"));
-
-        auto dummy_content = require_expected(btu::common::read_file(dir.path() / u8"dummy_sse.esp"));
-
-        CHECK(dummy_content == Settings::get(btu::Game::SSE).dummy_plugin.value());
+            THEN("the dummy plugin has the correct content")
+            {
+                auto dummy_content = require_expected(btu::common::read_file(dir.path() / u8"unloaded.esp"));
+                CHECK(dummy_content == Settings::get(btu::Game::SSE).dummy_plugin.value());
+            }
+            AND_THEN("the existing plugin was not modified")
+            {
+                auto existing_content = require_expected(
+                    btu::common::read_file(dir.path() / u8"existing.esp"));
+                CHECK(existing_content.empty());
+            }
+        }
     }
 }
