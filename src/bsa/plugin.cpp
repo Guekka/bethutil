@@ -71,11 +71,11 @@ void remove_suffixes(std::u8string &filename, const Settings &sets)
 
 [[nodiscard]] auto plugins_loading_archive(const Path &archive, const Settings &sets)
 {
-    auto filename = archive.filename().u8string();
-    remove_suffixes(filename, sets);
+    auto stem = archive.stem().u8string();
+    remove_suffixes(stem, sets);
 
     return flux::ref(sets.plugin_extensions)
-        .map([&archive, &filename](const auto &ext) { return archive.parent_path() / (filename + ext); })
+        .map([&archive, &stem](const auto &ext) { return archive.parent_path() / (stem + ext); })
         .to<std::vector>();
 }
 
@@ -168,17 +168,14 @@ void make_dummy_plugins(std::span<const Path> archives, const Settings &sets)
 
     for (const Path &arch : archives)
     {
-        if (flux::any(plugins_loading_archive(arch, sets), BTU_RESOLVE_OVERLOAD(btu::fs::exists)))
+        const auto associated_plugins = plugins_loading_archive(arch, sets);
+        if (flux::any(associated_plugins, BTU_RESOLVE_OVERLOAD(btu::fs::exists)))
             continue;
 
-        auto plugin = arch;
+        auto plugin = associated_plugins.front();
         plugin.replace_extension(sets.dummy_extension);
 
-        auto filename = plugin.filename().u8string();
-        remove_suffixes(filename, sets);
-        plugin.replace_filename(filename);
-
-        const auto res = common::write_file(plugin, *sets.dummy_plugin);
+        const auto res = common::write_file_new(plugin, *sets.dummy_plugin);
         if (!res)
         {
             // TODO: what to do?
