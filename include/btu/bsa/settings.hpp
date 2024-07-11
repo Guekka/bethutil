@@ -140,125 +140,124 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
 {
     constexpr auto megabyte = 1024ULL * 1024ULL;
 
-    static const Settings default_sets = [=] {
+    static const Settings tes4_default_sets = [=] {
         Settings sets;
-        sets.game                = Game::SSE;
+        sets.game                = Game::TES4;
         sets.max_size            = 2000ULL * megabyte;
+        sets.version             = ArchiveVersion::tes4;
+        sets.has_texture_version = false;
+        sets.texture_suffix      = std::nullopt;
+        sets.extension           = u8".bsa";
+        sets.plugin_extensions   = { u8".esm", u8".esp"};
+        sets.dummy_plugin        = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
+        sets.dummy_extension     = u8".esp";
+        sets.standard_files      = {
+            {u8".nif", {u8"meshes"}, TES4ArchiveType::meshes},
+            {u8".egm", {u8"meshes"}, TES4ArchiveType::meshes},
+            {u8".egt", {u8"meshes"}, TES4ArchiveType::meshes},
+            {u8".tri", {u8"meshes"}, TES4ArchiveType::meshes},
+            {u8".cmp", {u8"meshes"}, TES4ArchiveType::meshes},
+            {u8".lst", {u8"meshes"}, TES4ArchiveType::meshes},
+            {u8".dtl", {u8"meshes"}, TES4ArchiveType::meshes},
+            {u8".spt", {u8"trees"}, TES4ArchiveType::meshes},
+        };
+        sets.texture_files = {
+            {u8".dds", {u8"textures"}, TES4ArchiveType::textures},
+            {u8".tai", {u8"textures"}, TES4ArchiveType::textures},
+            {u8".tga", {u8"textures"}, TES4ArchiveType::textures},
+            {u8".bmp", {u8"textures"}, TES4ArchiveType::textures},
+            {u8".fnt", {u8"textures"}, TES4ArchiveType::fonts},
+            {u8".tex", {u8"textures"}, TES4ArchiveType::fonts},
+        };
+        sets.incompressible_files = {
+            {u8".wav", {u8"sound"}, TES4ArchiveType::sounds},
+            {u8".ogg", {u8"sound"}, TES4ArchiveType::voices},
+            {u8".lip", {u8"sound"}, TES4ArchiveType::voices},
+            {u8".txt", {u8"menus"}, TES4ArchiveType::menus},
+            {u8".vso", {u8"shaders"}, TES4ArchiveType::shaders},
+            {u8".pso", {u8"shaders"}, TES4ArchiveType::shaders},
+            {u8".vsh", {u8"shaders"}, TES4ArchiveType::shaders},
+            {u8".psh", {u8"shaders"}, TES4ArchiveType::shaders},
+            {u8".lsl", {u8"shaders"}, TES4ArchiveType::shaders},
+            {u8".h", {u8"shaders"}, TES4ArchiveType::shaders},
+            {u8".dat", {u8"lsdata"}, TES4ArchiveType::misc},
+            {u8".dlodsettings", {u8"lodsettings"}, TES4ArchiveType::misc},
+            {u8".ctl", {u8"facegen"}, TES4ArchiveType::misc},
+        };
+        // Purposefully missing: .kf, .mp3, .ini, .txt, .json
+        return sets;
+    }();
+
+    static const Settings tes5_default_sets = [=] {
+        Settings sets            = tes4_default_sets;
+        sets.game                = Game::SSE;
         sets.version             = ArchiveVersion::sse;
         sets.has_texture_version = true;
         sets.texture_suffix      = u8"Textures";
         sets.extension           = u8".bsa";
         sets.plugin_extensions   = {u8".esl", u8".esm", u8".esp"};
         sets.dummy_plugin        = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
-        sets.dummy_extension     = u8".esp";
         sets.standard_files      = {
             AllowedPath{u8".bgem", {u8"materials"}},
             AllowedPath{u8".bgsm", {u8"materials"}},
-            AllowedPath{u8".bto", {u8"meshes"}},
-            AllowedPath{u8".btr", {u8"meshes"}},
-            AllowedPath{u8".btt", {u8"meshes"}},
+            AllowedPath{u8".bto", {u8"meshes"}, TES4ArchiveType::meshes},
+            AllowedPath{u8".btr", {u8"meshes"}, TES4ArchiveType::meshes},
+            AllowedPath{u8".btt", {u8"meshes"}, TES4ArchiveType::meshes},
             AllowedPath{u8".cgid", {u8"grass"}},
-            AllowedPath{u8".dlodsettings", {u8"lodsettings"}},
-            AllowedPath{u8".dtl", {u8"meshes"}}, // Unsure
-            AllowedPath{u8".egm", {u8"meshes"}}, // Unsure
+            AllowedPath{u8".dlodsettings", {u8"lodsettings"}, TES4ArchiveType::misc},
+            AllowedPath{u8".dtl", {u8"meshes"}, TES4ArchiveType::meshes}, // Unsure
+            AllowedPath{u8".egm", {u8"meshes"}, TES4ArchiveType::meshes}, // Unsure
             AllowedPath{u8".jpg", {u8"root"}},
-            AllowedPath{u8".hkb", {u8"meshes"}},
-            AllowedPath{u8".hkb", {u8"meshes"}},
-            AllowedPath{u8".hkx", {u8"meshes"}},
-            AllowedPath{u8".lst", {u8"meshes"}},
-            AllowedPath{u8".nif", {u8"meshes"}},
-            AllowedPath{u8".psc", {u8"scripts", u8"source"}},
-            AllowedPath{u8".tga", {u8"textures"}},
-            AllowedPath{u8".tri", {u8"meshes"}},
+            AllowedPath{u8".hkb", {u8"meshes"}, TES4ArchiveType::meshes},
+            AllowedPath{u8".hkb", {u8"meshes"}, TES4ArchiveType::meshes},
+            AllowedPath{u8".hkx", {u8"meshes"}, TES4ArchiveType::meshes},
+            AllowedPath{u8".lst", {u8"meshes"}, TES4ArchiveType::meshes},
+            AllowedPath{u8".nif", {u8"meshes"}, TES4ArchiveType::meshes},
+            AllowedPath{u8".psc", {u8"scripts", u8"source"}, TES4ArchiveType::misc},
+            AllowedPath{u8".tga", {u8"textures"}, TES4ArchiveType::textures},
+            AllowedPath{u8".tri", {u8"meshes"}, TES4ArchiveType::meshes},
         };
         sets.texture_files = {
-            AllowedPath{u8".dds", {u8"textures", u8"interface"}},
-            AllowedPath{u8".png", {u8"textures"}},
+            AllowedPath{u8".dds", {u8"textures", u8"interface"}, TES4ArchiveType::textures},
+            AllowedPath{u8".png", {u8"textures"}, TES4ArchiveType::textures},
         };
-        sets.incompressible_files = {AllowedPath{u8".dlstrings", {u8"strings"}},
-                                     AllowedPath{u8".fuz", {u8"sound"}},
-                                     AllowedPath{u8".fxp", {u8"shadersfx"}},
-                                     AllowedPath{u8".gid", {u8"grass"}},
-                                     AllowedPath{u8".gfx", {u8"interface"}},
-                                     AllowedPath{u8".hkc", {u8"meshes"}},
-                                     AllowedPath{u8".hkt", {u8"meshes"}},
-                                     AllowedPath{u8".hkp", {u8"meshes"}},
-                                     AllowedPath{u8".ilstrings", {u8"strings"}},
-                                     AllowedPath{u8".ini", {u8"meshes"}},
-                                     AllowedPath{u8".lip", {u8"sound"}},
-                                     AllowedPath{u8".lnk", {u8"grass"}},
-                                     AllowedPath{u8".lod", {u8"lodsettings"}},
-                                     AllowedPath{u8".ogg", {u8"sound"}},
-                                     AllowedPath{u8".pex", {u8"scripts"}},
-                                     AllowedPath{u8".seq", {u8"seq"}},
-                                     AllowedPath{u8".strings", {u8"strings"}},
-                                     AllowedPath{u8".swf", {u8"interface"}},
-                                     AllowedPath{u8".txt", {u8"interface", u8"meshes", u8"scripts"}},
-                                     AllowedPath{u8".wav", {u8"sound"}},
-                                     AllowedPath{u8".xml", {u8"dialogueviews"}},
-                                     AllowedPath{u8".xwm", {u8"music", u8"sound"}}};
+        sets.incompressible_files = {
+            AllowedPath{u8".dlstrings", {u8"strings"}},
+            AllowedPath{u8".fuz", {u8"sound"}, TES4ArchiveType::sounds},
+            AllowedPath{u8".fxp", {u8"shadersfx"}, TES4ArchiveType::shaders},
+            AllowedPath{u8".gid", {u8"grass"}},
+            AllowedPath{u8".gfx", {u8"interface"}, TES4ArchiveType::menus},
+            AllowedPath{u8".hkc", {u8"meshes"}, TES4ArchiveType::meshes},
+            AllowedPath{u8".hkt", {u8"meshes"}, TES4ArchiveType::meshes},
+            AllowedPath{u8".hkp", {u8"meshes"}, TES4ArchiveType::meshes},
+            AllowedPath{u8".ilstrings", {u8"strings"}},
+            AllowedPath{u8".ini", {u8"meshes"}},
+            AllowedPath{u8".lip", {u8"sound"}, TES4ArchiveType::voices},
+            AllowedPath{u8".lnk", {u8"grass"}},
+            AllowedPath{u8".lod", {u8"lodsettings"}},
+            AllowedPath{u8".ogg", {u8"sound"}, TES4ArchiveType::voices},
+            AllowedPath{u8".pex", {u8"scripts"}, TES4ArchiveType::misc},
+            AllowedPath{u8".seq", {u8"seq"}},
+            AllowedPath{u8".strings", {u8"strings"}},
+            AllowedPath{u8".swf", {u8"interface"}},
+            AllowedPath{u8".txt", {u8"interface", u8"meshes", u8"scripts"}},
+            AllowedPath{u8".wav", {u8"sound"}, TES4ArchiveType::sounds},
+            AllowedPath{u8".xml", {u8"dialogueviews"}, TES4ArchiveType::menus},
+            AllowedPath{u8".xwm", {u8"music", u8"sound"}, TES4ArchiveType::sounds},
+        };
         return sets;
     }();
 
     switch (game)
     {
-        case Game::TES4:
-        {
-            static const Settings sets_tes4 = [=] {
-                Settings s            = default_sets;
-                s.game                = Game::TES4;
-                s.version             = ArchiveVersion::tes4;
-                s.has_texture_version = false;
-                s.texture_suffix      = std::nullopt;
-                s.plugin_extensions   = {u8".esm", u8".esp"};
-                s.dummy_plugin        = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
-                return s;
-            }();
-            return sets_tes4;
-        }
+        case Game::TES4: return tes4_default_sets;
         case Game::FNV:
         {
             static const Settings sets_fnv = [=] {
-                Settings s            = default_sets;
+                Settings s            = tes4_default_sets;
                 s.game                = Game::FNV;
                 s.version             = ArchiveVersion::tes5;
-                s.has_texture_version = false;
-                s.texture_suffix      = std::nullopt;
-                s.plugin_extensions   = {u8".esm", u8".esp"};
                 s.dummy_plugin        = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
-                s.standard_files      = {
-                    {u8".nif", {u8"meshes"}, TES4ArchiveType::meshes},
-                    {u8".egm", {u8"meshes"}, TES4ArchiveType::meshes},
-                    {u8".egt", {u8"meshes"}, TES4ArchiveType::meshes},
-                    {u8".tri", {u8"meshes"}, TES4ArchiveType::meshes},
-                    {u8".cmp", {u8"meshes"}, TES4ArchiveType::meshes},
-                    {u8".lst", {u8"meshes"}, TES4ArchiveType::meshes},
-                    {u8".dtl", {u8"meshes"}, TES4ArchiveType::meshes},
-                    {u8".spt", {u8"trees"}, TES4ArchiveType::meshes},
-                };
-                s.texture_files = {
-                    {u8".dds", {u8"textures"}, TES4ArchiveType::textures},
-                    {u8".tai", {u8"textures"}, TES4ArchiveType::textures},
-                    {u8".tga", {u8"textures"}, TES4ArchiveType::textures},
-                    {u8".bmp", {u8"textures"}, TES4ArchiveType::textures},
-                    {u8".fnt", {u8"textures"}, TES4ArchiveType::fonts},
-                    {u8".tex", {u8"textures"}, TES4ArchiveType::fonts},
-                };
-                s.incompressible_files = {
-                    {u8".wav", {u8"sound"}, TES4ArchiveType::sounds},
-                    {u8".ogg", {u8"sound"}, TES4ArchiveType::voices},
-                    {u8".lip", {u8"sound"}, TES4ArchiveType::voices},
-                    {u8".txt", {u8"menus"}, TES4ArchiveType::menus},
-                    {u8".vso", {u8"shaders"}, TES4ArchiveType::shaders},
-                    {u8".pso", {u8"shaders"}, TES4ArchiveType::shaders},
-                    {u8".vsh", {u8"shaders"}, TES4ArchiveType::shaders},
-                    {u8".psh", {u8"shaders"}, TES4ArchiveType::shaders},
-                    {u8".lsl", {u8"shaders"}, TES4ArchiveType::shaders},
-                    {u8".h", {u8"shaders"}, TES4ArchiveType::shaders},
-                    {u8".dat", {u8"lsdata"}, TES4ArchiveType::misc},
-                    {u8".dlodsettings", {u8"lodsettings"}, TES4ArchiveType::misc},
-                    {u8".ctl", {u8"facegen"}, TES4ArchiveType::misc},
-                };
                 return s;
             }();
             return sets_fnv;
@@ -266,7 +265,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
         case Game::SLE:
         {
             static const Settings sets_sle = [=] {
-                Settings s            = default_sets;
+                Settings s            = tes5_default_sets;
                 s.game                = Game::SLE;
                 s.version             = ArchiveVersion::tes5;
                 s.has_texture_version = false;
@@ -278,11 +277,11 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
             }();
             return sets_sle;
         }
-        case Game::SSE: return default_sets;
+        case Game::SSE: return tes5_default_sets;
         case Game::FO4:
         {
             static const Settings sets_fo4 = [=] {
-                Settings s            = default_sets;
+                Settings s            = tes5_default_sets;
                 s.game                = Game::FO4;
                 s.version             = ArchiveVersion::fo4;
                 s.max_size            = 4000ULL * megabyte;
@@ -310,7 +309,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
             }();
             return sets_starfield;
         }
-        default: return default_sets;
+        default: return tes5_default_sets;
     }
 }
 
