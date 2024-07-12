@@ -46,27 +46,19 @@ NLOHMANN_JSON_SERIALIZE_ENUM(TextureType,
                               {TextureType::Skin, "skin"},
                               {TextureType::EnvironmentMask, "environment_mask"}});
 
-enum class AllowCompressed : std::uint8_t
+struct GuessBestFormatArgs
 {
-    Yes,
-    No,
+    bool opaque_alpha     = false;
+    bool allow_compressed = true;
+    bool force_alpha      = false;
 };
 
-NLOHMANN_JSON_SERIALIZE_ENUM(AllowCompressed, {{AllowCompressed::Yes, "yes"}, {AllowCompressed::No, "no"}});
-
-enum class ForceAlpha : std::uint8_t
-{
-    Yes,
-    No
-};
-
-NLOHMANN_JSON_SERIALIZE_ENUM(ForceAlpha, {{ForceAlpha::Yes, "yes"}, {ForceAlpha::No, "no"}});
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(GuessBestFormatArgs, opaque_alpha, allow_compressed, force_alpha);
 
 /// Based on https://forums.nexusmods.com/index.php?/topic/476227-skyrim-nif-files-with-underscores/
 auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<TextureType>;
 
 auto guess_best_format(DXGI_FORMAT current_format,
                        BestFormatFor formats,
-                       AllowCompressed allow_compressed = AllowCompressed::Yes,
-                       ForceAlpha force_alpha           = ForceAlpha::No) noexcept -> DXGI_FORMAT;
+                       const GuessBestFormatArgs &guess_params) noexcept -> DXGI_FORMAT;
 } // namespace btu::tex
