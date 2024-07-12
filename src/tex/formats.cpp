@@ -44,13 +44,13 @@ auto guess_texture_type(std::u8string_view path) noexcept -> std::optional<Textu
 
 auto guess_best_format(const DXGI_FORMAT current_format,
                        const BestFormatFor formats,
-                       const AllowCompressed allow_compressed,
-                       const ForceAlpha force_alpha) noexcept -> DXGI_FORMAT
+                       const GuessBestFormatArgs &guess_params) noexcept -> DXGI_FORMAT
 {
     // allow compression if user requested it, or it was already compressed
-    const bool compressed = allow_compressed == AllowCompressed::Yes || DirectX::IsCompressed(current_format);
+    const bool compressed = guess_params.allow_compressed || DirectX::IsCompressed(current_format);
     // provide an alpha channel if there was already one
-    const bool alpha = DirectX::HasAlpha(current_format) || force_alpha == ForceAlpha::Yes;
+    const bool opaque_alpha = guess_params.opaque_alpha;
+    const bool alpha = !opaque_alpha || guess_params.force_alpha;
     if (compressed && alpha)
         return formats.compressed;
     if (compressed)
