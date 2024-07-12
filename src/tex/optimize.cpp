@@ -74,6 +74,15 @@ auto transparent_alpha_required(const Texture &file, const Settings &sets) -> bo
     return is_cubemap && uncompressed && bad_alpha;
 }
 
+[[nodiscard]] auto has_opaque_alpha(const ScratchImage &tex) noexcept -> bool
+{
+    using enum DirectX::TEX_ALPHA_MODE;
+
+    const auto has_alpha  = DirectX::HasAlpha(tex.GetMetadata().format);
+    const auto alpha_mode = tex.GetMetadata().GetAlphaMode();
+    return !has_alpha || alpha_mode == TEX_ALPHA_MODE_OPAQUE || tex.IsAlphaAllOpaque();
+};
+
 [[nodiscard]] auto can_be_compressed(const TexMetadata &info) noexcept -> bool
 {
     const bool too_small = info.width < 4 || info.height < 4;
@@ -103,12 +112,16 @@ auto transparent_alpha_required(const Texture &file, const Settings &sets) -> bo
 
 [[nodiscard]] auto best_output_format(const Texture &file,
                                       const Settings &sets,
-                                      ForceAlpha force_alpha) noexcept -> DXGI_FORMAT
+                                      bool force_alpha) noexcept -> DXGI_FORMAT
 {
-    const auto &info = file.get().GetMetadata();
+    const auto &tex  = file.get();
+    const auto &info = tex.GetMetadata();
 
-    const auto allow_compressed = can_be_compressed(info) ? AllowCompressed::Yes : AllowCompressed::No;
-    return guess_best_format(info.format, sets.output_format, allow_compressed, force_alpha);
+    return guess_best_format(info.format,
+                             sets.output_format,
+                             GuessBestFormatArgs{.opaque_alpha     = has_opaque_alpha(tex),
+                                                 .allow_compressed = can_be_compressed(info),
+                                                 .force_alpha      = force_alpha});
 }
 
 auto compute_optimization_steps(const Texture &file, const Settings &sets) noexcept -> OptimizationSteps
@@ -118,9 +131,11 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
 
     auto res = OptimizationSteps{};
 
+    // Check if conversion is a must.
     res.convert = conversion_required(file, sets);
-    // do not recompress if original is already compressed
-    if (sets.compress && res.best_format != info.format && !DirectX::IsCompressed(info.format))
+
+    // Do not compress the image if already compressed.
+    if (sets.compress && !DirectX::IsCompressed(info.format))
         res.convert = true;
 
     const auto dim = Dimension{info.width, info.height};
@@ -148,7 +163,7 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     // I prefer to keep steps independent, but this one has to depend on add_transparent_alpha. If we add an alpha, the output format must have alpha
     res.best_format = best_output_format(file,
                                          sets,
-                                         res.add_transparent_alpha ? ForceAlpha::Yes : ForceAlpha::No);
+                                         res.add_transparent_alpha);
 
     return res;
 }
@@ -167,7 +182,7 @@ auto Settings::get(Game game) noexcept -> const Settings &
             .output_format        = {.uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
                                      .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
                                      .compressed                 = DXGI_FORMAT_BC3_UNORM,
-                                     .compressed_without_alpha   = DXGI_FORMAT_BC5_UNORM},
+                                     .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
             .landscape_textures   = {}, // Unknown
         };
     }();
