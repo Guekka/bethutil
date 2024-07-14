@@ -16,10 +16,11 @@ namespace btu::tex {
 
 auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) noexcept -> Result
 {
-    const auto compressed = DirectX::IsCompressed(file.get().GetMetadata().format);
-    auto res              = Result{std::move(file)};
+    const auto must_decompress = (sets.resize || sets.add_transparent_alpha) && DirectX::IsCompressed(file.get().GetMetadata().format);
+    auto res                   = Result{std::move(file)};
 
-    if (compressed)
+    // We must only decompress if we want to resize or transform the image.
+    if (must_decompress)
         res = std::move(res).and_then(decompress);
     if (sets.resize)
         res = std::move(res).and_then(
@@ -32,7 +33,7 @@ auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) no
     // We have uncompressed the texture. If it was compressed, it's best to convert it to a better format
     const auto cur_format_is_same_as_best = res && res->get().GetMetadata().format == sets.best_format;
 
-    if ((sets.convert || compressed) && !cur_format_is_same_as_best)
+    if ((sets.convert || must_decompress) && !cur_format_is_same_as_best)
     {
         auto out = sets.best_format;
         res      = std::move(res)
@@ -120,7 +121,7 @@ auto transparent_alpha_required(const Texture &file, const Settings &sets) -> bo
     return guess_best_format(info.format,
                              sets.output_format,
                              GuessBestFormatArgs{.opaque_alpha     = has_opaque_alpha(tex),
-                                                 .allow_compressed = can_be_compressed(info),
+                                                 .allow_compressed = sets.compress && can_be_compressed(info),
                                                  .force_alpha      = force_alpha});
 }
 
@@ -157,13 +158,17 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
             res.add_transparent_alpha = true;
 
     const bool opt_mip = optimal_mip_count(file.get_dimension()) == info.mipLevels;
-    if (sets.mipmaps && (!opt_mip || res.resize)) // resize removes mips
+    if ((sets.mipmaps && !opt_mip) || (info.mipLevels > 1 && res.resize)) // resize removes mips if there are any, regenerate them
         res.mipmaps = true;
 
     // I prefer to keep steps independent, but this one has to depend on add_transparent_alpha. If we add an alpha, the output format must have alpha
     res.best_format = best_output_format(file,
                                          sets,
                                          res.add_transparent_alpha);
+
+    // Ensure result is saved without alpha in cases where it could be problematic (i.e. resizing).
+    if (res.resize && res.best_format == sets.output_format.uncompressed_without_alpha)
+        res.convert = true;
 
     return res;
 }
@@ -177,10 +182,16 @@ auto Settings::get(Game game) noexcept -> const Settings &
             .compress             = false,
             .resize               = {},
             .mipmaps              = true,
-            .use_format_whitelist = false,
-            .allowed_formats      = {}, // Unknown
-            .output_format        = {.uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
-                                     .uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM,
+            .use_format_whitelist = true,
+            .allowed_formats      = {
+                DXGI_FORMAT_BC3_UNORM,
+                DXGI_FORMAT_BC1_UNORM,
+                DXGI_FORMAT_R8G8B8A8_UNORM,
+                DXGI_FORMAT_B8G8R8A8_UNORM,
+                DXGI_FORMAT_B8G8R8X8_UNORM,
+            }, // Older titles only support DXT1-DXT5 compression.
+            .output_format        = {.uncompressed               = DXGI_FORMAT_B8G8R8A8_UNORM,
+                                     .uncompressed_without_alpha = DXGI_FORMAT_B8G8R8X8_UNORM,
                                      .compressed                 = DXGI_FORMAT_BC3_UNORM,
                                      .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
             .landscape_textures   = {}, // Unknown
@@ -222,13 +233,14 @@ auto Settings::get(Game game) noexcept -> const Settings &
             static auto sse_sets = [&] {
                 auto sets                 = tes3_sets;
                 sets.compress             = true;
-                sets.use_format_whitelist = true;
                 sets.allowed_formats      = {
                     DXGI_FORMAT_BC7_UNORM,
                     DXGI_FORMAT_BC5_UNORM,
                     DXGI_FORMAT_BC3_UNORM,
                     DXGI_FORMAT_BC1_UNORM,
                     DXGI_FORMAT_R8G8B8A8_UNORM,
+                    DXGI_FORMAT_B8G8R8A8_UNORM,
+                    DXGI_FORMAT_B8G8R8X8_UNORM,
                 };
                 sets.output_format.compressed               = DXGI_FORMAT_BC7_UNORM;
                 sets.output_format.compressed_without_alpha = DXGI_FORMAT_BC7_UNORM;
