@@ -17,6 +17,44 @@ auto operator<<(std::ostream &os, const btu::tex::OptimizationSteps &s) -> std::
               << ";mips: " << s.mipmaps << "; resize x:" << dim.w << " y:" << dim.h;
 }
 
+const auto no_explicit_sets = []() noexcept {
+    auto sets          = btu::tex::Settings::get(btu::Game::SSE);
+    sets.output_format = btu::tex::BestFormatFor{
+        .uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
+        .uncompressed_without_alpha = DXGI_FORMAT_P8,
+        .compressed                 = DXGI_FORMAT_BC7_UNORM,
+        .compressed_without_alpha   = DXGI_FORMAT_BC5_UNORM,
+    };
+    sets.use_format_whitelist = false;
+    sets.compress             = false;
+    sets.mipmaps              = false;
+    sets.resize               = std::monostate{};
+    return sets;
+}();
+
+const auto resize_sets = []() noexcept {
+    auto sets   = no_explicit_sets;
+    sets.resize = btu::tex::util::ResizeRatio{.ratio = 7, .min = {128, 128}};
+    return sets;
+}();
+
+
+const auto compress_whitelist_mips_resize_sets = []() noexcept {
+    auto sets                 = no_explicit_sets;
+    sets.use_format_whitelist = true;
+    sets.allowed_formats      = {DXGI_FORMAT_BC7_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM};
+    sets.compress             = true;
+    sets.mipmaps              = true;
+    sets.resize               = btu::tex::util::ResizeRatio{.ratio = 7, .min = {128, 128}};
+    return sets;
+}();
+
+const auto landscape_sets = [] {
+    auto sets               = no_explicit_sets;
+    sets.landscape_textures = {u8"landscape/file.dds"};
+    return sets;
+}();
+
 constexpr auto bc5_512_no_mips_meta = [] {
     return DirectX::TexMetadata{
         .width      = 512,
@@ -31,35 +69,15 @@ constexpr auto bc5_512_no_mips_meta = [] {
     };
 }();
 
-auto generate_tex(const DirectX::TexMetadata &info) -> btu::tex::Texture
-{
-    auto image    = DirectX::ScratchImage{};
-    const auto hr = image.Initialize(info);
-    REQUIRE(SUCCEEDED(hr));
-    auto tex = btu::tex::Texture{};
-    tex.set(std::move(image));
-
-    return tex;
-}
-
-const auto compress_whitelist_mips_resize_sets = []() noexcept {
-    auto sets                 = btu::tex::Settings::get(btu::Game::SSE);
-    sets.use_format_whitelist = true;
-    sets.output_format        = btu::tex::BestFormatFor{
-               .uncompressed               = DXGI_FORMAT_R8G8B8A8_UNORM,
-               .uncompressed_without_alpha = DXGI_FORMAT_P8,
-               .compressed                 = DXGI_FORMAT_BC1_UNORM,
-               .compressed_without_alpha   = DXGI_FORMAT_BC5_UNORM,
-    };
-    sets.allowed_formats = {DXGI_FORMAT_BC7_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM};
-    sets.compress        = true;
-    sets.mipmaps         = true;
-    sets.resize          = btu::tex::util::ResizeRatio{.ratio = 7, .min = {128, 128}};
-    return sets;
-}();
-
 constexpr auto r8g8b8a8_512_no_mips_meta = [] {
     auto info   = bc5_512_no_mips_meta;
+    info.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    return info;
+}();
+
+constexpr auto r8g8b8a8_512_with_mips_meta = [] {
+    auto info   = bc5_512_no_mips_meta;
+    info.mipLevels = 4;
     info.format = DXGI_FORMAT_R8G8B8A8_UNORM;
     return info;
 }();
@@ -70,18 +88,10 @@ constexpr auto bc7_512_no_mips_meta = [] {
     return info;
 }();
 
-const auto landscape_sets = [] {
-    auto sets                 = compress_whitelist_mips_resize_sets;
-    sets.use_format_whitelist = false;
-    sets.compress             = false;
-    sets.mipmaps              = false;
-    sets.resize               = std::monostate{};
-    sets.landscape_textures   = {u8"landscape/file.dds"};
-    return sets;
-}();
-
 void add_opaque_alpha(DirectX::ScratchImage &tex)
 {
+    REQUIRE(!DirectX::IsCompressed(tex.GetMetadata().format));
+
     // We create a texture with opaque alpha
     constexpr auto transform = [](DirectX::XMVECTOR *out_pixels,
                                   const DirectX::XMVECTOR *,
@@ -100,12 +110,31 @@ void add_opaque_alpha(DirectX::ScratchImage &tex)
     tex = std::move(timage);
 }
 
-[[nodiscard]] auto generate_landscape_texture(DirectX::TexMetadata meta) -> btu::tex::Texture
+auto generate_tex(const DirectX::TexMetadata &info) -> btu::tex::Texture
+{
+    auto image = DirectX::ScratchImage{};
+
+    auto hr = image.Initialize(info);
+    REQUIRE(SUCCEEDED(hr));
+
+    auto tex = btu::tex::Texture{};
+    tex.set(std::move(image));
+
+    return tex;
+}
+
+[[nodiscard]] auto generate_opaque_texture(DirectX::TexMetadata meta) -> btu::tex::Texture
 {
     auto tex = generate_tex(meta);
     // if format does not have alpha, it's already opaque
     if (DirectX::HasAlpha(meta.format))
         add_opaque_alpha(tex.get());
+    return tex;
+}
+
+[[nodiscard]] auto generate_landscape_texture(DirectX::TexMetadata meta) -> btu::tex::Texture
+{
+    auto tex = generate_opaque_texture(meta);
     tex.set_load_path(u8"textures/landscape/file.dds");
     return tex;
 }
@@ -132,7 +161,7 @@ TEST_CASE("compute_optimization_steps", "[src]")
         CHECK(res.resize == std::nullopt);
         CHECK(res.add_transparent_alpha);
         CHECK_FALSE(res.mipmaps);
-        CHECK(res.best_format == landscape_sets.output_format.compressed);
+        CHECK(res.best_format == landscape_sets.output_format.uncompressed);
         CHECK_FALSE(res.convert);
     }
     SECTION("do not compress to same format as current")
@@ -169,6 +198,78 @@ TEST_CASE("compute_optimization_steps", "[src]")
         CHECK(res.add_transparent_alpha);
         CHECK_FALSE(res.mipmaps);
         CHECK(res.best_format == landscape_sets.output_format.compressed);
+        CHECK_FALSE(res.convert);
+    }
+    SECTION("nothing to do for texture without alpha")
+    {
+        auto tex  = generate_opaque_texture(r8g8b8a8_512_no_mips_meta);
+        auto sets = no_explicit_sets;
+
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize == std::nullopt);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK_FALSE(res.mipmaps);
+        CHECK(res.best_format == sets.output_format.uncompressed_without_alpha);
+        CHECK_FALSE(res.convert);
+    }
+    SECTION("nothing to do for texture with alpha")
+    {
+        auto tex  = generate_tex(r8g8b8a8_512_no_mips_meta);
+        auto sets = no_explicit_sets;
+
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize == std::nullopt);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK_FALSE(res.mipmaps);
+        CHECK(res.best_format == sets.output_format.uncompressed);
+        CHECK_FALSE(res.convert);
+    }
+    SECTION("nothing to do for compressed texture")
+    {
+        auto tex  = generate_tex(bc7_512_no_mips_meta);
+        auto sets = no_explicit_sets;
+
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize == std::nullopt);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK_FALSE(res.mipmaps);
+        CHECK(res.best_format == sets.output_format.compressed);
+        CHECK_FALSE(res.convert);
+    }
+    SECTION("resizing texture without alpha converts to format without alpha")
+    {
+        auto tex    = generate_opaque_texture(r8g8b8a8_512_no_mips_meta);
+        auto sets   = resize_sets;
+
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK_FALSE(res.mipmaps);
+        CHECK(res.best_format == sets.output_format.uncompressed_without_alpha);
+        CHECK(res.convert);
+    }
+    SECTION("resizing always keeps mipmaps")
+    {
+        auto tex = generate_tex(r8g8b8a8_512_with_mips_meta);
+        auto sets = resize_sets;
+
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK(res.mipmaps);
+        CHECK(res.best_format == sets.output_format.uncompressed);
+        CHECK_FALSE(res.convert);
+    }
+    SECTION("resizing compressed texture keeps the compression")
+    {
+        auto tex  = generate_tex(bc7_512_no_mips_meta);
+        auto sets = resize_sets;
+
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK_FALSE(res.mipmaps);
+        CHECK(res.best_format == sets.output_format.compressed);
         CHECK_FALSE(res.convert);
     }
 }
@@ -225,6 +326,8 @@ TEST_CASE("tex_optimize", "[src]")
         auto sets = compress_whitelist_mips_resize_sets;
         // go back to more common settings
         sets.output_format = btu::tex::Settings::get(btu::Game::SSE).output_format;
+        // Change X8 to A8, as X8 is saved and loaded as A8 anyways, just without alpha bits.
+        sets.output_format.uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM;
         sets.resize        = btu::tex::Dimension{128, 128};
         test_expected_dir(u8"optimize", [&](auto &&f) {
             const btu::tex::OptimizationSteps steps = btu::tex::compute_optimization_steps(f, sets);
