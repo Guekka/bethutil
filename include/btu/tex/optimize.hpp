@@ -34,6 +34,8 @@ struct Settings
     BestFormatFor output_format;
 
     std::vector<std::u8string> landscape_textures;
+
+    std::vector<std::u8string> ignored_files;
 };
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
@@ -44,7 +46,8 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
                                    use_format_whitelist,
                                    allowed_formats,
                                    output_format,
-                                   landscape_textures)
+                                   landscape_textures,
+                                   ignored_files)
 
 struct OptimizationSteps
 {

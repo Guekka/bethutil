@@ -12,6 +12,8 @@
 #include <btu/common/metaprogramming.hpp>
 #include <btu/tex/dxtex.hpp>
 
+#include <regex>
+
 namespace btu::tex {
 
 auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) noexcept -> Result
@@ -132,6 +134,17 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
 
     auto res = OptimizationSteps{};
 
+    // Check if file is ignored.
+    auto path = canonize_path(file.get_load_path());
+    for (auto &pattern : sets.ignored_files)
+    {
+        auto regex = std::regex{btu::common::as_ascii_string(pattern),
+                                std::regex::optimize | std::regex::icase};
+        
+        if (std::regex_match(common::as_ascii_string(path), regex))
+            return res;
+    }
+
     // Check if conversion is a must.
     res.convert = conversion_required(file, sets);
 
@@ -195,6 +208,7 @@ auto Settings::get(Game game) noexcept -> const Settings &
                                      .compressed                 = DXGI_FORMAT_BC3_UNORM,
                                      .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
             .landscape_textures   = {}, // Unknown
+            .ignored_files        = {}, // Ignore nothing by default.
         };
     }();
 
@@ -213,8 +227,9 @@ auto Settings::get(Game game) noexcept -> const Settings &
         case Game::FNV:
         {
             static auto fnv_sets = [&] {
-                auto sets = tes3_sets;
-                sets.game = Game::FNV;
+                auto sets          = tes3_sets;
+                sets.game          = Game::FNV;
+                sets.ignored_files = {u8"interface/.*", u8".*lod(_[nsdgpe])?\\.dds"};
                 return sets;
             }();
             return fnv_sets;
