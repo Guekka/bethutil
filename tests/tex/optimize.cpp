@@ -44,6 +44,13 @@ const auto mipmaps_sets = []() noexcept {
     return sets;
 }();
 
+const auto compress_resize_with_ignore_sets = []() noexcept {
+    auto sets          = resize_sets;
+    sets.compress      = true;
+    sets.ignored_files = {u8"interface/.*", u8".*ignore.*\\.dds"};
+    return sets;
+}();
+
 const auto compress_whitelist_mips_resize_sets = []() noexcept {
     auto sets                 = no_explicit_sets;
     sets.use_format_whitelist = true;
@@ -275,6 +282,46 @@ TEST_CASE("compute_optimization_steps", "[src]")
         CHECK_FALSE(res.add_transparent_alpha);
         CHECK_FALSE(res.mipmaps);
         CHECK(res.best_format == sets.output_format.compressed);
+        CHECK_FALSE(res.convert);
+    }
+    SECTION("do not ignore non-matching texture")
+    {
+        auto tex  = generate_tex(r8g8b8a8_512_no_mips_meta);
+        auto sets = compress_resize_with_ignore_sets;
+
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK_FALSE(res.mipmaps);
+        CHECK(res.best_format == sets.output_format.compressed);
+        CHECK(res.convert);
+    }
+    SECTION("ignore texture (simple path)")
+    {
+        auto tex  = generate_tex(r8g8b8a8_512_no_mips_meta);
+        auto sets = compress_resize_with_ignore_sets;
+
+        tex.set_load_path(u8"something/textures/interface/barter/tex.dds");
+
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize == std::nullopt);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK_FALSE(res.mipmaps);
+        CHECK(res.best_format == DXGI_FORMAT_UNKNOWN);
+        CHECK_FALSE(res.convert);
+    }
+    SECTION("ignore texture (complex path)")
+    {
+        auto tex  = generate_tex(r8g8b8a8_512_no_mips_meta);
+        auto sets = compress_resize_with_ignore_sets;
+
+        tex.set_load_path(u8"something/textures/landscape/tex_ignore.dds");
+
+        const auto res = compute_optimization_steps(tex, sets);
+        CHECK(res.resize == std::nullopt);
+        CHECK_FALSE(res.add_transparent_alpha);
+        CHECK_FALSE(res.mipmaps);
+        CHECK(res.best_format == DXGI_FORMAT_UNKNOWN);
         CHECK_FALSE(res.convert);
     }
 }
