@@ -50,7 +50,7 @@ auto guess_best_format(const DXGI_FORMAT current_format,
     const bool compressed = guess_params.allow_compressed || DirectX::IsCompressed(current_format);
     // provide an alpha channel if there was already one
     const bool opaque_alpha = guess_params.opaque_alpha;
-    const bool alpha = !opaque_alpha || guess_params.force_alpha;
+    const bool alpha        = !opaque_alpha || guess_params.force_alpha;
     if (compressed && alpha)
         return formats.compressed;
     if (compressed)

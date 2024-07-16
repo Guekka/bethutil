@@ -86,7 +86,7 @@ struct PackGroup
                                 const PackSettings &sets,
                                 ArchiveType type) noexcept -> std::optional<File>
 {
-    auto file      = File{sets.game_settings.version, type, get_tes4_archive_type(file_path, sets.game_settings)};
+    auto file = File{sets.game_settings.version, type, get_tes4_archive_type(file_path, sets.game_settings)};
     const bool res = file.read(file_path);
     if (!res)
         return std::nullopt;
