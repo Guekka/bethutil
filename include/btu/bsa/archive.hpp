@@ -68,7 +68,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(ArchiveVersion,
                              })
 
 using TES4ArchiveType = libbsa::tes4::archive_type;
-using UnderlyingFile = std::variant<libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file>;
+using UnderlyingFile  = std::variant<libbsa::tes3::file, libbsa::tes4::file, libbsa::fo4::file>;
 
 class File final
 {
