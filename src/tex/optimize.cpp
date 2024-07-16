@@ -16,12 +16,12 @@ namespace btu::tex {
 
 auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) noexcept -> Result
 {
-    const auto &info           = file.get().GetMetadata();
+    const auto &info = file.get().GetMetadata();
     // All operations require a decompressed texture.
     const auto must_decompress = DirectX::IsCompressed(info.format);
     // Special case - force conversion if result shouldn't have alpha to get rid of alpha bits that are added by DirectX.
-    const auto should_convert  = sets.convert || must_decompress || !DirectX::HasAlpha(sets.best_format);
-    auto res                   = Result{std::move(file)};
+    const auto should_convert = sets.convert || must_decompress || !DirectX::HasAlpha(sets.best_format);
+    auto res                  = Result{std::move(file)};
 
     if (must_decompress)
         res = std::move(res).and_then(decompress);
@@ -161,13 +161,12 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
             res.add_transparent_alpha = true;
 
     const bool opt_mip = optimal_mip_count(file.get_dimension()) == info.mipLevels;
-    if ((sets.mipmaps && !opt_mip) || (info.mipLevels > 1 && res.resize)) // resize removes mips if there are any, regenerate them
+    if ((sets.mipmaps && !opt_mip)
+        || (info.mipLevels > 1 && res.resize)) // resize removes mips if there are any, regenerate them
         res.mipmaps = true;
 
     // I prefer to keep steps independent, but this one has to depend on add_transparent_alpha. If we add an alpha, the output format must have alpha
-    res.best_format = best_output_format(file,
-                                         sets,
-                                         res.add_transparent_alpha);
+    res.best_format = best_output_format(file, sets, res.add_transparent_alpha);
 
     return res;
 }
@@ -230,9 +229,9 @@ auto Settings::get(Game game) noexcept -> const Settings &
         case Game::SSE:
         {
             static auto sse_sets = [&] {
-                auto sets                 = tes3_sets;
-                sets.compress             = true;
-                sets.allowed_formats      = {
+                auto sets            = tes3_sets;
+                sets.compress        = true;
+                sets.allowed_formats = {
                     DXGI_FORMAT_BC7_UNORM,
                     DXGI_FORMAT_BC5_UNORM,
                     DXGI_FORMAT_BC3_UNORM,
