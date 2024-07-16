@@ -86,7 +86,10 @@ File::File(ArchiveVersion version, ArchiveType type, std::optional<TES4ArchiveTy
     }();
 }
 
-File::File(UnderlyingFile f, ArchiveVersion version, ArchiveType type, std::optional<TES4ArchiveType> tes4_type = std::nullopt)
+File::File(UnderlyingFile f,
+           ArchiveVersion version,
+           ArchiveType type,
+           std::optional<TES4ArchiveType> tes4_type = std::nullopt)
     : ver_(version)
     , type_(type)
     , tes4_archive_type_(tes4_type)
@@ -419,12 +422,11 @@ auto Archive::write(Path path) && -> bool
                 }();
 
                 auto result = d->insert(elem_path.filename().lexically_normal().generic_string(),
-                          std::move(elem.second).as_raw_file<libbsa::tes4::file>());
+                                        std::move(elem.second).as_raw_file<libbsa::tes4::file>());
 
                 if (result.second)
                 {
-                    if (auto arch_type = elem.second.tes4_archive_type();
-                        arch_type)
+                    if (auto arch_type = elem.second.tes4_archive_type(); arch_type)
                     {
                         bsa.archive_types(bsa.archive_types() | arch_type.value());
                     }

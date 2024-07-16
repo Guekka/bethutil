@@ -53,8 +53,7 @@ TEST_CASE("guess_best_format compressed with alpha", "[src]")
 {
     auto result = guess_best_format(DXGI_FORMAT_BC3_UNORM,
                                     k_best_formats,
-                                    GuessBestFormatArgs{.opaque_alpha     = false,
-                                                        .allow_compressed = true});
+                                    GuessBestFormatArgs{.opaque_alpha = false, .allow_compressed = true});
     CHECK(result == k_best_formats.compressed);
 }
 
@@ -62,8 +61,7 @@ TEST_CASE("guess_best_format compressed with opaque alpha", "[src]")
 {
     auto result = guess_best_format(DXGI_FORMAT_BC3_UNORM,
                                     k_best_formats,
-                                    GuessBestFormatArgs{.opaque_alpha     = true,
-                                                        .allow_compressed = true});
+                                    GuessBestFormatArgs{.opaque_alpha = true, .allow_compressed = true});
     CHECK(result == k_best_formats.compressed_without_alpha);
 }
 
@@ -71,8 +69,7 @@ TEST_CASE("guess_best_format compressed without alpha", "[src]")
 {
     auto result = guess_best_format(DXGI_FORMAT_BC5_UNORM,
                                     k_best_formats,
-                                    GuessBestFormatArgs{.opaque_alpha     = true,
-                                                        .allow_compressed = true});
+                                    GuessBestFormatArgs{.opaque_alpha = true, .allow_compressed = true});
     CHECK(result == k_best_formats.compressed_without_alpha);
 }
 
@@ -80,8 +77,7 @@ TEST_CASE("guess_best_format uncompressed with alpha", "[src]")
 {
     auto result = guess_best_format(DXGI_FORMAT_R8G8B8A8_UNORM,
                                     k_best_formats,
-                                    GuessBestFormatArgs{.opaque_alpha     = false,
-                                                        .allow_compressed = false});
+                                    GuessBestFormatArgs{.opaque_alpha = false, .allow_compressed = false});
     CHECK(result == k_best_formats.uncompressed);
 }
 
@@ -89,8 +85,7 @@ TEST_CASE("guess_best_format uncompressed with opaque alpha", "[src]")
 {
     auto result = guess_best_format(DXGI_FORMAT_R8G8B8A8_UNORM,
                                     k_best_formats,
-                                    GuessBestFormatArgs{.opaque_alpha     = true,
-                                                        .allow_compressed = false});
+                                    GuessBestFormatArgs{.opaque_alpha = true, .allow_compressed = false});
     CHECK(result == k_best_formats.uncompressed_without_alpha);
 }
 
@@ -98,8 +93,7 @@ TEST_CASE("guess_best_format uncompressed without alpha", "[src]")
 {
     auto result = guess_best_format(DXGI_FORMAT_R8G8_B8G8_UNORM,
                                     k_best_formats,
-                                    GuessBestFormatArgs{.opaque_alpha     = true,
-                                                        .allow_compressed = false});
+                                    GuessBestFormatArgs{.opaque_alpha = true, .allow_compressed = false});
     CHECK(result == k_best_formats.uncompressed_without_alpha);
 }
 
@@ -107,8 +101,7 @@ TEST_CASE("guess_best_format already compressed with allow compressed no", "[src
 {
     auto result = guess_best_format(DXGI_FORMAT_BC3_UNORM,
                                     k_best_formats,
-                                    GuessBestFormatArgs{.opaque_alpha     = false,
-                                                        .allow_compressed = false});
+                                    GuessBestFormatArgs{.opaque_alpha = false, .allow_compressed = false});
     CHECK(result == k_best_formats.compressed);
 }
 
@@ -116,8 +109,7 @@ TEST_CASE("guess_best_format already compressed with opaque alpha and allow comp
 {
     auto result = guess_best_format(DXGI_FORMAT_BC3_UNORM,
                                     k_best_formats,
-                                    GuessBestFormatArgs{.opaque_alpha     = true,
-                                                        .allow_compressed = false});
+                                    GuessBestFormatArgs{.opaque_alpha = true, .allow_compressed = false});
     CHECK(result == k_best_formats.compressed_without_alpha);
 }
 
@@ -125,8 +117,7 @@ TEST_CASE("guess_best_format non compressed with allow compressed yes", "[src]")
 {
     auto result = guess_best_format(DXGI_FORMAT_R8G8B8A8_UNORM,
                                     k_best_formats,
-                                    GuessBestFormatArgs{.opaque_alpha     = false,
-                                                        .allow_compressed = true});
+                                    GuessBestFormatArgs{.opaque_alpha = false, .allow_compressed = true});
     CHECK(result == k_best_formats.compressed);
 }
 
@@ -134,7 +125,6 @@ TEST_CASE("guess_best_format non compressed with opaque alpha and allow compress
 {
     auto result = guess_best_format(DXGI_FORMAT_R8G8B8A8_UNORM,
                                     k_best_formats,
-                                    GuessBestFormatArgs{.opaque_alpha     = true,
-                                                        .allow_compressed = true});
+                                    GuessBestFormatArgs{.opaque_alpha = true, .allow_compressed = true});
     CHECK(result == k_best_formats.compressed_without_alpha);
 }
