@@ -150,7 +150,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
         sets.has_texture_version = false;
         sets.texture_suffix      = std::nullopt;
         sets.extension           = u8".bsa";
-        sets.plugin_extensions   = { u8".esm", u8".esp"};
+        sets.plugin_extensions   = {u8".esm", u8".esp"};
         sets.dummy_plugin        = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
         sets.dummy_extension     = u8".esp";
         sets.standard_files      = {
@@ -256,10 +256,10 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
         case Game::FNV:
         {
             static const Settings sets_fnv = [=] {
-                Settings s            = tes4_default_sets;
-                s.game                = Game::FNV;
-                s.version             = ArchiveVersion::tes5;
-                s.dummy_plugin        = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
+                Settings s     = tes4_default_sets;
+                s.game         = Game::FNV;
+                s.version      = ArchiveVersion::tes5;
+                s.dummy_plugin = std::vector(std::begin(dummy::fnv), std::end(dummy::fnv));
                 return s;
             }();
             return sets_fnv;
@@ -363,11 +363,11 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
     return FileTypes::Blacklist;
 }
 
-[[nodiscard]] inline auto get_tes4_archive_type(const Path& filepath, 
-                                                const Settings& sets) -> std::optional<TES4ArchiveType>
+[[nodiscard]] inline auto get_tes4_archive_type(const Path &filepath,
+                                                const Settings &sets) -> std::optional<TES4ArchiveType>
 {
     const auto ext = common::to_lower(filepath.extension().u8string());
-    auto get     = [ext](const auto &vec) {
+    auto get       = [ext](const auto &vec) {
         using std::cbegin, std::cend;
         auto it = std::ranges::find_if(vec, [&](const auto &p) { return p.extension == ext; });
         if (it != cend(vec))

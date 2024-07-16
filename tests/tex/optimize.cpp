@@ -81,9 +81,9 @@ constexpr auto r8g8b8a8_512_no_mips_meta = [] {
 }();
 
 constexpr auto r8g8b8a8_512_with_mips_meta = [] {
-    auto info   = bc5_512_no_mips_meta;
+    auto info      = bc5_512_no_mips_meta;
     info.mipLevels = 4;
-    info.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    info.format    = DXGI_FORMAT_R8G8B8A8_UNORM;
     return info;
 }();
 
@@ -243,8 +243,8 @@ TEST_CASE("compute_optimization_steps", "[src]")
     }
     SECTION("resizing texture without alpha keeps a format without alpha")
     {
-        auto tex    = generate_opaque_tex(r8g8b8a8_512_no_mips_meta);
-        auto sets   = resize_sets;
+        auto tex  = generate_opaque_tex(r8g8b8a8_512_no_mips_meta);
+        auto sets = resize_sets;
 
         const auto res = compute_optimization_steps(tex, sets);
         CHECK(res.resize);
@@ -255,7 +255,7 @@ TEST_CASE("compute_optimization_steps", "[src]")
     }
     SECTION("resizing always keeps mipmaps")
     {
-        auto tex = generate_tex(r8g8b8a8_512_with_mips_meta);
+        auto tex  = generate_tex(r8g8b8a8_512_with_mips_meta);
         auto sets = resize_sets;
 
         const auto res = compute_optimization_steps(tex, sets);
@@ -466,7 +466,7 @@ TEST_CASE("tex_optimize", "[src]")
         sets.output_format = btu::tex::Settings::get(btu::Game::SSE).output_format;
         // Change X8 to A8, as X8 is saved and loaded as A8 anyways, just without alpha bits.
         sets.output_format.uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM;
-        sets.resize        = btu::tex::Dimension{128, 128};
+        sets.resize                                   = btu::tex::Dimension{128, 128};
         test_expected_dir(u8"optimize", [&](auto &&f) {
             const btu::tex::OptimizationSteps steps = btu::tex::compute_optimization_steps(f, sets);
             return btu::tex::optimize(std::forward<decltype(f)>(f), steps, compression_dev);
