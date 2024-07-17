@@ -69,7 +69,7 @@ void remove_suffixes(std::u8string &filename, const Settings &sets)
         filename = str_replace_once(filename, suffix, u8"", common::CaseSensitive::Yes);
 }
 
-[[nodiscard]] auto plugins_loading_archive(const Path &archive, const Settings &sets)
+[[nodiscard]] auto plugins_loading_archive_limited(const Path &archive, const Settings &sets)
 {
     auto stem = archive.stem().u8string();
     remove_suffixes(stem, sets);
@@ -77,6 +77,28 @@ void remove_suffixes(std::u8string &filename, const Settings &sets)
     return flux::ref(sets.plugin_extensions)
         .map([&archive, &stem](const auto &ext) { return archive.parent_path() / (stem + ext); })
         .to<std::vector>();
+}
+
+/// If plugins can have unlimited archives attached, also look at all the prefixes of stem.
+[[nodiscard]] auto plugins_loading_archive_unlimited(const Path &archive, const Settings &sets)
+{
+    const auto stem = archive.stem().u8string();
+    return flux::cartesian_product_map([&stem](const size_t size,
+                                               const auto &ext) { return stem.substr(0, size) + ext; },
+                                       flux::iota(size_t{1}, stem.size() + 1).reverse(),
+                                       flux::ref(sets.plugin_extensions))
+        .map([&archive](const auto &filename) { return archive.parent_path() / filename; })
+        .to<std::vector>();
+}
+
+[[nodiscard]] auto plugins_loading_archive(const Path &archive, const Settings &sets) -> std::vector<Path>
+{
+    switch (sets.dummy_plugin_loading_mode)
+    {
+        case PluginLoadingMode::Limited: return plugins_loading_archive_limited(archive, sets);
+        case PluginLoadingMode::Unlimited: return plugins_loading_archive_unlimited(archive, sets);
+    }
+    return {};
 }
 
 auto find_archive_name_using_plugins(std::span<const Path> plugins,
@@ -113,6 +135,7 @@ auto find_archive_name_using_plugins(std::span<const Path> plugins,
     return std::nullopt;
 }
 
+/// Returns an archive name that is unique, which is guaranteed by trying suitable suffixes
 auto find_archive_name(const Path &directory,
                        const Settings &sets,
                        ArchiveType type) noexcept -> std::optional<Path>
@@ -187,13 +210,21 @@ auto list_archive(const Path &dir, const Settings &sets) noexcept -> std::vector
 {
     try
     {
-        return flux::from_range(fs::directory_iterator(dir))
-            .filter([](const auto &f) { return f.is_regular_file(); })
-            .filter([&sets](const auto &f) {
-                return common::to_lower(f.path().extension().u8string()) == sets.extension;
-            })
-            .map([](const auto &f) { return f.path(); })
-            .to<std::vector>();
+        std::vector<Path> archives = flux::from_range(fs::directory_iterator(dir))
+                                         .filter([](const auto &f) { return f.is_regular_file(); })
+                                         .filter([&sets](const auto &f) {
+                                             return common::to_lower(f.path().extension().u8string())
+                                                    == sets.extension;
+                                         })
+                                         .map([](const auto &f) { return f.path(); })
+                                         .to<std::vector>();
+
+        // When a single plugin can load multiple archives, it loads all archives such that their
+        // name contains the name of the corresponding plugin as a prefix. Sorting the archive
+        // names by length should ensure that only the required number of dummy plugins is created.
+        flux::sort(archives, [](const auto p1, const auto p2) { return p1.stem() <= p2.stem(); });
+
+        return archives;
     }
     catch (const std::exception &)
     {
