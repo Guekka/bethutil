@@ -77,6 +77,48 @@ TEST_CASE("find_archive_name", "[src]")
 
 TEST_CASE("remake dummy plugins")
 {
+    GIVEN("a game that can load limited archives per plugin, a directory with no plugins, and two archives")
+    {
+        auto dir = prepare_dir(std::vector{u8"Test.bsa"sv, u8"Test1.bsa"sv});
+
+        WHEN("remake_dummy_plugins is called")
+        {
+            auto sets = Settings::get(btu::Game::SSE);
+            remake_dummy_plugins(dir.path(), sets);
+
+            THEN("two dummy plugins were created")
+            {
+                CHECK(list_plugins(dir.path(), sets).size() == 2);
+            }
+            AND_THEN("the dummy plugins have the correct content")
+            {
+                auto dummy_content = require_expected(btu::common::read_file(dir.path() / u8"Test.esp"));
+                CHECK(dummy_content == sets.dummy_plugin.value());
+                dummy_content = require_expected(btu::common::read_file(dir.path() / u8"Test1.esp"));
+                CHECK(dummy_content == sets.dummy_plugin.value());
+            }
+        }
+    }
+    GIVEN("a game that can load unlimited archives per plugin, a directory with no plugins, and two archives")
+    {
+        auto dir = prepare_dir(std::vector{u8"Test.bsa"sv, u8"Test1.bsa"sv});
+
+        WHEN("remake_dummy_plugins is called")
+        {
+            auto sets = Settings::get(btu::Game::FNV);
+            remake_dummy_plugins(dir.path(), sets);
+
+            THEN("one dummy plugin was created")
+            {
+                CHECK(list_plugins(dir.path(), sets).size() == 1);
+            }
+            AND_THEN("the dummy plugin has the correct content")
+            {
+                auto dummy_content = require_expected(btu::common::read_file(dir.path() / u8"Test.esp"));
+                CHECK(dummy_content == sets.dummy_plugin.value());
+            }
+        }
+    }
     GIVEN("a directory with a plugin, a loaded archive and an unloaded archive")
     {
         auto dir = prepare_dir(
@@ -84,17 +126,61 @@ TEST_CASE("remake dummy plugins")
 
         WHEN("remake_dummy_plugins is called")
         {
-            remake_dummy_plugins(dir.path(), Settings::get(btu::Game::SSE));
+            auto sets = Settings::get(btu::Game::SSE);
+            remake_dummy_plugins(dir.path(), sets);
 
             THEN("the dummy plugin has the correct content")
             {
                 auto dummy_content = require_expected(btu::common::read_file(dir.path() / u8"unloaded.esp"));
-                CHECK(dummy_content == Settings::get(btu::Game::SSE).dummy_plugin.value());
+                CHECK(dummy_content == sets.dummy_plugin.value());
             }
             AND_THEN("the existing plugin was not modified")
             {
                 auto existing_content = require_expected(
                     btu::common::read_file(dir.path() / u8"existing.esp"));
+                CHECK(existing_content.empty());
+            }
+        }
+    }
+    GIVEN("a directory with a plugin that can load a limited number of archives, a loaded archive \
+           and an unloaded archive with the same prefix")
+    {
+        auto dir = prepare_dir(std::vector{u8"plugin.esp"sv, u8"plugin.bsa"sv, u8"plugin1.bsa"sv});
+
+        WHEN("remake_dummy_plugins is called")
+        {
+            auto sets = Settings::get(btu::Game::SSE);
+            remake_dummy_plugins(dir.path(), sets);
+
+            THEN("the dummy plugin has the correct content")
+            {
+                auto dummy_content = require_expected(btu::common::read_file(dir.path() / u8"plugin1.esp"));
+                CHECK(dummy_content == sets.dummy_plugin.value());
+            }
+            AND_THEN("the existing plugin was not modified")
+            {
+                auto existing_content = require_expected(btu::common::read_file(dir.path() / u8"plugin.esp"));
+                CHECK(existing_content.empty());
+            }
+        }
+    }
+    GIVEN("a directory with a plugin that can load an unlimited number of archives and two loaded archives")
+    {
+        auto dir = prepare_dir(std::vector{u8"plugin.esp"sv, u8"plugin.bsa"sv, u8"plugin1.bsa"sv});
+
+        WHEN("remake_dummy_plugins is called")
+        {
+            auto sets = Settings::get(btu::Game::FNV);
+            remake_dummy_plugins(dir.path(), sets);
+
+            THEN("the existing plugin is the single plugin in the folder")
+            {
+                const auto plugins = list_plugins(dir.path(), sets);
+                CHECK(plugins == std::vector{dir.path() / u8"plugin.esp"});
+            }
+            AND_THEN("the existing plugin was not modified")
+            {
+                auto existing_content = require_expected(btu::common::read_file(dir.path() / u8"plugin.esp"));
                 CHECK(existing_content.empty());
             }
         }

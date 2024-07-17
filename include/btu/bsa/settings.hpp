@@ -86,6 +86,16 @@ static constexpr auto k_ba2_ext = u8".ba2";
 
 static constexpr auto k_archive_extensions = std::to_array<std::u8string_view>({k_bsa_ext, k_ba2_ext});
 
+enum class PluginLoadingMode
+{
+    Limited,  // Plugins only load archives "<plugin>[ - Suffix]" and "<plugin> - Textures".
+    Unlimited // Plugins load archives "<plugin>*".
+};
+
+NLOHMANN_JSON_SERIALIZE_ENUM(PluginLoadingMode,
+                             {{PluginLoadingMode::Limited, "limited"},
+                              {PluginLoadingMode::Unlimited, "unlimited"}});
+
 struct AllowedPath
 {
     static const inline auto k_root = std::u8string(u8"root");
@@ -116,6 +126,7 @@ struct Settings
     std::vector<std::u8string> plugin_extensions;
     std::optional<std::vector<std::byte>> dummy_plugin;
     std::u8string dummy_extension;
+    PluginLoadingMode dummy_plugin_loading_mode{};
 
     std::vector<AllowedPath> standard_files;
     std::vector<AllowedPath> texture_files;
@@ -144,16 +155,17 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
 
     static const Settings tes4_default_sets = [=] {
         Settings sets;
-        sets.game                = Game::TES4;
-        sets.max_size            = 2000ULL * megabyte;
-        sets.version             = ArchiveVersion::tes4;
-        sets.has_texture_version = false;
-        sets.texture_suffix      = std::nullopt;
-        sets.extension           = u8".bsa";
-        sets.plugin_extensions   = {u8".esm", u8".esp"};
-        sets.dummy_plugin        = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
-        sets.dummy_extension     = u8".esp";
-        sets.standard_files      = {
+        sets.game                      = Game::TES4;
+        sets.max_size                  = 2000ULL * megabyte;
+        sets.version                   = ArchiveVersion::tes4;
+        sets.has_texture_version       = false;
+        sets.texture_suffix            = std::nullopt;
+        sets.extension                 = u8".bsa";
+        sets.plugin_extensions         = {u8".esm", u8".esp"};
+        sets.dummy_plugin              = std::vector(std::begin(dummy::oblivion), std::end(dummy::oblivion));
+        sets.dummy_extension           = u8".esp";
+        sets.dummy_plugin_loading_mode = PluginLoadingMode::Unlimited;
+        sets.standard_files            = {
             {u8".nif", {u8"meshes"}, TES4ArchiveType::meshes},
             {u8".egm", {u8"meshes"}, TES4ArchiveType::meshes},
             {u8".egt", {u8"meshes"}, TES4ArchiveType::meshes},
@@ -191,15 +203,16 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
     }();
 
     static const Settings tes5_default_sets = [=] {
-        Settings sets            = tes4_default_sets;
-        sets.game                = Game::SSE;
-        sets.version             = ArchiveVersion::sse;
-        sets.has_texture_version = true;
-        sets.texture_suffix      = u8"Textures";
-        sets.extension           = u8".bsa";
-        sets.plugin_extensions   = {u8".esl", u8".esm", u8".esp"};
-        sets.dummy_plugin        = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
-        sets.standard_files      = {
+        Settings sets                  = tes4_default_sets;
+        sets.game                      = Game::SSE;
+        sets.version                   = ArchiveVersion::sse;
+        sets.has_texture_version       = true;
+        sets.texture_suffix            = u8"Textures";
+        sets.extension                 = u8".bsa";
+        sets.plugin_extensions         = {u8".esl", u8".esm", u8".esp"};
+        sets.dummy_plugin              = std::vector(std::begin(dummy::sse), std::end(dummy::sse));
+        sets.dummy_plugin_loading_mode = PluginLoadingMode::Limited;
+        sets.standard_files            = {
             AllowedPath{u8".bgem", {u8"materials"}},
             AllowedPath{u8".bgsm", {u8"materials"}},
             AllowedPath{u8".bto", {u8"meshes"}, TES4ArchiveType::meshes},
