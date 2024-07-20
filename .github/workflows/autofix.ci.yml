@@ -1,4 +1,4 @@
-name: Apply Formatting
+name: autofix.ci
 
 on:
   pull_request:
@@ -45,6 +45,4 @@ jobs:
       with:
         args: --in-place
 
-    - uses: stefanzweifel/git-auto-commit-action@v5
-      with:
-        commit_message: "style: apply formatting"
+    - uses: autofix-ci/action@dd55f44df8f7cdb7a6bf74c78677eb8acd40cd0a
