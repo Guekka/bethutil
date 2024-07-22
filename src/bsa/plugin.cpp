@@ -22,10 +22,10 @@ const auto k_suffix_separator = std::u8string(u8" - ");
     try
     {
         return flux::from_range(fs::directory_iterator(dir))
-            .filter([](const auto &f) { return f.is_regular_file(); })
             .filter([&sets](const auto &f) {
-                return common::contains(sets.plugin_extensions,
-                                        common::to_lower(f.path().extension().u8string()));
+                return f.is_regular_file()
+                       && common::contains(sets.plugin_extensions,
+                                           common::to_lower(f.path().extension().u8string()));
             })
             .map([](const auto &f) { return f.path(); })
             .to<std::vector>();
@@ -40,9 +40,9 @@ const auto k_suffix_separator = std::u8string(u8" - ");
 {
     const auto raw_suffixes = std::to_array({sets.suffix, sets.texture_suffix});
     return flux::ref(raw_suffixes)
-        // TODO: filter_map
-        .filter([](const auto &s) { return s.has_value(); })
-        .map([](const auto &s) { return k_suffix_separator + s.value(); })
+        .filter_map([](const auto &suffix) {
+            return suffix.has_value() ? std::optional{k_suffix_separator + suffix.value()} : std::nullopt;
+        })
         .to<std::vector>();
 }
 
@@ -211,10 +211,10 @@ auto list_archive(const Path &dir, const Settings &sets) noexcept -> std::vector
     try
     {
         std::vector<Path> archives = flux::from_range(fs::directory_iterator(dir))
-                                         .filter([](const auto &f) { return f.is_regular_file(); })
                                          .filter([&sets](const auto &f) {
-                                             return common::to_lower(f.path().extension().u8string())
-                                                    == sets.extension;
+                                             return f.is_regular_file()
+                                                    && common::to_lower(f.path().extension().u8string())
+                                                           == sets.extension;
                                          })
                                          .map([](const auto &f) { return f.path(); })
                                          .to<std::vector>();
