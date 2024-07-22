@@ -185,14 +185,12 @@ auto find_matching_paths_icase(const Path &directory,
                                         .to<std::unordered_map<std::u8string, Path>>();
 
     return flux::from(relative_lowercase_paths)
-        .map([&files_in_directory](const Path &path) -> std::optional<Path> {
+        .filter_map([&files_in_directory](const Path &path) -> std::optional<Path> {
             const auto lower_path = to_lower(path.u8string());
             if (const auto it = files_in_directory.find(lower_path); it != files_in_directory.end())
                 return it->second;
             return {};
         })
-        .filter([](const auto &path) { return path.has_value(); })
-        .map([](const auto &path) { return path.value(); })
         .to<std::vector<Path>>();
 #endif
 }

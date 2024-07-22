@@ -51,15 +51,12 @@ struct PackGroup
     constexpr std::array allowed_types = {FileTypes::Standard, FileTypes::Texture, FileTypes::Incompressible};
 
     auto packable_files = flux::from_range(fs::recursive_directory_iterator(dir))
-                              .filter([&](const auto &p) { return allow_path_pred(dir, p); })
                               .filter([&](const auto &p) {
-                                  return common::contains(allowed_types, get_filetype(p.path(), dir, sets));
+                                  // filter out empty files
+                                  return p.is_regular_file() && p.file_size() > 0 && allow_path_pred(dir, p)
+                                         && common::contains(allowed_types, get_filetype(p, dir, sets));
                               })
                               .map([](const auto &p) { return p.path(); })
-                              .filter([](const auto &p) {
-                                  // filter out empty files
-                                  return fs::is_regular_file(p) && fs::file_size(p) > 0;
-                              })
                               .to<std::vector>();
 
     // sort by size, largest first
