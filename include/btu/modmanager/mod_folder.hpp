@@ -82,7 +82,7 @@ public:
     using enum ModFolderIteratorBase::ArchiveTooLargeAction;
     using enum ModFolderIteratorBase::ArchiveTooLargeState;
 
-    explicit ModFolder(Path directory, bsa::Settings bsa_settings);
+    explicit ModFolder(Path directory, bsa::Settings bsa_settings, bool ignore_existing_archives = false);
 
     /// Get the size of the folder, including files in archives.
     /// Utility function, equivalent to iterate() and counting the files.
@@ -102,6 +102,7 @@ public:
 private:
     Path dir_;
     bsa::Settings bsa_settings_;
+    bool ignore_existing_archives_;
     common::ThreadPool thread_pool_;
 };
 } // namespace btu::modmanager
