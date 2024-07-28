@@ -85,6 +85,21 @@ TEST_CASE("ModFolder transform", "[src]")
     CHECK(btu::common::compare_directories(dir / "output", dir / "expected"));
 }
 
+TEST_CASE("ModFolder ignore existing", "[src]")
+{
+    const Path dir = "modfolder_ignore_existing";
+    // operate on copy
+    btu::fs::remove_all(dir / "output");
+    btu::fs::copy(dir / "input", dir / "output");
+
+    auto mf = btu::modmanager::ModFolder(dir / "output", btu::bsa::Settings::get(btu::Game::SSE), true);
+
+    Transformer transformer;
+    mf.transform(transformer);
+
+    CHECK(btu::common::compare_directories(dir / "output", dir / "expected"));
+}
+
 TEST_CASE("ModFolder size", "[src]")
 {
     const Path dir = "modfolder";
