@@ -16,9 +16,10 @@
 
 namespace btu::modmanager {
 
-ModFolder::ModFolder(Path directory, bsa::Settings bsa_settings)
+ModFolder::ModFolder(Path directory, bsa::Settings bsa_settings, bool ignore_existing_archives)
     : dir_(std::move(directory))
     , bsa_settings_(BTU_MOV(bsa_settings))
+    , ignore_existing_archives_(ignore_existing_archives)
     , thread_pool_(common::make_thread_pool())
 {
 }
@@ -273,6 +274,9 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
     {
         if (transformer.stop_requested())
             return;
+
+        if (is_arch(file_path) && ignore_existing_archives_)
+            continue;
 
         futs.push_back(thread_pool_.submit_task([this, &file_path, &is_arch, &transformer] {
             if (is_arch(file_path)) [[unlikely]]
