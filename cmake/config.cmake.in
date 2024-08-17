@@ -9,5 +9,6 @@ find_dependency("bc7enc")
 find_dependency("mpsc_channel")
 find_dependency("nlohmann_json")
 find_dependency("reproc++")
+find_dependency("crunch2")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")

@@ -20,7 +20,8 @@
     "reproc",
     "utf8h",
     "rsm-bsa",
-    "tl-expected"
+    "tl-expected",
+    "crunch2"
   ],
   "features": {
     "tests": {
