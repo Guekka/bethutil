@@ -11,7 +11,9 @@
 
 namespace btu::tex {
 class Texture;
+class CrunchTexture;
 
-using Result      = tl::expected<Texture, Error>;
-using ResultError = tl::expected<void, Error>;
+using Result       = tl::expected<Texture, Error>;
+using ResultCrunch = tl::expected<CrunchTexture, Error>;
+using ResultError  = tl::expected<void, Error>;
 } // namespace btu::tex

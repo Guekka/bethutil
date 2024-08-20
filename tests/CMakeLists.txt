@@ -25,7 +25,8 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/nif/utils.hpp"
     "${SOURCE_DIR}/tex/formats.cpp"
     "${SOURCE_DIR}/tex/functions.cpp"
-    "${SOURCE_DIR}/tex/optimize.cpp")
+    "${SOURCE_DIR}/tex/optimize.cpp"
+    "${SOURCE_DIR}/tex/crunch.cpp")
 
 if("${BETHUTIL_BUILD_EXAMPLES}")
   list(APPEND SOURCE_FILES)
@@ -84,6 +85,11 @@ acquire_test("nif_corrupted")
 acquire_test("read_file")
 acquire_test("nif_memory_io")
 acquire_test("tex_memory_io")
+acquire_test("crunch")
+acquire_test("crunch_resize")
+acquire_test("crunch_mipmaps")
+acquire_test("crunch_compress_dxt1")
+acquire_test("crunch_compress_dxt5")
 
 if("${BETHUTIL_BUILD_EXAMPLES}")
   target_include_directories(tests PRIVATE "${ROOT_DIR}/examples")

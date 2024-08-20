@@ -7,6 +7,7 @@
 
 #include "../utils.hpp"
 #include "btu/tex/compression_device.hpp"
+#include "btu/tex/crunch_texture.hpp"
 #include "btu/tex/dimension.hpp"
 #include "btu/tex/texture.hpp"
 
