@@ -93,6 +93,24 @@ auto CrunchTexture::get_texture_type() const noexcept -> const TextureType
     return guessed.value_or(TextureType::Diffuse);
 }
 
+auto CrunchTexture::get_format_as_dxgi() const noexcept -> const DXGI_FORMAT
+{
+    switch (tex_.get_format())
+    {
+        case PIXEL_FMT_DXT1:
+        case PIXEL_FMT_DXT1A: return DXGI_FORMAT_BC1_UNORM_SRGB;
+        case PIXEL_FMT_DXT2:
+        case PIXEL_FMT_DXT3: return DXGI_FORMAT_BC2_UNORM_SRGB;
+        case PIXEL_FMT_DXT4:
+        case PIXEL_FMT_DXT5: return DXGI_FORMAT_BC3_UNORM_SRGB;
+        case PIXEL_FMT_DXT5A: return DXGI_FORMAT_BC4_UNORM;
+        case PIXEL_FMT_3DC: return DXGI_FORMAT_BC5_UNORM;
+        case PIXEL_FMT_R8G8B8: return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+        case PIXEL_FMT_A8R8G8B8: return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+        default: return DXGI_FORMAT_UNKNOWN;
+    }
+}
+
 auto load_crunch(Path path) noexcept -> tl::expected<CrunchTexture, Error>
 {
     CrunchTexture tex;
