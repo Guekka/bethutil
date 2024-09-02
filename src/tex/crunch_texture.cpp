@@ -127,7 +127,7 @@ auto load_crunch(Path path) noexcept -> tl::expected<CrunchTexture, Error>
     {
         // Crunch saves loading errors in the texture object as a string.
         // Also it is being cleared in a weird fashion so not super helpful.
-        return tl::make_unexpected(error_from_hresult(E_UNEXPECTED));
+        return tl::make_unexpected(error_from_hresult(ERROR_READ_FAULT));
     }
 
     tex.set(std::move(tex_));
@@ -150,7 +150,7 @@ auto load_crunch(Path relative_path, std::span<std::byte> data) noexcept -> tl::
     {
         // Crunch saves loading errors in the texture object as a string.
         // Also it is being cleared in a weird fashion so not super helpful.
-        return tl::make_unexpected(error_from_hresult(E_UNEXPECTED));
+        return tl::make_unexpected(error_from_hresult(ERROR_READ_FAULT));
     }
 
     tex.set(std::move(tex_));
@@ -165,12 +165,12 @@ auto save(const CrunchTexture &tex, const Path &path) noexcept -> ResultError
     cfile_stream write_stream;
     if (!write_stream.open(filename.c_str(), cDataStreamWritable | cDataStreamSeekable))
     {
-        return tl::make_unexpected(error_from_hresult(E_UNEXPECTED));
+        return tl::make_unexpected(error_from_hresult(ERROR_WRITE_FAULT));
     }
     data_stream_serializer serializer(write_stream);
 
     if (!tex.get().write_dds(serializer))
-        return tl::make_unexpected(error_from_hresult(E_UNEXPECTED));
+        return tl::make_unexpected(error_from_hresult(ERROR_WRITE_FAULT));
     return {};
 }
 
@@ -180,7 +180,7 @@ auto save(const CrunchTexture &tex) noexcept -> tl::expected<std::vector<std::by
     data_stream_serializer serializer(out_stream);
 
     if (!tex.get().write_dds(serializer))
-        return tl::make_unexpected(error_from_hresult(E_UNEXPECTED));
+        return tl::make_unexpected(error_from_hresult(ERROR_WRITE_FAULT));
 
     auto buf = out_stream.get_buf();
     // NOLINTBEGIN(*pointer-arithmetic): needed for the conversion to work properly

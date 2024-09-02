@@ -36,7 +36,7 @@ auto resize(CrunchTexture &&file, Dimension dim) -> ResultCrunch
     const auto success = file.get().resize(dim.w, dim.h, res_params);
     if (!success)
     {
-        // TODO: Better error propagation.
+        // No error information is propagated from Crunch.
         return tl::make_unexpected(error_from_hresult(E_UNEXPECTED));
     }
 
@@ -55,7 +55,7 @@ auto generate_mipmaps(CrunchTexture &&file) -> ResultCrunch
     const auto success = file.get().generate_mipmaps(gen_params, true);
     if (!success)
     {
-        // TODO: Better error propagation.
+        // No error information is propagated from Crunch.
         return tl::make_unexpected(error_from_hresult(E_UNEXPECTED));
     }
 
@@ -72,7 +72,7 @@ auto convert(CrunchTexture &&file, DXGI_FORMAT format) -> ResultCrunch
         case DXGI_FORMAT_B8G8R8X8_UNORM: crunch_format = pixel_format::PIXEL_FMT_R8G8B8; break;
         case DXGI_FORMAT_B8G8R8A8_UNORM:
         case DXGI_FORMAT_R8G8B8A8_UNORM: crunch_format = pixel_format::PIXEL_FMT_A8R8G8B8; break;
-        default: return tl::make_unexpected(error_from_hresult(E_UNEXPECTED));
+        default: return tl::make_unexpected(error_from_hresult(ERROR_BAD_FORMAT));
     }
 
     // Default compression arguments.
@@ -90,7 +90,7 @@ auto convert(CrunchTexture &&file, DXGI_FORMAT format) -> ResultCrunch
     const auto success = file.get().convert(crunch_format, pack_params);
     if (!success)
     {
-        // TODO: Better error propagation.
+        // No error information is propagated from Crunch.
         return tl::make_unexpected(error_from_hresult(E_UNEXPECTED));
     }
 
