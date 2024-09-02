@@ -33,7 +33,9 @@ auto resize(CrunchTexture &&file, Dimension dim) -> ResultCrunch
 
     set_gamma_correction(res_params, file.get_texture_type());
 
-    const auto success = file.get().resize(dim.w, dim.h, res_params);
+    const auto success = file.get().resize(static_cast<crnlib::uint>(dim.w),
+                                           static_cast<crnlib::uint>(dim.h),
+                                           res_params);
     if (!success)
     {
         // No error information is propagated from Crunch.

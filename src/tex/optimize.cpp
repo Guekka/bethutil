@@ -53,7 +53,9 @@ auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) no
     return res;
 }
 
-auto optimize(CrunchTexture &&file, OptimizationSteps sets, CompressionDevice &dev) noexcept -> ResultCrunch
+auto optimize(CrunchTexture &&file,
+              OptimizationSteps sets,
+              [[maybe_unused]] CompressionDevice &dev) noexcept -> ResultCrunch
 {
     const auto must_decompress = file.get().is_packed() && (sets.resize || sets.mipmaps);
     const auto should_convert  = sets.convert || must_decompress;

@@ -143,7 +143,7 @@ auto load_crunch(Path relative_path, std::span<std::byte> data) noexcept -> tl::
     const auto load_path = tex.get_load_path().string();
 
     mipmapped_texture tex_;
-    dynamic_stream in_stream(data.data(), data.size(), load_path.c_str());
+    dynamic_stream in_stream(data.data(), static_cast<crnlib::uint>(data.size()), load_path.c_str());
     data_stream_serializer serializer(in_stream);
     const auto success = tex_.read_from_stream(serializer);
     if (!success)
