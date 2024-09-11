@@ -11,13 +11,15 @@ vcpkg_from_github(
   HEAD_REF
   master
   PATCHES
-  "fix_cmake.patch")
+        "fix_linux_compile.patch"
+        "fix_cmake.patch"
+)
 
 vcpkg_cmake_configure(SOURCE_PATH "${SOURCE_PATH}")
 
 vcpkg_cmake_install()
 vcpkg_copy_pdbs()
-vcpkg_cmake_config_fixup(CONFIG_PATH "lib/cmake/Crunch2")
+vcpkg_cmake_config_fixup(CONFIG_PATH "lib/cmake/crunch2")
 
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include
      ${CURRENT_PACKAGES_DIR}/debug/share)
@@ -29,5 +31,5 @@ endif()
 
 file(
   INSTALL "${SOURCE_PATH}/license.txt"
-  DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}"
+        DESTINATION "${CURRENT_PACKAGES_DIR}/share/crunch2"
   RENAME copyright)

@@ -12,7 +12,6 @@
 #include <crunch/crn_dynamic_stream.h>
 #include <crunch/crn_image.h>
 #include <crunch/crn_mipmapped_texture.h>
-#include <winerror.h>
 
 #include <mutex>
 
@@ -84,7 +83,7 @@ void CrunchTexture::set_load_path(Path path) noexcept
     load_path_ = std::move(path);
 }
 
-auto CrunchTexture::get_texture_type() const noexcept -> const TextureType
+auto CrunchTexture::get_texture_type() const noexcept -> TextureType
 {
     const auto filename = load_path_.filename().u8string();
 
@@ -93,7 +92,7 @@ auto CrunchTexture::get_texture_type() const noexcept -> const TextureType
     return guessed.value_or(TextureType::Diffuse);
 }
 
-auto CrunchTexture::get_format_as_dxgi() const noexcept -> const DXGI_FORMAT
+auto CrunchTexture::get_format_as_dxgi() const noexcept -> DXGI_FORMAT
 {
     switch (tex_.get_format())
     {
@@ -127,7 +126,7 @@ auto load_crunch(Path path) noexcept -> tl::expected<CrunchTexture, Error>
     {
         // Crunch saves loading errors in the texture object as a string.
         // Also it is being cleared in a weird fashion so not super helpful.
-        return tl::make_unexpected(error_from_hresult(ERROR_READ_FAULT));
+        return tl::make_unexpected(Error(TextureErr::ReadFailure));
     }
 
     tex.set(std::move(tex_));
@@ -150,7 +149,7 @@ auto load_crunch(Path relative_path, std::span<std::byte> data) noexcept -> tl::
     {
         // Crunch saves loading errors in the texture object as a string.
         // Also it is being cleared in a weird fashion so not super helpful.
-        return tl::make_unexpected(error_from_hresult(ERROR_READ_FAULT));
+        return tl::make_unexpected(Error(TextureErr::ReadFailure));
     }
 
     tex.set(std::move(tex_));
@@ -165,12 +164,12 @@ auto save(const CrunchTexture &tex, const Path &path) noexcept -> ResultError
     cfile_stream write_stream;
     if (!write_stream.open(filename.c_str(), cDataStreamWritable | cDataStreamSeekable))
     {
-        return tl::make_unexpected(error_from_hresult(ERROR_WRITE_FAULT));
+        return tl::make_unexpected(Error(TextureErr::WriteFailure));
     }
     data_stream_serializer serializer(write_stream);
 
     if (!tex.get().write_dds(serializer))
-        return tl::make_unexpected(error_from_hresult(ERROR_WRITE_FAULT));
+        return tl::make_unexpected(Error(TextureErr::WriteFailure));
     return {};
 }
 
@@ -180,7 +179,7 @@ auto save(const CrunchTexture &tex) noexcept -> tl::expected<std::vector<std::by
     data_stream_serializer serializer(out_stream);
 
     if (!tex.get().write_dds(serializer))
-        return tl::make_unexpected(error_from_hresult(ERROR_WRITE_FAULT));
+        return tl::make_unexpected(Error(TextureErr::WriteFailure));
 
     auto buf = out_stream.get_buf();
     // NOLINTBEGIN(*pointer-arithmetic): needed for the conversion to work properly
