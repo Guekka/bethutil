@@ -124,11 +124,7 @@ auto load(Path relative_path, std::span<std::byte> data) noexcept -> tl::expecte
     if (FAILED(hr))
     {
         // Maybe it's a TGA then?
-        const auto hr2 = LoadFromTGAMemory(data.data(),
-                                           data.size(),
-                                           DirectX::TGA_FLAGS_NONE,
-                                           &info,
-                                           tex.get());
+        const auto hr2 = LoadFromTGAMemory(data.data(), data.size(), DirectX::TGA_FLAGS_NONE, &info, tex.get());
         if (FAILED(hr2))
             return tl::make_unexpected(error_from_hresult(hr)); // preserve original error
     }
