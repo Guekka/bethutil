@@ -40,13 +40,13 @@ auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) no
     {
         auto out = sets.best_format;
         res      = std::move(res)
-                   // // safety check: make sure we don't remove the alpha
-                   .and_then([&](Texture &&tex) -> Result {
-                       if (!DirectX::HasAlpha(out) && !tex.get().IsAlphaAllOpaque())
-                           return tl::make_unexpected(Error(TextureErr::BadInput));
-                       return std::move(tex);
-                   })
-                   .and_then([&](Texture &&tex) { return convert(std::move(tex), out, dev); });
+                  // // safety check: make sure we don't remove the alpha
+                  .and_then([&](Texture &&tex) -> Result {
+                      if (!DirectX::HasAlpha(out) && !tex.get().IsAlphaAllOpaque())
+                          return tl::make_unexpected(Error(TextureErr::BadInput));
+                      return std::move(tex);
+                  })
+                  .and_then([&](Texture &&tex) { return convert(std::move(tex), out, dev); });
     }
 
     return res;
@@ -169,9 +169,9 @@ template<class Tex>
 
     return guess_best_format(info.format,
                              sets.output_format,
-                             GuessBestFormatArgs{.opaque_alpha = has_opaque_alpha(tex),
+                             GuessBestFormatArgs{.opaque_alpha     = has_opaque_alpha(tex),
                                                  .allow_compressed = sets.compress && can_be_compressed(file),
-                                                 .force_alpha = force_alpha});
+                                                 .force_alpha      = force_alpha});
 }
 
 [[nodiscard]] static auto best_output_format(const CrunchTexture &file,
@@ -182,10 +182,9 @@ template<class Tex>
 
     return guess_best_format(file.get_format_as_dxgi(),
                              sets.output_format,
-                             GuessBestFormatArgs{.opaque_alpha = !tex.has_alpha(),
+                             GuessBestFormatArgs{.opaque_alpha     = !tex.has_alpha(),
                                                  .allow_compressed = sets.compress
-                                                                     && can_be_compressed<
-                                                                         CrunchTexture>(file),
+                                                                     && can_be_compressed<CrunchTexture>(file),
                                                  .force_alpha = force_alpha});
 }
 

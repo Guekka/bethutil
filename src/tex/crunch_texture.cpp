@@ -186,8 +186,7 @@ auto save(const CrunchTexture &tex) noexcept -> tl::expected<std::vector<std::by
     auto buf = out_stream.get_buf();
     // NOLINTBEGIN(*pointer-arithmetic): needed for the conversion to work properly
     return std::vector(reinterpret_cast<std::byte *>(buf.get_ptr()),
-                       reinterpret_cast<std::byte *>(buf.get_ptr() + buf.size_in_bytes())
-        );
+                       reinterpret_cast<std::byte *>(buf.get_ptr() + buf.size_in_bytes()));
     // NOLINTEND(*pointer-arithmetic)
 }
 } // namespace btu::tex
