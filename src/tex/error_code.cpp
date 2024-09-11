@@ -20,6 +20,10 @@ auto TextureErrCategory::message(int ev) const -> std::string
     {
         case TextureErr::Success: return "no error";
         case TextureErr::Unknown: return "default error";
+        case TextureErr::BadInput: return "invalid input";
+        case TextureErr::MemoryAllocation: return "memory allocation failure";
+        case TextureErr::WriteFailure: return "write failure";
+        case TextureErr::ReadFailure: return "read failure";
         default: return "(unrecognized error)";
     }
 }
