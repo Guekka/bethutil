@@ -74,7 +74,7 @@ auto convert(CrunchTexture &&file, DXGI_FORMAT format) -> ResultCrunch
         case DXGI_FORMAT_B8G8R8X8_UNORM: crunch_format = pixel_format::PIXEL_FMT_R8G8B8; break;
         case DXGI_FORMAT_B8G8R8A8_UNORM:
         case DXGI_FORMAT_R8G8B8A8_UNORM: crunch_format = pixel_format::PIXEL_FMT_A8R8G8B8; break;
-        default: return tl::make_unexpected(error_from_hresult(ERROR_BAD_FORMAT));
+        default: return tl::make_unexpected(Error(TextureErr::BadInput));
     }
 
     // Default compression arguments.

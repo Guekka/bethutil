@@ -9,7 +9,7 @@
 #include "btu/tex/detail/common.hpp"
 
 #include <crunch/crn_mipmapped_texture.h>
-#include <dxgiformat.h>
+#include <directx/dxgiformat.h>
 
 #include <filesystem>
 #include <span>
@@ -40,8 +40,8 @@ public:
     [[nodiscard]] auto get_load_path() const noexcept -> const Path &;
     void set_load_path(Path path) noexcept;
 
-    [[nodiscard]] auto get_texture_type() const noexcept -> const TextureType;
-    [[nodiscard]] auto get_format_as_dxgi() const noexcept -> const DXGI_FORMAT;
+    [[nodiscard]] auto get_texture_type() const noexcept -> TextureType;
+    [[nodiscard]] auto get_format_as_dxgi() const noexcept -> DXGI_FORMAT;
 
     [[nodiscard]] auto operator==(const CrunchTexture &) const noexcept -> bool = default;
 
