@@ -83,7 +83,7 @@ auto Texture::get_images() const noexcept -> std::span<const Image>
 auto Texture::get_dimension() const noexcept -> Dimension
 {
     const auto info = get().GetMetadata();
-    return {info.width, info.height};
+    return Dimension{.w = info.width, .h = info.height};
 }
 
 auto Texture::get_load_path() const noexcept -> const Path &
@@ -124,7 +124,11 @@ auto load(Path relative_path, std::span<std::byte> data) noexcept -> tl::expecte
     if (FAILED(hr))
     {
         // Maybe it's a TGA then?
-        const auto hr2 = LoadFromTGAMemory(data.data(), data.size(), DirectX::TGA_FLAGS_NONE, &info, tex.get());
+        const auto hr2 = LoadFromTGAMemory(data.data(),
+                                           data.size(),
+                                           DirectX::TGA_FLAGS_NONE,
+                                           &info,
+                                           tex.get());
         if (FAILED(hr2))
             return tl::make_unexpected(error_from_hresult(hr)); // preserve original error
     }
@@ -159,5 +163,4 @@ auto save(const Texture &tex) noexcept -> tl::expected<std::vector<std::byte>, E
                        static_cast<std::byte *>(blob.GetBufferPointer()) + blob.GetBufferSize());
     // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
-
 } // namespace btu::tex

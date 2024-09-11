@@ -19,8 +19,8 @@ namespace crnlib {
 auto operator==(const image_u8 &lhs, const image_u8 &rhs) noexcept -> bool
 {
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    auto *lhs_end = lhs.get_ptr() + lhs.get_total();
-    auto *rhs_end = rhs.get_ptr() + rhs.get_total();
+    const auto *lhs_end = lhs.get_ptr() + lhs.get_total();
+    const auto *rhs_end = rhs.get_ptr() + rhs.get_total();
     // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     return std::equal(lhs.get_ptr(), lhs_end, rhs.get_ptr(), rhs_end);
 }
@@ -34,14 +34,15 @@ auto operator==(const mipmapped_texture &lhs, const mipmapped_texture &rhs) noex
     if (!first)
         return false;
 
-    image_u8 lhs_temp, rhs_temp;
     for (uint face = 0; face < lhs.get_num_faces(); face++)
     {
         for (uint level = 0; level < lhs.get_num_levels(); level++)
         {
-            image_u8 *lhs_img = lhs.get_level_image(face, level, lhs_temp);
-            image_u8 *rhs_img = rhs.get_level_image(face, level, rhs_temp);
-            if (*lhs_img != *rhs_img)
+            image_u8 lhs_img;
+            image_u8 rhs_img;
+            lhs.get_level_image(face, level, lhs_img);
+            rhs.get_level_image(face, level, rhs_img);
+            if (lhs_img != rhs_img)
                 return false;
         }
     }
@@ -53,9 +54,9 @@ auto operator==(const mipmapped_texture &lhs, const mipmapped_texture &rhs) noex
 namespace btu::tex {
 using namespace crnlib;
 
-void CrunchTexture::set(mipmapped_texture &&tex) noexcept
+void CrunchTexture::set(const mipmapped_texture &tex) noexcept
 {
-    tex_ = std::move(tex);
+    tex_ = tex;
 }
 
 auto CrunchTexture::get() noexcept -> mipmapped_texture &
@@ -70,7 +71,7 @@ auto CrunchTexture::get() const noexcept -> const mipmapped_texture &
 
 auto CrunchTexture::get_dimension() const noexcept -> Dimension
 {
-    return {tex_.get_width(), tex_.get_height()};
+    return {.w = tex_.get_width(), .h = tex_.get_height()};
 }
 
 auto CrunchTexture::get_load_path() const noexcept -> const Path &
@@ -115,44 +116,45 @@ auto load_crunch(Path path) noexcept -> tl::expected<CrunchTexture, Error>
     CrunchTexture tex;
     tex.set_load_path(std::move(path));
 
-    mipmapped_texture tex_;
-
     const auto load_path = tex.get_load_path().string();
 
-    texture_file_types::format src_file_format = texture_file_types::determine_file_format(load_path.c_str());
+    const texture_file_types::format src_file_format = texture_file_types::determine_file_format(
+        load_path.c_str());
 
-    const auto success = tex_.read_from_file(load_path.c_str(), src_file_format);
+    mipmapped_texture mipmapped_tex;
+    const bool success = mipmapped_tex.read_from_file(load_path.c_str(), src_file_format);
     if (!success)
     {
         // Crunch saves loading errors in the texture object as a string.
-        // Also it is being cleared in a weird fashion so not super helpful.
+        // Also, it is being cleared in a weird fashion so not super helpful.
         return tl::make_unexpected(Error(TextureErr::ReadFailure));
     }
 
-    tex.set(std::move(tex_));
+    tex.set(mipmapped_tex);
 
     return tex;
 }
 
-auto load_crunch(Path relative_path, std::span<std::byte> data) noexcept -> tl::expected<CrunchTexture, Error>
+auto load_crunch(Path relative_path,
+                 const std::span<const std::byte> data) noexcept -> tl::expected<CrunchTexture, Error>
 {
     CrunchTexture tex;
     tex.set_load_path(std::move(relative_path));
 
     const auto load_path = tex.get_load_path().string();
 
-    mipmapped_texture tex_;
-    dynamic_stream in_stream(data.data(), static_cast<crnlib::uint>(data.size()), load_path.c_str());
+    mipmapped_texture mipmapped_tex;
+    dynamic_stream in_stream(data.data(), static_cast<uint>(data.size()), load_path.c_str());
     data_stream_serializer serializer(in_stream);
-    const auto success = tex_.read_from_stream(serializer);
+    const auto success = mipmapped_tex.read_from_stream(serializer);
     if (!success)
     {
         // Crunch saves loading errors in the texture object as a string.
-        // Also it is being cleared in a weird fashion so not super helpful.
+        // Also, it is being cleared in a weird fashion so not super helpful.
         return tl::make_unexpected(Error(TextureErr::ReadFailure));
     }
 
-    tex.set(std::move(tex_));
+    tex.set(mipmapped_tex);
 
     return tex;
 }
@@ -183,9 +185,9 @@ auto save(const CrunchTexture &tex) noexcept -> tl::expected<std::vector<std::by
 
     auto buf = out_stream.get_buf();
     // NOLINTBEGIN(*pointer-arithmetic): needed for the conversion to work properly
-    return std::vector(static_cast<std::byte *>(static_cast<void *>(buf.get_ptr())),
-                       static_cast<std::byte *>(static_cast<void *>(buf.get_ptr())) + buf.size_in_bytes());
+    return std::vector(reinterpret_cast<std::byte *>(buf.get_ptr()),
+                       reinterpret_cast<std::byte *>(buf.get_ptr() + buf.size_in_bytes())
+        );
     // NOLINTEND(*pointer-arithmetic)
 }
-
 } // namespace btu::tex
