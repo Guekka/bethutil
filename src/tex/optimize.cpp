@@ -14,7 +14,6 @@
 #include <btu/tex/dxtex.hpp>
 
 namespace btu::tex {
-
 auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) noexcept -> Result
 {
     const auto &info = file.get().GetMetadata();
@@ -41,13 +40,13 @@ auto optimize(Texture &&file, OptimizationSteps sets, CompressionDevice &dev) no
     {
         auto out = sets.best_format;
         res      = std::move(res)
-                  // // safety check: make sure we don't remove the alpha
-                  .and_then([&](Texture &&tex) -> Result {
-                      if (!DirectX::HasAlpha(out) && !tex.get().IsAlphaAllOpaque())
-                          return tl::make_unexpected(Error(TextureErr::BadInput));
-                      return std::move(tex);
-                  })
-                  .and_then([&](Texture &&tex) { return convert(std::move(tex), out, dev); });
+                   // // safety check: make sure we don't remove the alpha
+                   .and_then([&](Texture &&tex) -> Result {
+                       if (!DirectX::HasAlpha(out) && !tex.get().IsAlphaAllOpaque())
+                           return tl::make_unexpected(Error(TextureErr::BadInput));
+                       return std::move(tex);
+                   })
+                   .and_then([&](Texture &&tex) { return convert(std::move(tex), out, dev); });
     }
 
     return res;
@@ -77,7 +76,7 @@ auto optimize(CrunchTexture &&file,
 /// SSE landscape textures uses alpha channel as specularity
 /// Textures with opaque alpha are thus rendered shiny
 /// To fix this, alpha has to be made transparent
-auto transparent_alpha_required(const Texture &file, const Settings &sets) -> bool
+[[nodiscard]] static auto transparent_alpha_required(const Texture &file, const Settings &sets) -> bool
 {
     const auto &tex         = file.get();
     const auto path         = canonize_path(file.get_load_path());
@@ -88,7 +87,7 @@ auto transparent_alpha_required(const Texture &file, const Settings &sets) -> bo
     return tex.IsAlphaAllOpaque();
 }
 
-[[nodiscard]] auto is_bad_cubemap(const TexMetadata &info) noexcept -> bool
+[[nodiscard]] static auto is_bad_cubemap(const TexMetadata &info) noexcept -> bool
 {
     const bool is_cubemap   = info.IsCubemap();
     const bool uncompressed = !DirectX::IsCompressed(info.format);
@@ -100,7 +99,7 @@ auto transparent_alpha_required(const Texture &file, const Settings &sets) -> bo
     return is_cubemap && uncompressed && bad_alpha;
 }
 
-[[nodiscard]] auto has_opaque_alpha(const ScratchImage &tex) noexcept -> bool
+[[nodiscard]] static auto has_opaque_alpha(const ScratchImage &tex) noexcept -> bool
 {
     using enum DirectX::TEX_ALPHA_MODE;
 
@@ -110,7 +109,7 @@ auto transparent_alpha_required(const Texture &file, const Settings &sets) -> bo
 };
 
 template<class Tex>
-[[nodiscard]] auto can_be_compressed(const Tex &file) noexcept -> bool
+[[nodiscard]] static auto can_be_compressed(const Tex &file) noexcept -> bool
 {
     const Dimension dim  = file.get_dimension();
     const bool too_small = dim.w < 4 || dim.h < 4;
@@ -120,13 +119,20 @@ template<class Tex>
 }
 
 template<class Tex>
-[[nodiscard]] auto is_tga(const Tex &file) noexcept -> bool
+[[nodiscard]] static auto is_tga(const Tex &file) noexcept -> bool
 {
-    const auto ext = file.get_load_path().extension();
-    return str_compare(ext.u8string(), u8".tga", common::CaseSensitive::No);
+    try
+    {
+        const auto ext = file.get_load_path().extension();
+        return str_compare(ext.u8string(), u8".tga", common::CaseSensitive::No);
+    }
+    catch (const std::exception &)
+    {
+        return false;
+    }
 }
 
-[[nodiscard]] auto conversion_required(const Texture &file, const Settings &sets) noexcept -> bool
+[[nodiscard]] static auto conversion_required(const Texture &file, const Settings &sets) noexcept -> bool
 {
     const auto &info = file.get().GetMetadata();
 
@@ -139,45 +145,47 @@ template<class Tex>
     return bad || is_tga(file);
 }
 
-[[nodiscard]] auto target_dimensions(const Dimension dim, const Settings &sets) -> std::optional<Dimension>
+[[nodiscard]] static auto target_dimensions(const Dimension dim,
+                                            const Settings &sets) -> std::optional<Dimension>
 {
-    std::optional<Dimension> target_dim
-        = std::visit(common::Overload{
-                         [](std::monostate) -> std::optional<Dimension> { return {}; },
-                         [&](util::ResizeRatio r) { return std::optional(compute_resize_dimension(dim, r)); },
-                         [&](Dimension target) {
-                             return std::optional(util::compute_resize_dimension(dim, target));
-                         },
-                     },
-                     sets.resize);
-    return target_dim;
+    return std::visit(common::Overload{
+                          [](std::monostate) -> std::optional<Dimension> { return {}; },
+                          [&](const util::ResizeRatio &r) {
+                              return std::optional(compute_resize_dimension(dim, r));
+                          },
+                          [&](const Dimension target) {
+                              return std::optional(util::compute_resize_dimension(dim, target));
+                          },
+                      },
+                      sets.resize);
 }
 
-[[nodiscard]] auto best_output_format(const Texture &file,
-                                      const Settings &sets,
-                                      bool force_alpha) noexcept -> DXGI_FORMAT
+[[nodiscard]] static auto best_output_format(const Texture &file,
+                                             const Settings &sets,
+                                             bool force_alpha) noexcept -> DXGI_FORMAT
 {
     const auto &tex  = file.get();
     const auto &info = tex.GetMetadata();
 
     return guess_best_format(info.format,
                              sets.output_format,
-                             GuessBestFormatArgs{.opaque_alpha     = has_opaque_alpha(tex),
+                             GuessBestFormatArgs{.opaque_alpha = has_opaque_alpha(tex),
                                                  .allow_compressed = sets.compress && can_be_compressed(file),
-                                                 .force_alpha      = force_alpha});
+                                                 .force_alpha = force_alpha});
 }
 
-[[nodiscard]] auto best_output_format(const CrunchTexture &file,
-                                      const Settings &sets,
-                                      bool force_alpha) noexcept -> DXGI_FORMAT
+[[nodiscard]] static auto best_output_format(const CrunchTexture &file,
+                                             const Settings &sets,
+                                             bool force_alpha) noexcept -> DXGI_FORMAT
 {
     const auto &tex = file.get();
 
     return guess_best_format(file.get_format_as_dxgi(),
                              sets.output_format,
-                             GuessBestFormatArgs{.opaque_alpha     = !tex.has_alpha(),
+                             GuessBestFormatArgs{.opaque_alpha = !tex.has_alpha(),
                                                  .allow_compressed = sets.compress
-                                                                     && can_be_compressed<CrunchTexture>(file),
+                                                                     && can_be_compressed<
+                                                                         CrunchTexture>(file),
                                                  .force_alpha = force_alpha});
 }
 
@@ -195,7 +203,7 @@ auto compute_optimization_steps(const Texture &file, const Settings &sets) noexc
     if (sets.compress && !DirectX::IsCompressed(info.format))
         res.convert = true;
 
-    const auto dim = Dimension{info.width, info.height};
+    const auto dim = Dimension{.w = info.width, .h = info.height};
 
     const std::optional<Dimension> target_dim = target_dimensions(dim, sets);
     if (target_dim.has_value() && dim != target_dim.value())
@@ -242,7 +250,7 @@ auto compute_optimization_steps(const CrunchTexture &file, const Settings &sets)
     if (sets.compress && !tex.is_packed())
         res.convert = true;
 
-    res.best_format = best_output_format(file, sets, false);
+    res.best_format = best_output_format(file, sets, /*force_alpha=*/false);
 
     return res;
 }
@@ -252,23 +260,23 @@ auto Settings::get(Game game) noexcept -> const Settings &
 {
     static auto tes3_sets = [&] {
         return Settings{
-            .game                 = Game::TES3,
-            .compress             = false,
-            .resize               = {},
-            .mipmaps              = true,
+            .game = Game::TES3,
+            .compress = false,
+            .resize = {},
+            .mipmaps = true,
             .use_format_whitelist = true,
-            .allowed_formats      = {
+            .allowed_formats = {
                 DXGI_FORMAT_BC3_UNORM,
                 DXGI_FORMAT_BC1_UNORM,
                 DXGI_FORMAT_R8G8B8A8_UNORM,
                 DXGI_FORMAT_B8G8R8A8_UNORM,
                 DXGI_FORMAT_B8G8R8X8_UNORM,
             }, // Older titles only support DXT1-DXT5 compression.
-            .output_format        = {.uncompressed               = DXGI_FORMAT_B8G8R8A8_UNORM,
-                                     .uncompressed_without_alpha = DXGI_FORMAT_B8G8R8X8_UNORM,
-                                     .compressed                 = DXGI_FORMAT_BC3_UNORM,
-                                     .compressed_without_alpha   = DXGI_FORMAT_BC1_UNORM},
-            .landscape_textures   = {}, // Unknown
+            .output_format = {.uncompressed = DXGI_FORMAT_B8G8R8A8_UNORM,
+                              .uncompressed_without_alpha = DXGI_FORMAT_B8G8R8X8_UNORM,
+                              .compressed = DXGI_FORMAT_BC3_UNORM,
+                              .compressed_without_alpha = DXGI_FORMAT_BC1_UNORM},
+            .landscape_textures = {}, // Unknown
         };
     }();
 
@@ -347,5 +355,4 @@ auto Settings::get(Game game) noexcept -> const Settings &
     }
     return tes3_sets;
 }
-
 } // namespace btu::tex

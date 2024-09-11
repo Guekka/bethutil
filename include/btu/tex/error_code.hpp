@@ -16,7 +16,6 @@ enum class TextureErr : std::uint8_t
     MemoryAllocation,
     WriteFailure,
     ReadFailure,
-
 };
 } // namespace btu::tex
 

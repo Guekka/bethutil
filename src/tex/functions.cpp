@@ -36,13 +36,20 @@ auto make_transparent_alpha(Texture &&file) -> Result
         const auto transparent = DirectX::XMVectorSet(0, 0, 0, 0);
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         const auto *end = in_pixels + width;
-        std::transform(in_pixels, end, out_pixels, [&](auto pix) {
-            return XMVectorSelect(transparent, pix, DirectX::g_XMSelect1110);
-        });
+        std::transform(in_pixels,
+                       end,
+                       out_pixels,
+                       [&](auto pix) {
+                           return XMVectorSelect(transparent, pix, DirectX::g_XMSelect1110);
+                       });
     };
 
     ScratchImage timage;
-    const auto hr = TransformImage(tex.GetImages(), tex.GetImageCount(), tex.GetMetadata(), transform, timage);
+    const auto hr = TransformImage(tex.GetImages(),
+                                   tex.GetImageCount(),
+                                   tex.GetMetadata(),
+                                   transform,
+                                   timage);
 
     if (FAILED(hr))
         return tl::make_unexpected(error_from_hresult(hr));
@@ -51,10 +58,10 @@ auto make_transparent_alpha(Texture &&file) -> Result
     return std::move(file);
 }
 
-auto convert_uncompressed(const ScratchImage &image,
-                          ScratchImage &timage,
-                          DXGI_FORMAT format,
-                          [[maybe_unused]] CompressionDevice &dummy) -> HRESULT
+static auto convert_uncompressed(const ScratchImage &image,
+                                 ScratchImage &timage,
+                                 DXGI_FORMAT format,
+                                 [[maybe_unused]] CompressionDevice &dummy) -> HRESULT
 {
     const auto *const img = image.GetImages();
     if (img == nullptr)
@@ -73,13 +80,17 @@ auto convert_uncompressed(const ScratchImage &image,
 // The reason for this to be separated in another file is that both libraries define DXGI_FORMAT
 // So there's a conflict
 // Also, we use another library because DirectXTex BC7 CPU encoder is unbearably slow
-auto convert_bc7(const uint8_t *source, uint8_t *dest, uint32_t width, uint32_t height, size_t slice_pitch)
+auto convert_bc7(const uint8_t *source,
+                 uint8_t *dest,
+                 uint32_t width,
+                 uint32_t height,
+                 size_t slice_pitch)
     -> tl::expected<void, Error>;
 
-auto convert_compressed(const ScratchImage &image,
-                        ScratchImage &timage,
-                        DXGI_FORMAT format,
-                        [[maybe_unused]] CompressionDevice &dev) -> HRESULT
+static auto convert_compressed(const ScratchImage &image,
+                               ScratchImage &timage,
+                               DXGI_FORMAT format,
+                               [[maybe_unused]] CompressionDevice &dev) -> HRESULT
 {
     const auto *const img = image.GetImages();
     if (img == nullptr)
@@ -125,14 +136,16 @@ auto convert_compressed(const ScratchImage &image,
 
         for (size_t i = 0; i < image.GetImageCount(); ++i)
         {
-            const auto &simg = image.GetImages()[i]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            const auto &timg = timage.GetImages()[i]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            const auto &simg = image.GetImages()[i];
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            const auto &timg = timage.GetImages()[i];
 
-            auto res = convert_bc7(simg.pixels,
-                                   timg.pixels,
-                                   static_cast<uint32_t>(simg.width),
-                                   static_cast<uint32_t>(simg.height),
-                                   simg.slicePitch);
+            const auto res = convert_bc7(simg.pixels,
+                                         timg.pixels,
+                                         static_cast<uint32_t>(simg.width),
+                                         static_cast<uint32_t>(simg.height),
+                                         simg.slicePitch);
             if (!res)
                 return E_FAIL;
         }
@@ -177,7 +190,7 @@ auto convert(Texture &&file, DXGI_FORMAT format, CompressionDevice &dev) -> Resu
     return std::move(file);
 }
 
-auto prepare_generate_mipmaps(Texture &&file) -> Result
+static auto prepare_generate_mipmaps(Texture &&file) -> Result
 {
     const auto &tex = file.get();
     // Mips generation only works on a single base image, so strip off existing mip levels
@@ -205,11 +218,11 @@ auto prepare_generate_mipmaps(Texture &&file) -> Result
     return std::move(file);
 }
 
-auto generate_mipmaps_impl(Texture &&file) -> Result
+static auto generate_mipmaps_impl(Texture &&file) -> Result
 {
     const auto &tex   = file.get();
     const auto &info  = tex.GetMetadata();
-    const size_t mips = optimal_mip_count({info.width, info.height});
+    const size_t mips = optimal_mip_count({.w = info.width, .h = info.height});
 
     ScratchImage timage;
     const auto hr = GenerateMipMaps(tex.GetImages(),
@@ -249,5 +262,4 @@ auto resize(Texture &&file, Dimension dim) -> Result
     file.set(std::move(timage));
     return std::move(file);
 }
-
 } // namespace btu::tex
