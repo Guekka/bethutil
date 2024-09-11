@@ -24,8 +24,7 @@ static void set_gamma_correction(mipmapped_texture::resample_params &params, con
     }
 }
 
-auto resize(CrunchTexture &&file,
-            const Dimension dim) -> ResultCrunch
+auto resize(CrunchTexture &&file, const Dimension dim) -> ResultCrunch
 {
     // Resizes the input texture. If compressed, automatically decompresses it. Removes mipmaps.
     mipmapped_texture::resample_params res_params;
@@ -64,21 +63,16 @@ auto generate_mipmaps(CrunchTexture &&file) -> ResultCrunch
     return std::move(file);
 }
 
-auto convert(CrunchTexture &&file,
-             const DXGI_FORMAT format) -> ResultCrunch
+auto convert(CrunchTexture &&file, const DXGI_FORMAT format) -> ResultCrunch
 {
     pixel_format crunch_format{};
     switch (format)
     {
-        case DXGI_FORMAT_BC1_UNORM: crunch_format = pixel_format::PIXEL_FMT_DXT1;
-            break;
-        case DXGI_FORMAT_BC3_UNORM: crunch_format = pixel_format::PIXEL_FMT_DXT5;
-            break;
-        case DXGI_FORMAT_B8G8R8X8_UNORM: crunch_format = pixel_format::PIXEL_FMT_R8G8B8;
-            break;
+        case DXGI_FORMAT_BC1_UNORM: crunch_format = pixel_format::PIXEL_FMT_DXT1; break;
+        case DXGI_FORMAT_BC3_UNORM: crunch_format = pixel_format::PIXEL_FMT_DXT5; break;
+        case DXGI_FORMAT_B8G8R8X8_UNORM: crunch_format = pixel_format::PIXEL_FMT_R8G8B8; break;
         case DXGI_FORMAT_B8G8R8A8_UNORM:
-        case DXGI_FORMAT_R8G8B8A8_UNORM: crunch_format = pixel_format::PIXEL_FMT_A8R8G8B8;
-            break;
+        case DXGI_FORMAT_R8G8B8A8_UNORM: crunch_format = pixel_format::PIXEL_FMT_A8R8G8B8; break;
         default: return tl::make_unexpected(Error(TextureErr::BadInput));
     }
 

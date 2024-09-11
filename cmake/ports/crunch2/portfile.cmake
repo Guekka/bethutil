@@ -11,9 +11,8 @@ vcpkg_from_github(
   HEAD_REF
   master
   PATCHES
-        "fix_linux_compile.patch"
-        "fix_cmake.patch"
-)
+  "fix_linux_compile.patch"
+  "fix_cmake.patch")
 
 vcpkg_cmake_configure(SOURCE_PATH "${SOURCE_PATH}")
 
@@ -31,5 +30,5 @@ endif()
 
 file(
   INSTALL "${SOURCE_PATH}/license.txt"
-        DESTINATION "${CURRENT_PACKAGES_DIR}/share/crunch2"
+  DESTINATION "${CURRENT_PACKAGES_DIR}/share/crunch2"
   RENAME copyright)
