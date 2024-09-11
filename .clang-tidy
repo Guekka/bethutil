@@ -13,6 +13,7 @@
 # - misc-include-cleaner: good idea but too much bother in practice
 # - misc-non-private-member-variables-in-classes: I like using structs
 # - misc-use-anonymous-namespace: doctest macros emit a warning with this check
+# - misc-use-internal-linkage: too many false positives in my experience
 # - readability-braces-around-statements: Same as above
 # - readability-identifier-length: Who decided that 1 letter variable names are bad? It depends on the context
 # - readability-magic-numbers: Same as above
@@ -33,6 +34,7 @@ Checks: >-
   -misc-include-cleaner,
   -misc-non-private-member-variables-in-classes,
   -misc-use-anonymous-namespace,
+  -misc-use-internal-linkage,
   -readability-braces-around-statements, 
   -readability-identifier-length, 
   -readability-magic-numbers, 

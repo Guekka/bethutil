@@ -14,47 +14,48 @@
 #include <filesystem>
 #include <span>
 
-namespace crnlib {
-class mipmapped_texture;
+namespace crnlib
+{
+    class mipmapped_texture;
 
-auto operator==(const image_u8 &lhs, const image_u8 &rhs) noexcept -> bool;
-auto operator==(const mipmapped_texture &lhs, const mipmapped_texture &rhs) noexcept -> bool;
+    auto operator==(const image_u8& lhs, const image_u8& rhs) noexcept -> bool;
+    auto operator==(const mipmapped_texture& lhs, const mipmapped_texture& rhs) noexcept -> bool;
 } // namespace crnlib
 
-namespace btu::tex {
-using crnlib::mipmapped_texture;
-
-struct Dimension;
-enum class TextureType : std::uint8_t;
-
-class CrunchTexture
+namespace btu::tex
 {
-public:
-    void set(mipmapped_texture &&tex) noexcept;
+    using crnlib::mipmapped_texture;
 
-    [[nodiscard]] auto get() noexcept -> mipmapped_texture &;
-    [[nodiscard]] auto get() const noexcept -> const mipmapped_texture &;
+    struct Dimension;
+    enum class TextureType : std::uint8_t;
 
-    [[nodiscard]] auto get_dimension() const noexcept -> Dimension;
+    class CrunchTexture
+    {
+    public:
+        void set(const mipmapped_texture& tex) noexcept;
 
-    [[nodiscard]] auto get_load_path() const noexcept -> const Path &;
-    void set_load_path(Path path) noexcept;
+        [[nodiscard]] auto get() noexcept -> mipmapped_texture&;
+        [[nodiscard]] auto get() const noexcept -> const mipmapped_texture&;
 
-    [[nodiscard]] auto get_texture_type() const noexcept -> TextureType;
-    [[nodiscard]] auto get_format_as_dxgi() const noexcept -> DXGI_FORMAT;
+        [[nodiscard]] auto get_dimension() const noexcept -> Dimension;
 
-    [[nodiscard]] auto operator==(const CrunchTexture &) const noexcept -> bool = default;
+        [[nodiscard]] auto get_load_path() const noexcept -> const Path&;
+        void set_load_path(Path path) noexcept;
 
-private:
-    Path load_path_;
-    mipmapped_texture tex_;
-};
+        [[nodiscard]] auto get_texture_type() const noexcept -> TextureType;
+        [[nodiscard]] auto get_format_as_dxgi() const noexcept -> DXGI_FORMAT;
 
-[[nodiscard]] auto load_crunch(Path path) noexcept -> tl::expected<CrunchTexture, Error>;
-[[nodiscard]] auto load_crunch(Path relative_path,
-                               std::span<std::byte> data) noexcept -> tl::expected<CrunchTexture, Error>;
+        [[nodiscard]] auto operator==(const CrunchTexture&) const noexcept -> bool = default;
 
-[[nodiscard]] auto save(const CrunchTexture &tex, const Path &path) noexcept -> ResultError;
-[[nodiscard]] auto save(const CrunchTexture &tex) noexcept -> tl::expected<std::vector<std::byte>, Error>;
+    private:
+        Path load_path_;
+        mipmapped_texture tex_;
+    };
 
+    [[nodiscard]] auto load_crunch(Path path) noexcept -> tl::expected<CrunchTexture, Error>;
+    [[nodiscard]] auto load_crunch(Path relative_path,
+                                   std::span<const std::byte> data) noexcept -> tl::expected<CrunchTexture, Error>;
+
+    [[nodiscard]] auto save(const CrunchTexture& tex, const Path& path) noexcept -> ResultError;
+    [[nodiscard]] auto save(const CrunchTexture& tex) noexcept -> tl::expected<std::vector<std::byte>, Error>;
 } // namespace btu::tex
