@@ -8,7 +8,6 @@
 #include <btu/common/path.hpp>
 #include <btu/tex/detail/common.hpp>
 #include <btu/tex/dxtex.hpp> // for DXGI_FORMAT
-
 #include <crunch/crn_mipmapped_texture.h>
 
 #include <filesystem>
