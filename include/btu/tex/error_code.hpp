@@ -14,7 +14,8 @@ enum class TextureErr : std::uint8_t
     Unknown = 1,
     BadInput,
     MemoryAllocation,
-
+    WriteFailure,
+    ReadFailure,
 };
 } // namespace btu::tex
 

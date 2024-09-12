@@ -34,6 +34,8 @@ set(HEADER_FILES
     "${INCLUDE_DIR}/btu/tex/functions.hpp"
     "${INCLUDE_DIR}/btu/tex/optimize.hpp"
     "${INCLUDE_DIR}/btu/tex/texture.hpp"
+    "${INCLUDE_DIR}/btu/tex/crunch_texture.hpp"
+    "${INCLUDE_DIR}/btu/tex/crunch_functions.hpp"
     "${INCLUDE_DIR}/btu/tex/detail/common.hpp"
     "${INCLUDE_DIR}/btu/tex/detail/formats_string.hpp"
     ../include/btu/common/json.hpp)
@@ -59,6 +61,8 @@ set(SOURCE_FILES
     "${SOURCE_DIR}/tex/functions_compress_bc7.cpp"
     "${SOURCE_DIR}/tex/optimize.cpp"
     "${SOURCE_DIR}/tex/texture.cpp"
+    "${SOURCE_DIR}/tex/crunch_texture.cpp"
+    "${SOURCE_DIR}/tex/crunch_functions.cpp"
     "${SOURCE_DIR}/tex/error_code.cpp")
 
 source_group(TREE "${ROOT_DIR}" FILES ${HEADER_FILES} ${SOURCE_FILES})
@@ -105,6 +109,9 @@ target_link_libraries("${PROJECT_NAME}" PRIVATE nlohmann_json::nlohmann_json)
 
 find_package(reproc++ CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)
+
+find_package(crunch2 CONFIG REQUIRED)
+target_link_libraries("${PROJECT_NAME}" PRIVATE crunch::crunch2)
 
 set_target_properties("${PROJECT_NAME}" PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties("${PROJECT_NAME}" PROPERTIES LINKER_LANGUAGE CXX)
