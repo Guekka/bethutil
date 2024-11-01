@@ -42,6 +42,8 @@ public:
     [[nodiscard]] auto get_texture_type() const noexcept -> TextureType;
     [[nodiscard]] auto get_format_as_dxgi() const noexcept -> DXGI_FORMAT;
 
+    [[nodiscard]] auto has_opaque_alpha() const noexcept -> bool;
+
     [[nodiscard]] auto operator==(const CrunchTexture &) const noexcept -> bool = default;
 
 private:

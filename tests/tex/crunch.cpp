@@ -73,6 +73,21 @@ TEST_CASE("Crunch Tex Memory IO", "[src]")
     REQUIRE(*mem_data == fs_data);
 }
 
+TEST_CASE("Crunch Tex has_opaque_alpha", "[src]")
+{
+    const auto dir             = Path("crunch");
+    const auto opaque_file     = dir / "in" / u8"opaque_alpha.dds";
+    const auto not_opaque_file = dir / "in" / u8"not_opaque_alpha.dds";
+
+    // Load.
+    auto opaque     = require_expected(btu::tex::load_crunch(opaque_file));
+    auto not_opaque = require_expected(btu::tex::load_crunch(not_opaque_file));
+
+    // Test alpha.
+    CHECK(opaque.has_opaque_alpha());
+    CHECK_FALSE(not_opaque.has_opaque_alpha());
+}
+
 TEST_CASE("Crunch resize", "[src]")
 {
     test_expected_dir_crunch(u8"crunch_resize", [](auto &&tex) {
