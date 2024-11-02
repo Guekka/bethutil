@@ -113,6 +113,7 @@ auto CrunchTexture::get_format_as_dxgi() const noexcept -> DXGI_FORMAT
 
 auto CrunchTexture::has_opaque_alpha() const noexcept -> bool
 {
+    // If format doesn't have alpha, or the image is already compressed.
     if (!tex_.has_alpha())
         return true;
 
@@ -127,7 +128,14 @@ auto CrunchTexture::has_opaque_alpha() const noexcept -> bool
     {
         const auto *mip = tex_.get_level(face, 0);
 
-        const auto img = mip->get_image();
+        // Get uncompressed image to check.
+        crnlib::image_u8 *img;
+        if (mip->is_packed()) {
+            img = crnlib::crnlib_new<image_u8>();
+            mip->get_unpacked_image(*img, 1);
+        }
+        else
+            img = mip->get_image();
 
         // One last safety check.
         [[unlikely]] if (img == nullptr)
