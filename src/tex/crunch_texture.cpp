@@ -130,7 +130,8 @@ auto CrunchTexture::has_opaque_alpha() const noexcept -> bool
 
         // Get uncompressed image to check.
         crnlib::image_u8 *img;
-        if (mip->is_packed()) {
+        if (mip->is_packed())
+        {
             img = crnlib::crnlib_new<image_u8>();
             mip->get_unpacked_image(*img, 1);
         }
