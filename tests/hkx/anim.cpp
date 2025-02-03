@@ -69,7 +69,7 @@ TEST_CASE("Trying to convert SE to SE", "[src]")
 
 TEST_CASE("Handles parallelism", "[src]")
 {
-    std::vector<HkxTempPath> outputs(5);
+    const std::vector<HkxTempPath> outputs(5);
 
     flux::ref(outputs)
         .map([](const HkxTempPath &out) {

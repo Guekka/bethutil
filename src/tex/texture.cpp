@@ -114,7 +114,7 @@ auto load(Path path) noexcept -> tl::expected<Texture, Error>
     return tex;
 }
 
-auto load(Path relative_path, std::span<std::byte> data) noexcept -> tl::expected<Texture, Error>
+    auto load(Path relative_path, const std::span<std::byte> data) noexcept -> tl::expected<Texture, Error>
 {
     Texture tex;
     tex.set_load_path(std::move(relative_path));

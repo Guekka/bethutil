@@ -9,7 +9,7 @@ auto read_file(const Path &a_path) noexcept -> tl::expected<std::vector<std::byt
 {
     std::error_code ec;
 
-    const auto size = fs::file_size(a_path, ec);
+    const auto size = file_size(a_path, ec);
     if (ec)
         return tl::make_unexpected(Error(ec));
 
@@ -25,7 +25,7 @@ auto read_file(const Path &a_path) noexcept -> tl::expected<std::vector<std::byt
     return data;
 }
 
-auto write_file(const Path &a_path, std::span<const std::byte> data) noexcept -> tl::expected<void, Error>
+    auto write_file(const Path &a_path, const std::span<const std::byte> data) noexcept -> tl::expected<void, Error>
 {
     std::ofstream out{a_path, std::ios_base::binary};
     if (!out)
@@ -37,7 +37,7 @@ auto write_file(const Path &a_path, std::span<const std::byte> data) noexcept ->
     return {};
 }
 
-auto write_file_new(const Path &a_path, std::span<const std::byte> data) noexcept -> tl::expected<void, Error>
+    auto write_file_new(const Path &a_path, const std::span<const std::byte> data) noexcept -> tl::expected<void, Error>
 {
     if (exists(a_path))
         return tl::make_unexpected(Error(std::make_error_code(std::errc::file_exists)));
@@ -163,7 +163,7 @@ auto hard_link(const Path &from, const Path &to) noexcept -> tl::expected<void, 
 auto find_matching_paths_icase(const Path &directory,
                                std::span<const Path> relative_lowercase_paths) noexcept -> std::vector<Path>
 {
-    if (!fs::exists(directory))
+    if (!exists(directory))
         return {};
 
 #ifdef _WIN32
@@ -179,7 +179,7 @@ auto find_matching_paths_icase(const Path &directory,
     const auto files_in_directory = flux::from_range(fs::recursive_directory_iterator(directory))
                                         .map([&directory](const fs::directory_entry &entry) {
                                             const auto &path         = entry.path();
-                                            const auto relative_path = fs::relative(path, directory);
+                                            const auto relative_path = relative(path, directory);
                                             return std::pair{to_lower(relative_path.u8string()), path};
                                         })
                                         .to<std::unordered_map<std::u8string, Path>>();
