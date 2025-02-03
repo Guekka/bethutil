@@ -6,7 +6,7 @@
 #include <nifly/NifFile.hpp>
 
 namespace btu::nif {
-    auto get_niversion(const Game game) -> std::optional<nifly::NiVersion>
+auto get_niversion(const Game game) -> std::optional<nifly::NiVersion>
 {
     using NiVer = nifly::NiVersion;
     switch (game)
@@ -23,7 +23,7 @@ namespace btu::nif {
     return std::nullopt;
 }
 
-    auto convert(Mesh file, const HeadpartStatus headpart, const Game game) -> tl::expected<Mesh, Error>
+auto convert(Mesh file, const HeadpartStatus headpart, const Game game) -> tl::expected<Mesh, Error>
 {
     if (game != Game::SSE && game != Game::SLE)
     {

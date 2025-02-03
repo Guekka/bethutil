@@ -204,7 +204,8 @@ void CompressionDevice::apply(const Callback &callback) noexcept(noexcept(callba
 #endif
 
 // ReSharper disable once CppMemberFunctionMayBeStatic - only used in Windows
-    auto CompressionDevice::try_apply([[maybe_unused]] const Callback &callback) noexcept(noexcept(callback)) -> bool
+auto CompressionDevice::try_apply([[maybe_unused]] const Callback &callback) noexcept(noexcept(callback))
+    -> bool
 {
 #ifdef _WIN32
     for (auto &dev : devices_)

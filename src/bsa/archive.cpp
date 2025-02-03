@@ -12,7 +12,7 @@
 
 namespace btu::bsa {
 
-    [[nodiscard]] constexpr auto to_tes4_version(const ArchiveVersion version) noexcept
+[[nodiscard]] constexpr auto to_tes4_version(const ArchiveVersion version) noexcept
     -> std::optional<libbsa::tes4::version>
 {
     switch (version)
@@ -28,7 +28,7 @@ namespace btu::bsa {
     libbsa::detail::declare_unreachable();
 }
 
-    [[nodiscard]] constexpr auto from_tes4_version(const libbsa::tes4::version version) noexcept -> ArchiveVersion
+[[nodiscard]] constexpr auto from_tes4_version(const libbsa::tes4::version version) noexcept -> ArchiveVersion
 {
     switch (version)
     {
@@ -39,8 +39,8 @@ namespace btu::bsa {
     libbsa::detail::declare_unreachable();
 }
 
-    [[nodiscard]] constexpr auto to_fo4_format(const ArchiveVersion version,
-                                               const ArchiveType type) noexcept -> std::optional<libbsa::fo4::format>
+[[nodiscard]] constexpr auto to_fo4_format(const ArchiveVersion version, const ArchiveType type) noexcept
+    -> std::optional<libbsa::fo4::format>
 {
     switch (version)
     {
@@ -58,7 +58,7 @@ namespace btu::bsa {
     }
 }
 
-    [[nodiscard]] constexpr auto fo4_compression_format(const ArchiveVersion version, const ArchiveType type)
+[[nodiscard]] constexpr auto fo4_compression_format(const ArchiveVersion version, const ArchiveType type)
 {
     if (version == ArchiveVersion::starfield && type == ArchiveType::Textures)
         return libbsa::fo4::compression_format::lz4;
@@ -66,8 +66,9 @@ namespace btu::bsa {
     return libbsa::fo4::compression_format::zip;
 }
 
-    File::File(ArchiveVersion version, const ArchiveType type,
-               const std::optional<TES4ArchiveType> tes4_type = std::nullopt)
+File::File(ArchiveVersion version,
+           const ArchiveType type,
+           const std::optional<TES4ArchiveType> tes4_type = std::nullopt)
     : ver_(version)
     , type_(type)
     , tes4_archive_type_(tes4_type)
