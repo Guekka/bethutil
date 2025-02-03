@@ -255,7 +255,7 @@ auto compute_optimization_steps(const CrunchTexture &file, const Settings &sets)
 }
 
 // NOLINTNEXTLINE(misc-no-recursion)
-    auto Settings::get(const Game game) noexcept -> const Settings &
+auto Settings::get(const Game game) noexcept -> const Settings &
 {
     static auto tes3_sets = [&] {
         return Settings{

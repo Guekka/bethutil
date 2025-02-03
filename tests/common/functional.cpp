@@ -10,7 +10,9 @@ TEST_CASE("bind_back", "[src]")
 {
     using btu::common::bind_back;
 
-    auto func = [](const int a, const std::unique_ptr<int> &b, const std::unique_ptr<int> c) { return a + *b + *c; };
+    auto func = [](const int a, const std::unique_ptr<int> &b, const std::unique_ptr<int> c) {
+        return a + *b + *c;
+    };
 
     auto init      = [] { return std::make_tuple(1, std::make_unique<int>(2), std::make_unique<int>(3)); };
     auto [a, b, c] = init();
