@@ -60,7 +60,7 @@ TEST_CASE("Crunch Tex Memory IO", "[src]")
     REQUIRE(mem_tex == fs_tex);
 
     // save
-    auto mem_data = btu::tex::save(mem_tex);
+    auto mem_data = save(mem_tex);
     REQUIRE(mem_data.has_value());
 
     auto out = dir / "out" / u8"tex.dds";

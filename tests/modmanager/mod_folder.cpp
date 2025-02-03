@@ -29,7 +29,7 @@ public:
         return ArchiveTooLargeAction::Skip;
     }
 
-    void process_file(btu::modmanager::ModFile f) noexcept override
+    void process_file(const btu::modmanager::ModFile f) noexcept override
     {
         const auto out = out_dir_ / f.relative_path;
         btu::fs::create_directories(out.parent_path());
@@ -60,7 +60,7 @@ public:
         return ArchiveTooLargeAction::Skip;
     }
 
-    [[nodiscard]] auto transform_file(btu::modmanager::ModFile file) noexcept
+    [[nodiscard]] auto transform_file(const btu::modmanager::ModFile file) noexcept
         -> std::optional<std::vector<std::byte>> override
     {
         // Change one byte in each file

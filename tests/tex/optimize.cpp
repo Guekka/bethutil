@@ -119,7 +119,7 @@ auto generate_tex(const DirectX::TexMetadata &info) -> btu::tex::Texture
 {
     auto image = DirectX::ScratchImage{};
 
-    auto hr = image.Initialize(info);
+    const auto hr = image.Initialize(info);
     REQUIRE(SUCCEEDED(hr));
 
     auto tex = btu::tex::Texture{};
@@ -464,9 +464,9 @@ TEST_CASE("tex_optimize", "[src]")
         auto sets = compress_whitelist_mips_resize_sets;
         // go back to more common settings
         sets.output_format = btu::tex::Settings::get(btu::Game::SSE).output_format;
-        // Change X8 to A8, as X8 is saved and loaded as A8 anyways, just without alpha bits.
+        // Change X8 to A8, as X8 is saved and loaded as A8 anyway, just without alpha bits.
         sets.output_format.uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM;
-        sets.resize                                   = btu::tex::Dimension{128, 128};
+        sets.resize = btu::tex::Dimension{.w=128, .h=128};
         test_expected_dir(u8"optimize", [&](auto &&f) {
             const btu::tex::OptimizationSteps steps = btu::tex::compute_optimization_steps(f, sets);
             return btu::tex::optimize(std::forward<decltype(f)>(f), steps, compression_dev);
