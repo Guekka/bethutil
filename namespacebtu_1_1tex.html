@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>btu::tex namespace | bethutil Utilities for Bethesda games</title>
+  <link href="favicon-dark.png" rel="icon" type="image/png"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="#22272e" name="theme-color"/>
+  <link href="poxy/poxy.css" referrerpolicy="no-referrer" rel="stylesheet"/>
+  <script src="poxy/poxy.js"></script>
+  <script>initialize_theme("dark");</script>
+  <meta content="bethutil" name="twitter:title"/>
+  <meta content="bethutil" property="og:title"/>
+  <meta content="bethutil" itemprop="name"/>
+  <meta content="Edgar B" name="author"/>
+  <meta content="Edgar B" property="article:author"/>
+  <meta content="Utilities for Bethesda games" name="description"/>
+  <meta content="Utilities for Bethesda games" name="twitter:description"/>
+  <meta content="Utilities for Bethesda games" property="og:description"/>
+  <meta content="Utilities for Bethesda games" itemprop="description"/>
+  <meta content="telephone=no" name="format-detection"/>
+  <meta content="Poxy v0.19.4" name="generator"/>
+  <meta content="strict-origin-when-cross-origin" name="referrer"/>
+  <script data-domain="guekka.github.io/bethutil" defer="" src="https://plausible.bizel.fr/js/script.js"></script>
+</head>
+<body class="poxy-has-toc">
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a class="m-col-t-8 m-col-m-none m-left-m" href="index.html" id="m-navbar-brand">bethutil <span class="m-thin">Utilities for Bethesda games</span></a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z" id="m-doc-search-icon-path"></path>
+        </svg></a>
+        <a href="#navigation" id="m-navbar-show" title="Show navigation"></a>
+        <a href="#" id="m-navbar-hide" title="Hide navigation"></a>
+      </div>
+      <div class="m-col-t-12 m-show-m m-col-m-none m-right-m" id="m-navbar-collapse">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="annotated.html">Classes</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+            <li><a class="poxy-icon repo github poxy-external" href="https://github.com/Guekka/bethutil" target="_blank" title="View on GitHub"><svg id="poxy-icon-repo" version="1.1" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><path d="M25,1.23a24.37,24.37,0,0,0-7.7,47.5C18.51,49,19,48.2,19,47.56s0-2.12,0-4.15c-6.78,1.47-8.21-3.27-8.21-3.27C9.61,37.33,8,36.58,8,36.58c-2.21-1.51.17-1.48.17-1.48a5.12,5.12,0,0,1,3.73,2.51c2.17,3.72,5.7,2.65,7.09,2a5.25,5.25,0,0,1,1.55-3.26c-5.41-.61-11.1-2.7-11.1-12A9.41,9.41,0,0,1,12,17.79a8.75,8.75,0,0,1,.24-6.45s2-.66,6.7,2.49a23.1,23.1,0,0,1,12.2,0c4.66-3.15,6.7-2.49,6.7-2.49A8.75,8.75,0,0,1,38,17.79a9.41,9.41,0,0,1,2.51,6.54c0,9.36-5.7,11.42-11.13,12a5.83,5.83,0,0,1,1.65,4.51c0,3.26,0,5.89,0,6.69,0,.65.44,1.41,1.68,1.17A24.38,24.38,0,0,0,25,1.23Z" fill="currentColor"></path></svg></a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li><a class="poxy-icon sponsor poxy-external" href="https://github.com/sponsors/Guekka/dashboard/profile" target="_blank" title="Become a sponsor"><svg id="poxy-icon-sponsor" version="1.1" viewBox="0 0 66.911 66.911" xmlns="http://www.w3.org/2000/svg"><path d="M66.911,22.831c0-10.563-8.558-19.122-19.118-19.122c-5.658,0-10.721,2.473-14.223,6.377	c-0.037,0.043-0.076,0.085-0.113,0.128c-3.5-3.98-8.618-6.505-14.334-6.505C8.561,3.709,0.005,12.268,0,22.831	c0,5.834,2.629,11.059,6.758,14.565H6.751l27.104,25.806l26.308-25.806h-0.012C64.279,33.89,66.911,28.669,66.911,22.831z" fill="currentColor"></path></svg></a></li>
+            <li><a class="poxy-icon theme" href="javascript:void(null);" id="poxy-theme-switch" onclick="toggle_theme(); return false;" role="button" title="Toggle dark and light themes"><svg id="poxy-theme-switch-img" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="185.6708" cy="183.8122" fill="currentColor" r="65.625"></circle><path d="M185.6708,87.5622a13.1256,13.1256,0,0,0,13.125-13.125V52.5622a13.125,13.125,0,1,0-26.25,0v21.875A13.1257,13.1257,0,0,0,185.6708,87.5622Z" fill="currentColor"></path><path d="M99.051,115.7519a13.1236,13.1236,0,1,0,18.56-18.56L102.1442,81.726a13.1236,13.1236,0,0,0-18.5595,18.56Z" fill="currentColor"></path><path d="M89.4208,183.8122a13.1257,13.1257,0,0,0-13.125-13.125H54.4208a13.125,13.125,0,0,0,0,26.25h21.875A13.1256,13.1256,0,0,0,89.4208,183.8122Z" fill="currentColor"></path><path d="M99.051,251.8725,83.5847,267.3431a13.1236,13.1236,0,1,0,18.56,18.56l15.4663-15.4706a13.1236,13.1236,0,1,0-18.5595-18.56Z" fill="currentColor"></path><path d="M185.6708,280.0622a13.1258,13.1258,0,0,0-13.125,13.125v21.875a13.125,13.125,0,0,0,26.25,0v-21.875A13.1257,13.1257,0,0,0,185.6708,280.0622Z" fill="currentColor"></path><path d="M272.2907,251.8725a13.1236,13.1236,0,1,0-18.56,18.56l15.4663,15.4706a13.1236,13.1236,0,1,0,18.56-18.56Z" fill="currentColor"></path><path d="M330.0458,183.8122a13.1257,13.1257,0,0,0-13.125-13.125h-21.875a13.125,13.125,0,0,0,0,26.25h21.875A13.1256,13.1256,0,0,0,330.0458,183.8122Z" fill="currentColor"></path><path d="M263.0109,119.5971a13.0824,13.0824,0,0,0,9.28-3.8452l15.4663-15.4663a13.1236,13.1236,0,1,0-18.56-18.56L253.7312,97.1923a13.125,13.125,0,0,0,9.28,22.4048Z" fill="currentColor"></path><path d="M456.9379,401.6714a63.97,63.97,0,0,1-14.9963,7.2055c-19.6448,6.5283-41.8787,2.9566-58.1439-9.8523a68.9311,68.9311,0,0,1-10.835-10.8339c-12.8088-16.2663-16.3806-38.5-9.8523-58.1471a63.8444,63.8444,0,0,1,7.2077-14.9931,8.8036,8.8036,0,0,0-10.1172-13.3034,87.5188,87.5188,0,1,0,110.0372,110.04A8.8,8.8,0,0,0,456.9379,401.6714Z" fill="currentColor"></path></svg></a></li>
+            <li class="m-show-m"><a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path"></use>
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="namespacebtu.html">btu</a>::<wbr/></span>tex <span class="m-thin">namespace</span>
+        </h1>
+        <p></p>
+        <nav class="m-block m-default poxy-toc" id="poxy-toc">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#namespaces">Namespaces</a></li>
+                <li><a href="#nested-classes">Classes</a></li>
+                <li><a href="#enum-members">Enums</a></li>
+                <li><a href="#typedef-members">Typedefs</a></li>
+                <li><a href="#func-members">Functions</a></li>
+                <li><a href="#var-members">Variables</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+        <section id="namespaces">
+          <h2><a href="#namespaces">Namespaces</a></h2>
+          <dl class="m-doc">
+            <dt>namespace <a class="m-doc" href="namespacebtu_1_1tex_1_1detail.html">detail</a></dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="nested-classes">
+          <h2><a href="#nested-classes">Classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              struct <a class="m-doc" href="structbtu_1_1tex_1_1_best_format_for.html">BestFormatFor</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              class <a class="m-doc" href="classbtu_1_1tex_1_1_compression_device.html">CompressionDevice</a>
+            </dt>
+            <dd>Recommended way to use is to make it static.</dd>
+            <dt>
+              class <a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              struct <a class="m-doc" href="structbtu_1_1tex_1_1_dimension.html">Dimension</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              struct <a class="m-doc" href="structbtu_1_1tex_1_1_error.html">Error</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              class <a class="m-doc" href="classbtu_1_1tex_1_1_failure_source_category.html">FailureSourceCategory</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              struct <a class="m-doc" href="structbtu_1_1tex_1_1_guess_best_format_args.html">GuessBestFormatArgs</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              struct <a class="m-doc" href="structbtu_1_1tex_1_1_settings.html">Settings</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              class <a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              struct <a class="m-doc" href="structbtu_1_1tex_1_1_texture_err_category.html">TextureErrCategory</a>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="enum-members">
+          <h2><a href="#enum-members">Enums</a></h2>
+          <dl class="m-doc">
+            <dt id="f44537bf80bfe73ac962c2fe6ab77571d26d03109f7d687fd379d0856adfbf12">
+              <span class="m-doc-wrap-bumper">enum class <a class="m-doc" href="#a75eb4ad855a5020111cf4ebdd4d0a114">FailureSource</a>: <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/integer.html" target="_blank">std::<wbr/>uint8_t</a> { </span><span class="m-doc-wrap"><a class="m-doc-self" href="#f44537bf80bfe73ac962c2fe6ab77571d26d03109f7d687fd379d0856adfbf12">BadUserInput</a> = 1,
+              <a class="m-doc-self" href="#f44537bf80bfe73ac962c2fe6ab77571d26d03109f7d687fd379d0856adfbf12">SystemError</a> = 2 }</span>
+            </dt>
+            <dd></dd>
+            <dt id="444d6107b2e721559cc11cac9b3dba604f21ee2681786d020d98438e5f150fe7">
+              <span class="m-doc-wrap-bumper">enum class <a class="m-doc" href="#a7fd1865c9f7112dba737c8f0139d6d44">TextureErr</a>: <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/integer.html" target="_blank">std::<wbr/>uint8_t</a> { </span><span class="m-doc-wrap"><a class="m-doc-self" href="#444d6107b2e721559cc11cac9b3dba604f21ee2681786d020d98438e5f150fe7">Success</a> = 0,
+              <a class="m-doc-self" href="#444d6107b2e721559cc11cac9b3dba604f21ee2681786d020d98438e5f150fe7">Unknown</a> = 1,
+              <a class="m-doc-self" href="#444d6107b2e721559cc11cac9b3dba604f21ee2681786d020d98438e5f150fe7">BadInput</a>,
+              <a class="m-doc-self" href="#444d6107b2e721559cc11cac9b3dba604f21ee2681786d020d98438e5f150fe7">MemoryAllocation</a>,
+              <a class="m-doc-self" href="#444d6107b2e721559cc11cac9b3dba604f21ee2681786d020d98438e5f150fe7">WriteFailure</a>,
+              <a class="m-doc-self" href="#444d6107b2e721559cc11cac9b3dba604f21ee2681786d020d98438e5f150fe7">ReadFailure</a> }</span>
+            </dt>
+            <dd></dd>
+            <dt id="7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">
+              <span class="m-doc-wrap-bumper">enum class <a class="m-doc" href="#a310091cdb4b029eaf1d0b3a292140a57">TextureType</a>: <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/integer.html" target="_blank">std::<wbr/>uint8_t</a> { </span><span class="m-doc-wrap"><a class="m-doc-self" href="#7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">Diffuse</a>,
+              <a class="m-doc-self" href="#7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">Normal</a>,
+              <a class="m-doc-self" href="#7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">Cube</a>,
+              <a class="m-doc-self" href="#7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">Specular</a>,
+              <a class="m-doc-self" href="#7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">Glow</a>,
+              <a class="m-doc-self" href="#7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">Parallax</a>,
+              <a class="m-doc-self" href="#7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">ModelSpaceNormal</a>,
+              <a class="m-doc-self" href="#7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">Backlight</a>,
+              <a class="m-doc-self" href="#7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">Skin</a>,
+              <a class="m-doc-self" href="#7454656ffc37bcd72b8c00d1b160b5f51fcc3e79d6623e812c9c25a268887efb">EnvironmentMask</a> }</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="typedef-members">
+          <h2><a href="#typedef-members">Typedefs</a></h2>
+          <dl class="m-doc">
+            <dt>
+              using <a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a> = tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt;
+            </dt>
+            <dd></dd>
+            <dt>
+              using <a class="m-doc" href="#a435e14781b8d930665e9f4669c7e454d">ResultCrunch</a> = tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt;
+            </dt>
+            <dd></dd>
+            <dt>
+              using <a class="m-doc" href="#ad15ae3a93606cfd462ec90d79e38579f">ResultError</a> = tl::expected&lt;void, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt;
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="func-members">
+          <h2><a href="#func-members">Functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#ae3ac2ed05c078e1fd64ac5fc31404881">NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="structbtu_1_1tex_1_1_dimension.html">Dimension</a>,
+              w,
+              h) namespace util</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a17ddefb2e0611a77aac1b28224bc0c0a">NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="structbtu_1_1tex_1_1_best_format_for.html">BestFormatFor</a>,
+              uncompressed,
+              uncompressed_without_alpha,
+              compressed,
+              compressed_without_alpha)</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a8e2258d147c6dd0199db53198c9d5490">NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="structbtu_1_1tex_1_1_guess_best_format_args.html">GuessBestFormatArgs</a>,
+              opaque_alpha,
+              allow_compressed,
+              force_alpha)</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#aadf2f648b607db82ec019b3b04f8357b">NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="structbtu_1_1tex_1_1_settings.html">Settings</a>,
+              game,
+              compress,
+              <a class="m-doc" href="#a37d36a9cd3980aa04b4cb2e4acc1b5da">resize</a>,
+              mipmaps,
+              use_format_whitelist,
+              allowed_formats,
+              output_format,
+              landscape_textures) struct OptimizationSteps</span>
+            </dt>
+            <dd></dd>
+            <dt id="ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">NLOHMANN_JSON_SERIALIZE_ENUM</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="#a310091cdb4b029eaf1d0b3a292140a57">TextureType</a>,
+              {{<a class="m-doc-self" href="#ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">TextureType::<wbr/>Diffuse</a>, "diffuse"}, {<a class="m-doc-self" href="#ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">TextureType::<wbr/>Normal</a>, "normal"}, {<a class="m-doc-self" href="#ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">TextureType::<wbr/>Cube</a>, "cube"}, {<a class="m-doc-self" href="#ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">TextureType::<wbr/>Specular</a>, "specular"}, {<a class="m-doc-self" href="#ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">TextureType::<wbr/>Glow</a>, "glow"}, {<a class="m-doc-self" href="#ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">TextureType::<wbr/>Parallax</a>, "parallax"}, {<a class="m-doc-self" href="#ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">TextureType::<wbr/>ModelSpaceNormal</a>, "model_space_normal"}, {<a class="m-doc-self" href="#ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">TextureType::<wbr/>Backlight</a>, "backlight"}, {<a class="m-doc-self" href="#ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">TextureType::<wbr/>Skin</a>, "skin"}, {<a class="m-doc-self" href="#ae9ba9bf18065fea323f96f6b8c59049f02524f489504b4bab21ecbffb1fed09">TextureType::<wbr/>EnvironmentMask</a>, "environment_mask"}})</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ae181f96a4805e40fb4dc9ff226486b52">compute_optimization_steps</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp; file,
+              const <a class="m-doc" href="structbtu_1_1tex_1_1_settings.html">Settings</a>&amp; sets) →  OptimizationSteps <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a0771bab778b84485960a92908fbd40ee">compute_optimization_steps</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp; file,
+              const <a class="m-doc" href="structbtu_1_1tex_1_1_settings.html">Settings</a>&amp; sets) →  OptimizationSteps <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a451c578ae7846888c8382e5066ba5fdb">convert</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp;&amp; file,
+              DXGI_FORMAT format) →  <a class="m-doc" href="#a435e14781b8d930665e9f4669c7e454d">ResultCrunch</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ac08ea78afcad96d45c6c0d683f463e41">convert</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file,
+              DXGI_FORMAT format,
+              <a class="m-doc" href="classbtu_1_1tex_1_1_compression_device.html">CompressionDevice</a>&amp; dev) →  <a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a596c07ddbaf7f756699b2d5644698412">decompress</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file) →  <a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a></span>
+            </dt>
+            <dd></dd>
+            <dt id="d470d73975f1e4eb69abae603959e71f06497e5468bed343411a6f3d0bb7a752">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ab538d4f4ca3e23d0f5838340413b806c">error_from_hresult</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/types/integer" target="_blank">int64_t</a> hr,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/error/error_code.html" target="_blank">std::<wbr/>error_code</a> default_err = <a class="m-doc-self" href="#d470d73975f1e4eb69abae603959e71f06497e5468bed343411a6f3d0bb7a752">TextureErr::<wbr/>Unknown</a>,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/source_location.html" target="_blank">std::<wbr/>source_location</a> loc = <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/source_location/current.html" target="_blank">std::<wbr/>source_location::<wbr/>current</a>()) →  <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a4a90a0f688ba7395d9f763aebd40c77a">from_string</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> str) →  DXGI_FORMAT</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a83e9fefe55a474c50720ffe6d7b2c44b">generate_mipmaps</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp;&amp; file) →  <a class="m-doc" href="#a435e14781b8d930665e9f4669c7e454d">ResultCrunch</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ae2bc7bbc61efcd88c08a269d80d45f2f">generate_mipmaps</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file) →  <a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#aa1d2c15be442f3704f9241912a21f3a4">guess_best_format</a>(</span><span class="m-doc-wrap">DXGI_FORMAT current_format,
+              <a class="m-doc" href="structbtu_1_1tex_1_1_best_format_for.html">BestFormatFor</a> formats,
+              const <a class="m-doc" href="structbtu_1_1tex_1_1_guess_best_format_args.html">GuessBestFormatArgs</a>&amp; guess_params) →  DXGI_FORMAT <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a997827cd10143f950ff10e11bd61c27f">guess_texture_type</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> path) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/optional.html" target="_blank">std::<wbr/>optional</a>&lt;<a class="m-doc" href="#a310091cdb4b029eaf1d0b3a292140a57">TextureType</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Based on <a class="poxy-external" href="https://forums.nexusmods.com/index.php?/topic/476227-skyrim-nif-files-with-underscores/" target="_blank">https:/<wbr/>/<wbr/>forums.nexusmods.com/<wbr/>index.php?/<wbr/>topic/<wbr/>476227-skyrim-nif-files-with-underscores/<wbr/></a>.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ac82ab61898eaf157bc2d88808b933692">load</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a> path) →  tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a9a88c0330e4c37b22c32a8c86d31d4cc">load</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a> relative_path,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; data) →  tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a88578eddda7d3bcb0a3d4b9711e0bbce">load_crunch</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a> path) →  tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#af9329a4464d9102118893f0489dd79b6">load_crunch</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a> relative_path,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; data) →  tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a414e4f1b5ee867c7ab8953454e63588d">make_error_code</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="#a7fd1865c9f7112dba737c8f0139d6d44">TextureErr</a> e) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/error/error_code.html" target="_blank">std::<wbr/>error_code</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ac8fff66d71570c4b7e2cc05e28573a77">make_error_condition</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="#a75eb4ad855a5020111cf4ebdd4d0a114">FailureSource</a> e) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/error/error_condition.html" target="_blank">std::<wbr/>error_condition</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a42a7ea80fe5cf427cf7c8a6f67a26900">make_transparent_alpha</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file) →  <a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a88583309caffff946dea632ffa126181">optimal_mip_count</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="structbtu_1_1tex_1_1_dimension.html">Dimension</a> dim) →  <a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/types/size_t" target="_blank">size_t</a> <span class="m-label m-flat m-primary">constexpr</span> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a602ae2f29e41d6478abf6c5f31869987">optimize</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file,
+              OptimizationSteps sets,
+              <a class="m-doc" href="classbtu_1_1tex_1_1_compression_device.html">CompressionDevice</a>&amp; dev) →  <a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#abd1df80a31375dfa3f332ce15da9fa0e">optimize</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp;&amp; file,
+              OptimizationSteps sets,
+              <a class="m-doc" href="classbtu_1_1tex_1_1_compression_device.html">CompressionDevice</a>&amp; dev) →  <a class="m-doc" href="#a435e14781b8d930665e9f4669c7e454d">ResultCrunch</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a37d36a9cd3980aa04b4cb2e4acc1b5da">resize</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp;&amp; file,
+              <a class="m-doc" href="structbtu_1_1tex_1_1_dimension.html">Dimension</a> dim) →  <a class="m-doc" href="#a435e14781b8d930665e9f4669c7e454d">ResultCrunch</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ae4f8c8542060c06233ee6b8d31251029">resize</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file,
+              <a class="m-doc" href="structbtu_1_1tex_1_1_dimension.html">Dimension</a> dim) →  <a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#acf9d02b7b56c9f638c1bf66481566bf2">save</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp; tex,
+              const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; path) →  <a class="m-doc" href="#ad15ae3a93606cfd462ec90d79e38579f">ResultError</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ad9b2bd00a87338cc0986e63d16270f65">save</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp; tex) →  tl::expected&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt;, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a46dff17e413356e6f006fa5d43d18dbb">save</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp; tex,
+              const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; path) →  <a class="m-doc" href="#ad15ae3a93606cfd462ec90d79e38579f">ResultError</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a529f953fff3fdb97c6a603625f7a573a">save</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp; tex) →  tl::expected&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt;, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a452e3440fda008bd2cb019ae4b105827">to_string</a>(</span><span class="m-doc-wrap">DXGI_FORMAT format) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a></span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="var-members">
+          <h2><a href="#var-members">Variables</a></h2>
+          <dl class="m-doc">
+            <dt>
+              auto <a class="m-doc" href="#a3783c7c2c4c09dc40adef5bd6165d81a">canonize_path</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              const <a class="m-doc" href="classbtu_1_1tex_1_1_failure_source_category.html">FailureSourceCategory</a> <a class="m-doc" href="#a58f3a9df9f2f20747ba57724ec9df388">k_failure_source_category</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              const <a class="m-doc" href="structbtu_1_1tex_1_1_texture_err_category.html">TextureErrCategory</a> <a class="m-doc" href="#a53fa4654edb32d86b890279a1a2051b5">k_texture_err_category</a>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Enum documentation</h2>
+          <section class="m-doc-details" id="a75eb4ad855a5020111cf4ebdd4d0a114"><div>
+            <h3>
+              enum class <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span><a class="m-doc-self" href="#a75eb4ad855a5020111cf4ebdd4d0a114">FailureSource</a>: <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/integer.html" target="_blank">std::<wbr/>uint8_t</a>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2error__code_8hpp.html">&lt;btu/tex/error_code.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a7fd1865c9f7112dba737c8f0139d6d44"><div>
+            <h3>
+              enum class <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span><a class="m-doc-self" href="#a7fd1865c9f7112dba737c8f0139d6d44">TextureErr</a>: <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/integer.html" target="_blank">std::<wbr/>uint8_t</a>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2error__code_8hpp.html">&lt;btu/tex/error_code.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a310091cdb4b029eaf1d0b3a292140a57"><div>
+            <h3>
+              enum class <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span><a class="m-doc-self" href="#a310091cdb4b029eaf1d0b3a292140a57">TextureType</a>: <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/integer.html" target="_blank">std::<wbr/>uint8_t</a>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="formats_8hpp.html">&lt;btu/tex/formats.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Typedef documentation</h2>
+          <section class="m-doc-details" id="a88545eaa7db80a8455ea83689a8a3414"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span><a class="m-doc-self" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a> = tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt;
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2detail_2common_8hpp.html">&lt;btu/tex/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a435e14781b8d930665e9f4669c7e454d"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span><a class="m-doc-self" href="#a435e14781b8d930665e9f4669c7e454d">ResultCrunch</a> = tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt;
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2detail_2common_8hpp.html">&lt;btu/tex/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ad15ae3a93606cfd462ec90d79e38579f"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span><a class="m-doc-self" href="#ad15ae3a93606cfd462ec90d79e38579f">ResultError</a> = tl::expected&lt;void, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt;
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2detail_2common_8hpp.html">&lt;btu/tex/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="ae3ac2ed05c078e1fd64ac5fc31404881"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ae3ac2ed05c078e1fd64ac5fc31404881">NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="structbtu_1_1tex_1_1_dimension.html">Dimension</a>,
+              w,
+              h) namespace util</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="dimension_8hpp.html">&lt;btu/tex/dimension.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a17ddefb2e0611a77aac1b28224bc0c0a"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a17ddefb2e0611a77aac1b28224bc0c0a">NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="structbtu_1_1tex_1_1_best_format_for.html">BestFormatFor</a>,
+              uncompressed,
+              uncompressed_without_alpha,
+              compressed,
+              compressed_without_alpha)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="formats_8hpp.html">&lt;btu/tex/formats.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a8e2258d147c6dd0199db53198c9d5490"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a8e2258d147c6dd0199db53198c9d5490">NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="structbtu_1_1tex_1_1_guess_best_format_args.html">GuessBestFormatArgs</a>,
+              opaque_alpha,
+              allow_compressed,
+              force_alpha)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="formats_8hpp.html">&lt;btu/tex/formats.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="aadf2f648b607db82ec019b3b04f8357b"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aadf2f648b607db82ec019b3b04f8357b">NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="structbtu_1_1tex_1_1_settings.html">Settings</a>,
+              game,
+              compress,
+              <a class="m-doc" href="#a37d36a9cd3980aa04b4cb2e4acc1b5da">resize</a>,
+              mipmaps,
+              use_format_whitelist,
+              allowed_formats,
+              output_format,
+              landscape_textures) struct OptimizationSteps</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2optimize_8hpp.html">&lt;btu/tex/optimize.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ad8bdf0468ca8336c9430dbbc724fbbbf"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">NLOHMANN_JSON_SERIALIZE_ENUM</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="#a310091cdb4b029eaf1d0b3a292140a57">TextureType</a>,
+              {{<a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">TextureType::<wbr/>Diffuse</a>, "diffuse"}, {<a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">TextureType::<wbr/>Normal</a>, "normal"}, {<a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">TextureType::<wbr/>Cube</a>, "cube"}, {<a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">TextureType::<wbr/>Specular</a>, "specular"}, {<a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">TextureType::<wbr/>Glow</a>, "glow"}, {<a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">TextureType::<wbr/>Parallax</a>, "parallax"}, {<a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">TextureType::<wbr/>ModelSpaceNormal</a>, "model_space_normal"}, {<a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">TextureType::<wbr/>Backlight</a>, "backlight"}, {<a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">TextureType::<wbr/>Skin</a>, "skin"}, {<a class="m-doc-self" href="#ad8bdf0468ca8336c9430dbbc724fbbbf">TextureType::<wbr/>EnvironmentMask</a>, "environment_mask"}})</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="formats_8hpp.html">&lt;btu/tex/formats.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ae181f96a4805e40fb4dc9ff226486b52"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">OptimizationSteps <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ae181f96a4805e40fb4dc9ff226486b52">compute_optimization_steps</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp; file,
+              const <a class="m-doc" href="structbtu_1_1tex_1_1_settings.html">Settings</a>&amp; sets) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2optimize_8hpp.html">&lt;btu/tex/optimize.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a0771bab778b84485960a92908fbd40ee"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">OptimizationSteps <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a0771bab778b84485960a92908fbd40ee">compute_optimization_steps</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp; file,
+              const <a class="m-doc" href="structbtu_1_1tex_1_1_settings.html">Settings</a>&amp; sets) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2optimize_8hpp.html">&lt;btu/tex/optimize.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a451c578ae7846888c8382e5066ba5fdb"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a435e14781b8d930665e9f4669c7e454d">ResultCrunch</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a451c578ae7846888c8382e5066ba5fdb">convert</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp;&amp; file,
+              DXGI_FORMAT format)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="crunch__functions_8hpp.html">&lt;btu/tex/crunch_functions.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ac08ea78afcad96d45c6c0d683f463e41"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ac08ea78afcad96d45c6c0d683f463e41">convert</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file,
+              DXGI_FORMAT format,
+              <a class="m-doc" href="classbtu_1_1tex_1_1_compression_device.html">CompressionDevice</a>&amp; dev)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2functions_8hpp.html">&lt;btu/tex/functions.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a596c07ddbaf7f756699b2d5644698412"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a596c07ddbaf7f756699b2d5644698412">decompress</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2functions_8hpp.html">&lt;btu/tex/functions.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ab538d4f4ca3e23d0f5838340413b806c"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ab538d4f4ca3e23d0f5838340413b806c">error_from_hresult</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/types/integer" target="_blank">int64_t</a> hr,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/error/error_code.html" target="_blank">std::<wbr/>error_code</a> default_err = <a class="m-doc-self" href="#ab538d4f4ca3e23d0f5838340413b806c">TextureErr::<wbr/>Unknown</a>,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/source_location.html" target="_blank">std::<wbr/>source_location</a> loc = <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/source_location/current.html" target="_blank">std::<wbr/>source_location::<wbr/>current</a>())</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2error__code_8hpp.html">&lt;btu/tex/error_code.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a4a90a0f688ba7395d9f763aebd40c77a"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">DXGI_FORMAT <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a4a90a0f688ba7395d9f763aebd40c77a">from_string</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> str)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="formats__string_8hpp.html">&lt;btu/tex/detail/formats_string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a83e9fefe55a474c50720ffe6d7b2c44b"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a435e14781b8d930665e9f4669c7e454d">ResultCrunch</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a83e9fefe55a474c50720ffe6d7b2c44b">generate_mipmaps</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp;&amp; file)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="crunch__functions_8hpp.html">&lt;btu/tex/crunch_functions.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ae2bc7bbc61efcd88c08a269d80d45f2f"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ae2bc7bbc61efcd88c08a269d80d45f2f">generate_mipmaps</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2functions_8hpp.html">&lt;btu/tex/functions.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="aa1d2c15be442f3704f9241912a21f3a4"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">DXGI_FORMAT <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aa1d2c15be442f3704f9241912a21f3a4">guess_best_format</a>(</span><span class="m-doc-wrap">DXGI_FORMAT current_format,
+              <a class="m-doc" href="structbtu_1_1tex_1_1_best_format_for.html">BestFormatFor</a> formats,
+              const <a class="m-doc" href="structbtu_1_1tex_1_1_guess_best_format_args.html">GuessBestFormatArgs</a>&amp; guess_params) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="formats_8hpp.html">&lt;btu/tex/formats.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a997827cd10143f950ff10e11bd61c27f"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/optional.html" target="_blank">std::<wbr/>optional</a>&lt;<a class="m-doc" href="#a310091cdb4b029eaf1d0b3a292140a57">TextureType</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a997827cd10143f950ff10e11bd61c27f">guess_texture_type</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> path) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="formats_8hpp.html">&lt;btu/tex/formats.hpp&gt;</a></div>
+            </h3>
+            <p>Based on <a class="poxy-external" href="https://forums.nexusmods.com/index.php?/topic/476227-skyrim-nif-files-with-underscores/" target="_blank">https:/<wbr/>/<wbr/>forums.nexusmods.com/<wbr/>index.php?/<wbr/>topic/<wbr/>476227-skyrim-nif-files-with-underscores/<wbr/></a>.</p>
+          </div></section>
+          <section class="m-doc-details" id="ac82ab61898eaf157bc2d88808b933692"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ac82ab61898eaf157bc2d88808b933692">load</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a> path) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="texture_8hpp.html">&lt;btu/tex/texture.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a9a88c0330e4c37b22c32a8c86d31d4cc"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a9a88c0330e4c37b22c32a8c86d31d4cc">load</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a> relative_path,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; data) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="texture_8hpp.html">&lt;btu/tex/texture.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a88578eddda7d3bcb0a3d4b9711e0bbce"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a88578eddda7d3bcb0a3d4b9711e0bbce">load_crunch</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a> path) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="crunch__texture_8hpp.html">&lt;btu/tex/crunch_texture.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="af9329a4464d9102118893f0489dd79b6"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">tl::expected&lt;<a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#af9329a4464d9102118893f0489dd79b6">load_crunch</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a> relative_path,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; data) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="crunch__texture_8hpp.html">&lt;btu/tex/crunch_texture.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a414e4f1b5ee867c7ab8953454e63588d"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/error/error_code.html" target="_blank">std::<wbr/>error_code</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a414e4f1b5ee867c7ab8953454e63588d">make_error_code</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="#a7fd1865c9f7112dba737c8f0139d6d44">TextureErr</a> e)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2error__code_8hpp.html">&lt;btu/tex/error_code.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ac8fff66d71570c4b7e2cc05e28573a77"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/error/error_condition.html" target="_blank">std::<wbr/>error_condition</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ac8fff66d71570c4b7e2cc05e28573a77">make_error_condition</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="#a75eb4ad855a5020111cf4ebdd4d0a114">FailureSource</a> e)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2error__code_8hpp.html">&lt;btu/tex/error_code.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a42a7ea80fe5cf427cf7c8a6f67a26900"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a42a7ea80fe5cf427cf7c8a6f67a26900">make_transparent_alpha</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2functions_8hpp.html">&lt;btu/tex/functions.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a88583309caffff946dea632ffa126181"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/types/size_t" target="_blank">size_t</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a88583309caffff946dea632ffa126181">optimal_mip_count</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="structbtu_1_1tex_1_1_dimension.html">Dimension</a> dim) <span class="m-label m-primary">constexpr</span> <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2functions_8hpp.html">&lt;btu/tex/functions.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a602ae2f29e41d6478abf6c5f31869987"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a602ae2f29e41d6478abf6c5f31869987">optimize</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file,
+              OptimizationSteps sets,
+              <a class="m-doc" href="classbtu_1_1tex_1_1_compression_device.html">CompressionDevice</a>&amp; dev) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2optimize_8hpp.html">&lt;btu/tex/optimize.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="abd1df80a31375dfa3f332ce15da9fa0e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a435e14781b8d930665e9f4669c7e454d">ResultCrunch</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#abd1df80a31375dfa3f332ce15da9fa0e">optimize</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp;&amp; file,
+              OptimizationSteps sets,
+              <a class="m-doc" href="classbtu_1_1tex_1_1_compression_device.html">CompressionDevice</a>&amp; dev) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2optimize_8hpp.html">&lt;btu/tex/optimize.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a37d36a9cd3980aa04b4cb2e4acc1b5da"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a435e14781b8d930665e9f4669c7e454d">ResultCrunch</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a37d36a9cd3980aa04b4cb2e4acc1b5da">resize</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp;&amp; file,
+              <a class="m-doc" href="structbtu_1_1tex_1_1_dimension.html">Dimension</a> dim)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="crunch__functions_8hpp.html">&lt;btu/tex/crunch_functions.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ae4f8c8542060c06233ee6b8d31251029"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#a88545eaa7db80a8455ea83689a8a3414">Result</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ae4f8c8542060c06233ee6b8d31251029">resize</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp;&amp; file,
+              <a class="m-doc" href="structbtu_1_1tex_1_1_dimension.html">Dimension</a> dim)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2functions_8hpp.html">&lt;btu/tex/functions.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="acf9d02b7b56c9f638c1bf66481566bf2"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#ad15ae3a93606cfd462ec90d79e38579f">ResultError</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#acf9d02b7b56c9f638c1bf66481566bf2">save</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp; tex,
+              const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; path) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="crunch__texture_8hpp.html">&lt;btu/tex/crunch_texture.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ad9b2bd00a87338cc0986e63d16270f65"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">tl::expected&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt;, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ad9b2bd00a87338cc0986e63d16270f65">save</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_crunch_texture.html">CrunchTexture</a>&amp; tex) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="crunch__texture_8hpp.html">&lt;btu/tex/crunch_texture.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a46dff17e413356e6f006fa5d43d18dbb"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#ad15ae3a93606cfd462ec90d79e38579f">ResultError</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a46dff17e413356e6f006fa5d43d18dbb">save</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp; tex,
+              const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; path) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="texture_8hpp.html">&lt;btu/tex/texture.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a529f953fff3fdb97c6a603625f7a573a"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">tl::expected&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt;, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a529f953fff3fdb97c6a603625f7a573a">save</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbtu_1_1tex_1_1_texture.html">Texture</a>&amp; tex) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="texture_8hpp.html">&lt;btu/tex/texture.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a452e3440fda008bd2cb019ae4b105827"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a452e3440fda008bd2cb019ae4b105827">to_string</a>(</span><span class="m-doc-wrap">DXGI_FORMAT format)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="formats__string_8hpp.html">&lt;btu/tex/detail/formats_string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Variable documentation</h2>
+          <section class="m-doc-details" id="a3783c7c2c4c09dc40adef5bd6165d81a"><div>
+            <h3>
+              auto <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span><a class="m-doc-self" href="#a3783c7c2c4c09dc40adef5bd6165d81a">canonize_path</a> <span class="m-label m-primary">constexpr</span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="texture_8hpp.html">&lt;btu/tex/texture.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a58f3a9df9f2f20747ba57724ec9df388"><div>
+            <h3>
+              const <a class="m-doc" href="classbtu_1_1tex_1_1_failure_source_category.html">FailureSourceCategory</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span><a class="m-doc-self" href="#a58f3a9df9f2f20747ba57724ec9df388">k_failure_source_category</a>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2error__code_8hpp.html">&lt;btu/tex/error_code.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a53fa4654edb32d86b890279a1a2051b5"><div>
+            <h3>
+              const <a class="m-doc" href="structbtu_1_1tex_1_1_texture_err_category.html">TextureErrCategory</a> <span class="m-doc-details-prefix">btu::<wbr/>tex::<wbr/></span><a class="m-doc-self" href="#a53fa4654edb32d86b890279a1a2051b5">k_texture_err_category</a>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tex_2error__code_8hpp.html">&lt;btu/tex/error_code.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">…</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input autocomplete="off" autofocus="autofocus" disabled="disabled" id="search-input" name="q" placeholder="Loading …" spellcheck="false" type="search"/>
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div class="m-text m-dim m-text-center" id="search-help">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">↓</span>
+            / <span class="m-label m-dim">↑</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div class="m-text m-warning m-text-center" id="search-notfound">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script><script>install_mcss_search_shim();</script>
+<script async="async" src="searchdata-v2.js"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        
+<a class="poxy-external" href="https://github.com/Guekka/bethutil" target="_blank">GitHub</a>
+• <a class="poxy-external" href="https://github.com/Guekka/bethutil/issues" target="_blank">Report an issue</a>
+• <a class="sponsor poxy-external" href="https://github.com/sponsors/Guekka/dashboard/profile" target="_blank">Become a sponsor</a>
+• <a class="poxy-external" href="https://github.com/Guekka/bethutil/blob/main/LICENSE" target="_blank">License</a>
+• <a download="" href="bethutil.tagfile.xml" target="_blank" type="text/xml">Doxygen tagfile</a>
+<br/><br/>
+Site generated using <a class="poxy-external" href="https://github.com/marzer/poxy/" target="_blank">Poxy</a>
+
+      </div>
+    </div>
+  </div>
+</nav></footer>
+
+
+</body></html>
