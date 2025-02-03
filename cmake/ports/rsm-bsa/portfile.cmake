@@ -8,6 +8,8 @@ vcpkg_from_github(
   starfield
   SHA512
   bb91206c3469fc7d896df77272305660ddd71b20f0ae4ddd61b08c11e8618355a3a1d234903adfebffbc91c7b1dea336c1e288acba832bd1bd036ebfc7ec5065
+        PATCHES
+        directxtex24_10.patch
   HEAD_REF
   master)
 
