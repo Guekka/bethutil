@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     systems.url = "github:nix-systems/default";
     devenv.url = "github:cachix/devenv";
   };
@@ -26,7 +26,7 @@
               packages = [pkgs.cmake pkgs.ninja pkgs.pkg-config pkgs.gcc pkgs.vcpkg pkgs.libgccjit pkgs.zip];
 
               enterShell = ''
-                export VCPKG_ROOT=$(realpath $(dirname $(readlink -f $(type -p vcpkg)))/../share/vcpkg)
+                export VCPKG_ROOT="${pkgs.vcpkg}/share/vcpkg"
               '';
             }
           ];
