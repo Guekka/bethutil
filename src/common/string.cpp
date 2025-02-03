@@ -6,22 +6,22 @@
 #include <random>
 
 namespace btu::common {
-    auto as_utf8_string(const std::string &str) -> std::u8string
+auto as_utf8_string(const std::string &str) -> std::u8string
 {
     return {reinterpret_cast<const char8_t *>(str.data()), str.size()};
 }
 
-    auto as_ascii_string(const std::u8string &str) -> std::string
+auto as_ascii_string(const std::u8string &str) -> std::string
 {
     return {reinterpret_cast<const char *>(str.data()), str.size()};
 }
 
-    auto as_utf8(const std::string_view str) -> std::u8string_view
+auto as_utf8(const std::string_view str) -> std::u8string_view
 {
     return {reinterpret_cast<const char8_t *>(str.data()), str.size()};
 }
 
-    auto as_ascii(const std::u8string_view str) -> std::string_view
+auto as_ascii(const std::u8string_view str) -> std::string_view
 {
     return {reinterpret_cast<const char *>(str.data()), str.size()};
 }

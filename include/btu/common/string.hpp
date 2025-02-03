@@ -68,9 +68,9 @@ enum class CaseSensitive : std::uint8_t
 auto as_utf8(std::string_view str) -> std::u8string_view;
 auto as_ascii(std::u8string_view str) -> std::string_view;
 
-    auto as_utf8_string(const std::string &str) -> std::u8string;
+auto as_utf8_string(const std::string &str) -> std::u8string;
 
-    auto as_ascii_string(const std::u8string &str) -> std::string;
+auto as_ascii_string(const std::u8string &str) -> std::string;
 
 auto to_utf8(const std::wstring &str) -> std::u8string;
 auto to_utf16(const std::u8string &str) -> std::wstring;
