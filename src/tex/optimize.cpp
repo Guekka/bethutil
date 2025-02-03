@@ -106,7 +106,7 @@ auto optimize(CrunchTexture &&file,
     const auto has_alpha  = DirectX::HasAlpha(tex.GetMetadata().format);
     const auto alpha_mode = tex.GetMetadata().GetAlphaMode();
     return !has_alpha || alpha_mode == TEX_ALPHA_MODE_OPAQUE || tex.IsAlphaAllOpaque();
-};
+}
 
 template<class Tex>
 [[nodiscard]] static auto can_be_compressed(const Tex &file) noexcept -> bool
@@ -162,7 +162,7 @@ template<class Tex>
 
 [[nodiscard]] static auto best_output_format(const Texture &file,
                                              const Settings &sets,
-                                             bool force_alpha) noexcept -> DXGI_FORMAT
+                                             const bool force_alpha) noexcept -> DXGI_FORMAT
 {
     const auto &tex  = file.get();
     const auto &info = tex.GetMetadata();
@@ -255,7 +255,7 @@ auto compute_optimization_steps(const CrunchTexture &file, const Settings &sets)
 }
 
 // NOLINTNEXTLINE(misc-no-recursion)
-auto Settings::get(Game game) noexcept -> const Settings &
+    auto Settings::get(const Game game) noexcept -> const Settings &
 {
     static auto tes3_sets = [&] {
         return Settings{

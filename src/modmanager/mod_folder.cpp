@@ -29,7 +29,7 @@ auto ModFolder::size() noexcept -> size_t
     class SizeIterator final : public ModFolderIterator
     {
     public:
-        size_t size;
+        size_t size{};
 
         [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,
                                              ArchiveTooLargeState /*state*/) noexcept
@@ -128,7 +128,7 @@ void transform_loose_file(const Path &absolute_path,
     const auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
         [&absolute_path] { return common::read_file(absolute_path); });
 
-    if (const auto transformed = transformer.transform_file({relative_path, file_data}))
+    if (const auto transformed = transformer.transform_file(ModFile{relative_path, file_data}))
     {
         if (!common::write_file(absolute_path, *transformed))
             transformer.failed_to_write_transformed_file(relative_path, *transformed);
@@ -165,7 +165,7 @@ void transform_loose_file(const Path &absolute_path,
                 return buffer.get<binary_io::memory_ostream>().rdbuf();
             });
 
-        auto transformed = transformer.transform_file({relative_path, file_data});
+        auto transformed = transformer.transform_file(ModFile{relative_path, file_data});
         if (transformed)
         {
             const bool res = file.read(*transformed);
