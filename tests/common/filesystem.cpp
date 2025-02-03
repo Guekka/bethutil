@@ -7,9 +7,9 @@
 
 #include <btu/common/filesystem.hpp>
 #include <catch.hpp>
+#include <flux/algorithm/all_any_none.hpp>
 
 #include <fstream>
-#include <flux/algorithm/all_any_none.hpp>
 
 namespace fs = btu::fs;
 

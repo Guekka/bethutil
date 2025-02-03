@@ -25,7 +25,8 @@ auto read_file(const Path &a_path) noexcept -> tl::expected<std::vector<std::byt
     return data;
 }
 
-    auto write_file(const Path &a_path, const std::span<const std::byte> data) noexcept -> tl::expected<void, Error>
+auto write_file(const Path &a_path,
+                const std::span<const std::byte> data) noexcept -> tl::expected<void, Error>
 {
     std::ofstream out{a_path, std::ios_base::binary};
     if (!out)
@@ -37,7 +38,8 @@ auto read_file(const Path &a_path) noexcept -> tl::expected<std::vector<std::byt
     return {};
 }
 
-    auto write_file_new(const Path &a_path, const std::span<const std::byte> data) noexcept -> tl::expected<void, Error>
+auto write_file_new(const Path &a_path,
+                    const std::span<const std::byte> data) noexcept -> tl::expected<void, Error>
 {
     if (exists(a_path))
         return tl::make_unexpected(Error(std::make_error_code(std::errc::file_exists)));

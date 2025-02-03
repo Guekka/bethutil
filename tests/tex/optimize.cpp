@@ -466,7 +466,7 @@ TEST_CASE("tex_optimize", "[src]")
         sets.output_format = btu::tex::Settings::get(btu::Game::SSE).output_format;
         // Change X8 to A8, as X8 is saved and loaded as A8 anyway, just without alpha bits.
         sets.output_format.uncompressed_without_alpha = DXGI_FORMAT_R8G8B8A8_UNORM;
-        sets.resize = btu::tex::Dimension{.w=128, .h=128};
+        sets.resize                                   = btu::tex::Dimension{.w = 128, .h = 128};
         test_expected_dir(u8"optimize", [&](auto &&f) {
             const btu::tex::OptimizationSteps steps = btu::tex::compute_optimization_steps(f, sets);
             return btu::tex::optimize(std::forward<decltype(f)>(f), steps, compression_dev);
