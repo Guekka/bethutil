@@ -7,7 +7,7 @@
 #include <span>
 
 namespace btu::common {
-using ThreadPool = BS::thread_pool;
+using ThreadPool = BS::thread_pool<>;
 
 // GCOVR_EXCL_START : this code comes from <https://github.com/jrgfogh/synchronized_value> and seems well tested
 // NOLINTBEGIN
