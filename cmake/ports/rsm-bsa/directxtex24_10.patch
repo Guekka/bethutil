@@ -1,0 +1,23 @@
+From 2bc688b636996e7b108f2711b234563026605cfe Mon Sep 17 00:00:00 2001
+From: Chuck Walbourn <chuckw@microsoft.com>
+Date: Thu, 31 Oct 2024 15:43:01 -0700
+Subject: [PATCH] Minor code fix to make library compatible with DirectXTex
+ October 2024
+
+---
+ src/bsa/fo4.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bsa/fo4.cpp b/src/bsa/fo4.cpp
+index 5484f13..2d9bbf3 100644
+--- a/src/bsa/fo4.cpp
++++ b/src/bsa/fo4.cpp
+@@ -677,7 +677,7 @@ namespace bsa::fo4
+ 		}
+ 
+ 		a_out.write_bytes({ //
+-			static_cast<const std::byte*>(blob.GetBufferPointer()),
++			reinterpret_cast<const std::byte*>(blob.GetBufferPointer()),
+ 			blob.GetBufferSize() });
+ 		std::vector<std::byte> buffer;
+ 		for (const auto& chunk : *this) {

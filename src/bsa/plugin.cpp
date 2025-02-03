@@ -222,7 +222,7 @@ auto list_archive(const Path &dir, const Settings &sets) noexcept -> std::vector
         // When a single plugin can load multiple archives, it loads all archives such that their
         // name contains the name of the corresponding plugin as a prefix. Sorting the archive
         // names by length should ensure that only the required number of dummy plugins is created.
-        flux::sort(archives, [](const auto p1, const auto p2) { return p1.stem() <= p2.stem(); });
+        flux::sort(archives, [](const auto p1, const auto p2) { return p1.stem() <=> p2.stem(); });
 
         return archives;
     }

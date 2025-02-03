@@ -155,8 +155,8 @@ auto save(const Texture &tex) noexcept -> tl::expected<std::vector<std::byte>, E
         return tl::make_unexpected(error_from_hresult(res));
 
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    return std::vector(static_cast<std::byte *>(blob.GetBufferPointer()),
-                       static_cast<std::byte *>(blob.GetBufferPointer()) + blob.GetBufferSize());
+    return std::vector(reinterpret_cast<std::byte *>(blob.GetBufferPointer()),
+                       reinterpret_cast<std::byte *>(blob.GetBufferPointer()) + blob.GetBufferSize());
     // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 } // namespace btu::tex
