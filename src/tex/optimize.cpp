@@ -178,11 +178,9 @@ template<class Tex>
                                              const Settings &sets,
                                              bool force_alpha) noexcept -> DXGI_FORMAT
 {
-    const auto &tex = file.get();
-
     return guess_best_format(file.get_format_as_dxgi(),
                              sets.output_format,
-                             GuessBestFormatArgs{.opaque_alpha     = !tex.has_alpha(),
+                             GuessBestFormatArgs{.opaque_alpha     = file.has_opaque_alpha(),
                                                  .allow_compressed = sets.compress
                                                                      && can_be_compressed<CrunchTexture>(file),
                                                  .force_alpha = force_alpha});

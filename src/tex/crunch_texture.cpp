@@ -111,6 +111,49 @@ auto CrunchTexture::get_format_as_dxgi() const noexcept -> DXGI_FORMAT
     }
 }
 
+auto CrunchTexture::has_opaque_alpha() const noexcept -> bool
+{
+    // If format doesn't have alpha, or the image is already compressed.
+    if (!tex_.has_alpha())
+        return true;
+
+    // Check if there are any miplevels at all.
+    [[unlikely]] if (!tex_.get_num_levels())
+        return true;
+
+    // Should catch everything.
+    const uint8 threshold = 254;
+
+    for (auto face = 0u; face < tex_.get_num_faces(); face++)
+    {
+        const auto *mip = tex_.get_level(face, 0);
+
+        // Get uncompressed image to check.
+        crnlib::image_u8 *img;
+        if (mip->is_packed())
+        {
+            img = crnlib::crnlib_new<image_u8>();
+            mip->get_unpacked_image(*img, 1);
+        }
+        else
+            img = mip->get_image();
+
+        // One last safety check.
+        [[unlikely]] if (img == nullptr)
+            return true;
+
+        const auto pixels = img->get_pixels();
+
+        for (auto i = 0u; i < img->get_total_pixels(); i++)
+        {
+            if (pixels[i].a < threshold)
+                return false;
+        }
+    }
+
+    return true;
+}
+
 auto load_crunch(Path path) noexcept -> tl::expected<CrunchTexture, Error>
 {
     CrunchTexture tex;
