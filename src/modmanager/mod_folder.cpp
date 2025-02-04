@@ -66,7 +66,7 @@ void ModFolder::iterate(ModFolderIterator &iterator) noexcept
         [[nodiscard]] auto transform_file(ModFile file) noexcept
             -> std::optional<std::vector<std::byte>> override
         {
-            iterator_.get().process_file(file);
+            iterator_.get().process_file(std::move(file));
             return std::nullopt;
         }
 
@@ -177,13 +177,13 @@ void transform_loose_file(const Path &absolute_path,
     };
 }
 
-[[nodiscard]] auto change_archive_version_if_needed(bsa::Archive &archive,
-                                                    const bsa::Settings &bsa_settings) noexcept -> bool
+[[nodiscard]] auto change_archive_version_if_needed(
+    bsa::Archive &archive, const bsa::Settings &bsa_settings) noexcept -> tl::expected<bool, common::Error>
 {
     if (const auto target_version = guess_target_archive_version(archive, bsa_settings))
     {
-        archive.set_version(*target_version);
-        return true;
+        const auto res = archive.set_version(*target_version);
+        return res.map([] { return true; });
     }
     return false;
 }
@@ -225,7 +225,12 @@ void transform_archive_file(const Path &archive_path,
     if (transformer.stop_requested())
         return;
 
-    const bool version_changed = change_archive_version_if_needed(archive, bsa_settings);
+    const auto version_changed = change_archive_version_if_needed(archive, bsa_settings);
+    if (!version_changed)
+    {
+        transformer.failed_to_change_archive_version(archive_path, version_changed.error());
+        return;
+    }
 
     if (const auto arch_size = archive.file_size(); arch_size > bsa_settings.max_size)
     {
@@ -238,7 +243,7 @@ void transform_archive_file(const Path &archive_path,
     if (transformer.stop_requested())
         return;
 
-    if (any_file_changed || version_changed)
+    if (any_file_changed || version_changed.value_or(false))
     {
         // Change the extension of the archive if needed
         auto path = archive_path;

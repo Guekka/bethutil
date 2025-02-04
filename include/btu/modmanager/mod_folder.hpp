@@ -68,6 +68,8 @@ public:
     virtual void failed_to_write_archive(const Path &old_archive_path, const Path &new_archive_path) noexcept
     {
     }
+
+    virtual void failed_to_change_archive_version(const Path &path, const common::Error &error) noexcept {}
 };
 
 class ModFolderIterator : public ModFolderIteratorBase
