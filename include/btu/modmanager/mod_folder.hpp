@@ -38,9 +38,8 @@ public:
         AfterProcessing,
     };
 
-    [[nodiscard]] virtual auto archive_too_large(const Path &archive_path,
-                                                 ArchiveTooLargeState state) noexcept -> ArchiveTooLargeAction
-        = 0;
+    [[nodiscard]] virtual auto archive_too_large(
+        const Path &archive_path, ArchiveTooLargeState state) noexcept -> ArchiveTooLargeAction = 0;
 
     virtual void failed_to_read_archive(const Path &archive_path) noexcept {}
 
@@ -54,7 +53,7 @@ public:
     /// std::nullopt, the file is not changed.
     /// \note For optimal performance, it is recommended to return std::nullopt for files that do not need to be changed.
     [[nodiscard]] virtual auto transform_file(ModFile file) noexcept -> std::optional<std::vector<std::byte>>
-        = 0;
+                                                                        = 0;
 
     virtual void failed_to_write_transformed_file(const Path &relative_path,
                                                   std::span<const std::byte> content) noexcept

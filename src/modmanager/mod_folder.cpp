@@ -177,9 +177,8 @@ void transform_loose_file(const Path &absolute_path,
     };
 }
 
-[[nodiscard]] auto change_archive_version_if_needed(bsa::Archive &archive,
-                                                    const bsa::Settings &bsa_settings) noexcept
-    -> tl::expected<bool, common::Error>
+[[nodiscard]] auto change_archive_version_if_needed(
+    bsa::Archive &archive, const bsa::Settings &bsa_settings) noexcept -> tl::expected<bool, common::Error>
 {
     if (const auto target_version = guess_target_archive_version(archive, bsa_settings))
     {
