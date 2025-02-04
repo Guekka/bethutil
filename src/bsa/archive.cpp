@@ -1,11 +1,14 @@
 #include "btu/bsa/archive.hpp"
 
 #include "bsa/detail/common.hpp"
+#include "btu/common/error.hpp"
 
 #include <binary_io/memory_stream.hpp>
 #include <bsa/bsa.hpp>
+#include <btu/bsa/error_code.hpp>
 #include <btu/common/threading.hpp>
 #include <flux.hpp>
+#include <tl/expected.hpp>
 
 #include <filesystem>
 #include <utility>
@@ -68,7 +71,7 @@ namespace btu::bsa {
 
 File::File(ArchiveVersion version,
            const ArchiveType type,
-           const std::optional<TES4ArchiveType> tes4_type = std::nullopt)
+           const std::optional<TES4ArchiveType> tes4_type) noexcept
     : ver_(version)
     , type_(type)
     , tes4_archive_type_(tes4_type)
@@ -91,7 +94,7 @@ File::File(ArchiveVersion version,
 File::File(UnderlyingFile f,
            const ArchiveVersion version,
            const ArchiveType type,
-           const std::optional<TES4ArchiveType> tes4_type = std::nullopt)
+           const std::optional<TES4ArchiveType> tes4_type = std::nullopt) noexcept
     : ver_(version)
     , type_(type)
     , tes4_archive_type_(tes4_type)
@@ -112,7 +115,7 @@ auto File::compressed() const noexcept -> Compression
     return std::visit(visitor, file_);
 }
 
-auto File::size() const noexcept -> size_t
+auto File::size() const noexcept -> std::optional<size_t>
 {
     constexpr auto visitor = common::Overload{
         [](const libbsa::tes3::file &f) { return f.size(); },
@@ -120,10 +123,17 @@ auto File::size() const noexcept -> size_t
         [](const libbsa::fo4::file &f) { return flux::ref(f).map(&libbsa::fo4::chunk::size).sum(); },
     };
 
-    return std::visit(visitor, file_);
+    try
+    {
+        return std::visit(visitor, file_);
+    }
+    catch (const std::exception &)
+    {
+        return std::nullopt;
+    }
 }
 
-void File::compress()
+auto File::compress() noexcept -> bool
 {
     const auto visitor = common::Overload{
         [](libbsa::tes3::file &) {},
@@ -147,11 +157,19 @@ void File::compress()
         },
     };
 
-    std::visit(visitor, file_);
-    assert(compressed() == Compression::Yes);
+    try
+    {
+        std::visit(visitor, file_);
+        assert(compressed() == Compression::Yes);
+        return true;
+    }
+    catch (const std::exception &)
+    {
+        return false;
+    }
 }
 
-auto File::read(Path path) -> bool
+auto File::read(Path path) noexcept -> bool
 {
     const auto visitor = common::Overload{
         [&path](libbsa::tes3::file &f) { f.read(std::move(path)); },
@@ -174,7 +192,7 @@ auto File::read(Path path) -> bool
     }
 }
 
-auto File::read(std::span<std::byte> src) -> bool
+auto File::read(std::span<std::byte> src) noexcept -> bool
 {
     const auto visitor = common::Overload{
         [&](libbsa::tes3::file &f) { f.read(libbsa::read_source(src)); },
@@ -197,7 +215,7 @@ auto File::read(std::span<std::byte> src) -> bool
     }
 }
 
-auto File::write(Path path) const -> bool
+auto File::write(Path path) const noexcept -> bool
 {
     const auto visitor = common::Overload{
         [&](const libbsa::tes3::file &f) { f.write(std::move(path)); },
@@ -220,7 +238,7 @@ auto File::write(Path path) const -> bool
     }
 }
 
-auto File::write(binary_io::any_ostream &dst) const -> bool
+auto File::write(binary_io::any_ostream &dst) const noexcept -> bool
 {
     const auto visitor = common::Overload{
         [&](const libbsa::tes3::file &f) { f.write(dst); },
@@ -254,100 +272,105 @@ auto File::tes4_archive_type() const noexcept -> std::optional<TES4ArchiveType>
     return tes4_archive_type_;
 }
 
-Archive::Archive(const ArchiveVersion ver, const ArchiveType type)
+Archive::Archive(const ArchiveVersion ver, const ArchiveType type) noexcept
     : ver_(ver)
     , type_(type)
 {
 }
 
-auto Archive::read(Path path) -> std::optional<Archive>
+auto Archive::read_tes3(Path path) -> tl::expected<Archive, Error>
 {
-    if (!exists(path))
-        return {};
+    libbsa::tes3::archive arch;
+    arch.read(std::move(path));
+
+    Archive res;
+    res.ver_  = ArchiveVersion::tes3;
+    res.type_ = ArchiveType::Standard;
+
+    for (auto &&[key, file] : std::move(arch))
+    {
+        auto relative_file_path = virtual_to_local_path(key);
+
+        const bool success = res.emplace(common::as_ascii_string(std::move(relative_file_path)),
+                                         File(std::move(file), ArchiveVersion::tes3, ArchiveType::Standard));
+
+        assert(success && "Invalid archive file type, this should never happen");
+    }
+    return res;
+}
+
+auto Archive::read_tes4(const Path &path) -> tl::expected<Archive, Error>
+{
+    libbsa::tes4::archive arch;
+    Archive res;
+    res.ver_ = from_tes4_version(arch.read(path));
+
+    // Here we can't know easily if it's standard or textures. Because they're basically the same in SSE
+    // Let's rely on the name of the archive. The only tes4 texture archive is x - Textures.bsa
+    res.type_ = ArchiveType::Standard;
+    if (path.filename().u8string().ends_with(u8" - Textures.bsa"))
+        res.type_ = ArchiveType::Textures;
+
+    for (auto &[dir_path, dir] : std::move(arch))
+    {
+        for (auto &[file_path, file] : std::move(dir))
+        {
+            const auto u8str = virtual_to_local_path(dir_path, file_path);
+            const auto str   = common::as_ascii_string(u8str);
+
+            const bool success = res.emplace(str, File(std::move(file), res.ver_, res.type_));
+            assert(success && "Invalid archive file type, this should never happen");
+        }
+    }
+    return res;
+}
+
+auto Archive::read_fo4(Path path) -> tl::expected<Archive, Error>
+{
+    libbsa::fo4::archive arch;
+    const auto archive_info = arch.read(std::move(path));
+
+    Archive res;
+    res.ver_ = [&] {
+        switch (archive_info.version_)
+        {
+            case libbsa::fo4::version::v1: [[fallthrough]];
+            case libbsa::fo4::version::v7: [[fallthrough]];
+            case libbsa::fo4::version::v8: return ArchiveVersion::fo4;
+            case libbsa::fo4::version::v2: [[fallthrough]];
+            case libbsa::fo4::version::v3: return ArchiveVersion::starfield;
+        }
+        libbsa::detail::declare_unreachable();
+    }();
+
+    res.type_ = archive_info.format_ == ::bsa::fo4::format::directx ? ArchiveType::Textures
+                                                                    : ArchiveType::Standard;
+
+    for (auto &&[key, file] : std::move(arch))
+    {
+        auto relative_file_path = virtual_to_local_path(key);
+        const bool success      = res.emplace(common::as_ascii_string(std::move(relative_file_path)),
+                                         File(std::move(file), res.ver_, res.type_));
+        assert(success && "Invalid archive file type, this should never happen");
+    }
+    return res;
+}
+
+auto Archive::read(Path path) noexcept -> tl::expected<Archive, Error>
+{
+    std::error_code ec;
+    if (!exists(path, ec) || ec)
+        return tl::make_unexpected(Error(ec));
 
     const auto opt_format = libbsa::guess_file_format(path);
     if (!opt_format.has_value())
-        return {};
+        return tl::make_unexpected(Error(BsaErr::UnknownFormat));
 
-    const auto format = *opt_format;
-    Archive res;
-    switch (format)
+    switch (*opt_format)
     {
-        case libbsa::file_format::tes3:
-        {
-            libbsa::tes3::archive arch;
-            arch.read(std::move(path));
-
-            res.ver_  = ArchiveVersion::tes3;
-            res.type_ = ArchiveType::Standard;
-
-            for (auto &&[key, file] : std::move(arch))
-            {
-                auto relative_file_path = virtual_to_local_path(key);
-
-                const bool success = res.emplace(common::as_ascii_string(std::move(relative_file_path)),
-                                                 File(std::move(file),
-                                                      ArchiveVersion::tes3,
-                                                      ArchiveType::Standard));
-
-                assert(success && "Invalid archive file type, this should never happen");
-            }
-            return res;
-        }
-        case libbsa::file_format::tes4:
-        {
-            libbsa::tes4::archive arch;
-            res.ver_ = from_tes4_version(arch.read(path));
-
-            // Here we can't know easily if it's standard or textures. Because they're basically the same in SSE
-            // Let's rely on the name of the archive. The only tes4 texture archive is x - Textures.bsa
-            // TODO: that doesn't feel clean, it's a "magic string"
-            res.type_ = ArchiveType::Standard;
-            if (path.filename().u8string().ends_with(u8" - Textures.bsa"))
-                res.type_ = ArchiveType::Textures;
-
-            for (auto &[dir_path, dir] : std::move(arch))
-            {
-                for (auto &[file_path, file] : std::move(dir))
-                {
-                    const auto u8str = virtual_to_local_path(dir_path, file_path);
-                    const auto str   = common::as_ascii_string(u8str);
-
-                    const bool success = res.emplace(str, File(std::move(file), res.ver_, res.type_));
-                    assert(success && "Invalid archive file type, this should never happen");
-                }
-            }
-            return res;
-        }
-        case libbsa::file_format::fo4:
-        {
-            libbsa::fo4::archive arch;
-            const auto archive_info = arch.read(std::move(path));
-
-            res.ver_ = [&] {
-                switch (archive_info.version_)
-                {
-                    case libbsa::fo4::version::v1: [[fallthrough]];
-                    case libbsa::fo4::version::v7: [[fallthrough]];
-                    case libbsa::fo4::version::v8: return ArchiveVersion::fo4;
-                    case libbsa::fo4::version::v2: [[fallthrough]];
-                    case libbsa::fo4::version::v3: return ArchiveVersion::starfield;
-                }
-                libbsa::detail::declare_unreachable();
-            }();
-
-            res.type_ = archive_info.format_ == ::bsa::fo4::format::directx ? ArchiveType::Textures
-                                                                            : ArchiveType::Standard;
-
-            for (auto &&[key, file] : std::move(arch))
-            {
-                auto relative_file_path = virtual_to_local_path(key);
-                const bool success      = res.emplace(common::as_ascii_string(std::move(relative_file_path)),
-                                                 File(std::move(file), res.ver_, res.type_));
-                assert(success && "Invalid archive file type, this should never happen");
-            }
-            return res;
-        }
+        case libbsa::file_format::tes3: return read_tes3(std::move(path));
+        case libbsa::file_format::tes4: return read_tes4(std::move(path));
+        case libbsa::file_format::fo4: return read_fo4(std::move(path));
     }
     libbsa::detail::declare_unreachable();
 }
@@ -363,7 +386,7 @@ auto Archive::read(Path path) -> std::optional<Archive>
  * @param path The path of the file to be written.
  */
 template<typename Archive, typename WriteFunc>
-[[nodiscard]] auto do_write(Archive &&arch, WriteFunc &&write_func, const fs::path &path) -> bool
+[[nodiscard]] auto do_write(Archive &&arch, WriteFunc &&write_func, const fs::path &path) noexcept -> bool
     requires std::is_rvalue_reference_v<decltype(arch)> && std::is_invocable_v<WriteFunc, Archive, fs::path>
 {
     auto write_and_check = [&](fs::path p) {
@@ -387,7 +410,88 @@ template<typename Archive, typename WriteFunc>
     return write_and_check(path);
 }
 
-auto Archive::write(Path path) && -> bool
+bool Archive::write_tes3(Path path) && noexcept
+{
+    libbsa::tes3::archive bsa;
+    for (auto &[filepath, file] : std::move(files_))
+    {
+        auto tes3_file = std::move(file).as_raw_file<libbsa::tes3::file>();
+        assert(tes3_file && "Invalid file in tes3 archive");
+        bsa.insert(filepath, std::move(*tes3_file));
+    }
+    return do_write(BTU_MOV(bsa), [](auto &&bsa, auto &&write_path) { bsa.write(BTU_FWD(write_path)); }, BTU_MOV(path));
+}
+
+bool Archive::write_tes4(Path path) && noexcept
+{
+    libbsa::tes4::archive bsa;
+
+    for (auto &[filepath, file] : std::move(files_))
+    {
+        auto elem_path = Path(filepath);
+        const auto d   = [&] {
+            const auto key = elem_path.parent_path().lexically_normal().generic_string();
+            if (bsa.find(key) == bsa.end())
+                bsa.insert(key, libbsa::tes4::directory());
+            return bsa[key];
+        }();
+
+        auto tes4_file = std::move(file).as_raw_file<libbsa::tes4::file>();
+        assert(tes4_file && "Invalid file in tes4 archive");
+        auto [_, res] = d->insert(elem_path.filename().lexically_normal().generic_string(),
+                                  std::move(*tes4_file));
+
+        if (res)
+        {
+            if (auto arch_type = file.tes4_archive_type(); arch_type)
+            {
+                bsa.archive_types(bsa.archive_types() | arch_type.value());
+            }
+        }
+    }
+
+    bsa.archive_flags(libbsa::tes4::archive_flag::directory_strings
+                      | libbsa::tes4::archive_flag::file_strings);
+
+    if (bsa.meshes())
+        bsa.archive_flags(bsa.archive_flags() | libbsa::tes4::archive_flag::retain_strings_during_startup);
+    if (bsa.textures())
+        bsa.archive_flags(bsa.archive_flags() | libbsa::tes4::archive_flag::embedded_file_names);
+    if (bsa.sounds())
+        bsa.archive_flags(bsa.archive_flags() | libbsa::tes4::archive_flag::retain_file_names);
+
+    return do_write(
+        BTU_MOV(bsa),
+        [this](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path), *to_tes4_version(ver_)); },
+        BTU_MOV(path));
+}
+
+bool Archive::write_fo4(Path path) && noexcept
+{
+    libbsa::fo4::archive ba2;
+    for (auto &[filepath, file] : std::move(files_))
+    {
+        auto fo4_file = std::move(file).as_raw_file<libbsa::fo4::file>();
+        assert(fo4_file && "Invalid file in fo4 archive");
+        ba2.insert(filepath, std::move(*fo4_file));
+    }
+    return do_write(
+        BTU_MOV(ba2),
+        [this](auto &&ba2, auto &&path) {
+            const auto v = ver_ == ArchiveVersion::starfield ? libbsa::fo4::version::v3
+                                                             : libbsa::fo4::version::v8;
+
+            ba2.write(BTU_FWD(path),
+                      {
+                          .format_             = *to_fo4_format(ver_, type_),
+                          .version_            = v,
+                          .compression_format_ = fo4_compression_format(ver_, type_),
+                      });
+        },
+        BTU_MOV(path));
+}
+
+auto Archive::write(const Path &path) && noexcept -> bool
 {
     if (files_.empty())
         return false;
@@ -396,117 +500,56 @@ auto Archive::write(Path path) && -> bool
 
     switch (ver_)
     {
-        case ArchiveVersion::tes3:
-        {
-            libbsa::tes3::archive bsa;
-            for (auto &&elem : std::move(files_))
-            {
-                bsa.insert(elem.first, std::move(elem.second).as_raw_file<libbsa::tes3::file>());
-            }
-            return do_write(
-                BTU_MOV(bsa), [](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path)); }, BTU_MOV(path));
-        }
+        case ArchiveVersion::tes3: return std::move(*this).write_tes3(path);
         case ArchiveVersion::tes4:
         case ArchiveVersion::fo3:
         case ArchiveVersion::tes5: [[fallthrough]];
-        case ArchiveVersion::sse:
-        {
-            libbsa::tes4::archive bsa;
-
-            for (auto &&elem : std::move(files_))
-            {
-                auto elem_path = Path(elem.first);
-                const auto d   = [&] {
-                    const auto key = elem_path.parent_path().lexically_normal().generic_string();
-                    if (bsa.find(key) == bsa.end())
-                        bsa.insert(key, libbsa::tes4::directory());
-                    return bsa[key];
-                }();
-
-                auto result = d->insert(elem_path.filename().lexically_normal().generic_string(),
-                                        std::move(elem.second).as_raw_file<libbsa::tes4::file>());
-
-                if (result.second)
-                {
-                    if (auto arch_type = elem.second.tes4_archive_type(); arch_type)
-                    {
-                        bsa.archive_types(bsa.archive_types() | arch_type.value());
-                    }
-                }
-            }
-
-            bsa.archive_flags(libbsa::tes4::archive_flag::directory_strings
-                              | libbsa::tes4::archive_flag::file_strings);
-
-            if (bsa.meshes())
-                bsa.archive_flags(bsa.archive_flags()
-                                  | libbsa::tes4::archive_flag::retain_strings_during_startup);
-            if (bsa.textures())
-                bsa.archive_flags(bsa.archive_flags() | libbsa::tes4::archive_flag::embedded_file_names);
-            if (bsa.sounds())
-                bsa.archive_flags(bsa.archive_flags() | libbsa::tes4::archive_flag::retain_file_names);
-
-            return do_write(
-                BTU_MOV(bsa),
-                [this](auto &&bsa, auto &&path) { bsa.write(BTU_FWD(path), *to_tes4_version(ver_)); },
-                BTU_MOV(path));
-        }
+        case ArchiveVersion::sse: return std::move(*this).write_tes4(path);
         case ArchiveVersion::fo4: [[fallthrough]];
-        case ArchiveVersion::starfield:
-        {
-            libbsa::fo4::archive ba2;
-            for (auto &&elem : std::move(files_))
-            {
-                ba2.insert(elem.first, std::move(elem.second).as_raw_file<libbsa::fo4::file>());
-            }
-            return do_write(
-                BTU_MOV(ba2),
-                [this](auto &&ba2, auto &&path) {
-                    const auto v = ver_ == ArchiveVersion::starfield ? libbsa::fo4::version::v3
-                                                                     : libbsa::fo4::version::v8;
-
-                    ba2.write(BTU_FWD(path),
-                              {
-                                  .format_             = *to_fo4_format(ver_, type_),
-                                  .version_            = v,
-                                  .compression_format_ = fo4_compression_format(ver_, type_),
-                              });
-                },
-                BTU_MOV(path));
-        }
+        case ArchiveVersion::starfield: return std::move(*this).write_fo4(path);
     }
-    libbsa::detail::declare_unreachable();
+    return false;
 }
 
-void Archive::set_version(ArchiveVersion version) noexcept
+auto Archive::set_version(ArchiveVersion version) noexcept -> tl::expected<void, Error>
 {
     if (version == std::exchange(ver_, version))
-        return;
+        return {};
 
-    common::for_each_mt(files_, [version](auto &path_file) {
-        auto res_file = File(version, path_file.second.type());
+    try
+    {
+        common::for_each_mt(files_, [version](auto &path_file) {
+            auto res_file = File(version, path_file.second.type());
 
-        auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
+            auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
 
-        bool res = path_file.second.write(buffer);
-        // TODO: better error handling
-        assert(res);
-        res = res_file.read(buffer.get<binary_io::memory_ostream>().rdbuf());
-        assert(res);
+            // throwing is the only way to stop the loop
+            bool res = path_file.second.write(buffer);
+            if (!res)
+                throw common::Exception(Error(BsaErr::FailedToWriteFile));
+            res = res_file.read(buffer.get<binary_io::memory_ostream>().rdbuf());
+            if (!res)
+                throw common::Exception(Error(BsaErr::FailedToReadFile));
 
-        if (path_file.second.compressed() == Compression::Yes)
-            res_file.compress();
+            if (path_file.second.compressed() == Compression::Yes)
+                std::ignore = res_file.compress(); // if we fail to compress, we just write uncompressed
 
-        path_file.second = BTU_MOV(res_file);
-    });
+            path_file.second = BTU_MOV(res_file);
+        });
+        return {};
+    }
+    catch (const common::Exception &e)
+    {
+        return tl::make_unexpected(e.error());
+    }
 }
 
 auto Archive::file_size() const noexcept -> size_t
 {
-    return flux::from_range(files_).map([](const auto &pair) { return pair.second.size(); }).sum();
+    return flux::from_range(files_).map([](const auto &pair) { return pair.second.size().value_or(0); }).sum();
 }
 
-auto Archive::emplace(std::string name, File file) -> bool
+auto Archive::emplace(std::string name, File file) noexcept -> bool
 {
     if (file.version() != ver_)
         return false;
@@ -515,10 +558,6 @@ auto Archive::emplace(std::string name, File file) -> bool
     return true;
 }
 
-auto Archive::get(const std::string &name) -> File &
-{
-    return files_.try_emplace(name, ver_, type_).first->second;
-}
 auto Archive::empty() const noexcept -> bool
 {
     return files_.empty();

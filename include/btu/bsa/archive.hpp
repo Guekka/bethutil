@@ -1,10 +1,12 @@
 #pragma once
 
+#include "btu/common/error.hpp"
 #include "btu/common/metaprogramming.hpp"
 #include "btu/common/path.hpp"
 
 #include <bsa/bsa.hpp>
 #include <nlohmann/json.hpp>
+#include <tl/expected.hpp>
 
 #include <variant>
 
@@ -73,28 +75,34 @@ using UnderlyingFile  = std::variant<libbsa::tes3::file, libbsa::tes4::file, lib
 class File final
 {
 public:
-    explicit File(ArchiveVersion version, ArchiveType type, std::optional<TES4ArchiveType> tes4_type);
-    File(UnderlyingFile f, ArchiveVersion version, ArchiveType type, std::optional<TES4ArchiveType> tes4_type);
+    explicit File(ArchiveVersion version,
+                  ArchiveType type,
+                  std::optional<TES4ArchiveType> tes4_type = std::nullopt) noexcept;
+    File(UnderlyingFile f,
+         ArchiveVersion version,
+         ArchiveType type,
+         std::optional<TES4ArchiveType> tes4_type) noexcept;
 
     [[nodiscard]] auto compressed() const noexcept -> Compression;
-    void compress();
+    [[nodiscard]] auto compress() noexcept -> bool;
 
-    [[nodiscard]] auto read(Path path) -> bool;
-    [[nodiscard]] auto read(std::span<std::byte> src) -> bool;
+    [[nodiscard]] auto read(Path path) noexcept -> bool;
+    [[nodiscard]] auto read(std::span<std::byte> src) noexcept -> bool;
 
-    [[nodiscard]] auto write(Path path) const -> bool;
-    [[nodiscard]] auto write(binary_io::any_ostream &dst) const -> bool;
+    [[nodiscard]] auto write(Path path) const noexcept -> bool;
+    [[nodiscard]] auto write(binary_io::any_ostream &dst) const noexcept -> bool;
 
     [[nodiscard]] auto version() const noexcept -> ArchiveVersion;
     [[nodiscard]] auto type() const noexcept -> ArchiveType;
     [[nodiscard]] auto tes4_archive_type() const noexcept -> std::optional<TES4ArchiveType>;
-    [[nodiscard]] auto size() const noexcept -> size_t;
+    [[nodiscard]] auto size() const noexcept -> std::optional<size_t>;
 
     template<typename T>
         requires btu::common::is_variant_member_v<T, UnderlyingFile>
-    [[nodiscard]] auto as_raw_file() &&
+    [[nodiscard]] auto as_raw_file() && noexcept
     {
-        return std::get<T>(std::move(file_));
+        auto *ret = std::get_if<T>(&file_);
+        return std::optional{std::move(*ret)};
     }
 
 private:
@@ -111,7 +119,10 @@ class Archive final
 public:
     using value_type = decltype(files_)::value_type;
 
-    Archive(ArchiveVersion ver, ArchiveType type);
+    Archive(ArchiveVersion ver, ArchiveType type) noexcept;
+    static auto read_tes3(Path path) -> tl::expected<Archive, common::Error>;
+    static auto read_tes4(const Path &path) -> tl::expected<Archive, common::Error>;
+    static auto read_fo4(Path path) -> tl::expected<Archive, common::Error>;
 
     // While it is possible to copy an archive, it is better to disable implicit copying: it is a heavy operation
     Archive(const Archive &)                     = delete;
@@ -122,11 +133,14 @@ public:
 
     ~Archive() = default;
 
-    static auto read(Path path) -> std::optional<Archive>;
-    [[nodiscard]] auto write(Path path) && -> bool;
+    [[nodiscard]] static auto read(Path path) noexcept -> tl::expected<Archive, common::Error>;
 
-    [[nodiscard]] auto emplace(std::string name, File file) -> bool;
-    [[nodiscard]] auto get(const std::string &name) -> File &;
+    [[nodiscard]] auto write_tes3(Path path) && noexcept -> bool;
+    [[nodiscard]] auto write_tes4(Path path) && noexcept -> bool;
+    [[nodiscard]] auto write_fo4(Path path) && noexcept -> bool;
+    [[nodiscard]] auto write(const Path &path) && noexcept -> bool;
+
+    [[nodiscard]] auto emplace(std::string name, File file) noexcept -> bool;
 
     [[nodiscard]] auto begin() noexcept { return files_.begin(); }
     [[nodiscard]] auto end() noexcept { return files_.end(); }
@@ -136,7 +150,7 @@ public:
     [[nodiscard]] auto size() const noexcept -> size_t;
 
     [[nodiscard]] auto version() const noexcept -> ArchiveVersion { return ver_; }
-    void set_version(ArchiveVersion version) noexcept;
+    [[nodiscard]] tl::expected<void, common::Error> set_version(ArchiveVersion version) noexcept;
 
     [[nodiscard]] auto type() const noexcept -> ArchiveType { return type_; }
 

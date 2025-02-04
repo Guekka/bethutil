@@ -38,9 +38,12 @@ class Exception : public std::exception
 
 public:
     explicit Exception(Error err)
-        : err_(err)
+        : err_(std::move(err))
     {
     }
+
     [[nodiscard]] auto what() const noexcept -> const char * override { return "btu::common::Exception"; }
+
+    [[nodiscard]] auto error() const noexcept -> const Error & { return err_; }
 };
 } // namespace btu::common
