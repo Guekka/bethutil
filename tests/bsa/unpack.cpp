@@ -15,8 +15,8 @@ auto unpack_all(const Path &in, const Path &out, const btu::bsa::Settings &sets)
 
     for (auto &&arch : archives)
     {
-        const auto res = btu::bsa::unpack({.file_path = arch, .root_opt = &out});
-        CHECK(res == btu::bsa::UnpackResult::Success);
+        const auto res = btu::bsa::unpack({.file_path = arch, .extract_to_dir = out});
+        CHECK(res.has_value());
     }
 }
 
