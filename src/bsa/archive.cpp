@@ -419,7 +419,8 @@ bool Archive::write_tes3(Path path) && noexcept
         assert(tes3_file && "Invalid file in tes3 archive");
         bsa.insert(filepath, std::move(*tes3_file));
     }
-    return do_write(BTU_MOV(bsa), [](auto &&bsa, auto &&write_path) { bsa.write(BTU_FWD(write_path)); }, BTU_MOV(path));
+    return do_write(
+        BTU_MOV(bsa), [](auto &&bsa, auto &&write_path) { bsa.write(BTU_FWD(write_path)); }, BTU_MOV(path));
 }
 
 bool Archive::write_tes4(Path path) && noexcept
