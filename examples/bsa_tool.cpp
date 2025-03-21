@@ -43,8 +43,8 @@ void unpack(const btu::Path &dir, const btu::bsa::Settings &sets)
         const auto params = btu::bsa::UnpackSettings{
             .file_path = file,
         };
-        if (auto err = unpack(params))
-            std::cerr << "Failed to unpack archive:" << err.error() << '\n' << std::flush;
+        if (const auto res = unpack(params); !res)
+            std::cerr << "Failed to unpack archive:" << res.error() << '\n' << std::flush;
     }
 }
 
