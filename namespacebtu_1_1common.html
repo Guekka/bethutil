@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>btu::common namespace | bethutil Utilities for Bethesda games</title>
+  <link href="favicon-dark.png" rel="icon" type="image/png"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="#22272e" name="theme-color"/>
+  <link href="poxy/poxy.css" referrerpolicy="no-referrer" rel="stylesheet"/>
+  <script src="poxy/poxy.js"></script>
+  <script>initialize_theme("dark");</script>
+  <meta content="bethutil" name="twitter:title"/>
+  <meta content="bethutil" property="og:title"/>
+  <meta content="bethutil" itemprop="name"/>
+  <meta content="Edgar B" name="author"/>
+  <meta content="Edgar B" property="article:author"/>
+  <meta content="Utilities for Bethesda games" name="description"/>
+  <meta content="Utilities for Bethesda games" name="twitter:description"/>
+  <meta content="Utilities for Bethesda games" property="og:description"/>
+  <meta content="Utilities for Bethesda games" itemprop="description"/>
+  <meta content="telephone=no" name="format-detection"/>
+  <meta content="Poxy v0.19.4" name="generator"/>
+  <meta content="strict-origin-when-cross-origin" name="referrer"/>
+  <script data-domain="guekka.github.io/bethutil" defer="" src="https://plausible.bizel.fr/js/script.js"></script>
+</head>
+<body class="poxy-has-toc">
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a class="m-col-t-8 m-col-m-none m-left-m" href="index.html" id="m-navbar-brand">bethutil <span class="m-thin">Utilities for Bethesda games</span></a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z" id="m-doc-search-icon-path"></path>
+        </svg></a>
+        <a href="#navigation" id="m-navbar-show" title="Show navigation"></a>
+        <a href="#" id="m-navbar-hide" title="Hide navigation"></a>
+      </div>
+      <div class="m-col-t-12 m-show-m m-col-m-none m-right-m" id="m-navbar-collapse">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="annotated.html">Classes</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+            <li><a class="poxy-icon repo github poxy-external" href="https://github.com/Guekka/bethutil" target="_blank" title="View on GitHub"><svg id="poxy-icon-repo" version="1.1" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><path d="M25,1.23a24.37,24.37,0,0,0-7.7,47.5C18.51,49,19,48.2,19,47.56s0-2.12,0-4.15c-6.78,1.47-8.21-3.27-8.21-3.27C9.61,37.33,8,36.58,8,36.58c-2.21-1.51.17-1.48.17-1.48a5.12,5.12,0,0,1,3.73,2.51c2.17,3.72,5.7,2.65,7.09,2a5.25,5.25,0,0,1,1.55-3.26c-5.41-.61-11.1-2.7-11.1-12A9.41,9.41,0,0,1,12,17.79a8.75,8.75,0,0,1,.24-6.45s2-.66,6.7,2.49a23.1,23.1,0,0,1,12.2,0c4.66-3.15,6.7-2.49,6.7-2.49A8.75,8.75,0,0,1,38,17.79a9.41,9.41,0,0,1,2.51,6.54c0,9.36-5.7,11.42-11.13,12a5.83,5.83,0,0,1,1.65,4.51c0,3.26,0,5.89,0,6.69,0,.65.44,1.41,1.68,1.17A24.38,24.38,0,0,0,25,1.23Z" fill="currentColor"></path></svg></a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li><a class="poxy-icon sponsor poxy-external" href="https://github.com/sponsors/Guekka/dashboard/profile" target="_blank" title="Become a sponsor"><svg id="poxy-icon-sponsor" version="1.1" viewBox="0 0 66.911 66.911" xmlns="http://www.w3.org/2000/svg"><path d="M66.911,22.831c0-10.563-8.558-19.122-19.118-19.122c-5.658,0-10.721,2.473-14.223,6.377	c-0.037,0.043-0.076,0.085-0.113,0.128c-3.5-3.98-8.618-6.505-14.334-6.505C8.561,3.709,0.005,12.268,0,22.831	c0,5.834,2.629,11.059,6.758,14.565H6.751l27.104,25.806l26.308-25.806h-0.012C64.279,33.89,66.911,28.669,66.911,22.831z" fill="currentColor"></path></svg></a></li>
+            <li><a class="poxy-icon theme" href="javascript:void(null);" id="poxy-theme-switch" onclick="toggle_theme(); return false;" role="button" title="Toggle dark and light themes"><svg id="poxy-theme-switch-img" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="185.6708" cy="183.8122" fill="currentColor" r="65.625"></circle><path d="M185.6708,87.5622a13.1256,13.1256,0,0,0,13.125-13.125V52.5622a13.125,13.125,0,1,0-26.25,0v21.875A13.1257,13.1257,0,0,0,185.6708,87.5622Z" fill="currentColor"></path><path d="M99.051,115.7519a13.1236,13.1236,0,1,0,18.56-18.56L102.1442,81.726a13.1236,13.1236,0,0,0-18.5595,18.56Z" fill="currentColor"></path><path d="M89.4208,183.8122a13.1257,13.1257,0,0,0-13.125-13.125H54.4208a13.125,13.125,0,0,0,0,26.25h21.875A13.1256,13.1256,0,0,0,89.4208,183.8122Z" fill="currentColor"></path><path d="M99.051,251.8725,83.5847,267.3431a13.1236,13.1236,0,1,0,18.56,18.56l15.4663-15.4706a13.1236,13.1236,0,1,0-18.5595-18.56Z" fill="currentColor"></path><path d="M185.6708,280.0622a13.1258,13.1258,0,0,0-13.125,13.125v21.875a13.125,13.125,0,0,0,26.25,0v-21.875A13.1257,13.1257,0,0,0,185.6708,280.0622Z" fill="currentColor"></path><path d="M272.2907,251.8725a13.1236,13.1236,0,1,0-18.56,18.56l15.4663,15.4706a13.1236,13.1236,0,1,0,18.56-18.56Z" fill="currentColor"></path><path d="M330.0458,183.8122a13.1257,13.1257,0,0,0-13.125-13.125h-21.875a13.125,13.125,0,0,0,0,26.25h21.875A13.1256,13.1256,0,0,0,330.0458,183.8122Z" fill="currentColor"></path><path d="M263.0109,119.5971a13.0824,13.0824,0,0,0,9.28-3.8452l15.4663-15.4663a13.1236,13.1236,0,1,0-18.56-18.56L253.7312,97.1923a13.125,13.125,0,0,0,9.28,22.4048Z" fill="currentColor"></path><path d="M456.9379,401.6714a63.97,63.97,0,0,1-14.9963,7.2055c-19.6448,6.5283-41.8787,2.9566-58.1439-9.8523a68.9311,68.9311,0,0,1-10.835-10.8339c-12.8088-16.2663-16.3806-38.5-9.8523-58.1471a63.8444,63.8444,0,0,1,7.2077-14.9931,8.8036,8.8036,0,0,0-10.1172-13.3034,87.5188,87.5188,0,1,0,110.0372,110.04A8.8,8.8,0,0,0,456.9379,401.6714Z" fill="currentColor"></path></svg></a></li>
+            <li class="m-show-m"><a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path"></use>
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="namespacebtu.html">btu</a>::<wbr/></span>common <span class="m-thin">namespace</span>
+        </h1>
+        <p></p>
+        <nav class="m-block m-default poxy-toc" id="poxy-toc">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#namespaces">Namespaces</a></li>
+                <li><a href="#nested-classes">Classes</a></li>
+                <li><a href="#nested-concepts">Concepts</a></li>
+                <li><a href="#enum-members">Enums</a></li>
+                <li><a href="#typedef-members">Typedefs</a></li>
+                <li><a href="#func-members">Functions</a></li>
+                <li><a href="#var-members">Variables</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+        <section id="namespaces">
+          <h2><a href="#namespaces">Namespaces</a></h2>
+          <dl class="m-doc">
+            <dt>namespace <a class="m-doc" href="namespacebtu_1_1common_1_1detail.html">detail</a></dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="nested-classes">
+          <h2><a href="#nested-classes">Classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              struct <a class="m-doc" href="structbtu_1_1common_1_1_cards.html">Cards</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              struct <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              class <a class="m-doc" href="classbtu_1_1common_1_1_exception.html">Exception</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              class <a class="m-doc" href="classbtu_1_1common_1_1_invalid_u_t_f8.html">InvalidUTF8</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename T</span></span>&gt;</div>
+              class <a class="m-doc" href="classbtu_1_1common_1_1_lazy.html">Lazy</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class... Ts</span></span>&gt;</div>
+              struct <a class="m-doc" href="structbtu_1_1common_1_1_overload.html">Overload</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              class <a class="m-doc" href="classbtu_1_1common_1_1_u_t_f8_iterator.html">UTF8Iterator</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class T</span></span>&gt;</div>
+              struct <a class="m-doc" href="structbtu_1_1common_1_1is__mutable__lambda.html">is_mutable_lambda</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class</span></span>&gt;</div>
+              struct <a class="m-doc" href="structbtu_1_1common_1_1is__mutable__lambda__helper.html">is_mutable_lambda_helper</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params m-doc-template-long"><span class="m-doc-template-param">class Ret</span>, <span class="m-doc-template-param">class Class</span>, <span class="m-doc-template-param">class... Args</span></span>&gt;</div>
+              struct <a class="m-doc" href="structbtu_1_1common_1_1is__mutable__lambda__helper_3_01_ret_07_class_1_1_5_08_07_args_8_8_8_08_01const_01_4.html">is_mutable_lambda_helper&lt;Ret(Class::*)(Args...) const&gt;</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params m-doc-template-long"><span class="m-doc-template-param">class Ret</span>, <span class="m-doc-template-param">class Class</span>, <span class="m-doc-template-param">class... Args</span></span>&gt;</div>
+              struct <a class="m-doc" href="structbtu_1_1common_1_1is__mutable__lambda__helper_3_01_ret_07_class_1_1_5_08_07_args_8_8_8_08_4.html">is_mutable_lambda_helper&lt;Ret(Class::*)(Args...)&gt;</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class T</span>, <span class="m-doc-template-param">class U</span></span>&gt;</div>
+              struct <a class="m-doc" href="structbtu_1_1common_1_1is__variant__member.html">is_variant_member</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class T</span>, <span class="m-doc-template-param">class... Ts</span></span>&gt;</div>
+              struct <a class="m-doc" href="structbtu_1_1common_1_1is__variant__member_3_01_t_00_01std_1_1variant_3_01_ts_8_8_8_01_4_01_4.html">is_variant_member&lt;T, std::variant&lt;Ts...&gt;&gt;</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename GuardedData</span>, <span class="m-doc-template-param">basic_lockable MutexType</span></span>&gt;</div>
+              class <a class="m-doc" href="classbtu_1_1common_1_1synchronized.html">synchronized</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename GuardedType</span>, <span class="m-doc-template-param">basic_lockable MutexType = <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/thread/mutex.html" target="_blank">std::<wbr/>mutex</a></span></span>&gt;</div>
+              class <a class="m-doc" href="classbtu_1_1common_1_1update__guard.html">update_guard</a>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="nested-concepts">
+          <h2><a href="#nested-concepts">Concepts</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename L</span></span>&gt;</div>
+              concept <a class="m-doc" href="conceptbtu_1_1common_1_1basic__lockable.html">basic_lockable</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class Func</span>, <span class="m-doc-template-param">class Arg</span></span>&gt;</div>
+              concept <a class="m-doc" href="conceptbtu_1_1common_1_1invocable__l__or__r.html">invocable_l_or_r</a>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="enum-members">
+          <h2><a href="#enum-members">Enums</a></h2>
+          <dl class="m-doc">
+            <dt id="fce2837c80cac6b53478fd78af43df706e93d10493e5b2974956a195fdf79b05">
+              <span class="m-doc-wrap-bumper">enum class <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a>: <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/integer.html" target="_blank">std::<wbr/>uint8_t</a> { </span><span class="m-doc-wrap"><a class="m-doc-self" href="#fce2837c80cac6b53478fd78af43df706e93d10493e5b2974956a195fdf79b05">Yes</a>,
+              <a class="m-doc-self" href="#fce2837c80cac6b53478fd78af43df706e93d10493e5b2974956a195fdf79b05">No</a> }</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="typedef-members">
+          <h2><a href="#typedef-members">Typedefs</a></h2>
+          <dl class="m-doc">
+            <dt>
+              using <a class="m-doc" href="#a5a182ad5e979501a5f114e0992983e75">ThreadPool</a> = BS::thread_pool&lt;&gt;
+            </dt>
+            <dd></dd>
+            <dt>
+              using <a class="m-doc" href="#ae9d13fbea52d07db3c550547508cdebb">U8Unit</a> = <a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/types/integer" target="_blank">int32_t</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename T</span>, <span class="m-doc-template-param">typename U</span></span>&gt;</div>
+              using <a class="m-doc" href="#a83d1f2364aa0d1b00e60070f86a9686c">is_equiv</a> = <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/is_same.html" target="_blank">std::<wbr/>is_same</a>&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/remove_cvref.html" target="_blank">std::<wbr/>remove_cvref_t</a>&lt;T&gt;, <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/remove_cvref.html" target="_blank">std::<wbr/>remove_cvref_t</a>&lt;U&gt;&gt;
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="func-members">
+          <h2><a href="#func-members">Functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class... Ts</span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#ab519d15eaac722ed7396cd428595fe1d">Overload</a>(</span><span class="m-doc-wrap">Ts...) →  Overload&lt; Ts... &gt;</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a9e13d7d4ca5e9afedd1d669841acb45a">as_ascii</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> str) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>string_view</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a5f2cdd8ee6c9826499e7989a61bc85e9">as_ascii_string</a>(</span><span class="m-doc-wrap">const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; str) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>string</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a0bba54f0203d560751af304fdd31f6f4">as_utf8</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>string_view</a> str) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#af12fd235982b6703ec45f0bec395f5a4">as_utf8_string</a>(</span><span class="m-doc-wrap">const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>string</a>&amp; str) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename CharT</span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#aff74c52b1d89e2e856aeb6652d69c3cd">backslash_to_slash</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>basic_string</a>&lt;CharT&gt;&amp; path) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Convert backslashes to slashes in path.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a7d05e36c9e7533fcccef4741ea5c0e99">compare_directories</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; dir1,
+              const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; dir2) →  bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a429b07c1596cd56ffd27961153607d5e">compare_files</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; filename1,
+              const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; filename2) →  bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a579cef42371f299a202de48a39b7b304">concat_codepoint</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; string,
+              <a class="m-doc" href="#ae9d13fbea52d07db3c550547508cdebb">U8Unit</a> cp)</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a></span>, <span class="m-doc-template-param">class ValueType</span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a10495be73ddfc5f9e291114a04be0d2f">contains</a>(</span><span class="m-doc-wrap">const <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a>&amp; cont,
+              const ValueType&amp; val) →  auto</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a07ed23d41cb70a78f400cd4d6973e3b0">find_matching_paths_icase</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">btu::<wbr/>Path</a>&amp; directory,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">btu::<wbr/>Path</a>&gt; relative_lowercase_paths) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">btu::<wbr/>Path</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a80c8eeac75c9aca858329e787a79866b">first_codepoint</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string) →  <a class="m-doc" href="#ae9d13fbea52d07db3c550547508cdebb">U8Unit</a> <span class="m-label m-flat m-primary">constexpr</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename Range</span>, <span class="m-doc-template-param">typename Func</span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a183562c5d3ac5031383b3a83f70dc7ee">for_each_mt</a>(</span><span class="m-doc-wrap">Range&amp;&amp; rng,
+              Func&amp;&amp; func) →  auto</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class T</span>, <span class="m-doc-template-param">class U</span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a33d48135c71e18a168b0f6acaf3a8a4c">forward_like</a>(</span><span class="m-doc-wrap">U&amp;&amp; x) →  decltype(auto) <span class="m-label m-flat m-primary">constexpr</span> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>See <a class="poxy-cppreference poxy-external" href="https://en.cppreference.com/w/cpp/utility/forward_like" target="_blank">https://en.cppreference.com/w/cpp/utility/forward_<wbr/>like</a>.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a162faf2c62f248b64e598ff5ab52d9b0">hard_link</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; from,
+              const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; to) →  tl::expected&lt;void, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a08cf3f339a1fa2d298e2a61af8e1e9cf">hardware_concurrency</a>(</span><span class="m-doc-wrap">) →  unsigned <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#aa4b64cfc59995c3419300e54d91c9532">is_lower</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string) →  bool <span class="m-label m-flat m-primary">constexpr</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#aad713cd4c12da91c4622c6d4f66a3f6e">make_path_canonizer</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> start) →  auto <span class="m-label m-flat m-primary">constexpr</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params m-doc-template-long"><span class="m-doc-template-param">typename Out</span>, <span class="m-doc-template-param">typename Range</span>, <span class="m-doc-template-param">typename Func</span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a22cb8105c4872dafb5d721d1e8a7c6fc">make_producer_mt</a>(</span><span class="m-doc-wrap">Range&amp;&amp; rng,
+              Func&amp;&amp; func) →  auto</span>
+            </dt>
+            <dd>Creates a multi-threaded producer for the specified range and function.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a062a7dee57e04f8b83a09e9bce6feb1e">make_thread_pool</a>(</span><span class="m-doc-wrap">)</span>
+            </dt>
+            <dd>Creates a thread pool with the number of threads equal to the number of hardware threads minus one.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a00f5099c820274df2dded37fc07c9bfc">make_valid</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; string,
+              <a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/language/types#Character_types" target="_blank">char8_t</a> replacement) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params m-doc-template-long"><span class="m-doc-template-param">class It</span>, <span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a></span>, <span class="m-doc-template-param">class Sum</span>, <span class="m-doc-template-param">class ValueType = typename <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/iterator/iterator_traits.html" target="_blank">std::<wbr/>iterator_traits</a>&lt;It&gt;::value_type</span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a96c8e8d73f9ab5aa7fc8954c2238534a">merge_if</a>(</span><span class="m-doc-wrap">It first,
+              It last,
+              const <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a>&amp; predicate,
+              const Sum&amp; sum) →  It</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class It</span>, <span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a></span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ab77d02c9dcb2932211b897e2e854ac91">merge_if</a>(</span><span class="m-doc-wrap">It first,
+              It last,
+              <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a>&amp;&amp; predicate) →  It</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a></span>, <span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a></span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#afbb64e534f6ea346b560b0fed2c588a9">merge_if</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a>&amp; cont,
+              <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a>&amp;&amp; predicate) →  auto</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params m-doc-template-long"><span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a></span>, <span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a></span>, <span class="m-doc-template-param">class Sum</span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a57fff2dda5d605dccb67767073009007">merge_if</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a>&amp; cont,
+              <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a>&amp;&amp; pred,
+              Sum&amp;&amp; sum) →  auto</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a88422224716bcb11a2447cccbdbd5cff">operator&lt;&lt;</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/io/basic_ostream.html" target="_blank">std::<wbr/>ostream</a>&amp; os,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/source_location.html" target="_blank">std::<wbr/>source_location</a> loc) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/io/basic_ostream.html" target="_blank">std::<wbr/>ostream</a>&amp;</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a37cea9c0e839bf9b7a9b55298944a68a">operator&lt;&lt;</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/io/basic_ostream.html" target="_blank">std::<wbr/>ostream</a>&amp; os,
+              const <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&amp; err) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/io/basic_ostream.html" target="_blank">std::<wbr/>ostream</a>&amp;</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ab18cd27f1f67a7ab57a34cded847db23">read_file</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; a_path) →  tl::expected&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt;, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class ValueType</span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#aa6bce492b41c063318ebddf1a3b70219">remove_duplicates</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;ValueType&gt;&amp; cont)</span>
+            </dt>
+            <dd></dd>
+            <dt id="ba64359aff364102fe6e869029a0651eb2b3493efa7002af6aa07f8f2a61bcc0">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#aaa1b5d4d4e5eadf92039ec927f4e7484">str_compare</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> lhs,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> rhs,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive = <a class="m-doc-self" href="#ba64359aff364102fe6e869029a0651eb2b3493efa7002af6aa07f8f2a61bcc0">CaseSensitive::<wbr/>Yes</a>) →  bool <span class="m-label m-flat m-primary">constexpr</span></span>
+            </dt>
+            <dd></dd>
+            <dt id="9ff81b4ad65a43f37e6685668f32b37fdeed769853c884fff24fed2f68add2e7">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ae4b406bd818998622f6106265a0799e1">str_contain</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> snippet,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive = <a class="m-doc-self" href="#9ff81b4ad65a43f37e6685668f32b37fdeed769853c884fff24fed2f68add2e7">CaseSensitive::<wbr/>Yes</a>) →  bool <span class="m-label m-flat m-primary">constexpr</span></span>
+            </dt>
+            <dd></dd>
+            <dt id="2478c49b488f4c92c8a7dbe836006c2a04db601209479f4f9a1d11b9370198f2">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a64cfaba57076b74bc89ee31e5193a7bf">str_find</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> snippet,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive = <a class="m-doc-self" href="#2478c49b488f4c92c8a7dbe836006c2a04db601209479f4f9a1d11b9370198f2">CaseSensitive::<wbr/>Yes</a>) →  <a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/types/size_t" target="_blank">size_t</a> <span class="m-label m-flat m-primary">constexpr</span></span>
+            </dt>
+            <dd></dd>
+            <dt id="8dd820fa870ebda04e2f48e515010de6c96ccfc2cb71ace82fb88f642ee637c0">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a2ae3fe6bc5dd16bebe3cf7ec2cd76551">str_match</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> pattern,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive = <a class="m-doc-self" href="#8dd820fa870ebda04e2f48e515010de6c96ccfc2cb71ace82fb88f642ee637c0">CaseSensitive::<wbr/>Yes</a>,
+              <a class="m-doc" href="structbtu_1_1common_1_1_cards.html">Cards</a> cards = <a class="m-doc" href="#a3bbc4219bf316197c6f1aae17cf7ca75">default_<wbr/>cards</a>) →  bool <span class="m-label m-flat m-primary">constexpr</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#abe50e5074516441e67f90a6865bd668b">str_random</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/types/size_t" target="_blank">size_t</a> length,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/language/types#Character_types" target="_blank">char8_t</a>&gt; charset = <a class="m-doc" href="#abe37a6c95755acc9febcd740131a7ac3">k_<wbr/>lower_<wbr/>alphabetic_<wbr/>charset</a>) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ad036bdab0df992a629bfac779db0dc03">str_replace_once</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; string,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> from,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> to,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; <span class="m-label m-flat m-primary">constexpr</span></span>
+            </dt>
+            <dd></dd>
+            <dt id="d9ed64796b49403264faa8710b59f9f836547f2e6b3bb6d95c3df69a30f60080">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a2350c38996805e37331483dc4337f3d3">str_starts_with</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> snippet,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive = <a class="m-doc-self" href="#d9ed64796b49403264faa8710b59f9f836547f2e6b3bb6d95c3df69a30f60080">CaseSensitive::<wbr/>Yes</a>) →  bool <span class="m-label m-flat m-primary">constexpr</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#aab271409e6a788c454de47ed3548df02">str_trim</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> in) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> <span class="m-label m-flat m-primary">constexpr</span> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a826b7aad4faf85b999346ff8d19cd3fe">to_lower</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename E</span></span>&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ab7492d8fcd1359ea41e7ee6bf529fa4a">to_underlying</a>(</span><span class="m-doc-wrap">E e) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/underlying_type.html" target="_blank">std::<wbr/>underlying_type_t</a>&lt;E&gt; <span class="m-label m-flat m-primary">constexpr</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a918bb9ded2898b1e3b4ccfe70ede3830">to_utf16</a>(</span><span class="m-doc-wrap">const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; str) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>wstring</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a4c35904a87c5e732d21aed632ff337bd">to_utf8</a>(</span><span class="m-doc-wrap">const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>wstring</a>&amp; str) →  <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a54a4e49d65176b7268128f99b1be87c4">write_file</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; a_path,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; data) →  tl::expected&lt;void, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a12bd60389295f9266f1d5f0549e8f865">write_file_new</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; a_path,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; data) →  tl::expected&lt;void, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="var-members">
+          <h2><a href="#var-members">Variables</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <a class="m-doc" href="structbtu_1_1common_1_1detail_1_1bind__back__fn.html">detail::<wbr/>bind_back_fn</a> <a class="m-doc" href="#a4cd0799cfb94e2b507438e766a4d01d3">bind_back</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <a class="m-doc" href="structbtu_1_1common_1_1_cards.html">Cards</a> <a class="m-doc" href="#a3bbc4219bf316197c6f1aae17cf7ca75">default_cards</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename T</span>, <span class="m-doc-template-param">typename U</span></span>&gt;</div>
+              bool <a class="m-doc" href="#af7f7c7d55e6100daba4cae2aa7042157">is_equiv_v</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class T</span></span>&gt;</div>
+              bool <a class="m-doc" href="#a29a10199500f4692f97ef9a0fb4fdcbd">is_mutable_lambda_v</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class T</span>, <span class="m-doc-template-param">class... Ts</span></span>&gt;</div>
+              bool <a class="m-doc" href="#a8d31016cf18c062508a3aa8e9bbabdb5">is_variant_member_v</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              auto <a class="m-doc" href="#abe37a6c95755acc9febcd740131a7ac3">k_lower_alphabetic_charset</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Enum documentation</h2>
+          <section class="m-doc-details" id="a61798ee3368031a2fdf6784961f9f74e"><div>
+            <h3>
+              enum class <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span><a class="m-doc-self" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a>: <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/integer.html" target="_blank">std::<wbr/>uint8_t</a>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Typedef documentation</h2>
+          <section class="m-doc-details" id="a5a182ad5e979501a5f114e0992983e75"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span><a class="m-doc-self" href="#a5a182ad5e979501a5f114e0992983e75">ThreadPool</a> = BS::thread_pool&lt;&gt;
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="threading_8hpp.html">&lt;btu/common/threading.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ae9d13fbea52d07db3c550547508cdebb"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span><a class="m-doc-self" href="#ae9d13fbea52d07db3c550547508cdebb">U8Unit</a> = <a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/types/integer" target="_blank">int32_t</a>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a83d1f2364aa0d1b00e60070f86a9686c"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="metaprogramming_8hpp.html">&lt;btu/common/metaprogramming.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename T</span>, <span class="m-doc-template-param">typename U</span></span>&gt;
+              </div>
+              using <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span><a class="m-doc-self" href="#a83d1f2364aa0d1b00e60070f86a9686c">is_equiv</a> = <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/is_same.html" target="_blank">std::<wbr/>is_same</a>&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/remove_cvref.html" target="_blank">std::<wbr/>remove_cvref_t</a>&lt;T&gt;, <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/remove_cvref.html" target="_blank">std::<wbr/>remove_cvref_t</a>&lt;U&gt;&gt;
+            </h3>
+            <p></p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="ab519d15eaac722ed7396cd428595fe1d"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="metaprogramming_8hpp.html">&lt;btu/common/metaprogramming.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class... Ts</span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ab519d15eaac722ed7396cd428595fe1d">Overload</a>(</span><span class="m-doc-wrap">Ts...) →  Overload&lt; Ts... &gt;</span></span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a9e13d7d4ca5e9afedd1d669841acb45a"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>string_view</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a9e13d7d4ca5e9afedd1d669841acb45a">as_ascii</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> str)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a5f2cdd8ee6c9826499e7989a61bc85e9"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>string</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a5f2cdd8ee6c9826499e7989a61bc85e9">as_ascii_string</a>(</span><span class="m-doc-wrap">const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; str)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a0bba54f0203d560751af304fdd31f6f4"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a0bba54f0203d560751af304fdd31f6f4">as_utf8</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>string_view</a> str)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="af12fd235982b6703ec45f0bec395f5a4"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#af12fd235982b6703ec45f0bec395f5a4">as_utf8_string</a>(</span><span class="m-doc-wrap">const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>string</a>&amp; str)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="aff74c52b1d89e2e856aeb6652d69c3cd"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="path_8hpp.html">&lt;btu/common/path.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename CharT</span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">void <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aff74c52b1d89e2e856aeb6652d69c3cd">backslash_to_slash</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>basic_string</a>&lt;CharT&gt;&amp; path) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>Convert backslashes to slashes in path.</p>
+<p>std::fs do not consider '\' as a separator on Linux. In fact, it is a valid character in file names. But in our case, we want to treat it as a separator. Let's hope no one will use it in file names.</p>
+          </div></section>
+          <section class="m-doc-details" id="a7d05e36c9e7533fcccef4741ea5c0e99"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a7d05e36c9e7533fcccef4741ea5c0e99">compare_directories</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; dir1,
+              const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; dir2) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="filesystem_8hpp.html">&lt;btu/common/filesystem.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a429b07c1596cd56ffd27961153607d5e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a429b07c1596cd56ffd27961153607d5e">compare_files</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; filename1,
+              const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; filename2) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="filesystem_8hpp.html">&lt;btu/common/filesystem.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a579cef42371f299a202de48a39b7b304"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a579cef42371f299a202de48a39b7b304">concat_codepoint</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; string,
+              <a class="m-doc" href="#ae9d13fbea52d07db3c550547508cdebb">U8Unit</a> cp)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a10495be73ddfc5f9e291114a04be0d2f"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="algorithms_8hpp.html">&lt;btu/common/algorithms.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a></span>, <span class="m-doc-template-param">class ValueType</span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a10495be73ddfc5f9e291114a04be0d2f">contains</a>(</span><span class="m-doc-wrap">const <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a>&amp; cont,
+              const ValueType&amp; val)</span></span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a07ed23d41cb70a78f400cd4d6973e3b0"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">btu::<wbr/>Path</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a07ed23d41cb70a78f400cd4d6973e3b0">find_matching_paths_icase</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">btu::<wbr/>Path</a>&amp; directory,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">btu::<wbr/>Path</a>&gt; relative_lowercase_paths) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="filesystem_8hpp.html">&lt;btu/common/filesystem.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a80c8eeac75c9aca858329e787a79866b"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="#ae9d13fbea52d07db3c550547508cdebb">U8Unit</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a80c8eeac75c9aca858329e787a79866b">first_codepoint</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string) <span class="m-label m-primary">constexpr</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a183562c5d3ac5031383b3a83f70dc7ee"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="threading_8hpp.html">&lt;btu/common/threading.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename Range</span>, <span class="m-doc-template-param">typename Func</span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a183562c5d3ac5031383b3a83f70dc7ee">for_each_mt</a>(</span><span class="m-doc-wrap">Range&amp;&amp; rng,
+              Func&amp;&amp; func)</span></span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a33d48135c71e18a168b0f6acaf3a8a4c"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="metaprogramming_8hpp.html">&lt;btu/common/metaprogramming.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class T</span>, <span class="m-doc-template-param">class U</span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">decltype(auto) <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a33d48135c71e18a168b0f6acaf3a8a4c">forward_like</a>(</span><span class="m-doc-wrap">U&amp;&amp; x) <span class="m-label m-primary">constexpr</span> <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>See <a class="poxy-cppreference poxy-external" href="https://en.cppreference.com/w/cpp/utility/forward_like" target="_blank">https://en.cppreference.com/w/cpp/utility/forward_<wbr/>like</a>.</p>
+          </div></section>
+          <section class="m-doc-details" id="a162faf2c62f248b64e598ff5ab52d9b0"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">tl::expected&lt;void, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a162faf2c62f248b64e598ff5ab52d9b0">hard_link</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; from,
+              const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; to) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="filesystem_8hpp.html">&lt;btu/common/filesystem.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a08cf3f339a1fa2d298e2a61af8e1e9cf"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">unsigned <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a08cf3f339a1fa2d298e2a61af8e1e9cf">hardware_concurrency</a>(</span><span class="m-doc-wrap">) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="threading_8hpp.html">&lt;btu/common/threading.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="aa4b64cfc59995c3419300e54d91c9532"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aa4b64cfc59995c3419300e54d91c9532">is_lower</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string) <span class="m-label m-primary">constexpr</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="aad713cd4c12da91c4622c6d4f66a3f6e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">auto <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aad713cd4c12da91c4622c6d4f66a3f6e">make_path_canonizer</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> start) <span class="m-label m-primary">constexpr</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="path_8hpp.html">&lt;btu/common/path.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a22cb8105c4872dafb5d721d1e8a7c6fc"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="threading_8hpp.html">&lt;btu/common/threading.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params m-doc-template-long"><span class="m-doc-template-param">typename Out</span>, <span class="m-doc-template-param">typename Range</span>, <span class="m-doc-template-param">typename Func</span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a22cb8105c4872dafb5d721d1e8a7c6fc">make_producer_mt</a>(</span><span class="m-doc-wrap">Range&amp;&amp; rng,
+              Func&amp;&amp; func)</span></span>
+            </h3>
+            <p>Creates a multi-threaded producer for the specified range and function.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Template parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">Out</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Range</td>
+                  <td>The type of the range.</td>
+                </tr>
+                <tr>
+                  <td>Func</td>
+                  <td>The type of the function.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>rng</td>
+                  <td>The range of elements to process.</td>
+                </tr>
+                <tr>
+                  <td>func</td>
+                  <td>The function to apply to each element in the range.</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Returns</th>
+                  <td>The multi-threaded producer object.</td>
+                </tr>
+              </tfoot>
+            </table>
+<p>This function creates a multi-threaded producer that generates values by applying the specified function to each element in the given range. The producer distributes the workload across multiple threads to improve performance.</p><aside class="m-note m-info"><h4>Note</h4><p>The multi-threaded producer returned by this function is responsible for managing the parallel execution of the given function on the range elements. The user is responsible for synchronizing access to any shared data if needed.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a062a7dee57e04f8b83a09e9bce6feb1e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">auto <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a062a7dee57e04f8b83a09e9bce6feb1e">make_thread_pool</a>(</span><span class="m-doc-wrap">)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="threading_8hpp.html">&lt;btu/common/threading.hpp&gt;</a></div>
+            </h3>
+            <p>Creates a thread pool with the number of threads equal to the number of hardware threads minus one.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>The thread pool object.</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a00f5099c820274df2dded37fc07c9bfc"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a00f5099c820274df2dded37fc07c9bfc">make_valid</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; string,
+              <a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/language/types#Character_types" target="_blank">char8_t</a> replacement) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a96c8e8d73f9ab5aa7fc8954c2238534a"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="algorithms_8hpp.html">&lt;btu/common/algorithms.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params m-doc-template-long"><span class="m-doc-template-param">class It</span>, <span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a></span>, <span class="m-doc-template-param">class Sum</span>, <span class="m-doc-template-param">class ValueType = typename <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/iterator/iterator_traits.html" target="_blank">std::<wbr/>iterator_traits</a>&lt;It&gt;::value_type</span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">It <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a96c8e8d73f9ab5aa7fc8954c2238534a">merge_if</a>(</span><span class="m-doc-wrap">It first,
+              It last,
+              const <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a>&amp; predicate,
+              const Sum&amp; sum)</span></span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ab77d02c9dcb2932211b897e2e854ac91"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="algorithms_8hpp.html">&lt;btu/common/algorithms.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class It</span>, <span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a></span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">It <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ab77d02c9dcb2932211b897e2e854ac91">merge_if</a>(</span><span class="m-doc-wrap">It first,
+              It last,
+              <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a>&amp;&amp; predicate)</span></span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="afbb64e534f6ea346b560b0fed2c588a9"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="algorithms_8hpp.html">&lt;btu/common/algorithms.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a></span>, <span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a></span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#afbb64e534f6ea346b560b0fed2c588a9">merge_if</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a>&amp; cont,
+              <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a>&amp;&amp; predicate)</span></span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a57fff2dda5d605dccb67767073009007"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="algorithms_8hpp.html">&lt;btu/common/algorithms.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params m-doc-template-long"><span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a></span>, <span class="m-doc-template-param">class <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a></span>, <span class="m-doc-template-param">class Sum</span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a57fff2dda5d605dccb67767073009007">merge_if</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Container" target="_blank">Container</a>&amp; cont,
+              <a class="m-doc poxy-injected poxy-external poxy-cppreference poxy-named-requirement" href="https://en.cppreference.com/w/cpp/named_req/Predicate" target="_blank">Predicate</a>&amp;&amp; pred,
+              Sum&amp;&amp; sum)</span></span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a88422224716bcb11a2447cccbdbd5cff"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/io/basic_ostream.html" target="_blank">std::<wbr/>ostream</a>&amp; <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a88422224716bcb11a2447cccbdbd5cff">operator&lt;&lt;</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/io/basic_ostream.html" target="_blank">std::<wbr/>ostream</a>&amp; os,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/source_location.html" target="_blank">std::<wbr/>source_location</a> loc)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="error_8hpp.html">&lt;btu/common/error.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a37cea9c0e839bf9b7a9b55298944a68a"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/io/basic_ostream.html" target="_blank">std::<wbr/>ostream</a>&amp; <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a37cea9c0e839bf9b7a9b55298944a68a">operator&lt;&lt;</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/io/basic_ostream.html" target="_blank">std::<wbr/>ostream</a>&amp; os,
+              const <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&amp; err)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="error_8hpp.html">&lt;btu/common/error.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ab18cd27f1f67a7ab57a34cded847db23"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">tl::expected&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt;, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ab18cd27f1f67a7ab57a34cded847db23">read_file</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; a_path) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="filesystem_8hpp.html">&lt;btu/common/filesystem.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="aa6bce492b41c063318ebddf1a3b70219"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="algorithms_8hpp.html">&lt;btu/common/algorithms.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class ValueType</span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">void <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aa6bce492b41c063318ebddf1a3b70219">remove_duplicates</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;ValueType&gt;&amp; cont)</span></span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="aaa1b5d4d4e5eadf92039ec927f4e7484"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aaa1b5d4d4e5eadf92039ec927f4e7484">str_compare</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> lhs,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> rhs,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive = <a class="m-doc-self" href="#aaa1b5d4d4e5eadf92039ec927f4e7484">CaseSensitive::<wbr/>Yes</a>) <span class="m-label m-primary">constexpr</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ae4b406bd818998622f6106265a0799e1"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ae4b406bd818998622f6106265a0799e1">str_contain</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> snippet,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive = <a class="m-doc-self" href="#ae4b406bd818998622f6106265a0799e1">CaseSensitive::<wbr/>Yes</a>) <span class="m-label m-primary">constexpr</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a64cfaba57076b74bc89ee31e5193a7bf"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/types/size_t" target="_blank">size_t</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a64cfaba57076b74bc89ee31e5193a7bf">str_find</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> snippet,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive = <a class="m-doc-self" href="#a64cfaba57076b74bc89ee31e5193a7bf">CaseSensitive::<wbr/>Yes</a>) <span class="m-label m-primary">constexpr</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a2ae3fe6bc5dd16bebe3cf7ec2cd76551"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a2ae3fe6bc5dd16bebe3cf7ec2cd76551">str_match</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> pattern,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive = <a class="m-doc-self" href="#a2ae3fe6bc5dd16bebe3cf7ec2cd76551">CaseSensitive::<wbr/>Yes</a>,
+              <a class="m-doc" href="structbtu_1_1common_1_1_cards.html">Cards</a> cards = <a class="m-doc" href="#a3bbc4219bf316197c6f1aae17cf7ca75">default_<wbr/>cards</a>) <span class="m-label m-primary">constexpr</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="abe50e5074516441e67f90a6865bd668b"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#abe50e5074516441e67f90a6865bd668b">str_random</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/types/size_t" target="_blank">size_t</a> length,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/language/types#Character_types" target="_blank">char8_t</a>&gt; charset = <a class="m-doc" href="#abe37a6c95755acc9febcd740131a7ac3">k_<wbr/>lower_<wbr/>alphabetic_<wbr/>charset</a>) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ad036bdab0df992a629bfac779db0dc03"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ad036bdab0df992a629bfac779db0dc03">str_replace_once</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; string,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> from,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> to,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive) <span class="m-label m-primary">constexpr</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a2350c38996805e37331483dc4337f3d3"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a2350c38996805e37331483dc4337f3d3">str_starts_with</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> snippet,
+              <a class="m-doc" href="#a61798ee3368031a2fdf6784961f9f74e">CaseSensitive</a> case_sensitive = <a class="m-doc-self" href="#a2350c38996805e37331483dc4337f3d3">CaseSensitive::<wbr/>Yes</a>) <span class="m-label m-primary">constexpr</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="aab271409e6a788c454de47ed3548df02"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aab271409e6a788c454de47ed3548df02">str_trim</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> in) <span class="m-label m-primary">constexpr</span> <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a826b7aad4faf85b999346ff8d19cd3fe"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a826b7aad4faf85b999346ff8d19cd3fe">to_lower</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string_view.html" target="_blank">std::<wbr/>u8string_view</a> string)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ab7492d8fcd1359ea41e7ee6bf529fa4a"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="metaprogramming_8hpp.html">&lt;btu/common/metaprogramming.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename E</span></span>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/underlying_type.html" target="_blank">std::<wbr/>underlying_type_t</a>&lt;E&gt; <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ab7492d8fcd1359ea41e7ee6bf529fa4a">to_underlying</a>(</span><span class="m-doc-wrap">E e) <span class="m-label m-primary">constexpr</span></span></span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a918bb9ded2898b1e3b4ccfe70ede3830"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>wstring</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a918bb9ded2898b1e3b4ccfe70ede3830">to_utf16</a>(</span><span class="m-doc-wrap">const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a>&amp; str)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a4c35904a87c5e732d21aed632ff337bd"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>u8string</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a4c35904a87c5e732d21aed632ff337bd">to_utf8</a>(</span><span class="m-doc-wrap">const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/string/basic_string.html" target="_blank">std::<wbr/>wstring</a>&amp; str)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a54a4e49d65176b7268128f99b1be87c4"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">tl::expected&lt;void, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a54a4e49d65176b7268128f99b1be87c4">write_file</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; a_path,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; data) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="filesystem_8hpp.html">&lt;btu/common/filesystem.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a12bd60389295f9266f1d5f0549e8f865"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">tl::expected&lt;void, <a class="m-doc" href="structbtu_1_1common_1_1_error.html">Error</a>&gt; <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a12bd60389295f9266f1d5f0549e8f865">write_file_new</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="namespacebtu.html#a7f2770a5475029ea6a940ad77d78d5fa">Path</a>&amp; a_path,
+              <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; data) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="filesystem_8hpp.html">&lt;btu/common/filesystem.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Variable documentation</h2>
+          <section class="m-doc-details" id="a4cd0799cfb94e2b507438e766a4d01d3"><div>
+            <h3>
+              <a class="m-doc" href="structbtu_1_1common_1_1detail_1_1bind__back__fn.html">detail::<wbr/>bind_back_fn</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span><a class="m-doc-self" href="#a4cd0799cfb94e2b507438e766a4d01d3">bind_back</a> <span class="m-label m-primary">constexpr</span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_2functional_8hpp.html">&lt;btu/common/functional.hpp&gt;</a></div>
+            </h3>
+<aside class="m-note m-default"><h4>See also</h4><p><code>bind_back_fn</code></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a3bbc4219bf316197c6f1aae17cf7ca75"><div>
+            <h3>
+              <a class="m-doc" href="structbtu_1_1common_1_1_cards.html">Cards</a> <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span><a class="m-doc-self" href="#a3bbc4219bf316197c6f1aae17cf7ca75">default_cards</a> <span class="m-label m-primary">constexpr</span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="af7f7c7d55e6100daba4cae2aa7042157"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="metaprogramming_8hpp.html">&lt;btu/common/metaprogramming.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">typename T</span>, <span class="m-doc-template-param">typename U</span></span>&gt;
+              </div>
+              bool <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span><a class="m-doc-self" href="#af7f7c7d55e6100daba4cae2aa7042157">is_equiv_v</a> <span class="m-label m-primary">constexpr</span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a29a10199500f4692f97ef9a0fb4fdcbd"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="metaprogramming_8hpp.html">&lt;btu/common/metaprogramming.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class T</span></span>&gt;
+              </div>
+              bool <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span><a class="m-doc-self" href="#a29a10199500f4692f97ef9a0fb4fdcbd">is_mutable_lambda_v</a> <span class="m-label m-primary">constexpr</span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a8d31016cf18c062508a3aa8e9bbabdb5"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="metaprogramming_8hpp.html">&lt;btu/common/metaprogramming.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class T</span>, <span class="m-doc-template-param">class... Ts</span></span>&gt;
+              </div>
+              bool <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span><a class="m-doc-self" href="#a8d31016cf18c062508a3aa8e9bbabdb5">is_variant_member_v</a> <span class="m-label m-primary">constexpr</span>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="abe37a6c95755acc9febcd740131a7ac3"><div>
+            <h3>
+              auto <span class="m-doc-details-prefix">btu::<wbr/>common::<wbr/></span><a class="m-doc-self" href="#abe37a6c95755acc9febcd740131a7ac3">k_lower_alphabetic_charset</a> <span class="m-label m-primary">constexpr</span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="string_8hpp.html">&lt;btu/common/string.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">…</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input autocomplete="off" autofocus="autofocus" disabled="disabled" id="search-input" name="q" placeholder="Loading …" spellcheck="false" type="search"/>
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div class="m-text m-dim m-text-center" id="search-help">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">↓</span>
+            / <span class="m-label m-dim">↑</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div class="m-text m-warning m-text-center" id="search-notfound">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script><script>install_mcss_search_shim();</script>
+<script async="async" src="searchdata-v2.js"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        
+<a class="poxy-external" href="https://github.com/Guekka/bethutil" target="_blank">GitHub</a>
+• <a class="poxy-external" href="https://github.com/Guekka/bethutil/issues" target="_blank">Report an issue</a>
+• <a class="sponsor poxy-external" href="https://github.com/sponsors/Guekka/dashboard/profile" target="_blank">Become a sponsor</a>
+• <a class="poxy-external" href="https://github.com/Guekka/bethutil/blob/main/LICENSE" target="_blank">License</a>
+• <a download="" href="bethutil.tagfile.xml" target="_blank" type="text/xml">Doxygen tagfile</a>
+<br/><br/>
+Site generated using <a class="poxy-external" href="https://github.com/marzer/poxy/" target="_blank">Poxy</a>
+
+      </div>
+    </div>
+  </div>
+</nav></footer>
+
+
+</body></html>
