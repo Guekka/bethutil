@@ -12,7 +12,7 @@
 #include <tl/expected.hpp>
 
 namespace btu::bsa {
-auto unpack(UnpackSettings sets) -> tl::expected<void, Error>
+auto unpack(UnpackSettings sets) noexcept -> tl::expected<void, Error>
 {
     {
         auto arch = Archive::read(sets.file_path);

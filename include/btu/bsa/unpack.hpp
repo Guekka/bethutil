@@ -17,6 +17,6 @@ struct UnpackSettings
     std::optional<Path> extract_to_dir = std::nullopt;
 };
 
-[[nodiscard]] auto unpack(UnpackSettings sets) -> tl::expected<void, common::Error>;
+[[nodiscard]] auto unpack(UnpackSettings sets) noexcept -> tl::expected<void, common::Error>;
 
 } // namespace btu::bsa
