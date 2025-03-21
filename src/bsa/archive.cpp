@@ -278,7 +278,7 @@ Archive::Archive(const ArchiveVersion ver, const ArchiveType type) noexcept
 {
 }
 
-auto Archive::read_tes3(Path path) -> tl::expected<Archive, Error>
+auto Archive::read_tes3(Path path) noexcept -> tl::expected<Archive, Error>
 {
     libbsa::tes3::archive arch;
     arch.read(std::move(path));
@@ -299,7 +299,7 @@ auto Archive::read_tes3(Path path) -> tl::expected<Archive, Error>
     return res;
 }
 
-auto Archive::read_tes4(const Path &path) -> tl::expected<Archive, Error>
+auto Archive::read_tes4(const Path &path) noexcept -> tl::expected<Archive, Error>
 {
     libbsa::tes4::archive arch;
     Archive res;
@@ -325,7 +325,7 @@ auto Archive::read_tes4(const Path &path) -> tl::expected<Archive, Error>
     return res;
 }
 
-auto Archive::read_fo4(Path path) -> tl::expected<Archive, Error>
+auto Archive::read_fo4(Path path) noexcept -> tl::expected<Archive, Error>
 {
     libbsa::fo4::archive arch;
     const auto archive_info = arch.read(std::move(path));

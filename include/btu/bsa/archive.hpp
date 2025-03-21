@@ -120,9 +120,9 @@ public:
     using value_type = decltype(files_)::value_type;
 
     Archive(ArchiveVersion ver, ArchiveType type) noexcept;
-    static auto read_tes3(Path path) -> tl::expected<Archive, common::Error>;
-    static auto read_tes4(const Path &path) -> tl::expected<Archive, common::Error>;
-    static auto read_fo4(Path path) -> tl::expected<Archive, common::Error>;
+    [[nodiscard]] static auto read_tes3(Path path) noexcept -> tl::expected<Archive, common::Error>;
+    [[nodiscard]] static auto read_tes4(const Path &path) noexcept -> tl::expected<Archive, common::Error>;
+    [[nodiscard]] static auto read_fo4(Path path) noexcept -> tl::expected<Archive, common::Error>;
 
     // While it is possible to copy an archive, it is better to disable implicit copying: it is a heavy operation
     Archive(const Archive &)                     = delete;
@@ -150,7 +150,7 @@ public:
     [[nodiscard]] auto size() const noexcept -> size_t;
 
     [[nodiscard]] auto version() const noexcept -> ArchiveVersion { return ver_; }
-    [[nodiscard]] tl::expected<void, common::Error> set_version(ArchiveVersion version) noexcept;
+    [[nodiscard]] auto set_version(ArchiveVersion version) noexcept -> tl::expected<void, common::Error>;
 
     [[nodiscard]] auto type() const noexcept -> ArchiveType { return type_; }
 
