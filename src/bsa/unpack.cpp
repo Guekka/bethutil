@@ -6,18 +6,20 @@
 #include "btu/bsa/unpack.hpp"
 
 #include "btu/bsa/archive.hpp"
+#include "btu/bsa/error_code.hpp"
 
 #include <btu/common/threading.hpp>
+#include <tl/expected.hpp>
 
 namespace btu::bsa {
-auto unpack(UnpackSettings sets) -> UnpackResult
+auto unpack(UnpackSettings sets) noexcept -> tl::expected<void, Error>
 {
     {
         auto arch = Archive::read(sets.file_path);
         if (!arch)
-            return UnpackResult::UnreadableArchive;
+            return tl::make_unexpected(Error(BsaErr::FailedToReadArchive));
 
-        const auto &root = sets.root_opt != nullptr ? *sets.root_opt : sets.file_path.parent_path();
+        const auto &root = sets.extract_to_dir.value_or(sets.file_path.parent_path());
         common::for_each_mt(std::move(*arch), [root, &sets](auto &&elem) {
             const auto path = root / elem.first;
             if (sets.overwrite_existing_files || !fs::exists(path)) // preserve existing loose files
@@ -33,10 +35,10 @@ auto unpack(UnpackSettings sets) -> UnpackResult
     }
     if (sets.remove_arch && !fs::remove(sets.file_path))
     {
-        return UnpackResult::FailedToDeleteArchive;
+        return tl::make_unexpected(Error(BsaErr::FailedToRemoveArchive));
     }
 
-    return UnpackResult::Success;
+    return {};
 }
 
 } // namespace btu::bsa

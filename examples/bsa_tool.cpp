@@ -43,8 +43,8 @@ void unpack(const btu::Path &dir, const btu::bsa::Settings &sets)
         const auto params = btu::bsa::UnpackSettings{
             .file_path = file,
         };
-        if (unpack(params) != btu::bsa::UnpackResult::Success)
-            std::cerr << "Failed to unpack archive\n";
+        if (const auto res = unpack(params); !res)
+            std::cerr << "Failed to unpack archive:" << res.error() << '\n' << std::flush;
     }
 }
 
@@ -62,7 +62,7 @@ void list(const btu::Path &dir, const btu::bsa::Settings &sets)
         }
         for (auto &&elem : std::move(*arch))
         {
-            std::cout << elem.first << "  " << elem.second.size() << " bytes - Compressed: "
+            std::cout << elem.first << "  " << elem.second.size().value_or(0) << " bytes - Compressed: "
                       << (elem.second.compressed() == btu::bsa::Compression::Yes ? "Yes" : "No") << '\n';
         }
     }
