@@ -4,26 +4,19 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 #pragma once
 
-#include "btu/bsa/settings.hpp"
+#include <btu/common/error.hpp>
+#include <btu/common/filesystem.hpp>
 
 namespace btu::bsa {
 
 struct UnpackSettings
 {
-    const Path &file_path;
-    bool remove_arch              = false;
-    bool overwrite_existing_files = false;
-    const Path *root_opt          = nullptr;
+    Path file_path;
+    bool remove_arch                   = false;
+    bool overwrite_existing_files      = false;
+    std::optional<Path> extract_to_dir = std::nullopt;
 };
 
-// TODO: use std::error_code
-enum class UnpackResult
-{
-    Success = 0,
-    UnreadableArchive,
-    FailedToDeleteArchive
-};
-
-[[nodiscard]] auto unpack(UnpackSettings sets) -> UnpackResult;
+[[nodiscard]] auto unpack(UnpackSettings sets) noexcept -> tl::expected<void, common::Error>;
 
 } // namespace btu::bsa

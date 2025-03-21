@@ -84,8 +84,8 @@ struct PackGroup
                                 ArchiveType type) noexcept -> std::optional<File>
 {
     auto file = File{sets.game_settings.version, type, get_tes4_archive_type(file_path, sets.game_settings)};
-    const bool res = file.read(file_path);
-    if (!res)
+    const bool read_success = file.read(file_path);
+    if (!read_success)
         return std::nullopt;
 
     const bool dx = (file.version() == ArchiveVersion::fo4 || file.version() == ArchiveVersion::starfield)
@@ -95,18 +95,22 @@ struct PackGroup
                               != FileTypes::Incompressible;
 
     if ((sets.compress == Compression::Yes && compressible) || dx) // dx is always compressed
-        file.compress();
+    {
+        const bool compress_success = file.compress();
+        if (!compress_success && dx) // we only care about failure if it's a texture archive
+            return std::nullopt;
+    }
     return file;
 }
 
 [[nodiscard]] auto file_fits(const Archive &arch, const File &file, const Settings &sets) noexcept -> bool
 {
-    return arch.file_size() + file.size() <= sets.max_size;
+    return arch.file_size() + file.size().value_or(0) <= sets.max_size;
 }
 
 [[nodiscard]] auto do_pack(std::vector<Path> file_paths,
-                           PackSettings settings,
-                           ArchiveType type) noexcept -> flux::generator<Archive &&>
+                           const PackSettings settings,
+                           const ArchiveType type) noexcept -> flux::generator<Archive &&>
 {
     auto [thread, receiver] = common::make_producer_mt<std::optional<Archive::value_type>>(
         std::move(file_paths), [&](const Path &absolute_path) -> std::optional<Archive::value_type> {
@@ -152,23 +156,23 @@ struct PackGroup
         co_yield BTU_MOV(arch);
 }
 
-auto pack(PackSettings settings) noexcept -> flux::generator<Archive &&>
+auto pack(const PackSettings settings) noexcept -> flux::generator<Archive &&>
 {
-    auto files = list_packable_files(settings.input_dir,
-                                     settings.game_settings,
-                                     get_allow_file_pred(settings));
+    auto [standard, texture] = list_packable_files(settings.input_dir,
+                                                   settings.game_settings,
+                                                   get_allow_file_pred(settings));
 
-    if (!files.standard.empty())
+    if (!standard.empty())
     {
-        FLUX_FOR(auto &&a, do_pack(BTU_MOV(files.standard), settings, ArchiveType::Standard))
+        FLUX_FOR(auto &&a, do_pack(BTU_MOV(standard), settings, ArchiveType::Standard))
         {
             co_yield BTU_MOV(a);
         }
     }
 
-    if (!files.texture.empty())
+    if (!texture.empty())
     {
-        FLUX_FOR(auto &&a, do_pack(BTU_MOV(files.texture), settings, ArchiveType::Textures))
+        FLUX_FOR(auto &&a, do_pack(BTU_MOV(texture), settings, ArchiveType::Textures))
         {
             co_yield BTU_MOV(a);
         }
