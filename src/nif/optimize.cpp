@@ -9,12 +9,12 @@ namespace btu::nif {
 auto optimize(Mesh file, const OptimizationSteps &steps) -> tl::expected<Mesh, Error>
 {
     auto res = tl::expected<Mesh, Error>(std::move(file));
-    if (steps.rename_referenced_textures)
-        res.map([](auto &m) { rename_referenced_textures(m); });
+    if (steps.rename_referenced_textures && res)
+        rename_referenced_textures(res.value());
     if (steps.format)
         res = res.and_then([&](auto &&m) { return convert(BTU_FWD(m), steps.headpart, *steps.format); });
-    if (steps.optimize)
-        res.map([](auto &m) { nif_optimize(m); });
+    if (steps.optimize && res)
+        nif_optimize(res.value());
 
     return res;
 }
