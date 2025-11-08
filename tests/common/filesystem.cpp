@@ -7,7 +7,7 @@
 
 #include <btu/common/filesystem.hpp>
 #include <catch.hpp>
-#include <flux/algorithm/all_any_none.hpp>
+#include <flux/op/all_any_none.hpp>
 
 #include <fstream>
 
