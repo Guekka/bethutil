@@ -101,9 +101,8 @@ void remove_suffixes(std::u8string &filename, const Settings &sets)
     return {};
 }
 
-auto find_archive_name_using_plugins(std::span<const Path> plugins,
-                                     const Settings &sets,
-                                     ArchiveType type) -> std::optional<Path>
+auto find_archive_name_using_plugins(std::span<const Path> plugins, const Settings &sets, ArchiveType type)
+    -> std::optional<Path>
 {
     if (plugins.empty())
         return std::nullopt;
@@ -136,9 +135,8 @@ auto find_archive_name_using_plugins(std::span<const Path> plugins,
 }
 
 /// Returns an archive name that is unique, which is guaranteed by trying suitable suffixes
-auto find_archive_name(const Path &directory,
-                       const Settings &sets,
-                       ArchiveType type) noexcept -> std::optional<Path>
+auto find_archive_name(const Path &directory, const Settings &sets, ArchiveType type) noexcept
+    -> std::optional<Path>
 {
     if (!is_directory(directory))
         return std::nullopt;
@@ -222,7 +220,7 @@ auto list_archive(const Path &dir, const Settings &sets) noexcept -> std::vector
         // When a single plugin can load multiple archives, it loads all archives such that their
         // name contains the name of the corresponding plugin as a prefix. Sorting the archive
         // names by length should ensure that only the required number of dummy plugins is created.
-        flux::sort(archives, [](const auto p1, const auto p2) { return p1.stem() <=> p2.stem(); });
+        flux::sort(archives, [](const auto p1, const auto p2) { return p1.stem() < p2.stem(); });
 
         return archives;
     }
