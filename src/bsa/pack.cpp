@@ -81,7 +81,7 @@ struct PackGroup
 
 [[nodiscard]] auto prepare_file(const Path &file_path,
                                 const PackSettings &sets,
-                                ArchiveType type) noexcept -> std::optional<File>
+                                const ArchiveType type) noexcept -> std::optional<File>
 {
     auto file = File{sets.game_settings.version, type, get_tes4_archive_type(file_path, sets.game_settings)};
     const bool read_success = file.read(file_path);
@@ -104,34 +104,36 @@ struct PackGroup
 }
 
 [[nodiscard]] auto file_fits(const Archive &arch, const File &file, const Settings &sets) noexcept -> bool
-{
-    return arch.file_size() + file.size().value_or(0) <= sets.max_size;
-}
+{ return arch.file_size() + file.size().value_or(0) <= sets.max_size; }
 
 [[nodiscard]] auto do_pack(std::vector<Path> file_paths,
                            const PackSettings settings,
                            const ArchiveType type) noexcept -> flux::generator<Archive &&>
 {
-    auto [thread, receiver] = common::make_producer_mt<std::optional<Archive::value_type>>(
+    // NOTE: gcc appears to have issues with structured bindings in coroutines, as
+    // using it here produces a "may be used uninitialized" warning
+    auto producer = common::make_producer_mt<std::optional<Archive::value_type>>(
         std::move(file_paths), [&](const Path &absolute_path) -> std::optional<Archive::value_type> {
-            auto file = prepare_file(absolute_path, settings, type);
-            if (!file)
-                return std::nullopt;
-
-            auto ret = Archive::value_type{relative(absolute_path, settings.input_dir).string(),
-                                           BTU_MOV(file).value()};
-            return std::optional{BTU_MOV(ret)};
+            return prepare_file(absolute_path, settings, type)
+                .transform([&](File &&file) -> Archive::value_type {
+                    return {relative(absolute_path, settings.input_dir).string(), std::move(file)};
+                });
         });
 
-    auto make_arch = [&] { return Archive{settings.game_settings.version, type}; };
+    [[maybe_unused]] auto thread = BTU_MOV(producer.first);
+    auto receiver                = BTU_MOV(producer.second);
+
+    auto make_arch = [&settings, type] { return Archive{settings.game_settings.version, type}; };
     auto arch      = make_arch();
 
-    for (auto maybe_prepared : receiver)
+    for (auto &&maybe_prepared : receiver)
     {
-        if (!maybe_prepared)
+        if (!maybe_prepared.has_value())
             continue; // just ignore this file. TODO: maybe warn?
 
-        auto [relative_path, file] = BTU_MOV(maybe_prepared).value();
+        auto prepared             = BTU_MOV(maybe_prepared).value();
+        const auto &relative_path = prepared.first;
+        auto &file                = prepared.second;
 
         if (file_fits(arch, file, settings.game_settings))
         {
@@ -165,17 +167,13 @@ auto pack(const PackSettings settings) noexcept -> flux::generator<Archive &&>
     if (!standard.empty())
     {
         FLUX_FOR(auto &&a, do_pack(BTU_MOV(standard), settings, ArchiveType::Standard))
-        {
-            co_yield BTU_MOV(a);
-        }
+        { co_yield BTU_MOV(a); }
     }
 
     if (!texture.empty())
     {
         FLUX_FOR(auto &&a, do_pack(BTU_MOV(texture), settings, ArchiveType::Textures))
-        {
-            co_yield BTU_MOV(a);
-        }
+        { co_yield BTU_MOV(a); }
     }
 }
 

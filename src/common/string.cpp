@@ -46,7 +46,19 @@ struct DeletableFacet : Facet
     ~DeletableFacet() override = default;
 };
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 thread_local std::wstring_convert<DeletableFacet<std::codecvt<wchar_t, char, std::mbstate_t>>> converter{};
+#pragma GCC diagnostic pop
+#elif defined __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+thread_local std::wstring_convert<DeletableFacet<std::codecvt<wchar_t, char, std::mbstate_t>>> converter{};
+#pragma clang diagnostic pop
+#else
+thread_local std::wstring_convert<DeletableFacet<std::codecvt<wchar_t, char, std::mbstate_t>>> converter{};
+#endif
 } // namespace detail
 
 auto to_utf8(const std::wstring &str) -> std::u8string

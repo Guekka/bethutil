@@ -64,6 +64,9 @@ CheckOptions:
     value: 'true'
   - key: cppcoreguidelines-avoid-do-while.IgnoreMacros
     value: 'true'
+  # No reason to add trailing return types to all lambdas, it just adds noise
+  - key: modernize-use-trailing-return-type.TransformLambdas
+    value: 'none'
   - key: readability-else-after-return.WarnOnUnfixable
     value: 'true'
   - key: readability-else-after-return.WarnOnConditionVariables

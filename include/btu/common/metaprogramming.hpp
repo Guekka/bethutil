@@ -21,9 +21,7 @@ Overload(Ts...) -> Overload<Ts...>;
 template<typename E>
     requires std::is_enum_v<E>
 constexpr auto to_underlying(E e) -> std::underlying_type_t<E>
-{
-    return static_cast<std::underlying_type_t<E>>(e);
-}
+{ return static_cast<std::underlying_type_t<E>>(e); }
 
 template<typename T, typename U>
 using is_equiv = std::is_same<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
@@ -66,27 +64,6 @@ struct is_mutable_lambda : is_mutable_lambda_helper<decltype(&T::operator())>
 template<class T>
 constexpr bool is_mutable_lambda_v = is_mutable_lambda<T>::value;
 
-/// See https://en.cppreference.com/w/cpp/utility/forward_like
-template<class T, class U>
-[[nodiscard]] constexpr auto forward_like(U &&x) noexcept -> decltype(auto)
-{
-    constexpr bool is_adding_const = std::is_const_v<std::remove_reference_t<T>>;
-    if constexpr (std::is_lvalue_reference_v<T &&>)
-    {
-        if constexpr (is_adding_const)
-            return std::as_const(x);
-        else
-            return static_cast<U &>(x);
-    }
-    else
-    {
-        if constexpr (is_adding_const)
-            return std::move(std::as_const(x));
-        else
-            return std::move(x);
-    }
-}
-
 } // namespace btu::common
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage): we need it to generate code
@@ -97,19 +74,15 @@ template<class T, class U>
                                        a_op static_cast<std::underlying_type_t<a_type>>(a_rhs)); \
     }                                                                                            \
                                                                                                  \
-    constexpr auto operator a_op##=(a_type &a_lhs, a_type a_rhs) noexcept -> a_type &            \
-    {                                                                                            \
-        return a_lhs = a_lhs a_op a_rhs;                                                         \
-    }
+    constexpr auto operator a_op## = (a_type & a_lhs, a_type a_rhs) noexcept -> a_type &         \
+    { return a_lhs = a_lhs a_op a_rhs; }
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage): we need it to generate code
 #define BETHUTIL_MAKE_ALL_ENUM_OPERATORS(a_type)                                         \
     static_assert(std::is_enum_v<a_type>, "\'" #a_type "\' is not an enum");             \
                                                                                          \
     [[nodiscard]] constexpr auto operator~(a_type a_val) noexcept -> a_type              \
-    {                                                                                    \
-        return static_cast<a_type>(~static_cast<std::underlying_type_t<a_type>>(a_val)); \
-    }                                                                                    \
+    { return static_cast<a_type>(~static_cast<std::underlying_type_t<a_type>>(a_val)); } \
                                                                                          \
     BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, ^)                                          \
     BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, &)                                          \

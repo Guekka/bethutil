@@ -5,8 +5,6 @@
 #include "btu/nif/functions.hpp"
 #include "btu/nif/mesh.hpp"
 
-#pragma once
-
 inline auto load_nif(const Path &path) -> btu::nif::Mesh
 {
     auto res = btu::nif::load(path);

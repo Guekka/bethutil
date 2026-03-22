@@ -348,9 +348,8 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
     return common::contains(directories, dir);
 }
 
-[[nodiscard]] inline auto get_filetype(const Path &filepath,
-                                       const Path &root,
-                                       const Settings &sets) -> FileTypes
+[[nodiscard]] inline auto get_filetype(const Path &filepath, const Path &root, const Settings &sets)
+    -> FileTypes
 {
     const auto ext = common::to_lower(filepath.extension().u8string());
     auto check     = [ext, &filepath, &root](const auto &vec) {
@@ -379,8 +378,8 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Settings,
     return FileTypes::Blacklist;
 }
 
-[[nodiscard]] inline auto get_tes4_archive_type(const Path &filepath,
-                                                const Settings &sets) -> std::optional<TES4ArchiveType>
+[[nodiscard]] inline auto get_tes4_archive_type(const Path &filepath, const Settings &sets)
+    -> std::optional<TES4ArchiveType>
 {
     const auto ext = common::to_lower(filepath.extension().u8string());
     auto get       = [ext](const auto &vec) {
