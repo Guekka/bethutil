@@ -191,8 +191,9 @@ template<typename Out, typename Range, typename Func>
     auto producer = std::jthread([rng    = std::forward<Range>(rng),
                                   func   = std::forward<Func>(func),
                                   sender = std::move(sender)]() mutable {
-        for_each_mt(std::forward<Range>(rng),
-                    [func, sender](auto &&elem) mutable { sender.send(func(forward_like<Range>(elem))); });
+        for_each_mt(std::forward<Range>(rng), [func, sender](auto &&elem) mutable {
+            sender.send(func(std::forward_like<Range>(elem)));
+        });
         sender.close();
     });
 
