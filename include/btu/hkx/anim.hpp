@@ -38,6 +38,9 @@ public:
     [[nodiscard]] virtual auto get_full_args(const Path &exe_dir) const -> std::vector<std::string> = 0;
 
     [[nodiscard]] virtual auto is_os_supported() const noexcept -> bool = 0;
+
+    // Behavior .hkx files (e.g. quadrupedbehavior.hkx) use a different converter profile.
+    [[nodiscard]] virtual auto is_behavior() const noexcept -> bool { return false; }
 };
 
 using AnimExeRef = std::reference_wrapper<const AnimExeInfo>;
