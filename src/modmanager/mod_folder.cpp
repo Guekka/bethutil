@@ -23,7 +23,7 @@ ModFolder::ModFolder(Path directory, bsa::Settings bsa_settings, bool ignore_exi
 ModFolder::ModFolder(Path directory,
                      bsa::Settings bsa_settings,
                      bool ignore_existing_archives,
-                     const unsigned worker_count)
+                     const std::uint32_t worker_count)
     : dir_(std::move(directory))
     , bsa_settings_(BTU_MOV(bsa_settings))
     , ignore_existing_archives_(ignore_existing_archives)
