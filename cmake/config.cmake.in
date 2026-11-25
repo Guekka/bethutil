@@ -1,4 +1,3 @@
-include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-targets.cmake")
 include(CMakeFindDependencyMacro)
 
 find_dependency("bsa")
@@ -10,5 +9,16 @@ find_dependency("mpsc_channel")
 find_dependency("nlohmann_json")
 find_dependency("reproc++")
 find_dependency("crunch2")
+
+find_path(BETHUTIL_UTF8H_INCLUDE_DIRS "utf8h/utf8.h" REQUIRED)
+find_path(BETHUTIL_FLUX_INCLUDE_DIRS "flux.hpp" REQUIRED)
+find_path(BETHUTIL_BSHOSHANY_THREAD_POOL_INCLUDE_DIRS "BS_thread_pool.hpp" REQUIRED)
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-targets.cmake")
+target_include_directories(
+    btu::bethutil SYSTEM INTERFACE
+    "${BETHUTIL_UTF8H_INCLUDE_DIRS}"
+    "${BETHUTIL_FLUX_INCLUDE_DIRS}"
+    "${BETHUTIL_BSHOSHANY_THREAD_POOL_INCLUDE_DIRS}")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
