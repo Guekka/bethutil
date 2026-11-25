@@ -5,6 +5,7 @@
 #include <btu/common/metaprogramming.hpp>
 
 #include <atomic>
+#include <cstdint>
 #include <exception>
 #include <mutex>
 #include <span>
@@ -116,10 +117,10 @@ public:
 // GCOVR_EXCL_STOP : end of synchronized_value code
 // NOLINTEND
 
-[[nodiscard]] inline auto hardware_concurrency() noexcept -> unsigned
+[[nodiscard]] inline auto hardware_concurrency() noexcept -> std::uint32_t
 {
     const auto result = std::thread::hardware_concurrency();
-    return result ? result : 1;
+    return result ? result : std::uint32_t{1};
 }
 
 /** \brief Creates a thread pool with the number of threads equal to the number of hardware threads minus one.
@@ -128,7 +129,19 @@ public:
  */
 [[nodiscard]] inline auto make_thread_pool()
 {
-    static const auto num_threads = std::max(hardware_concurrency() - 1, 1u);
+    static const auto num_threads = std::max(hardware_concurrency() - std::uint32_t{1}, std::uint32_t{1});
+    return ThreadPool{num_threads};
+}
+
+/** \brief Creates a thread pool with the requested number of threads.
+ *
+ * A zero count selects the default pool size.
+ */
+[[nodiscard]] inline auto make_thread_pool_with_count(std::uint32_t num_threads)
+{
+    if (num_threads == 0)
+        return make_thread_pool();
+
     return ThreadPool{num_threads};
 }
 
