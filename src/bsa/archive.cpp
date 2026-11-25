@@ -392,19 +392,38 @@ template<typename Archive, typename WriteFunc>
     auto write_and_check = [&](fs::path p) {
         std::forward<WriteFunc>(write_func)(BTU_MOV(arch), p);
         arch.clear(); // release memory mapping
-        return exists(p);
+        std::error_code ec;
+        return fs::is_regular_file(p, ec) && !ec;
     };
 
     // On Windows, we cannot remove the file while it is memory mapped
     // So we need to release the memory mapping first
     // That's why we have to move the archive to the lambda
-    if (exists(path))
+    std::error_code ec;
+    const bool path_exists = fs::exists(path, ec);
+    if (ec)
+        return false;
+
+    if (path_exists)
     {
         const auto tmp_path = path.parent_path() / (path.filename().u8string() + u8".tmp");
-        write_and_check(tmp_path);
-        fs::remove(path);
-        fs::rename(tmp_path, path);
-        return true;
+        const bool temp_exists = fs::exists(tmp_path, ec);
+        // Never mistake a pre-existing temp file for output from this write.
+        if (ec || temp_exists)
+            return false;
+
+        if (!write_and_check(tmp_path))
+        {
+            std::error_code cleanup_error;
+            fs::remove(tmp_path, cleanup_error);
+            return false;
+        }
+
+        if (!fs::remove(path, ec) || ec)
+            return false;
+
+        fs::rename(tmp_path, path, ec);
+        return !ec;
     }
 
     return write_and_check(path);
