@@ -2,13 +2,32 @@
 
 #include <catch.hpp>
 
+#include <atomic>
+#include <chrono>
+#include <thread>
+
 TEST_CASE("for_each_mt", "[src]")
 {
     using btu::common::for_each_mt;
     SECTION("exception safe")
     {
-        std::vector<int> v(100);
-        CHECK_THROWS(for_each_mt(v, [](auto &&) { throw std::runtime_error("e"); }));
+        std::vector<int> v(1000);
+        CHECK_THROWS(for_each_mt(v, [](auto &&) { throw std::runtime_error("parallel failure"); }));
+    }
+    SECTION("captures overlapping exceptions")
+    {
+        std::vector<int> v(10000);
+        std::atomic_uint started = 0;
+        CHECK_THROWS(for_each_mt(v, [&started](auto &&) {
+            if (started.fetch_add(1, std::memory_order_relaxed) == 0)
+            {
+                const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(100);
+                while (started.load(std::memory_order_relaxed) == 1
+                       && std::chrono::steady_clock::now() < deadline)
+                    std::this_thread::yield();
+            }
+            throw std::runtime_error("overlapping failure");
+        }));
     }
     SECTION("keeps lvalue/rvalue")
     {
