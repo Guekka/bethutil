@@ -406,7 +406,7 @@ template<typename Archive, typename WriteFunc>
 
     if (path_exists)
     {
-        const auto tmp_path = path.parent_path() / (path.filename().u8string() + u8".tmp");
+        const auto tmp_path    = path.parent_path() / (path.filename().u8string() + u8".tmp");
         const bool temp_exists = fs::exists(tmp_path, ec);
         // Never mistake a pre-existing temp file for output from this write.
         if (ec || temp_exists)
