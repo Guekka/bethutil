@@ -7,6 +7,7 @@
 
 #include "../utils.hpp"
 #include "btu/common/filesystem.hpp"
+#include "btu/common/threading.hpp"
 
 #include <binary_io/memory_stream.hpp>
 #include <btu/hkx/anim.hpp>
@@ -153,7 +154,8 @@ TEST_CASE("ModFolder processes archive members in parallel")
 class FailingTaskRecorder final : public btu::modmanager::ModFolderTransformer
 {
     Path archive_path_;
-    mutable bool archive_removed_ = false;
+    // stop_requested may run in parallel for archive members.
+    mutable btu::common::synchronized<bool> archive_removed_{false};
     bool failure_reported_        = false;
 
 public:
@@ -177,10 +179,11 @@ public:
 
     [[nodiscard]] auto stop_requested() const noexcept -> bool override
     {
-        if (!archive_removed_)
+        auto archive_removed = archive_removed_.wlock();
+        if (!*archive_removed)
         {
             std::error_code ec;
-            archive_removed_ = btu::fs::remove(archive_path_, ec) && !ec;
+            *archive_removed = btu::fs::remove(archive_path_, ec) && !ec;
         }
         return false;
     }
@@ -190,7 +193,11 @@ public:
         failure_reported_ = path == archive_path_ && error.what()[0] != '\0';
     }
 
-    [[nodiscard]] auto archive_removed() const noexcept -> bool { return archive_removed_; }
+    [[nodiscard]] auto archive_removed() const noexcept -> bool
+    {
+        auto archive_removed = archive_removed_.rlock();
+        return *archive_removed;
+    }
     [[nodiscard]] auto failure_reported() const noexcept -> bool { return failure_reported_; }
 };
 
