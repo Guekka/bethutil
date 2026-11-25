@@ -42,7 +42,6 @@ public:
         const Path &archive_path, ArchiveTooLargeState state) noexcept -> ArchiveTooLargeAction = 0;
 
     virtual void failed_to_read_archive(const Path &archive_path) noexcept {}
-
     [[nodiscard]] virtual auto stop_requested() const noexcept -> bool { return false; }
 };
 
@@ -85,6 +84,11 @@ public:
     using enum ModFolderIteratorBase::ArchiveTooLargeState;
 
     explicit ModFolder(Path directory, bsa::Settings bsa_settings, bool ignore_existing_archives = false);
+    /// A worker count of zero selects the default pool size.
+    explicit ModFolder(Path directory,
+                       bsa::Settings bsa_settings,
+                       bool ignore_existing_archives,
+                       unsigned worker_count);
 
     /// Get the size of the folder, including files in archives.
     /// Utility function, equivalent to iterate() and counting the files.

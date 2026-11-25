@@ -53,7 +53,7 @@ target_compile_options(tests
 
 find_package(Catch2 CONFIG REQUIRED)
 include(Catch)
-catch_discover_tests(tests)
+catch_discover_tests(tests PROPERTIES TIMEOUT 120)
 
 macro(acquire_test NAME)
   file(ARCHIVE_EXTRACT INPUT "${ROOT_DIR}/data/${NAME}.7z" DESTINATION
