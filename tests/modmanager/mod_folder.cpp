@@ -85,6 +85,67 @@ TEST_CASE("ModFolder transform with one worker")
     CHECK(btu::common::compare_directories(temp.path(), dir / "expected"));
 }
 
+class FailingTaskRecorder final : public btu::modmanager::ModFolderTransformer
+{
+    Path archive_path_;
+    mutable bool archive_removed_ = false;
+    bool failure_reported_ = false;
+
+public:
+    explicit FailingTaskRecorder(Path archive_path)
+        : archive_path_(std::move(archive_path))
+    {
+    }
+
+    [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,
+                                         ArchiveTooLargeState /*state*/) noexcept
+        -> ArchiveTooLargeAction override
+    {
+        return ArchiveTooLargeAction::Process;
+    }
+
+    [[nodiscard]] auto transform_file(const btu::modmanager::ModFile /*file*/) noexcept
+        -> std::optional<std::vector<std::byte>> override
+    {
+        return std::nullopt;
+    }
+
+    [[nodiscard]] auto stop_requested() const noexcept -> bool override
+    {
+        if (!archive_removed_)
+        {
+            std::error_code ec;
+            archive_removed_ = btu::fs::remove(archive_path_, ec) && !ec;
+        }
+        return false;
+    }
+
+    void failed_to_process_file(const Path &path, const std::exception &error) noexcept override
+    {
+        failure_reported_ = path == archive_path_ && error.what()[0] != '\0';
+    }
+
+    [[nodiscard]] auto archive_removed() const noexcept -> bool { return archive_removed_; }
+    [[nodiscard]] auto failure_reported() const noexcept -> bool { return failure_reported_; }
+};
+
+TEST_CASE("ModFolder reports worker exceptions")
+{
+    const Path dir = "modfolder";
+    TempPath temp{dir};
+    btu::fs::create_directories(temp.path());
+
+    const auto archive_path = temp.path() / "disappears.ba2";
+    create_file(archive_path);
+
+    auto mf = btu::modmanager::ModFolder(temp.path(), btu::bsa::Settings::get(btu::Game::FO4));
+    auto transformer = FailingTaskRecorder{archive_path};
+    mf.transform(transformer);
+
+    CHECK(transformer.archive_removed());
+    CHECK(transformer.failure_reported());
+}
+
 TEST_CASE("ModFolder transform", "[src]")
 {
     const Path dir = "modfolder_transform";
