@@ -44,7 +44,7 @@ auto make_record(std::string_view type,
     auto header = btu::esp::detail::PluginRecordHeader{};
     std::memcpy(header.record.type, type.data(), sizeof header.record.type);
     header.record.data_size = static_cast<std::uint32_t>(fields.size());
-    header.record.id       = id;
+    header.record.id        = id;
 
     auto record = std::vector<std::byte>{};
     append_bytes(record, header);
@@ -122,7 +122,7 @@ TEST_CASE("ESP parsers skip oversized and malformed fields")
         const auto plugin = make_plugin(group);
         auto path         = write_temp_plugin(plugin);
 
-        auto file = std::fstream{path.path(), std::ios::binary | std::ios::in};
+        auto file         = std::fstream{path.path(), std::ios::binary | std::ios::in};
         const auto result = btu::esp::list_headparts(std::move(file));
         REQUIRE(result);
         CHECK(*result == std::vector<std::u8string>{u8"example.nif"});
@@ -130,18 +130,18 @@ TEST_CASE("ESP parsers skip oversized and malformed fields")
 
     SECTION("landscape texture IDs and paths")
     {
-        const auto invalid_id = std::array<std::byte, 8>{};
-        auto ltex_fields      = make_field("TNAM", invalid_id);
+        const auto invalid_id          = std::array<std::byte, 8>{};
+        auto ltex_fields               = make_field("TNAM", invalid_id);
         const std::uint32_t texture_id = 42;
-        const auto valid_id             = make_field("TNAM", std::as_bytes(std::span{&texture_id, size_t{1}}));
+        const auto valid_id            = make_field("TNAM", std::as_bytes(std::span{&texture_id, size_t{1}}));
         ltex_fields.insert(ltex_fields.end(), valid_id.begin(), valid_id.end());
 
         const auto ltex_record = make_record("LTEX", 1, ltex_fields);
         const auto ltex_group  = make_group("LTEX", ltex_record);
 
         const auto oversized_path = std::vector<std::byte>(2049, std::byte{'x'});
-        auto txst_fields           = make_field("TX00", oversized_path);
-        const auto valid_path      = make_field("TX00", bytes_of("textures/test.dds"));
+        auto txst_fields          = make_field("TX00", oversized_path);
+        const auto valid_path     = make_field("TX00", bytes_of("textures/test.dds"));
         txst_fields.insert(txst_fields.end(), valid_path.begin(), valid_path.end());
 
         const auto txst_record = make_record("TXST", texture_id, txst_fields);
@@ -152,7 +152,7 @@ TEST_CASE("ESP parsers skip oversized and malformed fields")
         const auto plugin = make_plugin(groups);
         auto path         = write_temp_plugin(plugin);
 
-        auto file = std::fstream{path.path(), std::ios::binary | std::ios::in};
+        auto file         = std::fstream{path.path(), std::ios::binary | std::ios::in};
         const auto result = btu::esp::list_landscape_textures(std::move(file));
         REQUIRE(result);
         CHECK(*result == std::vector<std::u8string>{u8"test.dds"});

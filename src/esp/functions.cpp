@@ -112,12 +112,12 @@ auto list_headparts(std::fstream file) noexcept -> tl::expected<std::vector<std:
         if (group_start == std::streampos(*file_end))
             break;
         if (group_start > std::streampos(*file_end) || !read_header(file, header)
-            || header.plugin.type != detail::k_group_grup
-            || header.plugin.group_size < sizeof header)
+            || header.plugin.type != detail::k_group_grup || header.plugin.group_size < sizeof header)
             return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
-        const auto group_end_pos = checked_end_position(
-            file, header.plugin.group_size - sizeof header, *file_end);
+        const auto group_end_pos = checked_end_position(file,
+                                                        header.plugin.group_size - sizeof header,
+                                                        *file_end);
         if (!group_end_pos)
             return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
@@ -139,8 +139,7 @@ auto list_headparts(std::fstream file) noexcept -> tl::expected<std::vector<std:
             if (record_start > std::streampos(*group_end_pos) || !read_header(file, header))
                 return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
-            const auto record_end_pos =
-                checked_end_position(file, header.record.data_size, *group_end_pos);
+            const auto record_end_pos = checked_end_position(file, header.record.data_size, *group_end_pos);
             if (!record_end_pos)
                 return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
@@ -155,8 +154,9 @@ auto list_headparts(std::fstream file) noexcept -> tl::expected<std::vector<std:
                     || !read_field_plugin_header(file, plugin_field_header))
                     return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
-                const auto field_end_pos =
-                    checked_end_position(file, plugin_field_header.data_size, *record_end_pos);
+                const auto field_end_pos = checked_end_position(file,
+                                                                plugin_field_header.data_size,
+                                                                *record_end_pos);
                 if (!field_end_pos)
                     return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
@@ -218,12 +218,12 @@ auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::ve
         if (group_start == std::streampos(*file_end))
             break;
         if (group_start > std::streampos(*file_end) || !read_header(file, header)
-            || header.plugin.type != detail::k_group_grup
-            || header.plugin.group_size < sizeof header)
+            || header.plugin.type != detail::k_group_grup || header.plugin.group_size < sizeof header)
             return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
-        const auto group_end_pos = checked_end_position(
-            file, header.plugin.group_size - sizeof header, *file_end);
+        const auto group_end_pos = checked_end_position(file,
+                                                        header.plugin.group_size - sizeof header,
+                                                        *file_end);
         if (!group_end_pos)
             return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
@@ -248,8 +248,7 @@ auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::ve
             if (record_start > std::streampos(*group_end_pos) || !read_header(file, header))
                 return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
-            const auto record_end_pos =
-                checked_end_position(file, header.record.data_size, *group_end_pos);
+            const auto record_end_pos = checked_end_position(file, header.record.data_size, *group_end_pos);
             if (!record_end_pos)
                 return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
@@ -264,8 +263,9 @@ auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::ve
                     || !read_field_plugin_header(file, plugin_field_header))
                     return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
-                const auto field_end_pos =
-                    checked_end_position(file, plugin_field_header.data_size, *record_end_pos);
+                const auto field_end_pos = checked_end_position(file,
+                                                                plugin_field_header.data_size,
+                                                                *record_end_pos);
                 if (!field_end_pos)
                     return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
