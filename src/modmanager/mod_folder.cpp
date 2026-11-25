@@ -123,7 +123,7 @@ void reduce_cpu_usage() noexcept
 
 void transform_loose_file(const Path &absolute_path,
                           const Path &dir,
-                          ModFolderTransformer &transformer) noexcept
+                          ModFolderTransformer &transformer)
 {
     if (transformer.stop_requested())
         return;
@@ -275,23 +275,38 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
                      .map([](auto &&e) { return e.path(); })
                      .to<std::vector>();
 
-    std::vector<std::future<void>> futs;
+    struct Task
+    {
+        Path path;
+        std::future<void> future;
+    };
+    std::vector<Task> tasks;
     for (const auto &file_path : files)
     {
         if (transformer.stop_requested())
-            return;
+            break;
 
         if (is_arch(file_path) && ignore_existing_archives_)
             continue;
 
-        futs.push_back(thread_pool_.submit_task([this, &file_path, &is_arch, &transformer] {
+        tasks.push_back({file_path, thread_pool_.submit_task([this, file_path, &is_arch, &transformer] {
             if (is_arch(file_path)) [[unlikely]]
                 transform_archive_file(file_path, transformer, bsa_settings_);
             else [[likely]]
                 transform_loose_file(file_path, dir_, transformer);
-        }));
+        })});
     }
-    flux::for_each(futs, [](auto &&fut) { fut.wait(); });
-    // TODO: there might be an exception in fut. Should we ignore it?
+
+    for (auto &task : tasks)
+    {
+        try
+        {
+            task.future.get();
+        }
+        catch (const std::exception &error)
+        {
+            transformer.failed_to_process_file(task.path, error);
+        }
+    }
 };
 } // namespace btu::modmanager
