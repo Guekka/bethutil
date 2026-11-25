@@ -11,6 +11,8 @@
 #include <btu/common/threading.hpp>
 #include <tl/expected.hpp>
 
+#include <atomic>
+
 namespace btu::bsa {
 auto unpack(UnpackSettings sets) noexcept -> tl::expected<void, Error>
 {
@@ -20,22 +22,34 @@ auto unpack(UnpackSettings sets) noexcept -> tl::expected<void, Error>
             return tl::make_unexpected(Error(BsaErr::FailedToReadArchive));
 
         const auto &root = sets.extract_to_dir.value_or(sets.file_path.parent_path());
-        common::for_each_mt(std::move(*arch), [root, &sets](auto &&elem) {
+        std::atomic_bool failed_to_write = false;
+        common::for_each_mt(std::move(*arch), [root, &sets, &failed_to_write](auto &&elem) {
             const auto path = root / elem.first;
-            if (sets.overwrite_existing_files || !fs::exists(path)) // preserve existing loose files
+            std::error_code ec;
+            const bool path_exists = fs::exists(path, ec);
+            if (ec)
             {
-                fs::create_directories(path.parent_path());
-                const bool res = elem.second.write(path);
-                if (!res)
-                {
-                    // TODO: how to handle error here?
-                }
+                failed_to_write = true;
+                return;
             }
+
+            if (!sets.overwrite_existing_files && path_exists)
+                return; // preserve existing loose files
+
+            fs::create_directories(path.parent_path(), ec);
+            if (ec || !elem.second.write(path))
+                failed_to_write = true;
         });
+
+        if (failed_to_write)
+            return tl::make_unexpected(Error(BsaErr::FailedToWriteFile));
     }
-    if (sets.remove_arch && !fs::remove(sets.file_path))
+
+    if (sets.remove_arch)
     {
-        return tl::make_unexpected(Error(BsaErr::FailedToRemoveArchive));
+        std::error_code ec;
+        if (!fs::remove(sets.file_path, ec) || ec)
+            return tl::make_unexpected(Error(BsaErr::FailedToRemoveArchive));
     }
 
     return {};

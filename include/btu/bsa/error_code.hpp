@@ -32,6 +32,7 @@ struct BsaErrCategory final : std::error_category
         {
             case BsaErr::Success: return "no error";
             case BsaErr::Unknown: return "default error";
+            case BsaErr::FailedToWriteFile: return "failed to write file";
         }
         return "(unrecognized error)";
     };

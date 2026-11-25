@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-#include "btu/esp/error_code.hpp"
+#include "btu/bsa/error_code.hpp"
 #include "utils.hpp"
 
 #include <btu/bsa/unpack.hpp>
@@ -30,4 +30,25 @@ TEST_CASE("unpack", "[src]")
     unpack_all(in, dir / "out", btu::bsa::Settings::get(btu::Game::FO4));
 
     REQUIRE(btu::common::compare_directories(dir / "out", dir / "expected"));
+}
+
+TEST_CASE("unpack failure preserves archive when removal was requested")
+{
+    const Path dir = "bsa_unpack";
+    const auto archives = list_archive(dir / "in", btu::bsa::Settings::get(btu::Game::SSE));
+    REQUIRE_FALSE(archives.empty());
+
+    TempPath archive{dir, u8".bsa"};
+    btu::fs::copy_file(archives.front(), archive.path());
+
+    TempPath blocked_output{dir};
+    create_file(blocked_output.path());
+
+    const auto result = btu::bsa::unpack({.file_path = archive.path(),
+                                          .remove_arch = true,
+                                          .extract_to_dir = blocked_output.path()});
+    REQUIRE_FALSE(result);
+    CHECK(result.error() == btu::bsa::BsaErr::FailedToWriteFile);
+    CHECK(result.error().message() == "failed to write file");
+    CHECK(btu::fs::exists(archive.path()));
 }
