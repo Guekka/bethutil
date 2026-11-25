@@ -11,7 +11,10 @@
 #include <binary_io/memory_stream.hpp>
 #include <flux.hpp>
 
+#include <atomic>
+#include <future>
 #include <utility>
+#include <vector>
 
 namespace btu::modmanager {
 
@@ -36,7 +39,7 @@ auto ModFolder::size() noexcept -> size_t
     class SizeIterator final : public ModFolderIterator
     {
     public:
-        size_t size{};
+        std::atomic_size_t size{};
 
         [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,
                                              ArchiveTooLargeState /*state*/) noexcept
@@ -45,12 +48,15 @@ auto ModFolder::size() noexcept -> size_t
             return Skip;
         }
 
-        void process_file(ModFile /*file*/) noexcept override { size += 1; }
+        void process_file(ModFile /*file*/) noexcept override
+        {
+            size.fetch_add(1, std::memory_order_relaxed);
+        }
     };
 
     auto iterator = SizeIterator{};
     iterate(iterator);
-    return iterator.size;
+    return iterator.size.load(std::memory_order_relaxed);
 }
 
 void ModFolder::iterate(ModFolderIterator &iterator) noexcept
@@ -114,19 +120,10 @@ void ModFolder::iterate(ModFolderIterator &iterator) noexcept
     return target;
 }
 
-/// Multiple users reported freezing. This should let other threads run.
-/// There is probably a better way, but I don't know it
-void reduce_cpu_usage() noexcept
-{
-    std::this_thread::sleep_for(std::chrono::nanoseconds(5));
-}
-
 void transform_loose_file(const Path &absolute_path, const Path &dir, ModFolderTransformer &transformer)
 {
     if (transformer.stop_requested())
         return;
-
-    reduce_cpu_usage();
 
     const auto relative_path = absolute_path.lexically_relative(dir);
 
@@ -149,13 +146,11 @@ void transform_loose_file(const Path &absolute_path, const Path &dir, ModFolderT
 }
 
 void transform_archive_file_inner(ModFolderTransformer &transformer,
-                                  bool &any_file_changed,
+                                  std::atomic_bool &any_file_changed,
                                   bsa::Archive::value_type &pair)
 {
     if (transformer.stop_requested())
         return;
-
-    reduce_cpu_usage();
 
     auto &[relative_path, file] = pair;
 
@@ -176,7 +171,8 @@ void transform_archive_file_inner(ModFolderTransformer &transformer,
         if (!res)
             transformer.failed_to_read_transformed_file(relative_path, *transformed);
 
-        any_file_changed = any_file_changed || res;
+        if (res)
+            any_file_changed.store(true);
     }
 }
 
@@ -211,15 +207,11 @@ void transform_archive_file(const Path &archive_path,
     }
 
     auto archive          = std::move(*opt_arch);
-    bool any_file_changed = false;
-    // Outer folder tasks use this pool too; avoid blocking its workers on nested archive tasks.
-    for (auto &pair : archive)
-    {
-        if (transformer.stop_requested())
-            return;
-
+    auto any_file_changed = std::atomic_bool{false};
+    // Use the common parallel backend rather than queueing child work onto the file pool.
+    common::for_each_mt(archive, [&transformer, &any_file_changed](auto &pair) {
         transform_archive_file_inner(transformer, any_file_changed, pair);
-    }
+    });
 
     if (transformer.stop_requested())
         return;
@@ -242,9 +234,8 @@ void transform_archive_file(const Path &archive_path,
     if (transformer.stop_requested())
         return;
 
-    if (any_file_changed || version_changed.value_or(false))
+    if (any_file_changed.load() || version_changed.value_or(false))
     {
-        // Change the extension of the archive if needed
         auto path = archive_path;
         if (path.extension() != bsa_settings.extension)
             path.replace_extension(bsa_settings.extension);
@@ -255,7 +246,6 @@ void transform_archive_file(const Path &archive_path,
             return;
         }
 
-        // Remove the old archive if the new one has a different name
         if (!equivalent(archive_path, path))
             fs::remove(archive_path);
     }
