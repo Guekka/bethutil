@@ -13,6 +13,7 @@
 #include <btu/common/threading.hpp>
 #include <tl/expected.hpp>
 
+#include <cstdint>
 #include <exception>
 
 namespace btu::modmanager {
@@ -93,7 +94,7 @@ public:
     explicit ModFolder(Path directory,
                        bsa::Settings bsa_settings,
                        bool ignore_existing_archives,
-                       unsigned worker_count);
+                       std::uint32_t worker_count);
 
     /// Get the size of the folder, including files in archives.
     /// Utility function, equivalent to iterate() and counting the files.
