@@ -129,6 +129,18 @@ public:
     return ThreadPool{num_threads};
 }
 
+/** \brief Creates a thread pool with the requested number of threads.
+ *
+ * A zero count selects the default pool size.
+ */
+[[nodiscard]] inline auto make_thread_pool_with_count(unsigned num_threads)
+{
+    if (num_threads == 0)
+        return make_thread_pool();
+
+    return ThreadPool{num_threads};
+}
+
 template<typename Range, typename Func>
     requires std::ranges::input_range<Range> && invocable_l_or_r<Func, std::ranges::range_value_t<Range>>
 auto for_each_mt(Range &&rng, Func &&func)
