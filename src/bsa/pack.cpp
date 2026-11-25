@@ -104,7 +104,9 @@ struct PackGroup
 }
 
 [[nodiscard]] auto file_fits(const Archive &arch, const File &file, const Settings &sets) noexcept -> bool
-{ return arch.file_size() + file.size().value_or(0) <= sets.max_size; }
+{
+    return arch.file_size() + file.size().value_or(0) <= sets.max_size;
+}
 
 [[nodiscard]] auto do_pack(std::vector<Path> file_paths,
                            const PackSettings settings,
@@ -167,13 +169,17 @@ auto pack(const PackSettings settings) noexcept -> flux::generator<Archive &&>
     if (!standard.empty())
     {
         FLUX_FOR(auto &&a, do_pack(BTU_MOV(standard), settings, ArchiveType::Standard))
-        { co_yield BTU_MOV(a); }
+        {
+            co_yield BTU_MOV(a);
+        }
     }
 
     if (!texture.empty())
     {
         FLUX_FOR(auto &&a, do_pack(BTU_MOV(texture), settings, ArchiveType::Textures))
-        { co_yield BTU_MOV(a); }
+        {
+            co_yield BTU_MOV(a);
+        }
     }
 }
 
