@@ -14,11 +14,18 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7.0.1
         with:
           submodules: true
 
-      - uses: ssciwr/doxygen-install@v1
+      - uses: lukka/get-cmake@v4.5.1
+        with:
+          cmakeVersion: 4.5.1
+          ninjaVersion: 1.13.2
+
+      - uses: ssciwr/doxygen-install@v2.0.3
+        with:
+          version: 1.18.0
 
       - name: Install Poxy
         run: sudo pip install poxy --break-system-packages
@@ -30,7 +37,7 @@ jobs:
         run: cmake --build ${{ github.workspace }}/build --target docs
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           force_orphan: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
