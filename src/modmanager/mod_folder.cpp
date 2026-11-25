@@ -27,7 +27,7 @@ ModFolder::ModFolder(Path directory,
     : dir_(std::move(directory))
     , bsa_settings_(BTU_MOV(bsa_settings))
     , ignore_existing_archives_(ignore_existing_archives)
-    , thread_pool_(worker_count == 0 ? common::make_thread_pool() : common::ThreadPool{worker_count})
+    , thread_pool_(common::make_thread_pool_with_count(worker_count))
 {
 }
 
