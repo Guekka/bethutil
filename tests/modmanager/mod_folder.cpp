@@ -76,8 +76,7 @@ TEST_CASE("ModFolder transform with one worker")
     TempPath temp{dir};
     btu::fs::copy(dir / "input", temp.path());
 
-    auto mf = btu::modmanager::ModFolder(
-        temp.path(), btu::bsa::Settings::get(btu::Game::SSE), false, 1);
+    auto mf = btu::modmanager::ModFolder(temp.path(), btu::bsa::Settings::get(btu::Game::SSE), false, 1);
 
     Transformer transformer;
     mf.transform(transformer);
