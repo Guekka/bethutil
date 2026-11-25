@@ -79,9 +79,11 @@ auto convert(CrunchTexture &&file, const DXGI_FORMAT format) -> ResultCrunch
     // Default compression arguments.
     dxt_image::pack_params pack_params;
 
-    // Crunch is capped to 16 threads total, but it should be handled internally.
+    // Keep the helper count within Crunch's task-pool limit.
     const auto threads               = std::thread::hardware_concurrency();
-    pack_params.m_num_helper_threads = (threads != 0 ? threads : 1) - 1;
+    const auto helper_threads        = (threads != 0 ? threads : 1) - 1;
+    const auto max_helper_threads    = static_cast<crnlib::uint>(cCRNMaxHelperThreads);
+    pack_params.m_num_helper_threads = std::min(helper_threads, max_helper_threads);
 
     // Disable endpoint caching for best and deterministic results. Time savings are nearly non-existent.
     pack_params.m_endpoint_caching = false;
