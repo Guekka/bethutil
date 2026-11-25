@@ -7,6 +7,7 @@
 #include <cstring>
 #include <fstream>
 #include <map>
+#include <optional>
 
 namespace btu::esp {
 
@@ -22,15 +23,59 @@ namespace btu::esp {
 /// The maximum allowed path length. It is way more than enough for any sane path.
 constexpr size_t reasonable_max_path = 2048;
 
-auto read_headers(std::fstream &file, detail::PluginRecordHeader &header) noexcept -> bool
+auto read_header(std::fstream &file, detail::PluginRecordHeader &header) noexcept -> bool
 {
     file.read(reinterpret_cast<char *>(&header), sizeof header);
-    return header.plugin.type == detail::k_group_grup;
+    return file.gcount() == static_cast<std::streamsize>(sizeof header);
 }
 
-void read_field_plugin_header(std::fstream &file, detail::PluginFieldHeader &plugin_field_header) noexcept
+auto read_field_plugin_header(std::fstream &file,
+                              detail::PluginFieldHeader &plugin_field_header) noexcept -> bool
 {
     file.read(reinterpret_cast<char *>(&plugin_field_header), sizeof plugin_field_header);
+    return file.gcount() == static_cast<std::streamsize>(sizeof plugin_field_header);
+}
+
+auto stream_end_position(std::fstream &file) noexcept -> std::optional<std::streamoff>
+{
+    file.seekg(0, std::ios::end);
+    if (!file)
+        return std::nullopt;
+
+    const auto end = file.tellg();
+    if (end == std::streampos(-1))
+        return std::nullopt;
+
+    file.seekg(0, std::ios::beg);
+    if (!file)
+        return std::nullopt;
+
+    return static_cast<std::streamoff>(end);
+}
+
+auto checked_end_position(std::fstream &file,
+                          const std::uint64_t size,
+                          const std::streamoff parent_end) noexcept -> std::optional<std::streamoff>
+{
+    const auto position = file.tellg();
+    if (position == std::streampos(-1))
+        return std::nullopt;
+
+    const auto start = static_cast<std::streamoff>(position);
+    if (start < 0 || start > parent_end)
+        return std::nullopt;
+
+    const auto available = static_cast<std::uint64_t>(parent_end - start);
+    if (size > available)
+        return std::nullopt;
+
+    return start + static_cast<std::streamoff>(size);
+}
+
+auto seek_to(std::fstream &file, const std::streamoff position) noexcept -> bool
+{
+    file.seekg(position, std::ios::beg);
+    return static_cast<bool>(file);
 }
 
 auto list_headparts(const Path &input) noexcept -> tl::expected<std::vector<std::u8string>, Error>
@@ -43,51 +88,91 @@ auto list_headparts(std::fstream file) noexcept -> tl::expected<std::vector<std:
     detail::PluginRecordHeader header{};
     detail::PluginFieldHeader plugin_field_header{};
 
+    const auto file_end = stream_end_position(file);
+    if (!file_end)
+        return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
     auto headparts = std::vector<std::u8string>{};
     headparts.reserve(500); // unlikely to have more than 500 headparts
 
-    read_headers(file, header);
+    if (!read_header(file, header))
+        return tl::make_unexpected(Error(EspErr::FailedToReadFile));
     if (header.plugin.type != detail::k_group_tes4)
         return {}; //Not a plugin file
 
-    //Skip TES4 record
-    file.seekg(header.record.data_size, std::ios::cur);
+    const auto tes4_end = checked_end_position(file, header.record.data_size, *file_end);
+    if (!tes4_end || !seek_to(file, *tes4_end))
+        return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
-    // Reading all groups
-    while (read_headers(file, header) && file)
+    while (true)
     {
+        const auto group_start = file.tellg();
+        if (group_start == std::streampos(-1))
+            return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+        if (group_start == std::streampos(*file_end))
+            break;
+        if (group_start > std::streampos(*file_end) || !read_header(file, header)
+            || header.plugin.type != detail::k_group_grup
+            || header.plugin.group_size < sizeof header)
+            return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
+        const auto group_end_pos = checked_end_position(
+            file, header.plugin.group_size - sizeof header, *file_end);
+        if (!group_end_pos)
+            return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
         // skip non headpart groups
         if (header.plugin.label != detail::k_group_hdpt)
         {
-            file.seekg(static_cast<std::streamsize>(header.plugin.group_size - sizeof header), std::ios::cur);
+            if (!seek_to(file, *group_end_pos))
+                return tl::make_unexpected(Error(EspErr::FailedToReadFile));
             continue;
         }
 
-        //Reading all headpart records
-        const auto group_end_pos = static_cast<std::streamsize>(header.plugin.group_size - sizeof header)
-                                   + file.tellg();
-        while (file.tellg() < group_end_pos)
+        while (true)
         {
-            read_headers(file, header);
+            const auto record_start = file.tellg();
+            if (record_start == std::streampos(-1))
+                return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+            if (record_start == std::streampos(*group_end_pos))
+                break;
+            if (record_start > std::streampos(*group_end_pos) || !read_header(file, header))
+                return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
-            // reading all record fields
-            const int64_t rec_end_pos = header.record.data_size + file.tellg();
-            while (file.tellg() < rec_end_pos)
+            const auto record_end_pos =
+                checked_end_position(file, header.record.data_size, *group_end_pos);
+            if (!record_end_pos)
+                return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
+            while (true)
             {
-                read_field_plugin_header(file, plugin_field_header);
+                const auto field_start = file.tellg();
+                if (field_start == std::streampos(-1))
+                    return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+                if (field_start == std::streampos(*record_end_pos))
+                    break;
+                if (field_start > std::streampos(*record_end_pos)
+                    || !read_field_plugin_header(file, plugin_field_header))
+                    return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
+                const auto field_end_pos =
+                    checked_end_position(file, plugin_field_header.data_size, *record_end_pos);
+                if (!field_end_pos)
+                    return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
                 // skip everything but MODL
-                if (plugin_field_header.type != detail::k_group_modl)
+                if (plugin_field_header.type != detail::k_group_modl
+                    || plugin_field_header.data_size > reasonable_max_path)
                 {
-                    file.seekg(plugin_field_header.data_size, std::ios::cur);
+                    if (!seek_to(file, *field_end_pos))
+                        return tl::make_unexpected(Error(EspErr::FailedToReadFile));
                     continue;
                 }
 
-                // prevent reading of corrupted files
-                if (plugin_field_header.data_size > reasonable_max_path)
-                    continue;
-
                 auto headpart = std::string(plugin_field_header.data_size, '\0');
                 file.read(headpart.data(), plugin_field_header.data_size);
+                if (!file)
+                    return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
                 constexpr auto cleanup_path = common::make_path_canonizer(u8"meshes/");
                 headparts.emplace_back(cleanup_path(headpart));
@@ -109,47 +194,96 @@ auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::ve
     detail::PluginRecordHeader header{};
     detail::PluginFieldHeader plugin_field_header{};
 
-    read_headers(file, header);
+    const auto file_end = stream_end_position(file);
+    if (!file_end)
+        return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
+    if (!read_header(file, header))
+        return tl::make_unexpected(Error(EspErr::FailedToReadFile));
     if (header.plugin.type != detail::k_group_tes4)
         return {}; //Not a plugin file
 
-    //Skip TES4 record
-    file.seekg(header.record.data_size, std::ios::cur);
+    const auto tes4_end = checked_end_position(file, header.record.data_size, *file_end);
+    if (!tes4_end || !seek_to(file, *tes4_end))
+        return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
     std::vector<uint32_t> tnam_form_ids;
     std::map<uint32_t, std::u8string> txst_textures;
 
-    //Reading all groups
-    while (read_headers(file, header) && file)
+    while (true)
     {
+        const auto group_start = file.tellg();
+        if (group_start == std::streampos(-1))
+            return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+        if (group_start == std::streampos(*file_end))
+            break;
+        if (group_start > std::streampos(*file_end) || !read_header(file, header)
+            || header.plugin.type != detail::k_group_grup
+            || header.plugin.group_size < sizeof header)
+            return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
+        const auto group_end_pos = checked_end_position(
+            file, header.plugin.group_size - sizeof header, *file_end);
+        if (!group_end_pos)
+            return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
         // skip other groups
         if (header.plugin.label != detail::k_group_ltex && header.plugin.label != detail::k_group_txst)
         {
-            file.seekg(static_cast<std::streamsize>(header.plugin.group_size - sizeof header), std::ios::cur);
+            if (!seek_to(file, *group_end_pos))
+                return tl::make_unexpected(Error(EspErr::FailedToReadFile));
             continue;
         }
 
         std::array<char, 4> signature_group{};
         std::copy_n(std::begin(header.plugin.label), signature_group.size(), signature_group.begin());
 
-        //Reading all records
-        const auto group_end_pos = static_cast<std::streamsize>(header.plugin.group_size - sizeof header)
-                                   + file.tellg();
-        while (file.tellg() < group_end_pos)
+        while (true)
         {
-            read_headers(file, header);
+            const auto record_start = file.tellg();
+            if (record_start == std::streampos(-1))
+                return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+            if (record_start == std::streampos(*group_end_pos))
+                break;
+            if (record_start > std::streampos(*group_end_pos) || !read_header(file, header))
+                return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
-            // reading all record fields
-            const int64_t rec_end_pos = header.record.data_size + file.tellg();
-            while (file.tellg() < rec_end_pos)
+            const auto record_end_pos =
+                checked_end_position(file, header.record.data_size, *group_end_pos);
+            if (!record_end_pos)
+                return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
+            while (true)
             {
-                read_field_plugin_header(file, plugin_field_header);
+                const auto field_start = file.tellg();
+                if (field_start == std::streampos(-1))
+                    return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+                if (field_start == std::streampos(*record_end_pos))
+                    break;
+                if (field_start > std::streampos(*record_end_pos)
+                    || !read_field_plugin_header(file, plugin_field_header))
+                    return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
+                const auto field_end_pos =
+                    checked_end_position(file, plugin_field_header.data_size, *record_end_pos);
+                if (!field_end_pos)
+                    return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+
                 // read FormID of landscape TXST record
                 if (signature_group == detail::k_group_ltex
                     && plugin_field_header.type == detail::k_group_tnam)
                 {
+                    if (plugin_field_header.data_size != sizeof(uint32_t))
+                    {
+                        if (!seek_to(file, *field_end_pos))
+                            return tl::make_unexpected(Error(EspErr::FailedToReadFile));
+                        continue;
+                    }
+
                     uint32_t form_id = 0;
-                    file.read(reinterpret_cast<char *>(&form_id), plugin_field_header.data_size);
+                    file.read(reinterpret_cast<char *>(&form_id), sizeof form_id);
+                    if (!file)
+                        return tl::make_unexpected(Error(EspErr::FailedToReadFile));
                     tnam_form_ids.emplace_back(form_id);
                 }
                 // read diffuse texture name from TXST record
@@ -158,17 +292,24 @@ auto list_landscape_textures(std::fstream file) noexcept -> tl::expected<std::ve
                 {
                     // prevent reading of corrupted files
                     if (plugin_field_header.data_size > reasonable_max_path)
+                    {
+                        if (!seek_to(file, *field_end_pos))
+                            return tl::make_unexpected(Error(EspErr::FailedToReadFile));
                         continue;
+                    }
 
                     auto texture = std::string(plugin_field_header.data_size, '\0');
                     file.read(texture.data(), plugin_field_header.data_size);
+                    if (!file)
+                        return tl::make_unexpected(Error(EspErr::FailedToReadFile));
 
                     constexpr auto cleanup_path = common::make_path_canonizer(u8"textures/");
                     txst_textures.try_emplace(header.record.id, cleanup_path(texture));
                 }
                 else
                 { // skip other fields
-                    file.seekg(plugin_field_header.data_size, std::ios::cur);
+                    if (!seek_to(file, *field_end_pos))
+                        return tl::make_unexpected(Error(EspErr::FailedToReadFile));
                 }
             }
         }
