@@ -9,7 +9,14 @@
 #include "btu/common/filesystem.hpp"
 
 #include <binary_io/memory_stream.hpp>
+#include <btu/bsa/archive.hpp>
 #include <btu/hkx/anim.hpp>
+
+#include <algorithm>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <string>
 
 class Iterator final : public btu::modmanager::ModFolderIterator
 {
@@ -70,6 +77,89 @@ public:
     }
 };
 
+class ParallelArchiveMemberTransformer final : public btu::modmanager::ModFolderTransformer
+{
+    mutable std::mutex mutex_;
+    std::condition_variable members_started_;
+    std::size_t active_calls_     = 0;
+    std::size_t call_count_       = 0;
+    std::size_t max_active_calls_ = 0;
+
+public:
+    [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,
+                                         ArchiveTooLargeState /*state*/) noexcept
+        -> ArchiveTooLargeAction override
+    {
+        return ArchiveTooLargeAction::Process;
+    }
+
+    [[nodiscard]] auto transform_file(const btu::modmanager::ModFile /*file*/) noexcept
+        -> std::optional<std::vector<std::byte>> override
+    {
+        auto lock = std::unique_lock{mutex_};
+        ++call_count_;
+        ++active_calls_;
+        max_active_calls_ = std::max(max_active_calls_, active_calls_);
+        members_started_.notify_all();
+
+        if (call_count_ == 1)
+            members_started_.wait_for(lock, std::chrono::seconds{2}, [this] { return call_count_ > 1; });
+
+        --active_calls_;
+        members_started_.notify_all();
+        return std::nullopt;
+    }
+
+    [[nodiscard]] auto call_count() const -> std::size_t
+    {
+        auto lock = std::lock_guard{mutex_};
+        return call_count_;
+    }
+
+    [[nodiscard]] auto max_active_calls() const -> std::size_t
+    {
+        auto lock = std::lock_guard{mutex_};
+        return max_active_calls_;
+    }
+};
+
+TEST_CASE("ModFolder transform with one worker")
+{
+    const Path dir = "modfolder_transform";
+    TempPath temp{dir};
+    btu::fs::copy(dir / "input", temp.path());
+
+    auto mf = btu::modmanager::ModFolder(temp.path(), btu::bsa::Settings::get(btu::Game::SSE), false, 1);
+
+    Transformer transformer;
+    mf.transform(transformer);
+
+    CHECK(btu::common::compare_directories(temp.path(), dir / "expected"));
+}
+
+TEST_CASE("ModFolder processes archive members in parallel")
+{
+    const Path dir = "modfolder_transform";
+    TempPath temp{dir};
+    btu::fs::create_directories(temp.path());
+
+    auto archive      = btu::bsa::Archive{btu::bsa::ArchiveVersion::fo4, btu::bsa::ArchiveType::Standard};
+    const auto member = btu::bsa::File{btu::bsa::ArchiveVersion::fo4, btu::bsa::ArchiveType::Standard};
+
+    constexpr auto member_count = std::size_t{4'096};
+    for (std::size_t i{}; i < member_count; ++i)
+        REQUIRE(archive.emplace("parallel_test_member_" + std::to_string(i), member));
+    REQUIRE(archive.size() == member_count);
+    REQUIRE(std::move(archive).write(temp.path() / "parallel.ba2"));
+
+    auto mf = btu::modmanager::ModFolder(temp.path(), btu::bsa::Settings::get(btu::Game::FO4), false, 2);
+    auto transformer = ParallelArchiveMemberTransformer{};
+    mf.transform(transformer);
+
+    CHECK(transformer.call_count() > 1);
+    CHECK(transformer.max_active_calls() > 1);
+}
+
 TEST_CASE("ModFolder transform", "[src]")
 {
     const Path dir = "modfolder_transform";
@@ -103,7 +193,7 @@ TEST_CASE("ModFolder ignore existing", "[src]")
 TEST_CASE("ModFolder size", "[src]")
 {
     const Path dir = "modfolder";
-    auto mf        = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4));
+    auto mf = btu::modmanager::ModFolder(dir / "input", btu::bsa::Settings::get(btu::Game::FO4), false, 2);
     CHECK(mf.size() == 4);
 }
 
