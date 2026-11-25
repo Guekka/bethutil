@@ -9,12 +9,14 @@
 #include "btu/common/filesystem.hpp"
 
 #include <binary_io/memory_stream.hpp>
+#include <btu/bsa/archive.hpp>
 #include <btu/hkx/anim.hpp>
 
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
+#include <string>
 
 class Iterator final : public btu::modmanager::ModFolderIterator
 {
@@ -140,7 +142,15 @@ TEST_CASE("ModFolder processes archive members in parallel")
     const Path dir = "modfolder_transform";
     TempPath temp{dir};
     btu::fs::create_directories(temp.path());
-    btu::fs::copy_file(dir / "input" / "expected_fo4.ba2", temp.path() / "expected_fo4.ba2");
+
+    auto archive = btu::bsa::Archive{btu::bsa::ArchiveVersion::fo4, btu::bsa::ArchiveType::Standard};
+    const auto member = btu::bsa::File{btu::bsa::ArchiveVersion::fo4, btu::bsa::ArchiveType::Standard};
+
+    constexpr auto member_count = std::size_t{4'096};
+    for (std::size_t i{}; i < member_count; ++i)
+        REQUIRE(archive.emplace("parallel_test_member_" + std::to_string(i), member));
+    REQUIRE(archive.size() == member_count);
+    REQUIRE(std::move(archive).write(temp.path() / "parallel.ba2"));
 
     auto mf = btu::modmanager::ModFolder(temp.path(), btu::bsa::Settings::get(btu::Game::FO4), false, 2);
     auto transformer = ParallelArchiveMemberTransformer{};
