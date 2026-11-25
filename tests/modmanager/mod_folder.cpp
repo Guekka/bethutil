@@ -143,7 +143,7 @@ TEST_CASE("ModFolder processes archive members in parallel")
     TempPath temp{dir};
     btu::fs::create_directories(temp.path());
 
-    auto archive = btu::bsa::Archive{btu::bsa::ArchiveVersion::fo4, btu::bsa::ArchiveType::Standard};
+    auto archive      = btu::bsa::Archive{btu::bsa::ArchiveVersion::fo4, btu::bsa::ArchiveType::Standard};
     const auto member = btu::bsa::File{btu::bsa::ArchiveVersion::fo4, btu::bsa::ArchiveType::Standard};
 
     constexpr auto member_count = std::size_t{4'096};
