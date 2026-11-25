@@ -121,9 +121,7 @@ void reduce_cpu_usage() noexcept
     std::this_thread::sleep_for(std::chrono::nanoseconds(5));
 }
 
-void transform_loose_file(const Path &absolute_path,
-                          const Path &dir,
-                          ModFolderTransformer &transformer)
+void transform_loose_file(const Path &absolute_path, const Path &dir, ModFolderTransformer &transformer)
 {
     if (transformer.stop_requested())
         return;
@@ -290,11 +288,11 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
             continue;
 
         tasks.push_back({file_path, thread_pool_.submit_task([this, file_path, &is_arch, &transformer] {
-            if (is_arch(file_path)) [[unlikely]]
-                transform_archive_file(file_path, transformer, bsa_settings_);
-            else [[likely]]
-                transform_loose_file(file_path, dir_, transformer);
-        })});
+                             if (is_arch(file_path)) [[unlikely]]
+                                 transform_archive_file(file_path, transformer, bsa_settings_);
+                             else [[likely]]
+                                 transform_loose_file(file_path, dir_, transformer);
+                         })});
     }
 
     for (auto &task : tasks)

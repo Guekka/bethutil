@@ -76,8 +76,7 @@ TEST_CASE("ModFolder transform with one worker")
     TempPath temp{dir};
     btu::fs::copy(dir / "input", temp.path());
 
-    auto mf = btu::modmanager::ModFolder(
-        temp.path(), btu::bsa::Settings::get(btu::Game::SSE), false, 1);
+    auto mf = btu::modmanager::ModFolder(temp.path(), btu::bsa::Settings::get(btu::Game::SSE), false, 1);
 
     Transformer transformer;
     mf.transform(transformer);
@@ -89,7 +88,7 @@ class FailingTaskRecorder final : public btu::modmanager::ModFolderTransformer
 {
     Path archive_path_;
     mutable bool archive_removed_ = false;
-    bool failure_reported_ = false;
+    bool failure_reported_        = false;
 
 public:
     explicit FailingTaskRecorder(Path archive_path)
@@ -138,7 +137,7 @@ TEST_CASE("ModFolder reports worker exceptions")
     const auto archive_path = temp.path() / "disappears.ba2";
     create_file(archive_path);
 
-    auto mf = btu::modmanager::ModFolder(temp.path(), btu::bsa::Settings::get(btu::Game::FO4));
+    auto mf          = btu::modmanager::ModFolder(temp.path(), btu::bsa::Settings::get(btu::Game::FO4));
     auto transformer = FailingTaskRecorder{archive_path};
     mf.transform(transformer);
 

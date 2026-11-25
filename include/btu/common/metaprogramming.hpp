@@ -21,7 +21,9 @@ Overload(Ts...) -> Overload<Ts...>;
 template<typename E>
     requires std::is_enum_v<E>
 constexpr auto to_underlying(E e) -> std::underlying_type_t<E>
-{ return static_cast<std::underlying_type_t<E>>(e); }
+{
+    return static_cast<std::underlying_type_t<E>>(e);
+}
 
 template<typename T, typename U>
 using is_equiv = std::is_same<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
@@ -74,15 +76,19 @@ constexpr bool is_mutable_lambda_v = is_mutable_lambda<T>::value;
                                        a_op static_cast<std::underlying_type_t<a_type>>(a_rhs)); \
     }                                                                                            \
                                                                                                  \
-    constexpr auto operator a_op## = (a_type & a_lhs, a_type a_rhs) noexcept -> a_type &         \
-    { return a_lhs = a_lhs a_op a_rhs; }
+    constexpr auto operator a_op##=(a_type &a_lhs, a_type a_rhs) noexcept -> a_type &            \
+    {                                                                                            \
+        return a_lhs = a_lhs a_op a_rhs;                                                         \
+    }
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage): we need it to generate code
 #define BETHUTIL_MAKE_ALL_ENUM_OPERATORS(a_type)                                         \
     static_assert(std::is_enum_v<a_type>, "\'" #a_type "\' is not an enum");             \
                                                                                          \
     [[nodiscard]] constexpr auto operator~(a_type a_val) noexcept -> a_type              \
-    { return static_cast<a_type>(~static_cast<std::underlying_type_t<a_type>>(a_val)); } \
+    {                                                                                    \
+        return static_cast<a_type>(~static_cast<std::underlying_type_t<a_type>>(a_val)); \
+    }                                                                                    \
                                                                                          \
     BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, ^)                                          \
     BETHUTIL_MAKE_ENUM_OPERATOR_PAIR(a_type, &)                                          \
