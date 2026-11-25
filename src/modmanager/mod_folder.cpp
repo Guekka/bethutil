@@ -208,9 +208,14 @@ void transform_archive_file(const Path &archive_path,
 
     auto archive          = std::move(*opt_arch);
     auto any_file_changed = std::atomic_bool{false};
-    // Use the common parallel backend rather than queueing child work onto the file pool.
-    common::for_each_mt(archive, [&transformer, &any_file_changed](auto &pair) {
-        transform_archive_file_inner(transformer, any_file_changed, pair);
+    auto archive_members  = std::vector<bsa::Archive::value_type *>{};
+    archive_members.reserve(archive.size());
+    for (auto &member : archive)
+        archive_members.push_back(&member);
+
+    // A random-access range lets the parallel backend split map-backed archives efficiently.
+    common::for_each_mt(archive_members, [&transformer, &any_file_changed](auto *member) {
+        transform_archive_file_inner(transformer, any_file_changed, *member);
     });
 
     if (transformer.stop_requested())
