@@ -243,6 +243,7 @@ void transform_archive_file(const Path &archive_path,
 
     if (any_file_changed.load() || version_changed.value_or(false))
     {
+        // Change the extension of the archive if needed
         auto path = archive_path;
         if (path.extension() != bsa_settings.extension)
             path.replace_extension(bsa_settings.extension);
@@ -253,6 +254,7 @@ void transform_archive_file(const Path &archive_path,
             return;
         }
 
+        // Remove the old archive if the new one has a different name
         if (!equivalent(archive_path, path))
             fs::remove(archive_path);
     }
@@ -288,5 +290,6 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
     }
 
     flux::for_each(tasks, [](auto &task) { task.wait(); });
+    // TODO: there might be an exception in a task. Should we ignore it?
 };
 } // namespace btu::modmanager
