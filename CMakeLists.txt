@@ -8,6 +8,8 @@ project(
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(CTest)
+
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(FATAL_ERROR "in-source builds are not allowed")
 endif()
@@ -22,8 +24,7 @@ if("${BETHUTIL_BUILD_EXAMPLES}")
   add_subdirectory(examples)
 endif()
 
-if("${BUILD_TESTING}")
-  include(CTest)
+if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
 
