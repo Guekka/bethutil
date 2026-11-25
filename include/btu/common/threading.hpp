@@ -136,9 +136,9 @@ template<typename Range, typename Func>
     requires std::ranges::input_range<Range> && invocable_l_or_r<Func, std::ranges::range_value_t<Range>>
 auto for_each_mt(Range &&rng, Func &&func)
 {
-    auto eptr = synchronized<std::exception_ptr>{};
+    auto eptr   = synchronized<std::exception_ptr>{};
     auto failed = std::atomic_bool{false};
-    auto call = [&eptr, &failed, f = std::forward<Func>(func)](auto &&elem) mutable noexcept {
+    auto call   = [&eptr, &failed, f = std::forward<Func>(func)](auto &&elem) mutable noexcept {
         if (failed.load(std::memory_order_relaxed))
             return; // Stop starting work once a failure has been recorded.
 
