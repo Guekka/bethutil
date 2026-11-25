@@ -21,7 +21,7 @@ auto unpack(UnpackSettings sets) noexcept -> tl::expected<void, Error>
         if (!arch)
             return tl::make_unexpected(Error(BsaErr::FailedToReadArchive));
 
-        const auto &root = sets.extract_to_dir.value_or(sets.file_path.parent_path());
+        const auto &root                 = sets.extract_to_dir.value_or(sets.file_path.parent_path());
         std::atomic_bool failed_to_write = false;
         common::for_each_mt(std::move(*arch), [root, &sets, &failed_to_write](auto &&elem) {
             const auto path = root / elem.first;
