@@ -70,6 +70,21 @@ public:
     }
 };
 
+TEST_CASE("ModFolder transform with one worker")
+{
+    const Path dir = "modfolder_transform";
+    TempPath temp{dir};
+    btu::fs::copy(dir / "input", temp.path());
+
+    auto mf = btu::modmanager::ModFolder(
+        temp.path(), btu::bsa::Settings::get(btu::Game::SSE), false, 1);
+
+    Transformer transformer;
+    mf.transform(transformer);
+
+    CHECK(btu::common::compare_directories(temp.path(), dir / "expected"));
+}
+
 TEST_CASE("ModFolder transform", "[src]")
 {
     const Path dir = "modfolder_transform";
