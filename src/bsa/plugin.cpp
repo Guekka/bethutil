@@ -101,8 +101,9 @@ void remove_suffixes(std::u8string &filename, const Settings &sets)
     return {};
 }
 
-auto find_archive_name_using_plugins(std::span<const Path> plugins, const Settings &sets, ArchiveType type)
-    -> std::optional<Path>
+auto find_archive_name_using_plugins(std::span<const Path> plugins,
+                                     const Settings &sets,
+                                     ArchiveType type) -> std::optional<Path>
 {
     if (plugins.empty())
         return std::nullopt;
@@ -135,8 +136,9 @@ auto find_archive_name_using_plugins(std::span<const Path> plugins, const Settin
 }
 
 /// Returns an archive name that is unique, which is guaranteed by trying suitable suffixes
-auto find_archive_name(const Path &directory, const Settings &sets, ArchiveType type) noexcept
-    -> std::optional<Path>
+auto find_archive_name(const Path &directory,
+                       const Settings &sets,
+                       ArchiveType type) noexcept -> std::optional<Path>
 {
     if (!is_directory(directory))
         return std::nullopt;
