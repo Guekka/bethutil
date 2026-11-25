@@ -126,8 +126,7 @@ public:
  */
 [[nodiscard]] inline auto make_thread_pool()
 {
-    static const auto num_threads =
-        std::max(hardware_concurrency() - std::uint32_t{1}, std::uint32_t{1});
+    static const auto num_threads = std::max(hardware_concurrency() - std::uint32_t{1}, std::uint32_t{1});
     return ThreadPool{num_threads};
 }
 
