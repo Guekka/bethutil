@@ -7,6 +7,7 @@
 
 #include "../utils.hpp"
 #include "btu/common/filesystem.hpp"
+#include "btu/common/threading.hpp"
 
 #include <binary_io/memory_stream.hpp>
 #include <btu/bsa/archive.hpp>
@@ -158,6 +159,73 @@ TEST_CASE("ModFolder processes archive members in parallel")
 
     CHECK(transformer.call_count() > 1);
     CHECK(transformer.max_active_calls() > 1);
+}
+
+class FailingTaskRecorder final : public btu::modmanager::ModFolderTransformer
+{
+    Path archive_path_;
+    // stop_requested may run in parallel for archive members.
+    mutable btu::common::synchronized<bool> archive_removed_{false};
+    bool failure_reported_ = false;
+
+public:
+    explicit FailingTaskRecorder(Path archive_path)
+        : archive_path_(std::move(archive_path))
+    {
+    }
+
+    [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,
+                                         ArchiveTooLargeState /*state*/) noexcept
+        -> ArchiveTooLargeAction override
+    {
+        return ArchiveTooLargeAction::Process;
+    }
+
+    [[nodiscard]] auto transform_file(const btu::modmanager::ModFile /*file*/) noexcept
+        -> std::optional<std::vector<std::byte>> override
+    {
+        return std::nullopt;
+    }
+
+    [[nodiscard]] auto stop_requested() const noexcept -> bool override
+    {
+        auto archive_removed = archive_removed_.wlock();
+        if (!*archive_removed)
+        {
+            std::error_code ec;
+            *archive_removed = btu::fs::remove(archive_path_, ec) && !ec;
+        }
+        return false;
+    }
+
+    void failed_to_process_file(const Path &path, const std::exception &error) noexcept override
+    {
+        failure_reported_ = path == archive_path_ && error.what()[0] != '\0';
+    }
+
+    [[nodiscard]] auto archive_removed() const noexcept -> bool
+    {
+        auto archive_removed = archive_removed_.rlock();
+        return *archive_removed;
+    }
+    [[nodiscard]] auto failure_reported() const noexcept -> bool { return failure_reported_; }
+};
+
+TEST_CASE("ModFolder reports worker exceptions")
+{
+    const Path dir = "modfolder";
+    TempPath temp{dir};
+    btu::fs::create_directories(temp.path());
+
+    const auto archive_path = temp.path() / "disappears.ba2";
+    create_file(archive_path);
+
+    auto mf          = btu::modmanager::ModFolder(temp.path(), btu::bsa::Settings::get(btu::Game::FO4));
+    auto transformer = FailingTaskRecorder{archive_path};
+    mf.transform(transformer);
+
+    CHECK(transformer.archive_removed());
+    CHECK(transformer.failure_reported());
 }
 
 TEST_CASE("ModFolder transform", "[src]")

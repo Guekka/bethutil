@@ -120,9 +120,7 @@ void ModFolder::iterate(ModFolderIterator &iterator) noexcept
     return target;
 }
 
-void transform_loose_file(const Path &absolute_path,
-                          const Path &dir,
-                          ModFolderTransformer &transformer) noexcept
+void transform_loose_file(const Path &absolute_path, const Path &dir, ModFolderTransformer &transformer)
 {
     if (transformer.stop_requested())
         return;
@@ -270,7 +268,12 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
                      .map([](auto &&e) { return e.path(); })
                      .to<std::vector>();
 
-    std::vector<std::future<void>> tasks;
+    struct Task
+    {
+        Path path;
+        std::future<void> future;
+    };
+    std::vector<Task> tasks;
     for (const auto &file_path : files)
     {
         if (transformer.stop_requested())
@@ -279,14 +282,24 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
         if (is_arch(file_path) && ignore_existing_archives_)
             continue;
 
-        tasks.push_back(thread_pool_.submit_task([this, file_path, &is_arch, &transformer] {
-            if (is_arch(file_path)) [[unlikely]]
-                transform_archive_file(file_path, transformer, bsa_settings_);
-            else [[likely]]
-                transform_loose_file(file_path, dir_, transformer);
-        }));
+        tasks.push_back({file_path, thread_pool_.submit_task([this, file_path, &is_arch, &transformer] {
+                             if (is_arch(file_path)) [[unlikely]]
+                                 transform_archive_file(file_path, transformer, bsa_settings_);
+                             else [[likely]]
+                                 transform_loose_file(file_path, dir_, transformer);
+                         })});
     }
 
-    flux::for_each(tasks, [](auto &task) { task.wait(); });
+    for (auto &task : tasks)
+    {
+        try
+        {
+            task.future.get();
+        }
+        catch (const std::exception &error)
+        {
+            transformer.failed_to_process_file(task.path, error);
+        }
+    }
 };
 } // namespace btu::modmanager

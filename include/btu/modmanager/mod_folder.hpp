@@ -14,6 +14,7 @@
 #include <tl/expected.hpp>
 
 #include <cstdint>
+#include <exception>
 
 namespace btu::modmanager {
 
@@ -45,6 +46,9 @@ public:
 
     virtual void failed_to_read_archive(const Path &archive_path) noexcept {}
     [[nodiscard]] virtual auto stop_requested() const noexcept -> bool { return false; }
+
+    /// Called on the caller thread when a file-processing task throws.
+    virtual void failed_to_process_file(const Path &path, const std::exception &error) noexcept {}
 };
 
 class ModFolderTransformer : public ModFolderIteratorBase
