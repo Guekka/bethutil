@@ -12,97 +12,11 @@
 #include <flux.hpp>
 
 #include <atomic>
-#include <condition_variable>
-#include <exception>
 #include <future>
-#include <list>
-#include <memory>
-#include <mutex>
 #include <utility>
 #include <vector>
 
 namespace btu::modmanager {
-
-// Lets worker tasks enqueue child work without waiting on the same pool.
-class ModFolderTaskGroup
-{
-public:
-    struct Task
-    {
-        std::shared_ptr<const Path> path;
-        std::future<void> future;
-    };
-
-private:
-    class Completion
-    {
-        ModFolderTaskGroup &group_;
-
-    public:
-        explicit Completion(ModFolderTaskGroup &group)
-            : group_(group)
-        {
-        }
-
-        ~Completion() { group_.task_finished(); }
-    };
-
-    common::ThreadPool &thread_pool_;
-    std::mutex mutex_;
-    std::condition_variable completed_;
-    std::size_t pending_tasks_ = 0;
-    std::list<Task> tasks_;
-
-    void task_finished()
-    {
-        auto lock = std::lock_guard{mutex_};
-        if (--pending_tasks_ == 0)
-            completed_.notify_one();
-    }
-
-public:
-    explicit ModFolderTaskGroup(common::ThreadPool &thread_pool)
-        : thread_pool_(thread_pool)
-    {
-    }
-
-    template<typename Function>
-    void submit(std::shared_ptr<const Path> path, Function &&function)
-    {
-        auto task = std::list<Task>::iterator{};
-        {
-            auto lock = std::unique_lock{mutex_};
-            task      = tasks_.insert(tasks_.end(), Task{std::move(path), {}});
-            ++pending_tasks_;
-        }
-
-        auto future = std::future<void>{};
-        try
-        {
-            future = thread_pool_.submit_task([this, task = std::forward<Function>(function)]() mutable {
-                auto completion = Completion{*this};
-                task();
-            });
-        }
-        catch (...)
-        {
-            auto lock = std::lock_guard{mutex_};
-            tasks_.erase(task);
-            if (--pending_tasks_ == 0)
-                completed_.notify_one();
-            throw;
-        }
-
-        task->future = std::move(future);
-    }
-
-    [[nodiscard]] auto wait() -> std::list<Task>
-    {
-        auto lock = std::unique_lock{mutex_};
-        completed_.wait(lock, [this] { return pending_tasks_ == 0; });
-        return std::move(tasks_);
-    }
-};
 
 ModFolder::ModFolder(Path directory, bsa::Settings bsa_settings, bool ignore_existing_archives)
     : ModFolder(std::move(directory), std::move(bsa_settings), ignore_existing_archives, 0)
@@ -275,149 +189,9 @@ void transform_archive_file_inner(ModFolderTransformer &transformer,
     return false;
 }
 
-class ArchiveTransformState : public std::enable_shared_from_this<ArchiveTransformState>
-{
-    std::shared_ptr<const Path> archive_path_;
-    ModFolderTransformer &transformer_;
-    const bsa::Settings &bsa_settings_;
-    bsa::Archive archive_;
-    std::atomic_size_t pending_members_{1};
-    std::atomic_bool any_file_changed_{false};
-    std::atomic_bool cancelled_{false};
-    std::mutex error_mutex_;
-    std::exception_ptr error_;
-
-    void record_error(std::exception_ptr error)
-    {
-        auto lock = std::lock_guard{error_mutex_};
-        if (!error_)
-            error_ = std::move(error);
-    }
-
-    void process_member(bsa::Archive::value_type &pair)
-    {
-        if (transformer_.stop_requested())
-        {
-            cancelled_.store(true);
-        }
-        else
-        {
-            try
-            {
-                transform_archive_file_inner(transformer_, any_file_changed_, pair);
-            }
-            catch (...)
-            {
-                record_error(std::current_exception());
-            }
-        }
-
-        complete_member();
-    }
-
-    void complete_member()
-    {
-        if (pending_members_.fetch_sub(1) == 1)
-            finish();
-    }
-
-    void finish()
-    {
-        auto error = std::exception_ptr{};
-        {
-            auto lock = std::lock_guard{error_mutex_};
-            error     = error_;
-        }
-        if (error)
-            std::rethrow_exception(error);
-
-        if (cancelled_.load() || transformer_.stop_requested())
-            return;
-
-        const auto &archive_path   = *archive_path_;
-        const auto version_changed = change_archive_version_if_needed(archive_, bsa_settings_);
-        if (!version_changed)
-        {
-            transformer_.failed_to_change_archive_version(archive_path, version_changed.error());
-            return;
-        }
-
-        if (const auto arch_size = archive_.file_size(); arch_size > bsa_settings_.max_size)
-        {
-            if (want_to_skip_archive(archive_path,
-                                     transformer_,
-                                     ModFolderIteratorBase::ArchiveTooLargeState::AfterProcessing))
-                return;
-        }
-
-        if (transformer_.stop_requested())
-            return;
-
-        if (any_file_changed_.load() || version_changed.value_or(false))
-        {
-            auto path = archive_path;
-            if (path.extension() != bsa_settings_.extension)
-                path.replace_extension(bsa_settings_.extension);
-
-            if (!std::move(archive_).write(path))
-            {
-                transformer_.failed_to_write_archive(archive_path, path);
-                return;
-            }
-
-            if (!equivalent(archive_path, path))
-                fs::remove(archive_path);
-        }
-    }
-
-public:
-    ArchiveTransformState(std::shared_ptr<const Path> archive_path,
-                          ModFolderTransformer &transformer,
-                          const bsa::Settings &bsa_settings,
-                          bsa::Archive archive)
-        : archive_path_(std::move(archive_path))
-        , transformer_(transformer)
-        , bsa_settings_(bsa_settings)
-        , archive_(std::move(archive))
-    {
-    }
-
-    void schedule_members(ModFolderTaskGroup &tasks)
-    {
-        const auto self = shared_from_this();
-        for (auto &pair : archive_)
-        {
-            if (transformer_.stop_requested())
-            {
-                cancelled_.store(true);
-                break;
-            }
-
-            pending_members_.fetch_add(1);
-            try
-            {
-                auto *member = &pair;
-                tasks.submit(archive_path_, [self, member] { self->process_member(*member); });
-            }
-            catch (...)
-            {
-                record_error(std::current_exception());
-                cancelled_.store(true);
-                pending_members_.fetch_sub(1);
-                break;
-            }
-        }
-
-        // Keep a sentinel while scheduling so fast workers cannot finalize a partially queued archive.
-        complete_member();
-    }
-};
-
 void transform_archive_file(const Path &archive_path,
                             ModFolderTransformer &transformer,
-                            const bsa::Settings &bsa_settings,
-                            ModFolderTaskGroup &tasks,
-                            std::shared_ptr<const Path> task_path)
+                            const bsa::Settings &bsa_settings)
 {
     if (const auto arch_size = file_size(archive_path); arch_size > bsa_settings.max_size)
     {
@@ -434,11 +208,49 @@ void transform_archive_file(const Path &archive_path,
         return;
     }
 
-    auto state = std::make_shared<ArchiveTransformState>(std::move(task_path),
-                                                         transformer,
-                                                         bsa_settings,
-                                                         std::move(*opt_arch));
-    state->schedule_members(tasks);
+    auto archive          = std::move(*opt_arch);
+    auto any_file_changed = std::atomic_bool{false};
+    // Use the common parallel backend rather than queueing child work onto the file pool.
+    common::for_each_mt(archive, [&transformer, &any_file_changed](auto &pair) {
+        transform_archive_file_inner(transformer, any_file_changed, pair);
+    });
+
+    if (transformer.stop_requested())
+        return;
+
+    const auto version_changed = change_archive_version_if_needed(archive, bsa_settings);
+    if (!version_changed)
+    {
+        transformer.failed_to_change_archive_version(archive_path, version_changed.error());
+        return;
+    }
+
+    if (const auto arch_size = archive.file_size(); arch_size > bsa_settings.max_size)
+    {
+        if (want_to_skip_archive(archive_path,
+                                 transformer,
+                                 ModFolderIteratorBase::ArchiveTooLargeState::AfterProcessing))
+            return;
+    }
+
+    if (transformer.stop_requested())
+        return;
+
+    if (any_file_changed.load() || version_changed.value_or(false))
+    {
+        auto path = archive_path;
+        if (path.extension() != bsa_settings.extension)
+            path.replace_extension(bsa_settings.extension);
+
+        if (!std::move(archive).write(path))
+        {
+            transformer.failed_to_write_archive(archive_path, path);
+            return;
+        }
+
+        if (!equivalent(archive_path, path))
+            fs::remove(archive_path);
+    }
 }
 
 void ModFolder::transform(ModFolderTransformer &transformer) noexcept
@@ -453,7 +265,7 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
                      .map([](auto &&e) { return e.path(); })
                      .to<std::vector>();
 
-    auto tasks = ModFolderTaskGroup{thread_pool_};
+    std::vector<std::future<void>> tasks;
     for (const auto &file_path : files)
     {
         if (transformer.stop_requested())
@@ -462,16 +274,14 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
         if (is_arch(file_path) && ignore_existing_archives_)
             continue;
 
-        auto task_path = std::make_shared<const Path>(file_path);
-        tasks.submit(task_path, [this, file_path, task_path, &is_arch, &transformer, &tasks] {
+        tasks.push_back(thread_pool_.submit_task([this, file_path, &is_arch, &transformer] {
             if (is_arch(file_path)) [[unlikely]]
-                transform_archive_file(file_path, transformer, bsa_settings_, tasks, task_path);
+                transform_archive_file(file_path, transformer, bsa_settings_);
             else [[likely]]
                 transform_loose_file(file_path, dir_, transformer);
-        });
+        }));
     }
 
-    for (auto &task : tasks.wait())
-        task.future.wait();
+    flux::for_each(tasks, [](auto &task) { task.wait(); });
 };
 } // namespace btu::modmanager
