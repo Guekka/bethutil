@@ -79,9 +79,9 @@ class ParallelArchiveMemberTransformer final : public btu::modmanager::ModFolder
 {
     mutable std::mutex mutex_;
     std::condition_variable members_started_;
-    std::size_t active_calls_       = 0;
-    std::size_t call_count_          = 0;
-    std::size_t max_active_calls_   = 0;
+    std::size_t active_calls_     = 0;
+    std::size_t call_count_       = 0;
+    std::size_t max_active_calls_ = 0;
 
 public:
     [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,

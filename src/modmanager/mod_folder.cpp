@@ -72,7 +72,7 @@ public:
         auto task = std::list<Task>::iterator{};
         {
             auto lock = std::unique_lock{mutex_};
-            task = tasks_.insert(tasks_.end(), Task{std::move(path), {}});
+            task      = tasks_.insert(tasks_.end(), Task{std::move(path), {}});
             ++pending_tasks_;
         }
 
@@ -134,7 +134,10 @@ auto ModFolder::size() noexcept -> size_t
             return Skip;
         }
 
-        void process_file(ModFile /*file*/) noexcept override { size.fetch_add(1, std::memory_order_relaxed); }
+        void process_file(ModFile /*file*/) noexcept override
+        {
+            size.fetch_add(1, std::memory_order_relaxed);
+        }
     };
 
     auto iterator = SizeIterator{};
@@ -331,7 +334,7 @@ class ArchiveTransformState : public std::enable_shared_from_this<ArchiveTransfo
         if (cancelled_.load() || transformer_.stop_requested())
             return;
 
-        const auto &archive_path    = *archive_path_;
+        const auto &archive_path   = *archive_path_;
         const auto version_changed = change_archive_version_if_needed(archive_, bsa_settings_);
         if (!version_changed)
         {
@@ -431,8 +434,10 @@ void transform_archive_file(const Path &archive_path,
         return;
     }
 
-    auto state =
-        std::make_shared<ArchiveTransformState>(std::move(task_path), transformer, bsa_settings, std::move(*opt_arch));
+    auto state = std::make_shared<ArchiveTransformState>(std::move(task_path),
+                                                         transformer,
+                                                         bsa_settings,
+                                                         std::move(*opt_arch));
     state->schedule_members(tasks);
 }
 
