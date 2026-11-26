@@ -183,4 +183,22 @@ auto pack(const PackSettings settings) noexcept -> flux::generator<Archive &&>
     }
 }
 
+auto list_pack_preview(const PackSettings &settings) noexcept -> PackPreview
+{
+    auto [standard, texture] = list_packable_files(settings.input_dir,
+                                                   settings.game_settings,
+                                                   get_allow_file_pred(settings));
+
+    auto make_relative = [&settings](std::vector<Path> &paths) {
+        for (auto &path : paths)
+        {
+            path = relative(path, settings.input_dir);
+        }
+    };
+
+    make_relative(standard);
+    make_relative(texture);
+    return {.standard_files = BTU_MOV(standard), .texture_files = BTU_MOV(texture)};
+}
+
 } // namespace btu::bsa
