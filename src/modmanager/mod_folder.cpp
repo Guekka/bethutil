@@ -12,15 +12,25 @@
 #include <flux.hpp>
 
 #include <atomic>
+#include <future>
 #include <utility>
+#include <vector>
 
 namespace btu::modmanager {
 
 ModFolder::ModFolder(Path directory, bsa::Settings bsa_settings, bool ignore_existing_archives)
+    : ModFolder(std::move(directory), std::move(bsa_settings), ignore_existing_archives, 0)
+{
+}
+
+ModFolder::ModFolder(Path directory,
+                     bsa::Settings bsa_settings,
+                     bool ignore_existing_archives,
+                     const std::uint32_t worker_count)
     : dir_(std::move(directory))
     , bsa_settings_(BTU_MOV(bsa_settings))
     , ignore_existing_archives_(ignore_existing_archives)
-    , thread_pool_(common::make_thread_pool())
+    , thread_pool_(common::make_thread_pool_with_count(worker_count))
 {
 }
 
@@ -29,7 +39,7 @@ auto ModFolder::size() noexcept -> size_t
     class SizeIterator final : public ModFolderIterator
     {
     public:
-        size_t size{};
+        std::atomic_size_t size{};
 
         [[nodiscard]] auto archive_too_large(const Path & /*archive_path*/,
                                              ArchiveTooLargeState /*state*/) noexcept
@@ -38,12 +48,15 @@ auto ModFolder::size() noexcept -> size_t
             return Skip;
         }
 
-        void process_file(ModFile /*file*/) noexcept override { size += 1; }
+        void process_file(ModFile /*file*/) noexcept override
+        {
+            size.fetch_add(1, std::memory_order_relaxed);
+        }
     };
 
     auto iterator = SizeIterator{};
     iterate(iterator);
-    return iterator.size;
+    return iterator.size.load(std::memory_order_relaxed);
 }
 
 void ModFolder::iterate(ModFolderIterator &iterator) noexcept
@@ -107,21 +120,12 @@ void ModFolder::iterate(ModFolderIterator &iterator) noexcept
     return target;
 }
 
-/// Multiple users reported freezing. This should let other threads run.
-/// There is probably a better way, but I don't know it
-void reduce_cpu_usage() noexcept
-{
-    std::this_thread::sleep_for(std::chrono::nanoseconds(5));
-}
-
 void transform_loose_file(const Path &absolute_path,
                           const Path &dir,
                           ModFolderTransformer &transformer) noexcept
 {
     if (transformer.stop_requested())
         return;
-
-    reduce_cpu_usage();
 
     const auto relative_path = absolute_path.lexically_relative(dir);
 
@@ -143,38 +147,35 @@ void transform_loose_file(const Path &absolute_path,
            == ModFolderIteratorBase::ArchiveTooLargeAction::Skip;
 }
 
-[[nodiscard]] auto transform_archive_file_inner(ModFolderTransformer &transformer,
-                                                std::atomic_bool &any_file_changed,
-                                                bsa::Archive::value_type &pair) noexcept
+void transform_archive_file_inner(ModFolderTransformer &transformer,
+                                  std::atomic_bool &any_file_changed,
+                                  bsa::Archive::value_type &pair)
 {
-    return [&transformer, &any_file_changed, &pair] {
-        if (transformer.stop_requested())
-            return;
+    if (transformer.stop_requested())
+        return;
 
-        reduce_cpu_usage();
+    auto &[relative_path, file] = pair;
 
-        auto &[relative_path, file] = pair;
+    auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
+        [&pair]() -> tl::expected<std::vector<std::byte>, common::Error> {
+            auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
+            if (!pair.second.write(buffer))
+                // TODO: better error here?
+                return tl::make_unexpected(common::Error(std::error_code(errno, std::system_category())));
 
-        auto file_data = common::Lazy<tl::expected<std::vector<std::byte>, common::Error>>(
-            [&pair]() -> tl::expected<std::vector<std::byte>, common::Error> {
-                auto buffer = binary_io::any_ostream{binary_io::memory_ostream{}};
-                if (!pair.second.write(buffer))
-                    // TODO: better error here?
-                    return tl::make_unexpected(common::Error(std::error_code(errno, std::system_category())));
+            return buffer.get<binary_io::memory_ostream>().rdbuf();
+        });
 
-                return buffer.get<binary_io::memory_ostream>().rdbuf();
-            });
+    auto transformed = transformer.transform_file(ModFile{relative_path, file_data});
+    if (transformed)
+    {
+        const bool res = file.read(*transformed);
+        if (!res)
+            transformer.failed_to_read_transformed_file(relative_path, *transformed);
 
-        auto transformed = transformer.transform_file(ModFile{relative_path, file_data});
-        if (transformed)
-        {
-            const bool res = file.read(*transformed);
-            if (!res)
-                transformer.failed_to_read_transformed_file(relative_path, *transformed);
-
-            any_file_changed = any_file_changed || res;
-        }
-    };
+        if (res)
+            any_file_changed.store(true);
+    }
 }
 
 [[nodiscard]] auto change_archive_version_if_needed(
@@ -190,8 +191,7 @@ void transform_loose_file(const Path &absolute_path,
 
 void transform_archive_file(const Path &archive_path,
                             ModFolderTransformer &transformer,
-                            const bsa::Settings &bsa_settings,
-                            common::ThreadPool &thread_pool) noexcept
+                            const bsa::Settings &bsa_settings)
 {
     if (const auto arch_size = file_size(archive_path); arch_size > bsa_settings.max_size)
     {
@@ -208,19 +208,17 @@ void transform_archive_file(const Path &archive_path,
         return;
     }
 
-    auto archive                      = std::move(*opt_arch);
-    std::atomic_bool any_file_changed = false;
-    std::vector<std::future<void>> futs;
-    for (auto &pair : archive)
-    {
-        if (transformer.stop_requested())
-            return;
+    auto archive          = std::move(*opt_arch);
+    auto any_file_changed = std::atomic_bool{false};
+    auto archive_members  = std::vector<bsa::Archive::value_type *>{};
+    archive_members.reserve(archive.size());
+    for (auto &member : archive)
+        archive_members.push_back(&member);
 
-        auto fut = thread_pool.submit_task(transform_archive_file_inner(transformer, any_file_changed, pair));
-        futs.push_back(std::move(fut));
-    }
-    flux::for_each(futs, [](auto &&fut) { fut.wait(); });
-    // TODO: there might be an exception in fut. Should we ignore it?
+    // A random-access range lets the parallel backend split map-backed archives efficiently.
+    common::for_each_mt(archive_members, [&transformer, &any_file_changed](auto *member) {
+        transform_archive_file_inner(transformer, any_file_changed, *member);
+    });
 
     if (transformer.stop_requested())
         return;
@@ -243,7 +241,7 @@ void transform_archive_file(const Path &archive_path,
     if (transformer.stop_requested())
         return;
 
-    if (any_file_changed || version_changed.value_or(false))
+    if (any_file_changed.load() || version_changed.value_or(false))
     {
         // Change the extension of the archive if needed
         auto path = archive_path;
@@ -274,23 +272,24 @@ void ModFolder::transform(ModFolderTransformer &transformer) noexcept
                      .map([](auto &&e) { return e.path(); })
                      .to<std::vector>();
 
-    std::vector<std::future<void>> futs;
+    std::vector<std::future<void>> tasks;
     for (const auto &file_path : files)
     {
         if (transformer.stop_requested())
-            return;
+            break;
 
         if (is_arch(file_path) && ignore_existing_archives_)
             continue;
 
-        futs.push_back(thread_pool_.submit_task([this, &file_path, &is_arch, &transformer] {
+        tasks.push_back(thread_pool_.submit_task([this, file_path, &is_arch, &transformer] {
             if (is_arch(file_path)) [[unlikely]]
-                transform_archive_file(file_path, transformer, bsa_settings_, thread_pool_);
+                transform_archive_file(file_path, transformer, bsa_settings_);
             else [[likely]]
                 transform_loose_file(file_path, dir_, transformer);
         }));
     }
-    flux::for_each(futs, [](auto &&fut) { fut.wait(); });
-    // TODO: there might be an exception in fut. Should we ignore it?
+
+    flux::for_each(tasks, [](auto &task) { task.wait(); });
+    // TODO: there might be an exception in a task. Should we ignore it?
 };
 } // namespace btu::modmanager
