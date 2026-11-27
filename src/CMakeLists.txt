@@ -74,22 +74,22 @@ add_library(
 add_library("btu::btu" ALIAS "${PROJECT_NAME}")
 
 find_path(UTF8H_INCLUDE_DIRS "utf8h/utf8.h" REQUIRED)
+find_path(FLUX_INCLUDE_DIRS "flux.hpp" REQUIRED)
+find_path(BSHOSHANY_THREAD_POOL_INCLUDE_DIRS "BS_thread_pool.hpp" REQUIRED)
 target_include_directories(
   "${PROJECT_NAME}" SYSTEM
   PUBLIC "$<BUILD_INTERFACE:${UTF8H_INCLUDE_DIRS}>"
-         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+         "$<BUILD_INTERFACE:${FLUX_INCLUDE_DIRS}>"
+         "$<BUILD_INTERFACE:${BSHOSHANY_THREAD_POOL_INCLUDE_DIRS}>")
 
 find_package(bsa CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE bsa::bsa)
-
-find_path(FLUX_INCLUDE_DIRS "flux.hpp")
-target_include_directories("${PROJECT_NAME}" PRIVATE ${FLUX_INCLUDE_DIRS})
+target_link_libraries("${PROJECT_NAME}" PUBLIC bsa::bsa)
 
 find_package(tl-expected CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE tl::expected)
+target_link_libraries("${PROJECT_NAME}" PUBLIC tl::expected)
 
 find_package(nifly CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE nifly)
+target_link_libraries("${PROJECT_NAME}" PUBLIC nifly)
 
 find_package(directxtex CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PUBLIC Microsoft::DirectXTex)
@@ -97,21 +97,17 @@ target_link_libraries("${PROJECT_NAME}" PUBLIC Microsoft::DirectXTex)
 find_package(bc7enc CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE bc7enc::bc7enc)
 
-find_path(BSHOSHANY_THREAD_POOL_INCLUDE_DIRS "BS_thread_pool.hpp")
-target_include_directories("${PROJECT_NAME}"
-                           PRIVATE ${BSHOSHANY_THREAD_POOL_INCLUDE_DIRS})
-
 find_package(mpsc_channel CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE mpsc::mpsc_channel)
+target_link_libraries("${PROJECT_NAME}" PUBLIC mpsc::mpsc_channel)
 
 find_package(nlohmann_json CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries("${PROJECT_NAME}" PUBLIC nlohmann_json::nlohmann_json)
 
 find_package(reproc++ CONFIG REQUIRED)
 target_link_libraries("${PROJECT_NAME}" PRIVATE reproc++)
 
 find_package(crunch2 CONFIG REQUIRED)
-target_link_libraries("${PROJECT_NAME}" PRIVATE crunch::crunch2)
+target_link_libraries("${PROJECT_NAME}" PUBLIC crunch::crunch2)
 
 set_target_properties("${PROJECT_NAME}" PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties("${PROJECT_NAME}" PROPERTIES LINKER_LANGUAGE CXX)
@@ -134,15 +130,15 @@ target_compile_options(
 target_compile_options("${PROJECT_NAME}"
                        PUBLIC "$<$<CXX_COMPILER_ID:MSVC>:/Zc:__cplusplus>")
 
+include(GNUInstallDirs)
+
 target_include_directories(
   "${PROJECT_NAME}" SYSTEM
   PUBLIC "$<BUILD_INTERFACE:${INCLUDE_DIR}>"
          "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
   PRIVATE "$<BUILD_INTERFACE:${INCLUDE_DIR}>"
           "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-
 include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
 
 install(TARGETS "${PROJECT_NAME}" EXPORT "${PROJECT_NAME}-targets")
 
