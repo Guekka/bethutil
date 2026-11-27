@@ -8,6 +8,7 @@
 #include <flux.hpp>
 
 #include <functional>
+#include <vector>
 
 namespace btu::bsa {
 using AllowFilePred = std::function<bool(const Path &dir, fs::directory_entry const &file_info)>;
@@ -21,6 +22,19 @@ struct PackSettings
 
     std::optional<AllowFilePred> allow_file_pred = std::nullopt;
 };
+
+struct PackPreview
+{
+    /// Paths relative to PackSettings::input_dir.
+    std::vector<Path> standard_files;
+    /// Paths relative to PackSettings::input_dir; empty if no texture archives are supported.
+    std::vector<Path> texture_files;
+};
+
+/// Lists files selected by pack() without reading file content or compressing.
+/// The paths are relative to PackSettings::input_dir. This does not predict archive
+/// splitting, which depends on post-compression file sizes.
+[[nodiscard]] auto list_pack_preview(const PackSettings &settings) noexcept -> PackPreview;
 
 [[nodiscard]] auto pack(PackSettings settings) noexcept -> flux::generator<Archive &&>;
 
