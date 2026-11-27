@@ -50,6 +50,9 @@ jobs:
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare vcpkg binary cache
+        run: mkdir -p "$VCPKG_DEFAULT_BINARY_CACHE"
+
       - name: Configure & Build
         working-directory: ${{ github.workspace }}/bethutil
         shell: 'nix develop -c bash -e {0}'
