@@ -50,7 +50,7 @@ TEST_CASE("Pack preview matches packed files", "[src]")
 {
     using namespace btu::bsa;
 
-    const auto temp_dir = TempPath(btu::fs::temp_directory_path() / "bsa_pack_preview");
+    const auto temp_dir  = TempPath(btu::fs::temp_directory_path() / "bsa_pack_preview");
     const auto input_dir = temp_dir.path() / "input";
     btu::fs::create_directories(input_dir / "meshes");
     btu::fs::create_directories(input_dir / "textures" / "interface");
@@ -74,9 +74,10 @@ TEST_CASE("Pack preview matches packed files", "[src]")
             .input_dir     = input_dir,
             .game_settings = game_settings,
             .compress      = Compression::No,
-            .allow_file_pred = [](const Path &, const btu::fs::directory_entry &entry) {
-                return entry.path().filename() != "filtered.nif";
-            },
+            .allow_file_pred =
+                [](const Path &, const btu::fs::directory_entry &entry) {
+                    return entry.path().filename() != "filtered.nif";
+                },
         };
 
         auto preview = list_pack_preview(pack_settings);
