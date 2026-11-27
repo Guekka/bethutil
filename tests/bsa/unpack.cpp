@@ -78,7 +78,7 @@ TEST_CASE("Unpack preview lists extraction and skipped paths without modifying f
 
     const auto actual_preview = list_unpack_preview(UnpackSettings{.file_path                = archive_path,
                                                                    .overwrite_existing_files = false,
-                                                                   .extract_to_dir           = actual_output_dir});
+                                                                   .extract_to_dir = actual_output_dir});
     REQUIRE(actual_preview.has_value());
     CHECK(actual_preview->files_to_extract == std::vector<Path>{"meshes/b.nif"});
     CHECK(actual_preview->skipped_files == std::vector<Path>{"meshes/a.nif"});
@@ -92,8 +92,8 @@ TEST_CASE("Unpack preview lists extraction and skipped paths without modifying f
     REQUIRE(actual_existing_after.has_value());
     CHECK(*actual_existing_after == *actual_existing_before);
     const auto actual_relative_path = std::vector<Path>{"meshes/a.nif"};
-    const auto existing_matches =
-        btu::common::find_matching_paths_icase(actual_output_dir, actual_relative_path);
+    const auto existing_matches     = btu::common::find_matching_paths_icase(actual_output_dir,
+                                                                         actual_relative_path);
     REQUIRE(existing_matches.size() == 1);
     CHECK(btu::fs::exists(existing_matches.front()));
     const auto extracted_file = btu::common::read_file(actual_output_dir / "meshes" / "b.nif");

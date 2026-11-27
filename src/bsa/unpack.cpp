@@ -61,8 +61,7 @@ namespace {
 }
 } // namespace
 
-auto list_unpack_preview(const UnpackSettings &settings) noexcept
-    -> tl::expected<UnpackPreview, common::Error>
+auto list_unpack_preview(const UnpackSettings &settings) noexcept -> tl::expected<UnpackPreview, common::Error>
 {
     auto archive = Archive::read(settings.file_path);
     if (!archive)
@@ -78,7 +77,7 @@ auto unpack(UnpackSettings sets) noexcept -> tl::expected<void, Error>
         if (!arch)
             return tl::make_unexpected(Error(BsaErr::FailedToReadArchive));
 
-        const auto &root = sets.extract_to_dir.value_or(sets.file_path.parent_path());
+        const auto &root   = sets.extract_to_dir.value_or(sets.file_path.parent_path());
         const auto preview = make_unpack_preview(*arch, sets);
         auto skipped_paths = std::unordered_set<std::u8string>{};
         skipped_paths.reserve(preview.skipped_files.size());
