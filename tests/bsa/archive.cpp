@@ -18,6 +18,26 @@ TEST_CASE("Load and save to same location works", "[src]")
     REQUIRE(btu::common::compare_directories(dir / "in", dir / "out"));
 }
 
+TEST_CASE("failed archive rewrite preserves the original")
+{
+    const Path dir = "bsa_load_save";
+    TempPath temp{dir};
+    btu::fs::create_directories(temp.path());
+
+    const auto source = dir / "in" / "arch.bsa";
+    const auto path   = temp.path() / "arch.bsa";
+    btu::fs::copy_file(source, path);
+
+    const auto blocked_temp_path = path.parent_path() / (path.filename().u8string() + u8".tmp");
+    btu::fs::create_directories(blocked_temp_path);
+    create_file(blocked_temp_path / "marker");
+
+    auto arch = btu::bsa::Archive::read(path);
+    REQUIRE(arch);
+    CHECK_FALSE(std::move(*arch).write(path));
+    CHECK(btu::common::compare_files(source, path));
+}
+
 TEST_CASE("set archive version", "[src]")
 {
     GIVEN("An archive with a file")
