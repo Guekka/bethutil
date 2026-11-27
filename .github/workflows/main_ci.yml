@@ -7,9 +7,11 @@ on:
       - '**/*.cpp'
       - '**/*.hpp'
       - '**/CMakeLists.txt'
-      - '**/CMakePresets.txt'
+      - '**/CMakePresets.json'
       - '**/cmake/**'
       - '**/vcpkg.json'
+      - 'flake.lock'
+      - 'flake.nix'
       - '.github/workflows/main_ci.yml'
       - 'codecov.yml'
 
@@ -19,9 +21,11 @@ on:
       - '**/*.cpp'
       - '**/*.hpp'
       - '**/CMakeLists.txt'
-      - '**/CMakePresets.txt'
+      - '**/CMakePresets.json'
       - '**/cmake/**'
       - '**/vcpkg.json'
+      - 'flake.lock'
+      - 'flake.nix'
       - '.github/workflows/main_ci.yml'
       - 'codecov.yml'
     tags-ignore:
@@ -36,54 +40,34 @@ env:
 jobs:
   linux:
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        config: [ gcc ]
-        include:
-          - config: gcc
-            version: '16'
 
     steps:
       - uses: actions/checkout@v7.0.1
         with:
           path: bethutil
 
-      - uses: lukka/get-cmake@v4.5.1
+      - uses: cachix/install-nix-action@v32.1.0
         with:
-          cmakeVersion: 4.5.1
-          ninjaVersion: 1.13.2
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up GCC
-        uses: egor-tensin/setup-gcc@v2.0.3
-        with:
-          version: ${{ matrix.version }}
-
-      - name: Setup Environment
-        run: |
-          echo "GCOV=gcov-${{ matrix.version }}" >> $GITHUB_ENV
-
-          sudo apt install gcovr liblz4-dev zlib1g-dev -y
-
-      - uses: lukka/run-vcpkg@v11.6
-        with:
-          vcpkgJsonGlob: ${{ github.workspace }}/bethutil/vcpkg.json
-          vcpkgGitCommitId: 7281d8d64321f945f296e696d8561f68c8186c67
+      - name: Prepare vcpkg binary cache
+        run: mkdir -p "$VCPKG_DEFAULT_BINARY_CACHE"
 
       - name: Configure & Build
         working-directory: ${{ github.workspace }}/bethutil
+        shell: 'nix develop -c bash -e {0}'
         run: |
           cmake --preset ninja-linux -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBETHUTIL_BUILD_DOCS=OFF
           cmake --build build
 
       - name: Test
-        working-directory: ${{ github.workspace }}/bethutil/build
-        env:
-          gcovr: gcovr -r .. . --coveralls --exclude-unreachable-branches --exclude-function-lines --exclude-throw-branches
+        working-directory: ${{ github.workspace }}/bethutil
+        shell: 'nix develop -c bash -e {0}'
         run: |
-          (cd tests && ./tests)
-          ${{ env.gcovr }} -f ".*/src/.*" -f ".*/include/btu/.*" -o src.json
+          (cd build/tests && ./tests)
+          (cd build && gcovr -r .. . --coveralls --exclude-unreachable-branches --exclude-function-lines --exclude-throw-branches -f ".*/src/.*" -f ".*/include/btu/.*" -o src.json)
 
-          find -type f -name *.gcda | xargs rm
+          (cd build && find -type f -name *.gcda | xargs rm)
 
       - name: Collect code coverage
         uses: codecov/codecov-action@v7.1.1
@@ -127,7 +111,7 @@ jobs:
       - uses: lukka/run-vcpkg@v11.6
         with:
           vcpkgJsonGlob: '**/bethutil/vcpkg.json'
-          vcpkgGitCommitId: 7281d8d64321f945f296e696d8561f68c8186c67
+          vcpkgGitCommitId: 9eec002df1cd109f8f104cd966a763daf9751489
 
       - name: (main) Configure & Build
         working-directory: ${{ github.workspace }}/bethutil
