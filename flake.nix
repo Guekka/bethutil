@@ -23,8 +23,11 @@
             pkgs.pkg-config
             pkgs.vcpkg
             pkgs.gcc
+            pkgs.gcovr
             pkgs.libgccjit
+            pkgs.lz4
             pkgs.zip
+            pkgs.zlib
           ];
           shellHook = ''
             export VCPKG_ROOT="${pkgs.vcpkg}/share/vcpkg"

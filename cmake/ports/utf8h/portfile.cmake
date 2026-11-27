@@ -4,11 +4,11 @@ vcpkg_from_github(
   REPO
   sheredom/utf8.h
   REF
-  a6cd7d4329e9336518d2e2a449d4f3cb8def54cc
+  85d200e67b0d2c09e6ef2549ebf72e9ba6c6d73a
   SHA512
-  265777c433ee9b6ec6cf30cd29728424a53beda7c7ddd3be8230ccdf6748d9f25c6473068a47c1d24e1e9c431097e12aeda5f7ad31a35df5f33d8a1e46af4c79
+  7dbd2d58102f5d5d705a0586c9a0b7862b44e5bb59e3b845ab9ec96640d044613068675a23fa567dda80725a17bb4f3675ca3e2200f545b7395e8ebf800216e8
   HEAD_REF
-  master)
+  main)
 
 file(COPY "${SOURCE_PATH}/utf8.h"
      DESTINATION "${CURRENT_PACKAGES_DIR}/include/utf8h")
