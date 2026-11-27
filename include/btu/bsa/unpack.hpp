@@ -7,6 +7,8 @@
 #include <btu/common/error.hpp>
 #include <btu/common/filesystem.hpp>
 
+#include <vector>
+
 namespace btu::bsa {
 
 struct UnpackSettings
@@ -16,6 +18,20 @@ struct UnpackSettings
     bool overwrite_existing_files      = false;
     std::optional<Path> extract_to_dir = std::nullopt;
 };
+
+struct UnpackPreview
+{
+    /// Archive-relative paths that would be extracted.
+    std::vector<Path> files_to_extract;
+    /// Archive-relative paths skipped because a case-insensitive match already exists.
+    std::vector<Path> skipped_files;
+};
+
+/// Lists paths selected by unpack() without extracting files or removing the archive.
+/// Paths are relative to the extraction directory. Existing paths are skipped when
+/// overwrite_existing_files is false.
+[[nodiscard]] auto list_unpack_preview(const UnpackSettings &settings) noexcept
+    -> tl::expected<UnpackPreview, common::Error>;
 
 [[nodiscard]] auto unpack(UnpackSettings sets) noexcept -> tl::expected<void, common::Error>;
 
